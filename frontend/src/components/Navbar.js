@@ -46,7 +46,7 @@ const Navbar = () => {
             Thể Loại
           </Link>
           <Link
-            to="/"
+            to="/upload"
             class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
           >
             Upload tài liệu
