@@ -12,7 +12,7 @@ const Hero = () => {
           Mọi tài liệu mà bạn chia sẽ đều đáng quý
           </p>
           <a
-            href="#"
+            href="/upload"
             class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white bg-blue-400 border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:text-white dark:border-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
           >
             Upload tài liệu
