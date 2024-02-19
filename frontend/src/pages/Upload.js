@@ -6,6 +6,7 @@ export const Upload = () => {
     <div>
       <h2 className='text-3xl font-bold'>Upload the document</h2>
       <DragDropFile />
+      <h3>Nhập tên đề tài</h3>
       <input type="text" name="" id="" />
     </div>
   )

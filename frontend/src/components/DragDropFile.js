@@ -24,6 +24,7 @@ const DragDropFile = () => {
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       // handleFiles(e.dataTransfer.files);
+      // console.log(e.dataTransfer.files)
     }
   };
   

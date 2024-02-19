@@ -9,3 +9,11 @@ create table document(
     subject_name text(50) not null,
     teacher_id int not null
 );
+create table user(
+	id int primary key auto_increment,
+    user_id int not null,
+    user_name text(200) not null,
+    department_id int not null,
+    password text(200) not null,
+    role text(50) not null
+);
