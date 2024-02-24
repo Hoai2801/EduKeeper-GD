@@ -1,57 +1,221 @@
-create database documentDB;
-use documentDB;
+-- MySQL dump 10.13  Distrib 8.0.35, for Win64 (x86_64)
+--
+-- Host: localhost    Database: documentdb
+-- ------------------------------------------------------
+-- Server version	8.0.35
 
-create table department(
-                           id int primary key auto_increment,
-                           department_name varchar(200) not null
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-create table category(
-                         id int primary key auto_increment,
-                         category_name varchar(200) not null
-);
+--
+-- Table structure for table `access`
+--
 
-create table users(
-                      id int primary key auto_increment,
-                      user_id int not null,
-                      user_name varchar(200) not null,
-                      department_id int not null,
-                      password varchar(200) not null,
-                      role varchar(50) not null,
-                      foreign key (department_id) references department(id)
-);
+DROP TABLE IF EXISTS `access`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `access` (
+                          `id` int NOT NULL AUTO_INCREMENT,
+                          `user_id` int NOT NULL,
+                          `document_id` int NOT NULL,
+                          PRIMARY KEY (`id`),
+                          KEY `user_id` (`user_id`),
+                          KEY `document_id` (`document_id`),
+                          CONSTRAINT `access_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+                          CONSTRAINT `access_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-create table teacher(
-                        id int primary key auto_increment,
-                        teacher_name varchar(200) not null
-);
+--
+-- Dumping data for table `access`
+--
 
-create table subject(
-                        id int primary key auto_increment,
-                        subject_name varchar(50) not null
-);
+LOCK TABLES `access` WRITE;
+/*!40000 ALTER TABLE `access` DISABLE KEYS */;
+/*!40000 ALTER TABLE `access` ENABLE KEYS */;
+UNLOCK TABLES;
 
-create table document(
-                         id int primary key auto_increment,
-                         user_id int not null,
-                         document_name varchar(200) not null,
-                         slug varchar(300) not null,
-                         document_type varchar(200) not null,
-                         document_size float not null,
-                         upload_date date not null,
-                         content text not null,
-                         department_id int not null,
-                         subject_name varchar(50) not null,
-                         teacher_id int not null,
-                         category_id int not null,
-                         foreign key (department_id) references department(id),
-                         foreign key (category_id) references category(id)
-);
+--
+-- Table structure for table `category`
+--
 
-create table access(
-                       id int primary key auto_increment,
-                       user_id int not null,
-                       document_id int not null,
-                       foreign key (user_id) references users(id),
-                       foreign key (document_id) references document(id)
-);
+DROP TABLE IF EXISTS `category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `category` (
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `category_name` varchar(200) NOT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `idx_category_name` (`category_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `category`
+--
+
+LOCK TABLES `category` WRITE;
+/*!40000 ALTER TABLE `category` DISABLE KEYS */;
+/*!40000 ALTER TABLE `category` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `department`
+--
+
+DROP TABLE IF EXISTS `department`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `department` (
+                              `id` int NOT NULL AUTO_INCREMENT,
+                              `department_name` varchar(200) NOT NULL,
+                              PRIMARY KEY (`id`),
+                              KEY `idx_department_name` (`department_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `department`
+--
+
+LOCK TABLES `department` WRITE;
+/*!40000 ALTER TABLE `department` DISABLE KEYS */;
+/*!40000 ALTER TABLE `department` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `document`
+--
+
+DROP TABLE IF EXISTS `document`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `document` (
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `user_id` int NOT NULL,
+                            `document_name` varchar(200) NOT NULL,
+                            `slug` varchar(300) NOT NULL,
+                            `document_type` varchar(200) NOT NULL,
+                            `document_size` float NOT NULL,
+                            `upload_date` date NOT NULL,
+                            `content` text NOT NULL,
+                            `department_name` varchar(200) DEFAULT NULL,
+                            `subject_name` varchar(50) NOT NULL,
+                            `category_name` varchar(200) DEFAULT NULL,
+                            `teacher_name` varchar(200) NOT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `document_ibfk_3` (`teacher_name`),
+                            KEY `document_ibfk_4` (`subject_name`),
+                            KEY `document_ibfk_1` (`department_name`),
+                            KEY `document_ibfk_2` (`category_name`),
+                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`department_name`) REFERENCES `department` (`department_name`),
+                            CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_name`) REFERENCES `category` (`category_name`),
+                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`teacher_name`) REFERENCES `teacher` (`teacher_name`),
+                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`subject_name`) REFERENCES `subject` (`subject_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `document`
+--
+
+LOCK TABLES `document` WRITE;
+/*!40000 ALTER TABLE `document` DISABLE KEYS */;
+/*!40000 ALTER TABLE `document` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `subject`
+--
+
+DROP TABLE IF EXISTS `subject`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `subject` (
+                           `id` int NOT NULL AUTO_INCREMENT,
+                           `subject_name` varchar(50) NOT NULL,
+                           PRIMARY KEY (`id`),
+                           KEY `idx_subject_name` (`subject_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subject`
+--
+
+LOCK TABLES `subject` WRITE;
+/*!40000 ALTER TABLE `subject` DISABLE KEYS */;
+/*!40000 ALTER TABLE `subject` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `teacher`
+--
+
+DROP TABLE IF EXISTS `teacher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `teacher` (
+                           `id` int NOT NULL AUTO_INCREMENT,
+                           `teacher_name` varchar(200) NOT NULL,
+                           PRIMARY KEY (`id`),
+                           KEY `idx_teacher_name` (`teacher_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `teacher`
+--
+
+LOCK TABLES `teacher` WRITE;
+/*!40000 ALTER TABLE `teacher` DISABLE KEYS */;
+/*!40000 ALTER TABLE `teacher` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+                         `id` int NOT NULL AUTO_INCREMENT,
+                         `user_id` int NOT NULL,
+                         `user_name` varchar(200) NOT NULL,
+                         `department_id` int NOT NULL,
+                         `password` varchar(200) NOT NULL,
+                         `role` varchar(50) NOT NULL,
+                         PRIMARY KEY (`id`),
+                         KEY `department_id` (`department_id`),
+                         CONSTRAINT `users_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-02-22 18:41:39

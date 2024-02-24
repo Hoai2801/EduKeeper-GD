@@ -27,7 +27,7 @@ const Home = () => {
               <Post />
               <Post />
               <div className='flex justify-center'>
-                  <button onClick={null} className='text-white bg-blue-300 rounded-md p-4'>Xem thêm</button>
+                  <button onClick={null} className='text-white bg-blue-400 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
               </div>
             </div>
         </div>
