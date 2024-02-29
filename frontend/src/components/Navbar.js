@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
   const user = 1;
 
-  const [isShow, setIsShown] = useState(false);
+  const [isShowProfile, setIsShownProfile] = useState(false);
+  const [isShowDepartment, setIsShownDepartment] = useState(false);
+  const [isShowBook, setIsShownBook] = useState(false);
+  const [isShowCategory, setIsShownCategory] = useState(false);
   const [isSubMenShow, setIsSubMenuShown] = useState(false);
 
   return (
@@ -24,30 +27,68 @@ const Navbar = () => {
           <Link
             to="/"
             class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
+            onMouseEnter={() => setIsShownDepartment(false)}
           >
             Trang chủ
           </Link>
           <Link
-            to="/"
-            class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
+            to="/nganh"
+            class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
           >
-            Ngành
+            <div className="" onMouseEnter={() => {
+              setIsShownDepartment(true)
+              setIsShownCategory(false)
+              setIsShownBook(false)
+              }}>
+              <p className="group-hover/department:text-blue-700">
+                Ngành
+              </p>
+              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowDepartment ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
+                <p>IT</p>
+                <p>CNTT</p>
+              </div>
+            </div>
           </Link>
           <Link
-            to="/"
-            class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
+            to="/book"
+            class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
           >
-            Sách
+            <div className="" onMouseEnter={() => {
+              setIsShownBook(true)
+              setIsShownDepartment(false)
+              setIsShownCategory(false)}
+              }>
+              <p className="group-hover/department:text-blue-700">
+            Sách/Giáo trình
+              </p>
+              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowBook ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
+                <p>IT</p>
+                <p>CNTT</p>
+              </div>
+            </div>
           </Link>
           <Link
-            to="/"
-            class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
+            to="/category"
+            class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
           >
+            <div className="" onMouseEnter={() => {
+              setIsShownCategory(true)
+              setIsShownDepartment(false)
+              setIsShownBook(false)}
+            }>
+              <p className="group-hover/department:text-blue-700">
             Thể Loại
+              </p>
+              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
+                <p>IT</p>
+                <p>CNTT</p>
+              </div>
+            </div>
           </Link>
           <Link
             to="/upload"
             class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
+            onMouseEnter={() => setIsShownCategory(false)}
           >
             Upload tài liệu
           </Link>
@@ -67,7 +108,7 @@ const Navbar = () => {
           <>
             <div
               class="pt-1 relative group mr-0 w-[500px] justify-end lg:flex hidden"
-              onMouseEnter={() => setIsShown(true)}
+              onMouseEnter={() => setIsShownProfile(true)}
             >
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"
@@ -75,10 +116,9 @@ const Navbar = () => {
                 className="w-10 min-w-10 mt-[-5px] h-10"
               />
               <div
-                className={` ${
-                  isShow ? "flex" : "hidden"
-                } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
-                onMouseLeave={() => setIsShown(false)}
+                className={` ${isShowProfile ? "flex" : "hidden"
+                  } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
+                onMouseLeave={() => setIsShownProfile(false)}
               >
                 <Link>Profile</Link>
                 <Link>Dang xuat</Link>
@@ -91,9 +131,8 @@ const Navbar = () => {
                   alt=""
                 />
                 <div
-                  className={` ${
-                    isSubMenShow ? "flex" : "hidden"
-                  } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
+                  className={` ${isSubMenShow ? "flex" : "hidden"
+                    } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
                   onMouseLeave={() => setIsSubMenuShown(false)}
                 >
                   <Link>Profile</Link>
