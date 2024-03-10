@@ -1,4 +1,4 @@
 package com.GDU.backend.repositories;
 
-public interface AccessRepo {
+public interface AccessRepository {
 }

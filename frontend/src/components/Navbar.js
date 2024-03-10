@@ -123,7 +123,7 @@ const Navbar = () => {
                   } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
                 onMouseLeave={() => setIsShownProfile(false)}
               >
-                <Link>Profile</Link>
+                <Link to={"/profile"}>Profile</Link>
                 <Link>Dang xuat</Link>
               </div>
             </div>
@@ -138,7 +138,7 @@ const Navbar = () => {
                     } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
                   onMouseLeave={() => setIsSubMenuShown(false)}
                 >
-                  <Link>Profile</Link>
+                  <Link to={"/profile"}>Profile</Link>
                   <Link>Dang xuat</Link>
                 </div>
               </div>

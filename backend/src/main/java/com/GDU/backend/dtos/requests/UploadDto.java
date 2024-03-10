@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Data
 @Builder
 public class UploadDto {
@@ -13,5 +15,5 @@ public class UploadDto {
     private String subject;
     private String category;
     private String teacherId;
-    private MultipartFile document;
+    private List<MultipartFile> helloFile;
 }
