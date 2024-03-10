@@ -11,6 +11,9 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1/document")
 @Log4j2
+
+/** @deprecated */
+@Deprecated
 public class UploadController {
     
     // <-- example how to get document content -->

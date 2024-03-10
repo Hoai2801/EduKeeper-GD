@@ -34,12 +34,13 @@ const Navbar = () => {
           <Link
             to="/nganh"
             class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            onMouseEnter={() => {
               setIsShownDepartment(true)
               setIsShownCategory(false)
               setIsShownBook(false)
-              }}>
+              }}
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
                 Ngành
               </p>
@@ -52,12 +53,13 @@ const Navbar = () => {
           <Link
             to="/book"
             class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            onMouseEnter={() => {
               setIsShownBook(true)
               setIsShownDepartment(false)
               setIsShownCategory(false)}
-              }>
+              }
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
             Sách/Giáo trình
               </p>
@@ -70,12 +72,13 @@ const Navbar = () => {
           <Link
             to="/category"
             class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            onMouseEnter={() => {
               setIsShownCategory(true)
               setIsShownDepartment(false)
               setIsShownBook(false)}
-            }>
+            }
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
             Thể Loại
               </p>

@@ -10,5 +10,8 @@ public class UploadDto {
     private Long userId;
     private String documentName;
     private String department;
+    private String subject;
+    private String category;
+    private String teacherId;
     private MultipartFile document;
 }

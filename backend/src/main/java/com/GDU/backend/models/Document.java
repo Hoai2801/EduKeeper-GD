@@ -19,7 +19,7 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToMany(mappedBy = "document")
+    @OneToMany(mappedBy = "id")
     private List<Access> access;
 
     private String slug;
