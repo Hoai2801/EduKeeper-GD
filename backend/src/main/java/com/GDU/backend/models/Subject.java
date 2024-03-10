@@ -18,4 +18,6 @@ public class Subject {
 
     @Column(name = "subject_name", nullable = false, length = 200)
     private String subject_name;
+
+
 }

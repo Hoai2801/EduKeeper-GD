@@ -18,9 +18,9 @@ public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @OneToMany(mappedBy = "document")
-    private List<Access> access;
+//
+//    @OneToMany(mappedBy = "document")
+//    private List<Access> access;
 
     private String slug;
 
@@ -32,5 +32,8 @@ public class Document {
 
     private String content;
 
-    private String subject_name;
+
+
+
+
 }

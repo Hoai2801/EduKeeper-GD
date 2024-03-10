@@ -16,11 +16,12 @@ public class Access {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users userID;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private Users userID;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "document_name")
+//    private Document document;
 
-    @ManyToOne
-    @JoinColumn(name = "document_id")
-    private Document documentID;
 }
