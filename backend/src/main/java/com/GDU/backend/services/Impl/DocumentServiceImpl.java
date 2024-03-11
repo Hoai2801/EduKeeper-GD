@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +26,9 @@ import java.util.Date;
 public class DocumentServiceImpl implements DocumentService {
     private final SubjectRepository subjectRepository;
     private final DocumentRepository documentRepository;
+
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
+
 
     /**
      * Uploads a document based on the provided UploadDto
@@ -62,18 +66,40 @@ public class DocumentServiceImpl implements DocumentService {
                 .department(department)
                 .upload_date(LocalDate.now())
                 .build();
-        
+        String fileName = System.currentTimeMillis() + "_" + uploadDto.getDocument().getOriginalFilename();
+        File destFile = new File(UPLOAD_DIR + fileName);
+
+        // Save the uploaded document to the file system
+        MultipartFile multipartFile = uploadDto.getDocument();
+        Path uploadDir = Paths.get(UPLOAD_DIR);
+        try {
+            Files.createDirectories(uploadDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        newDocument.setPath(destFile.getAbsolutePath());
         // Save the new document to the document repository
         documentRepository.save(newDocument);
 
         // Return a success message
-        return "Document uploaded successfully";
+        return destFile.getAbsolutePath();
     }
 
     @Override
     public Document getDocumentById(Long id) {
         return documentRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Document not found"));
+    }
+
+    @Override
+    public Document getDocumentBySlug(String slug) {
+        return documentRepository.getDocumentBySlug(slug);
     }
 
 }
