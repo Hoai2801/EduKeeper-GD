@@ -34,12 +34,13 @@ const Navbar = () => {
           <Link
             to="/nganh"
             class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            onMouseEnter={() => {
               setIsShownDepartment(true)
               setIsShownCategory(false)
               setIsShownBook(false)
-              }}>
+              }}
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
                 Ngành
               </p>
@@ -52,12 +53,13 @@ const Navbar = () => {
           <Link
             to="/book"
             class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            onMouseEnter={() => {
               setIsShownBook(true)
               setIsShownDepartment(false)
               setIsShownCategory(false)}
-              }>
+              }
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
             Sách/Giáo trình
               </p>
@@ -70,12 +72,13 @@ const Navbar = () => {
           <Link
             to="/category"
             class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            onMouseEnter={() => {
               setIsShownCategory(true)
               setIsShownDepartment(false)
               setIsShownBook(false)}
-            }>
+            }
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
             Thể Loại
               </p>
@@ -120,7 +123,7 @@ const Navbar = () => {
                   } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
                 onMouseLeave={() => setIsShownProfile(false)}
               >
-                <Link>Profile</Link>
+                <Link to={"/profile"}>Profile</Link>
                 <Link>Dang xuat</Link>
               </div>
             </div>
@@ -135,7 +138,7 @@ const Navbar = () => {
                     } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
                   onMouseLeave={() => setIsSubMenuShown(false)}
                 >
-                  <Link>Profile</Link>
+                  <Link to={"/profile"}>Profile</Link>
                   <Link>Dang xuat</Link>
                 </div>
               </div>

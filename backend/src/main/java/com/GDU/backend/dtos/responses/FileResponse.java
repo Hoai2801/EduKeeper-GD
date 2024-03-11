@@ -1,24 +1,20 @@
-package com.GDU.backend.models;
+package com.GDU.backend.dtos.responses;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.GDU.backend.models.*;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.core.io.Resource;
 
+import java.lang.reflect.Type;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "document")
-public class Document {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class FileResponse {
     private String title;
-    
+
     private String slug;
 
     private String document_type;
@@ -28,30 +24,32 @@ public class Document {
     private LocalDate upload_date;
 
     private String path;
-    
+
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private Teacher teacherID;
-    
+
     @ManyToOne
     @JoinColumn(name = "department")
     private Department department;
-    
+
     @ManyToOne
     @JoinColumn(name = "subject")
     private Subject subject;
-    
+
     @ManyToOne
     @JoinColumn(name = "category")
     private Category category;
-    
+
     private int views;
-    
+
     private int download;
-    
+
     private int helpfull;
-    
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User userID;
+    
+    private Type file;
 }

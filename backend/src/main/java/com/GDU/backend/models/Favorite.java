@@ -4,21 +4,19 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "access")
-public class Access {
+@Table(name = "favorite")
+public class Favorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private Users userID;
+    private User userID;
 
     @ManyToOne
     @JoinColumn(name = "document_id")
