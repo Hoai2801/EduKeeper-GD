@@ -1,12 +1,7 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.dtos.requests.UploadDto;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/document")

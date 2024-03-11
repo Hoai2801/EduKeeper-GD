@@ -1,19 +1,79 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.dtos.requests.UploadDto;
+import com.GDU.backend.dtos.requests.UploadDTO;
+import com.GDU.backend.exceptions.ResourceNotFoundException;
+import com.GDU.backend.models.*;
+import com.GDU.backend.repositories.DocumentRepository;
+import com.GDU.backend.repositories.SubjectRepository;
 import com.GDU.backend.services.DocumentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
+    private final SubjectRepository subjectRepository;
+    private final DocumentRepository documentRepository;
+
+    /**
+     * Uploads a document based on the provided UploadDto
+     *
+     * @param uploadDto the data transfer object containing document information
+     * @return a string indicating the success of the document upload
+     */
     @Override
-    public String uploadDocument(UploadDto uploadDto) {
-        // TODO: implement upload document
-        // TODO: convert name of document to slug
-        // TODO: calculate document size
-        // TODO: get document type
-        // TODO: get upload now
-        // TODO: save document
-        return "Success";
+    public String uploadDocument(UploadDTO uploadDto) {
+        // Create a new User instance based on the provided userId
+        User user = User.builder().id(uploadDto.getUserId()).build();
+        Teacher teacher = Teacher.builder().id(uploadDto.getTeacherId()).build();
+
+        // Retrieve the existing subject based on the provided subject id
+        Subject existingSubject = subjectRepository.findById(uploadDto.getSubject())
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
+
+        Category category = Category.builder().id(uploadDto.getCategory()).build();
+        
+        Department department = Department.builder().id(uploadDto.getDepartment()).build();
+
+        // Create a new Document instance with the provided document information
+        Document newDocument = Document.builder()
+                .userID(user)
+                .title(uploadDto.getTitle())
+                .slug(
+                        uploadDto.getTitle().replace(" ", "-").toLowerCase() 
+                                + "-" + new Date().getTime())
+                .document_type(uploadDto.getDocument().getContentType())
+                // Calculate and set the document size in megabytes
+                .document_size(uploadDto.getDocument().getSize() / 1_000_000)
+                .subject(existingSubject)
+                .teacherID(teacher)
+                .category(category)
+                .department(department)
+                .upload_date(LocalDate.now())
+                .build();
+        
+        // Save the new document to the document repository
+        documentRepository.save(newDocument);
+
+        // Return a success message
+        return "Document uploaded successfully";
     }
+
+    @Override
+    public Document getDocumentById(Long id) {
+        return documentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Document not found"));
+    }
+
 }

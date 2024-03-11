@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -14,7 +12,7 @@ import lombok.*;
 public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(name = "teacher_name", nullable = false, length = 200)
     private String teacher_name;
