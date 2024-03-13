@@ -9,13 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class UploadDTO {
     private Long userId;
-    @NotNull(message = "Title cannot be null")
     private String title;
     private Long department;
     private Long subject;
     private Long category;
     private Long teacherId;
     
-//    @NotNull
+    @NotNull
     private MultipartFile document;
 }

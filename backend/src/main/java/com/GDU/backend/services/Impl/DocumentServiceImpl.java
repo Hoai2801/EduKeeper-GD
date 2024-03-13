@@ -9,6 +9,9 @@ import com.GDU.backend.services.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,7 +43,6 @@ public class DocumentServiceImpl implements DocumentService {
     public String uploadDocument(UploadDTO uploadDto) {
         // Create a new User instance based on the provided userId
         User user = User.builder().id(uploadDto.getUserId()).build();
-        Teacher teacher = Teacher.builder().id(uploadDto.getTeacherId()).build();
 
         // Retrieve the existing subject based on the provided subject id
         Subject existingSubject = subjectRepository.findById(uploadDto.getSubject())
@@ -61,7 +63,7 @@ public class DocumentServiceImpl implements DocumentService {
                 // Calculate and set the document size in megabytes
                 .document_size(uploadDto.getDocument().getSize() / 1_000_000)
                 .subject(existingSubject)
-                .teacherID(teacher)
+                .teacherID(User.builder().id(1L).build())
                 .category(category)
                 .department(department)
                 .upload_date(LocalDate.now())
@@ -93,8 +95,8 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Document getDocumentById(Long id) {
-        return documentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Document not found"));
+        return documentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
     }
 
     @Override

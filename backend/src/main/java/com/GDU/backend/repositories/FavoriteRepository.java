@@ -1,4 +1,4 @@
 package com.GDU.backend.repositories;
 
-public interface AccessRepository {
+public interface FavoriteRepository {
 }

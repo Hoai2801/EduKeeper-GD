@@ -2,10 +2,12 @@ package com.GDU.backend.services;
 
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.models.Document;
+import org.springframework.core.io.Resource;
 
 public interface DocumentService {
     String uploadDocument(UploadDTO uploadDto);
     Document getDocumentById(Long id);
 
     Document getDocumentBySlug(String slug);
+
 }

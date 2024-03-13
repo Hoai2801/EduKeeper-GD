@@ -28,30 +28,29 @@ public class Document {
     private LocalDate upload_date;
 
     private String path;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User userID;
     
     @ManyToOne
     @JoinColumn(name = "teacher_id")
-    private Teacher teacherID;
+    private User teacherID;
     
     @ManyToOne
-    @JoinColumn(name = "department")
+    @JoinColumn(name = "department_id")
     private Department department;
     
     @ManyToOne
-    @JoinColumn(name = "subject")
+    @JoinColumn(name = "subject_id")
     private Subject subject;
     
     @ManyToOne
-    @JoinColumn(name = "category")
+    @JoinColumn(name = "category_id")
     private Category category;
     
     private int views;
     
     private int download;
     
-    private int helpfull;
-    
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User userID;
 }
