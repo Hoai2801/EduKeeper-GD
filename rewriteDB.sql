@@ -13,7 +13,6 @@ CREATE TABLE `department` (
 
 INSERT INTO `department` (`department_name`)
 VALUES
-	('Toàn khoa'),
     ('Công nghệ thông tin'),
     ('Kỹ thuật phần mềm'),
     ('Mạng máy tính và truyền thông dữ liệu'),
@@ -45,54 +44,53 @@ CREATE TABLE `specialized` (
                                CONSTRAINT `specialized_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
 );
 
-INSERT INTO `specialized` (`specialized_name`, `department_id`)
-VALUES
-	('Toàn ngành', 1),
-    ('Khai thác dữ liệu lớn', '2'),
-    ('Lập trình kết nối vạn vật_IOT', '2'),
-    ('An toàn thông tin mạng', '2'),
-    ('Đồ họa kỹ thuật số', '2'),
-    ('Thiết kế vi mạch', '2'),
-    ('Kỹ thuật phần mềm', '3'),
-    ('Mạng máy tính và truyền thông dữ liệu', '4'),
-    ('Quản trị nguồn nhân lực', '5'),
-    ('Quản trị doanh nghiệp', '5'),
-    ('Quản trị vận hành', '5'),
-    ('Quản trị khởi nghiệp', '5'),
-    ('Quản trị bán lẻ', '5'),
-    ('Kinh doanh bất động sản', '5'),
-    ('Quản trị dịch vụ hàng không', '5'),
-    ('Marketing kỹ thuật số', '6'),
-    ('Quản trị truyền thông và thương hiệu', '6'),
-    ('Quản trị tài chính', '7'),
-    ('Tín dụng ngân hàng', '7'),
-    ('Tài chính và thanh toán quốc tế', '7'),
-    ('Ngoại thương', '8'),
-    ('Kinh doanh xuất nhập khẩu', '8'),
-    ('Thương mại điện tử', '9'),
-    ('Quản trị cơ sở lưu trú', '10'),
-    ('Quản trị dịch vụ ăn uống', '10'),
-    ('Logistics và Quản lý chuỗi cung ứng', '11'),
-    ('Quản trị dịch vụ du lịch và lữ hành', '12'),
-    ('Kế toán', '13'),
-    ('Luật kinh doanh', '14'),
-    ('Luật thương mại quốc tế', '14'),
-    ('Tiếng Anh thương mại', '15'),
-    ('Tiếng Anh biên phiên dịch', '15'),
-    ('Tiếng Anh du lịch', '15'),
-    ('Văn hóa và ngôn ngữ Nhật Bản', '16'),
-    ('Văn hóa và ngôn ngữ Hàn Quốc', '16'),
-    ('Văn hóa và ngôn ngữ Trung Quốc', '16'),
-    ('Truyền thông giao tiếp', '17'),
-    ('Truyền hình điện ảnh quảng cáo', '17'),
-    ('Xây dụng - Quản trị kênh truyền thông độc lập', '17'),
-    ('Quan hệ công chúng', '18');
+insert into `specialized` (`specialized_name`, `department_id`)
+values
+    ('Khai thác dữ liệu lớn', '1'),
+    ('Lập trình kết nối vạn vật_IOT', '1'),
+    ('An toàn thông tin mạng', '1'),
+    ('Đồ họa kỹ thuật số', '1'),
+    ('Thiết kế vi mạch', '1'),
+    ('Kỹ thuật phần mềm', '2'),
+    ('Mạng máy tính và truyền thông dữ liệu', '3'),
+    ('Quản trị nguồn nhân lực', '4'),
+    ('Quản trị doanh nghiệp', '4'),
+    ('Quản trị vận hành', '4'),
+    ('Quản trị khởi nghiệp', '4'),
+    ('Quản trị bán lẻ', '4'),
+    ('Kinh doanh bất động sản', '4'),
+    ('Quản trị dịch vụ hàng không', '4'),
+    ('Marketing kỹ thuật số', '5'),
+    ('Quản trị truyền thông và thương hiệu', '5'),
+    ('Quản trị tài chính', '6'),
+    ('Tín dụng ngân hàng', '6'),
+    ('Tài chính và thanh toán quốc tế', '6'),
+    ('Ngoại thương', '7'),
+    ('Kinh doanh xuất nhập khẩu', '7'),
+    ('Thương mại điện tử', '8'),
+    ('Quản trị cơ sở lưu trú', '9'),
+    ('Quản trị dịch vụ ăn uống', '9'),
+    ('Logistics và Quản lý chuỗi cung ứng', '10'),
+    ('Quản trị dịch vụ du lịch và lữ hành', '11'),
+    ('Kế toán', '12'),
+    ('Luật kinh doanh', '13'),
+    ('Luật thương mại quốc tế', '13'),
+    ('Tiếng Anh thương mại', '14'),
+    ('Tiếng Anh biên phiên dịch', '14'),
+    ('Tiếng Anh du lịch', '14'),
+    ('Văn hóa và ngôn ngữ Nhật Bản', '15'),
+    ('Văn hóa và ngôn ngữ Hàn Quốc', '15'),
+    ('Văn hóa và ngôn ngữ Trung Quốc', '15'),
+    ('Truyền thông giao tiếp', '16'),
+    ('Truyền hình điện ảnh quảng cáo', '16'),
+    ('Xây dụng - Quản trị kênh truyền thông độc lập', '16'),
+    ('Quan hệ công chúng', '17');
 
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
                          `id` int NOT NULL AUTO_INCREMENT,
-                         `username` varchar(200) NOT NULL,
+                         `user_name` varchar(200) NOT NULL,
                          `department_id` smallint NOT NULL,
                          `password` varchar(200) NOT NULL,
                          `role` varchar(50) NOT NULL,
@@ -101,7 +99,7 @@ CREATE TABLE `users` (
                          CONSTRAINT `users_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
 );
 
-INSERT INTO users(username, department_id, password, role) value('hoai', 1, 'password', 'ADMIN');
+INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN');
 
 DROP TABLE IF EXISTS `category`;
 
@@ -134,12 +132,12 @@ CREATE TABLE `subject` (
 INSERT INTO subject(subject_name) values('Toan'), ('AV');
 
 -- lưu trữ môn học nào thuộc khoa nào 
-CREATE TABLE `subject_specialized` (
+CREATE TABLE `subject_department` (
                                       `subject_id` smallint NOT NULL,
-                                      `specialized_id` smallint NOT NULL,
-                                      PRIMARY KEY (`subject_id`, `specialized_id`),
+                                      `department_id` smallint NOT NULL,
+                                      PRIMARY KEY (`subject_id`, `department_id`),
                                       FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
-                                      FOREIGN KEY (`specialized_id`) REFERENCES `specialized` (`id`)
+                                      FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
 );
 
 DROP TABLE IF EXISTS `document`;
@@ -150,12 +148,12 @@ CREATE TABLE `document` (
                             `user_id` int NOT NULL,
                             `title` varchar(200) NOT NULL,
                             `slug` varchar(300) NOT NULL,
-                            `document_type` varchar(10) NOT NULL,
+                            `document_type` varchar(30) NOT NULL,
                             `document_size` smallint NOT NULL,
                             `upload_date` date NOT NULL,
 							-- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
-                            `department_id` smallint DEFAULT NULL,
+                            `specialized_id` smallint DEFAULT NULL,
                             `subject_id` smallint NOT NULL,
                             `category_id` tinyint DEFAULT NULL,
                             `teacher_id` int NOT NULL,
@@ -164,10 +162,10 @@ CREATE TABLE `document` (
                             PRIMARY KEY (`id`),
                             KEY `document_ibfk_3` (`teacher_id`),
                             KEY `document_ibfk_4` (`subject_id`),
-                            KEY `document_ibfk_1` (`department_id`),
+                            KEY `document_ibfk_1` (`specialized_id`),
                             KEY `document_ibfk_2` (`category_id`),
                             KEY `document_ibfk_5` (`user_id`),
-                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`),
+                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`specialized_id`) REFERENCES `specialized` (`id`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
                             CONSTRAINT `document_ibfk_3` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`),
                             CONSTRAINT `document_ibfk_4` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
