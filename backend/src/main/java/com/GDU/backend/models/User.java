@@ -14,6 +14,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(name = "user_name")
     private String username;
     
     @ManyToOne
@@ -22,6 +23,7 @@ public class User {
     
     private String password;
     
+    @Enumerated(EnumType.STRING)
     private Role role;
     
 }

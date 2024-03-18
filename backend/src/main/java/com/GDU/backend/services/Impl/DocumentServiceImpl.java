@@ -50,9 +50,10 @@ public class DocumentServiceImpl implements DocumentService {
 
         Category category = Category.builder().id(uploadDto.getCategory()).build();
         
-        Department department = Department.builder().id(uploadDto.getDepartment()).build();
+        Specialized specialized = Specialized.builder().id(uploadDto.getSpecialized()).build();
 
         // Create a new Document instance with the provided document information
+        System.out.println(uploadDto.getDocument().getSize());
         Document newDocument = Document.builder()
                 .userID(user)
                 .title(uploadDto.getTitle())
@@ -63,9 +64,10 @@ public class DocumentServiceImpl implements DocumentService {
                 // Calculate and set the document size in megabytes
                 .document_size(uploadDto.getDocument().getSize() / 1_000_000)
                 .subject(existingSubject)
+                // User with role "TEACHER"
                 .teacherID(User.builder().id(1L).build())
                 .category(category)
-                .department(department)
+                .specialized(specialized)
                 .upload_date(LocalDate.now())
                 .build();
         String fileName = System.currentTimeMillis() + "_" + uploadDto.getDocument().getOriginalFilename();

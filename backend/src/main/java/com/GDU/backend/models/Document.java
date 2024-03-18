@@ -38,8 +38,8 @@ public class Document {
     private User teacherID;
     
     @ManyToOne
-    @JoinColumn(name = "department_id")
-    private Department department;
+    @JoinColumn(name = "specialized_id")
+    private Specialized specialized;
     
     @ManyToOne
     @JoinColumn(name = "subject_id")

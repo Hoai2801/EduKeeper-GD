@@ -53,7 +53,7 @@ public class DocumentController {
         }
     }
    
-    @PostMapping("")
+    @PostMapping
     @Validated
     @Async
     public CompletableFuture<ResponseEntity<String>> uploadDocument(
