@@ -7,11 +7,6 @@ import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.repositories.SubjectRepository;
 import com.GDU.backend.services.DocumentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.env.Environment;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.PathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +18,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +27,6 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
-
 
     /**
      * Uploads a document based on the provided UploadDto
@@ -49,7 +44,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
 
         Category category = Category.builder().id(uploadDto.getCategory()).build();
-        
+
         Department department = Department.builder().id(uploadDto.getDepartment()).build();
 
         // Create a new Document instance with the provided document information
@@ -57,13 +52,13 @@ public class DocumentServiceImpl implements DocumentService {
                 .userID(user)
                 .title(uploadDto.getTitle())
                 .slug(
-                        uploadDto.getTitle().replace(" ", "-").toLowerCase() 
+                        uploadDto.getTitle().replace(" ", "-").toLowerCase()
                                 + "-" + new Date().getTime())
                 .document_type(uploadDto.getDocument().getContentType())
                 // Calculate and set the document size in megabytes
                 .document_size(uploadDto.getDocument().getSize() / 1_000_000)
                 .subject(existingSubject)
-                .teacherID(User.builder().id(1L).build())
+                .teacherID(User.builder().id(uploadDto.getTeacherId()).build())
                 .category(category)
                 .department(department)
                 .upload_date(LocalDate.now())
@@ -90,6 +85,7 @@ public class DocumentServiceImpl implements DocumentService {
         documentRepository.save(newDocument);
 
         // Return a success message
+
         return destFile.getAbsolutePath();
     }
 
@@ -102,6 +98,58 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public Document getDocumentBySlug(String slug) {
         return documentRepository.getDocumentBySlug(slug);
+    }
+
+    @Override
+    public String updateDownloads(Long id) {
+        Document existsDocument = documentRepository.findById(id).orElse(null);
+        if (existsDocument == null) {
+            return "Document is not existing";
+        }
+        existsDocument.setDownload(existsDocument.getDownload() + 1);
+        documentRepository.save(existsDocument);
+        return "Update downloads success";
+    }
+
+    @Override
+    public String updateViews(Long id) {
+        Document existsDocument = documentRepository.findById(id).orElse(null);
+        if (existsDocument == null) {
+            return "Document is not existing";
+        }
+        existsDocument.setViews(existsDocument.getViews() + 1);
+        documentRepository.save(existsDocument);
+        return "Update views success";
+    }
+
+    @Override
+    public List<Document> getPopularDocumentsOfThisWeek() {
+        return documentRepository.getPopularDocumentThisWeek();
+    }
+
+    @Override
+    public List<Document> getPopularDocumentsOfThisMonth() {
+        return documentRepository.getPopularDocumentThisMonth();
+    }
+
+    @Override
+    public List<Document> getDocumentsByTeacherName(String teacherName) {
+        return documentRepository.getDocumentsByTeacherName(teacherName);
+    }
+
+    @Override
+    public List<Document> getDocumentsByTeacherId(Long teacherId) {
+        return documentRepository.getDocumentsByTeacherId(teacherId);
+    }
+
+    @Override
+    public List<Document> getDocumentsByUserId(Long userId) {
+        return documentRepository.getDocumentsByUserId(userId);
+    }
+
+    @Override
+    public List<Document> getDocumentsSuggested(Long categoryId, Long departmentId, Long subjectId, String type) {
+        return documentRepository.getDocumentsSuggested(categoryId, departmentId, subjectId, type);
     }
 
 }
