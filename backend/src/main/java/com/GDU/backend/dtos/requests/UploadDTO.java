@@ -12,13 +12,15 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadDTO {
-    private Long userId;
     private String title;
     private Long specialized;
-    private Long subject;
     private Long category;
-    private Long teacherId;
-    
+    private String author;
+
+//    private Long userId;
+//    private Long subject;
+//    private Long teacherId;
+
     @NotNull
     private MultipartFile document;
 }

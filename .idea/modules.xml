@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/EduKeeper-GD.iml" filepath="$PROJECT_DIR$/.idea/EduKeeper-GD.iml" />
+<<<<<<< HEAD
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/backend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/backend.main.iml" />
+>>>>>>> bb4f7bec855d8cc3400446450b338bad7431226f
+    </modules>
+  </component>
+</project>
