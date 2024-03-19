@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/subject")
 @RequiredArgsConstructor
+@Deprecated
 public class SubjectController {
     private final SubjectServiceImpl subjectService;
 

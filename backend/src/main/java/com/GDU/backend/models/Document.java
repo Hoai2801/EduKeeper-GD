@@ -28,22 +28,13 @@ public class Document {
     private LocalDate upload_date;
 
     private String path;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User userID;
     
-    @ManyToOne
-    @JoinColumn(name = "teacher_id")
-    private User teacherID;
+    @Column(name = "author_name", nullable = false, length = 100)
+    private String author;
     
     @ManyToOne
     @JoinColumn(name = "specialized_id")
     private Specialized specialized;
-    
-    @ManyToOne
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
     
     @ManyToOne
     @JoinColumn(name = "category_id")

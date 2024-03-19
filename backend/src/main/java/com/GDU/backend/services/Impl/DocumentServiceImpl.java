@@ -41,13 +41,7 @@ public class DocumentServiceImpl implements DocumentService {
      */
     @Override
     public String uploadDocument(UploadDTO uploadDto) {
-        // Create a new User instance based on the provided userId
-        User user = User.builder().id(uploadDto.getUserId()).build();
-
-        // Retrieve the existing subject based on the provided subject id
-        Subject existingSubject = subjectRepository.findById(uploadDto.getSubject())
-                .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
-
+        // Get the category and specialized from the UploadDto
         Category category = Category.builder().id(uploadDto.getCategory()).build();
         
         Specialized specialized = Specialized.builder().id(uploadDto.getSpecialized()).build();
@@ -55,17 +49,13 @@ public class DocumentServiceImpl implements DocumentService {
         // Create a new Document instance with the provided document information
         System.out.println(uploadDto.getDocument().getSize());
         Document newDocument = Document.builder()
-                .userID(user)
                 .title(uploadDto.getTitle())
-                .slug(
-                        uploadDto.getTitle().replace(" ", "-").toLowerCase() 
+                .author(uploadDto.getAuthor())
+                .slug(uploadDto.getTitle().replace(" ", "-").toLowerCase() 
                                 + "-" + new Date().getTime())
                 .document_type(uploadDto.getDocument().getContentType())
                 // Calculate and set the document size in megabytes
                 .document_size(uploadDto.getDocument().getSize() / 1_000_000)
-                .subject(existingSubject)
-                // User with role "TEACHER"
-                .teacherID(User.builder().id(1L).build())
                 .category(category)
                 .specialized(specialized)
                 .upload_date(LocalDate.now())
@@ -92,7 +82,7 @@ public class DocumentServiceImpl implements DocumentService {
         documentRepository.save(newDocument);
 
         // Return a success message
-        return destFile.getAbsolutePath();
+        return "Document uploaded successfully";
     }
 
     @Override

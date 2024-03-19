@@ -115,37 +115,13 @@ INSERT INTO `category` (`category_name`)
 VALUES
     ('Sách'),
     ('Tiểu luận'),
-    ('Nghiên cứu khoa học'),
-    ('Powerpoint'),
-    ('Tài liệu giảng dạy');
-
-DROP TABLE IF EXISTS `subject`;
-
--- lưu trữ tiểu luận của môn học 
-CREATE TABLE `subject` (
-                           `id` smallint NOT NULL AUTO_INCREMENT,
-                           `subject_name` varchar(50) NOT NULL,
-                           PRIMARY KEY (`id`),
-                           KEY `idx_subject_name` (`subject_name`)
-);
-
-INSERT INTO subject(subject_name) values('Toan'), ('AV');
-
--- lưu trữ môn học nào thuộc khoa nào 
-CREATE TABLE `subject_department` (
-                                      `subject_id` smallint NOT NULL,
-                                      `department_id` smallint NOT NULL,
-                                      PRIMARY KEY (`subject_id`, `department_id`),
-                                      FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
-                                      FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
-);
+    ('Nghiên cứu khoa học');
 
 DROP TABLE IF EXISTS `document`;
 
 -- dùng để lưu thông tin của tài liệu 
 CREATE TABLE `document` (
                             `id` int NOT NULL AUTO_INCREMENT,
-                            `user_id` int NOT NULL,
                             `title` varchar(200) NOT NULL,
                             `slug` varchar(300) NOT NULL,
                             `document_type` varchar(30) NOT NULL,
@@ -154,22 +130,15 @@ CREATE TABLE `document` (
 							-- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
                             `specialized_id` smallint DEFAULT NULL,
-                            `subject_id` smallint NOT NULL,
                             `category_id` tinyint DEFAULT NULL,
-                            `teacher_id` int NOT NULL,
+                            `author_name` varchar(100) NOT NULL,
                             `download` int not null,
                             `views` int not null,
                             PRIMARY KEY (`id`),
-                            KEY `document_ibfk_3` (`teacher_id`),
-                            KEY `document_ibfk_4` (`subject_id`),
                             KEY `document_ibfk_1` (`specialized_id`),
                             KEY `document_ibfk_2` (`category_id`),
-                            KEY `document_ibfk_5` (`user_id`),
                             CONSTRAINT `document_ibfk_1` FOREIGN KEY (`specialized_id`) REFERENCES `specialized` (`id`),
-                            CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`),
-                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
-                            CONSTRAINT `document_ibfk_5` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+                            CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
 );
 
 DROP TABLE IF EXISTS `favorite`;
@@ -196,7 +165,6 @@ CREATE TABLE token (
                        user_id int,
                        FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
 
 
 
