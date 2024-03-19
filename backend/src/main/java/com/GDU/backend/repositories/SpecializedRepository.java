@@ -21,6 +21,6 @@ public interface SpecializedRepository extends JpaRepository<Specialized, Long> 
     @Query("SELECT d FROM Document d WHERE d.specialized.id = :specializedId ORDER BY d.id DESC")
     List<Document> getLastestDocumentsBySpecialized(Long specializedId);
 
-    @Query("SELECT d FROM Document d WHERE d.specialized.id = :specializedId AND d.upload_date >= :time")
-    List<Document> getDocumentsByDate(Long specializedId, Date time);
+//    @Query("SELECT d FROM Document d WHERE d.specialized.id = :specializedId AND d.upload_date >= :time")
+//    List<Document> getDocumentsByDate(Long specializedId, Date time);
 }

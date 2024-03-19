@@ -1,5 +1,6 @@
 package com.GDU.backend.controllers;
 
+import com.GDU.backend.dtos.requests.RecommentDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
@@ -28,7 +29,8 @@ public class DocumentController {
      * Get file by slug
      *
      * @param slug - the slug of the file
-     * @return ResponseEntity with the file and 200 status code if successful, or 500 status code if an error occurs
+     * @return ResponseEntity with the file and 200 status code if successful, or
+     *         500 status code if an error occurs
      */
     @GetMapping("/{slug}/file")
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
@@ -49,22 +51,79 @@ public class DocumentController {
         try {
             return ResponseEntity.ok(DocumentService.getDocumentBySlug(slug));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
+
    
-    @PostMapping
     @Validated
     @Async
+    @PostMapping
     public CompletableFuture<ResponseEntity<String>> uploadDocument(
-            @Valid @ModelAttribute UploadDTO uploadDto
-    ) {
+            @Valid @ModelAttribute UploadDTO uploadDto) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return ResponseEntity.ok(DocumentService.uploadDocument(uploadDto));
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading document: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Error uploading document: " + e.getMessage());
             }
         });
     }
+
+    @PutMapping("/download/{id}")
+    public ResponseEntity<?> updateDownLoad(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(DocumentService.updateDownloads(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+
+    @PutMapping("/views/{id}")
+    public ResponseEntity<?> updateViews(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(DocumentService.updateViews(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+
+    @GetMapping("/week")
+    public ResponseEntity<?> getListPopularDocumentOfWeek() {
+        try {
+            return ResponseEntity.ok(DocumentService.getPopularDocumentsOfThisWeek());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+
+    @GetMapping("/month")
+    public ResponseEntity<?> getListPopularDocumentOfMonth() {
+        try {
+            return ResponseEntity.ok(DocumentService.getPopularDocumentsOfThisMonth());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+    
+
+    @GetMapping("/userId/{id}")
+    public ResponseEntity<?> getDocumentsByUserId(@PathVariable("id") Long userId) {
+        try {
+            return ResponseEntity.ok(DocumentService.getDocumentsByUserId(userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+
+    @GetMapping("/recomment")
+    public ResponseEntity<?> getDocumentsSuggested(@RequestBody RecommentDTO recomment) {
+        try {
+            return ResponseEntity.ok(DocumentService.getDocumentsSuggested(recomment));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+
 }

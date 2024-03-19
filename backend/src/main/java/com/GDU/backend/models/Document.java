@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +17,7 @@ public class Document {
     private Long id;
 
     private String title;
-    
+
     private String slug;
 
     private String document_type;
@@ -39,9 +38,9 @@ public class Document {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-    
+
     private int views;
-    
+
     private int download;
-    
+
 }

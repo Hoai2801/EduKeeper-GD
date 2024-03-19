@@ -39,13 +39,5 @@ public class SpecializedServiceImpl implements SpecializedService {
     public int getDocumentsCountBySpecialized(Long specializedId) {
         return specializedRepository.getLastestDocumentsBySpecialized(specializedId).size();
     }
-
-    @Override
-    public List<Document> getDocumentsFromDay(Long id, Long day) {
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, (int) - day);
-        System.out.println("date = " + cal.getTime());
-        LocalDate.of(Year.now().getValue(), YearMonth.now().getMonthValue(), LocalDate.now().getDayOfMonth() - 7);
-        return specializedRepository.getDocumentsByDate(id, cal.getTime()); 
-    }
+    
 }
