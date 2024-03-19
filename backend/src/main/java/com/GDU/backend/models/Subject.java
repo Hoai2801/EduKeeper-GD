@@ -3,19 +3,19 @@ package com.GDU.backend.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "teacher")
-public class Teacher {
+@Table(name = "subject")
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @Column(name = "teacher_name", nullable = false, length = 200)
-    private String teacher_name;
+    @Column(name = "subject_name", nullable = false, length = 200)
+    private String subject_name;
 }

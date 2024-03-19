@@ -11,8 +11,8 @@ const Navbar = () => {
 
   return (
     <div className="sticky top-0 bg-white z-50">
-      <div class="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
-        <div class="flex gap-4 w-[250px] h-full">
+      <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
+        <div className="flex gap-4 w-[250px] h-full">
           <Link to="/">
             <div className="min-w-[135px]">
               <img
@@ -23,25 +23,26 @@ const Navbar = () => {
             </div>
           </Link>
         </div>
-        <div class="lg:gap-4 text-[12px] w-[700px] hidden lg:flex ">
+        <div className="lg:gap-4 text-[12px] w-[700px] hidden lg:flex ">
           <Link
             to="/"
-            class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
+            className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
             onMouseEnter={() => setIsShownDepartment(false)}
           >
             Trang chủ
           </Link>
           <Link
             to="/nganh"
-            class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
+            onMouseEnter={() => {
               setIsShownDepartment(true)
               setIsShownCategory(false)
               setIsShownBook(false)
-              }}>
+            }}
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
-                Ngành
+                Tài liệu
               </p>
               <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowDepartment ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
                 <p>IT</p>
@@ -51,15 +52,17 @@ const Navbar = () => {
           </Link>
           <Link
             to="/book"
-            class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
+            onMouseEnter={() => {
               setIsShownBook(true)
               setIsShownDepartment(false)
-              setIsShownCategory(false)}
-              }>
+              setIsShownCategory(false)
+            }
+            }
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
-            Sách/Giáo trình
+                Sách/Giáo trình
               </p>
               <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowBook ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
                 <p>IT</p>
@@ -69,15 +72,17 @@ const Navbar = () => {
           </Link>
           <Link
             to="/category"
-            class="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-          >
-            <div className="" onMouseEnter={() => {
+            className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
+            onMouseEnter={() => {
               setIsShownCategory(true)
               setIsShownDepartment(false)
-              setIsShownBook(false)}
-            }>
+              setIsShownBook(false)
+            }
+            }
+          >
+            <div className="" >
               <p className="group-hover/department:text-blue-700">
-            Thể Loại
+                Powerpoint
               </p>
               <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
                 <p>IT</p>
@@ -87,7 +92,7 @@ const Navbar = () => {
           </Link>
           <Link
             to="/upload"
-            class="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
+            className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
             onMouseEnter={() => setIsShownCategory(false)}
           >
             Upload tài liệu
@@ -107,7 +112,7 @@ const Navbar = () => {
         {user ? (
           <>
             <div
-              class="pt-1 relative group mr-0 w-[500px] justify-end lg:flex hidden"
+              className="pt-1 relative group mr-0 w-[500px] justify-end lg:flex hidden"
               onMouseEnter={() => setIsShownProfile(true)}
             >
               <img
@@ -120,7 +125,7 @@ const Navbar = () => {
                   } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
                 onMouseLeave={() => setIsShownProfile(false)}
               >
-                <Link>Profile</Link>
+                <Link to={"/profile"}>Profile</Link>
                 <Link>Dang xuat</Link>
               </div>
             </div>
@@ -135,7 +140,7 @@ const Navbar = () => {
                     } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
                   onMouseLeave={() => setIsSubMenuShown(false)}
                 >
-                  <Link>Profile</Link>
+                  <Link to={"/profile"}>Profile</Link>
                   <Link>Dang xuat</Link>
                 </div>
               </div>
@@ -143,7 +148,7 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            <div class="flex gap-5 justify-end w-full">
+            <div className="flex gap-5 justify-end w-full">
               <button
                 onClick={null}
                 className="bg-blue-400 px-5 py-1 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300"

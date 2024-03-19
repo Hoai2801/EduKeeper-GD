@@ -20,16 +20,16 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "user_name")
     private String username;
-    
+
 //    @ManyToOne
 //    @Getter
 //    @Setter
 //    @JoinColumn(name = "department_id")
 //    private Department department;
-    
+
     private String password;
 
     @Enumerated(EnumType.STRING)
