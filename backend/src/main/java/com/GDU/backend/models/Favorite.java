@@ -6,14 +6,19 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Builder
-@Table(name = "department")
-public class Department {
+@Entity
+@Table(name = "favorite")
+public class Favorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "department_name", nullable = false, length = 200)
-    private String departmentName;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User userID;
+
+    @ManyToOne
+    @JoinColumn(name = "document_id")
+    private Document documentID;
 }

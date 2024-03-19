@@ -3,12 +3,9 @@ package com.GDU.backend.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 
 @Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,23 +14,33 @@ import java.util.List;
 public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-//
-//    @OneToMany(mappedBy = "document")
-//    private List<Access> access;
+    private Long id;
+
+    private String title;
 
     private String slug;
 
     private String document_type;
 
-    private String document_size;
+    private Long document_size;
 
-    private Date upload_date;
+    private LocalDate upload_date;
 
-    private String content;
+    private String path;
 
+    @Column(name = "author_name", nullable = false, length = 100)
+    private String author;
 
+    @ManyToOne
+    @JoinColumn(name = "specialized_id")
+    private Specialized specialized;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
+    private int views;
+
+    private int download;
 
 }
