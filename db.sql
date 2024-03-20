@@ -7,29 +7,31 @@ DROP TABLE IF EXISTS `department`;
 CREATE TABLE `department` (
                               `id` smallint NOT NULL AUTO_INCREMENT,
                               `department_name` varchar(100) NOT NULL,
+                              `department_slug` varchar(100) not null,
                               PRIMARY KEY (`id`),
                               KEY `idx_department_name` (`department_name`)
 );
 
-INSERT INTO `department` (`department_name`)
+INSERT INTO `department` (`department_name`, `department_slug`)
 VALUES
-    ('Công nghệ thông tin'),
-    ('Kỹ thuật phần mềm'),
-    ('Mạng máy tính và truyền thông dữ liệu'),
-    ('Quản trị kinh doanh'),
-    ('Marketing'),
-    ('Tài chính ngân hàng'),
-    ('Kinh doanh quốc tế'),
-    ('Thương mại điện tử'),
-    ('Quản trị khách sạn'),
-    ('Logistics và Quản lý chuỗi cung ứng'),
-    ('Quản trị dịch vụ du lịch và lữ hành'),
-    ('Kế toán'),
-    ('Luật'),
-    ('Ngôn ngữ anh'),
-    ('Đông phương học'),
-    ('Truyền thông đa phương tiện'),
-    ('Quan hệ công chúng');
+    ('Công nghệ thông tin', 'cong-nghe-thong-tin'),
+    ('Kỹ thuật phần mềm', 'ky-thuat-phan-mem'),
+    ('Mạng máy tính và truyền thông dữ liệu', 'mang-may-tinh-va-truyen-thong-du-lieu'),
+    ('Quản trị kinh doanh', 'quan-tri-kinh-doanh'),
+    ('Marketing', 'marketing'),
+    ('Tài chính ngân hàng', 'tai-chinh-ngan-hang'),
+    ('Kinh doanh quốc tế', 'kinh-doanh-quoc-te'),
+    ('Thương mại điện tử', 'thuong-mai-dien-tu'),
+    ('Quản trị khách sạn', 'quan-tri-khach-san'),
+    ('Logistics và Quản lý chuỗi cung ứng', 'logistics-va-quan-ly-chuoi-cung-ung'),
+    ('Quản trị dịch vụ du lịch và lữ hành', 'quan-tri-dich-vu-du-lich-va-lu-hanh'),
+    ('Kế toán', 'ke-toan'),
+    ('Luật', 'luat'),
+    ('Ngôn ngữ anh', 'ngon-ngu-anh'),
+    ('Đông phương học', 'dong-phuong-hoc'),
+    ('Truyền thông đa phương tiện', 'truyen-thong-da-phuong-tien'),
+    ('Quan hệ công chúng', 'quan-he-cong-chung');
+
 
 
 DROP TABLE IF EXISTS `specialized`;
@@ -38,53 +40,55 @@ DROP TABLE IF EXISTS `specialized`;
 CREATE TABLE `specialized` (
                                id smallint not null auto_increment,
                                `specialized_name` varchar(50) not null,
+                               `specialized_slug` varchar(100) not null,
                                `department_id` smallint not null,
                                PRIMARY KEY (`id`),
                                KEY `department_id` (`department_id`),
                                CONSTRAINT `specialized_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
 );
 
-insert into `specialized` (`specialized_name`, `department_id`)
-values
-    ('Khai thác dữ liệu lớn', '1'),
-    ('Lập trình kết nối vạn vật_IOT', '1'),
-    ('An toàn thông tin mạng', '1'),
-    ('Đồ họa kỹ thuật số', '1'),
-    ('Thiết kế vi mạch', '1'),
-    ('Kỹ thuật phần mềm', '2'),
-    ('Mạng máy tính và truyền thông dữ liệu', '3'),
-    ('Quản trị nguồn nhân lực', '4'),
-    ('Quản trị doanh nghiệp', '4'),
-    ('Quản trị vận hành', '4'),
-    ('Quản trị khởi nghiệp', '4'),
-    ('Quản trị bán lẻ', '4'),
-    ('Kinh doanh bất động sản', '4'),
-    ('Quản trị dịch vụ hàng không', '4'),
-    ('Marketing kỹ thuật số', '5'),
-    ('Quản trị truyền thông và thương hiệu', '5'),
-    ('Quản trị tài chính', '6'),
-    ('Tín dụng ngân hàng', '6'),
-    ('Tài chính và thanh toán quốc tế', '6'),
-    ('Ngoại thương', '7'),
-    ('Kinh doanh xuất nhập khẩu', '7'),
-    ('Thương mại điện tử', '8'),
-    ('Quản trị cơ sở lưu trú', '9'),
-    ('Quản trị dịch vụ ăn uống', '9'),
-    ('Logistics và Quản lý chuỗi cung ứng', '10'),
-    ('Quản trị dịch vụ du lịch và lữ hành', '11'),
-    ('Kế toán', '12'),
-    ('Luật kinh doanh', '13'),
-    ('Luật thương mại quốc tế', '13'),
-    ('Tiếng Anh thương mại', '14'),
-    ('Tiếng Anh biên phiên dịch', '14'),
-    ('Tiếng Anh du lịch', '14'),
-    ('Văn hóa và ngôn ngữ Nhật Bản', '15'),
-    ('Văn hóa và ngôn ngữ Hàn Quốc', '15'),
-    ('Văn hóa và ngôn ngữ Trung Quốc', '15'),
-    ('Truyền thông giao tiếp', '16'),
-    ('Truyền hình điện ảnh quảng cáo', '16'),
-    ('Xây dụng - Quản trị kênh truyền thông độc lập', '16'),
-    ('Quan hệ công chúng', '17');
+INSERT INTO `specialized` (`specialized_name`, `specialized_slug`, `department_id`)
+VALUES
+('Khai thác dữ liệu lớn', 'khai-thac-du-lieu-lon', 1),
+('Lập trình kết nối vạn vật_IOT', 'lap-trinh-ket-noi-van-vat-iot', 1),
+('An toàn thông tin mạng', 'an-toan-thong-tin-mang', 1),
+('Đồ họa kỹ thuật số', 'do-hoa-ky-thuat-so', 1),
+('Thiết kế vi mạch', 'thiet-ke-vi-mach', 1),
+('Kỹ thuật phần mềm', 'ky-thuat-phan-mem', 2),
+('Mạng máy tính và truyền thông dữ liệu', 'mang-may-tinh-va-truyen-thong-du-lieu', 3),
+('Quản trị nguồn nhân lực', 'quan-tri-nguon-nhan-luc', 4),
+('Quản trị doanh nghiệp', 'quan-tri-doanh-nghiep', 4),
+('Quản trị vận hành', 'quan-tri-van-hanh', 4),
+('Quản trị khởi nghiệp', 'quan-tri-khoi-nghiep', 4),
+('Quản trị bán lẻ', 'quan-tri-ban-le', 4),
+('Kinh doanh bất động sản', 'kinh-doanh-bat-dong-san', 4),
+('Quản trị dịch vụ hàng không', 'quan-tri-dich-vu-hang-khong', 4),
+('Marketing kỹ thuật số', 'marketing-ky-thuat-so', 5),
+('Quản trị truyền thông và thương hiệu', 'quan-tri-truyen-thong-va-thuong-hieu', 5),
+('Quản trị tài chính', 'quan-tri-tai-chinh', 6),
+('Tín dụng ngân hàng', 'tin-dung-ngan-hang', 6),
+('Tài chính và thanh toán quốc tế', 'tai-chinh-va-thanh-toan-quoc-te', 6),
+('Ngoại thương', 'ngoai-thuong', 7),
+('Kinh doanh xuất nhập khẩu', 'kinh-doanh-xuat-nhap-khau', 7),
+('Thương mại điện tử', 'thuong-mai-dien-tu', 8),
+('Quản trị cơ sở lưu trú', 'quan-tri-co-so-luu-tru', 9),
+('Quản trị dịch vụ ăn uống', 'quan-tri-dich-vu-an-uong', 9),
+('Logistics và Quản lý chuỗi cung ứng', 'logistics-va-quan-ly-chuoi-cung-ung', 10),
+('Quản trị dịch vụ du lịch và lữ hành', 'quan-tri-dich-vu-du-lich-va-lu-hanh', 11),
+('Kế toán', 'ke-toan', 12),
+('Luật kinh doanh', 'luat-kinh-doanh', 13),
+('Luật thương mại quốc tế', 'luat-thuong-mai-quoc-te', 13),
+('Tiếng Anh thương mại', 'tieng-anh-thuong-mai', 14),
+('Tiếng Anh biên phiên dịch', 'tieng-anh-bien-phien-dich', 14),
+('Tiếng Anh du lịch', 'tieng-anh-du-lich', 14),
+('Văn hóa và ngôn ngữ Nhật Bản', 'van-hoa-va-ngon-ngu-nhat-ban', 15),
+('Văn hóa và ngôn ngữ Hàn Quốc', 'van-hoa-va-ngon-ngu-han-quoc', 15),
+('Văn hóa và ngôn ngữ Trung Quốc', 'van-hoa-va-ngon-ngu-trung-quoc', 15),
+('Truyền thông giao tiếp', 'truyen-thong-giao-tiep', 16),
+('Truyền hình điện ảnh quảng cáo', 'truyen-hinh-dien-anh-quang-cao', 16),
+('Xây dựng - Quản trị kênh truyền thông độc lập', 'xay-dung-quan-tri-kenh-truyen-thong-doc-lap', 16),
+('Quan hệ công chúng', 'quan-he-cong-chung', 17);
+
 
 DROP TABLE IF EXISTS `users`;
 
