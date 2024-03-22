@@ -2,6 +2,7 @@ package com.GDU.backend.services;
 
 import java.util.List;
 
+import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommentDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.models.Document;
@@ -13,6 +14,8 @@ public interface DocumentService {
 
     String updateViews(Long id);
 
+    String updateDocumentById(Long id, UploadDTO uploadDTO);
+
     Document getDocumentById(Long id);
 
     Document getDocumentBySlug(String slug);
@@ -21,9 +24,13 @@ public interface DocumentService {
 
     List<Document> getPopularDocumentsOfThisMonth();
 
-//    List<Document> getDocumentsByTeacherName(String teacherName);
-//
-//    List<Document> getDocumentsByTeacherId(Long teacherId);
+    List<Document> getDocumentsByAuthorName(String authorName);
+    //
+    // List<Document> getDocumentsByTeacherId(Long teacherId);
 
     List<Document> getDocumentsSuggested(RecommentDTO recommentDTO);
+
+    List<Document> getDocumentsBySlugSpecialized(String slug);
+
+    List<Document> getDocumentsByFilter(FilterDTO filterDTO);
 }

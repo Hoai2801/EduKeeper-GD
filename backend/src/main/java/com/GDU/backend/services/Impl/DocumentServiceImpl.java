@@ -1,11 +1,11 @@
 package com.GDU.backend.services.Impl;
 
+import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommentDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.DocumentRepository;
-import com.GDU.backend.repositories.SubjectRepository;
 import com.GDU.backend.services.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -38,11 +39,10 @@ public class DocumentServiceImpl implements DocumentService {
     public String uploadDocument(UploadDTO uploadDto) {
         // Get the category and specialized from the UploadDto
         Category category = Category.builder().id(uploadDto.getCategory()).build();
-        
+
         Specialized specialized = Specialized.builder().id(uploadDto.getSpecialized()).build();
 
         // Create a new Document instance with the provided document information
-        System.out.println(uploadDto.getDocument().getSize());
         Document newDocument = Document.builder()
                 .title(uploadDto.getTitle())
                 .author(uploadDto.getAuthor())
@@ -88,6 +88,54 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public String updateDocumentById(Long id, UploadDTO uploadDTO) {
+        Document existDocument = documentRepository.findById(id).orElse(null);
+        if (existDocument == null) {
+            return "Document not existing";
+        }
+
+        // Update document
+        existDocument
+                .setCategory(uploadDTO.getCategory() != null ? Category.builder().id(uploadDTO.getCategory()).build()
+                        : existDocument.getCategory());
+        existDocument.setAuthor(uploadDTO.getAuthor() != null ? uploadDTO.getAuthor() : existDocument.getAuthor());
+        existDocument.setTitle(uploadDTO.getTitle() != null ? uploadDTO.getTitle() : existDocument.getTitle());
+        existDocument.setSlug(uploadDTO.getTitle() != null ? uploadDTO.getTitle().replace(" ", "-").toLowerCase()
+                + "-" + new Date().getTime() : existDocument.getSlug());
+        existDocument.setSpecialized(
+                uploadDTO.getSpecialized() != null ? Specialized.builder().id(uploadDTO.getSpecialized()).build()
+                        : existDocument.getSpecialized());
+
+        // Handle Path
+        if (uploadDTO.getDocument() != null) {
+            existDocument.setDocument_type(uploadDTO.getDocument().getContentType());
+            existDocument
+                    .setDocument_size(uploadDTO.getDocument().getSize() / 1_000_000);
+
+            String fileName = System.currentTimeMillis() + "_" + uploadDTO.getDocument().getOriginalFilename();
+            File destFile = new File(UPLOAD_DIR + fileName);
+
+            // Save the uploaded document to the file system
+            MultipartFile multipartFile = uploadDTO.getDocument();
+            Path uploadDir = Paths.get(UPLOAD_DIR);
+            try {
+                Files.createDirectories(uploadDir);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            existDocument.setPath(destFile.getAbsolutePath());
+        }
+        documentRepository.save(existDocument);
+        return "Update document successfully";
+    }
+
+    @Override
     public Document getDocumentBySlug(String slug) {
         return documentRepository.getDocumentBySlug(slug);
     }
@@ -98,6 +146,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (existsDocument == null) {
             return "Document is not existing";
         }
+
         existsDocument.setDownload(existsDocument.getDownload() + 1);
         documentRepository.save(existsDocument);
         return "Update downloads success";
@@ -126,20 +175,40 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<Document> getDocumentsSuggested(RecommentDTO recommentDTO) {
-        // return list document which have a same specialized and category, title or author
+        // return list document which have a same specialized and category, title or
+        // author
         return documentRepository.getDocumentsSuggested(recommentDTO.getSpecialized(), recommentDTO.getCategory(),
                 recommentDTO.getTitle(), recommentDTO.getAuthor());
     }
 
-//    @Override
-//    public List<Document> getDocumentsByTeacherName(String teacherName) {
-//        return documentRepository.getDocumentsByTeacherName(teacherName);
-//    }
+    @Override
+    public List<Document> getDocumentsByAuthorName(String authorName) {
+        return documentRepository.getDocumentsByAuthorName(authorName);
+    }
 
-//    @Override
-//    public List<Document> getDocumentsByTeacherId(Long teacherId) {
-//        return documentRepository.getDocumentsByTeacherId(teacherId);
-//    }
+    // @Override
+    // public List<Document> getDocumentsByTeacherId(Long teacherId) {
+    // return documentRepository.getDocumentsByTeacherId(teacherId);
+    // }
 
+    @Override
+    public List<Document> getDocumentsBySlugSpecialized(String slug) {
+        return documentRepository.getDocumentsBySlugSpecialized(slug);
+    }
+
+    @Override
+    public List<Document> getDocumentsByFilter(FilterDTO filterDTO) {
+        List<Document> documents = documentRepository.getDocumentsByFilter(filterDTO.getDepartmentSlug(),
+                filterDTO.getTitle(),
+                filterDTO.getSpecializedSlug(),
+                filterDTO.getCategoryName(), filterDTO.getAuthorName());
+        if (filterDTO.getOrder().equalsIgnoreCase("ASC")) {
+            documents.sort(Comparator.comparing(Document::getUpload_date));
+        } else {
+            documents.sort(Comparator.comparing(Document::getUpload_date).reversed());
+
+        }
+        return documents;
+    }
 
 }

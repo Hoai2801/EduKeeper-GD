@@ -1,9 +1,12 @@
 package com.GDU.backend.controllers;
 
+import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommentDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
+
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
@@ -55,7 +58,6 @@ public class DocumentController {
         }
     }
 
-   
     @Validated
     @Async
     @PostMapping
@@ -69,6 +71,15 @@ public class DocumentController {
                         .body("Error uploading document: " + e.getMessage());
             }
         });
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateDocumentById(@PathVariable("id") Long id, @RequestBody UploadDTO uploadDTO) {
+        try {
+            return ResponseEntity.ok(DocumentService.updateDocumentById(id, uploadDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
     }
 
     @PutMapping("/download/{id}")
@@ -106,19 +117,18 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
-    
 
-    @GetMapping("/userId/{id}")
-    public ResponseEntity<?> getDocumentsByUserId(@PathVariable("id") Long userId) {
+    @GetMapping("/author/{name}")
+    public ResponseEntity<?> getDocumentsByUserId(@PathVariable("name") String authorName) {
         try {
-            return ResponseEntity.ok(DocumentService.getDocumentsByUserId(userId));
+            return ResponseEntity.ok(DocumentService.getDocumentsByAuthorName(authorName));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
 
-    @GetMapping("/recomment")
-    public ResponseEntity<?> getDocumentsSuggested(@RequestBody RecommentDTO recomment) {
+    @PostMapping("/recomment")
+    public ResponseEntity<?> getDocumentsSuggested(@ModelAttribute RecommentDTO recomment) {
         try {
             return ResponseEntity.ok(DocumentService.getDocumentsSuggested(recomment));
         } catch (Exception e) {
@@ -126,4 +136,22 @@ public class DocumentController {
         }
     }
 
+    // Specialized
+    @GetMapping("/specialized/{slug}")
+    public ResponseEntity<?> getDocumentsBySlugSpecialized(@PathVariable("slug") String slug) {
+        try {
+            return ResponseEntity.ok(DocumentService.getDocumentsBySlugSpecialized(slug));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+
+    @PostMapping("/filter")
+    public ResponseEntity<?> getDocumentsbyFilter(@ModelAttribute FilterDTO filter) {
+        try {
+            return ResponseEntity.ok(DocumentService.getDocumentsByFilter(filter));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
 }

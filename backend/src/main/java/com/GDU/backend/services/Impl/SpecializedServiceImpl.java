@@ -7,22 +7,16 @@ import com.GDU.backend.services.SpecializedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
-import java.time.YearMonth;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SpecializedServiceImpl implements SpecializedService {
-    private final SpecializedRepository specializedRepository; 
-    
+    private final SpecializedRepository specializedRepository;
+
     @Override
     public List<Specialized> getSpecializeds() {
-        return specializedRepository.findAllFromId(1L); 
+        return specializedRepository.findAllFromId(1L);
     }
 
     @Override
@@ -39,5 +33,5 @@ public class SpecializedServiceImpl implements SpecializedService {
     public int getDocumentsCountBySpecialized(Long specializedId) {
         return specializedRepository.getLastestDocumentsBySpecialized(specializedId).size();
     }
-    
+
 }
