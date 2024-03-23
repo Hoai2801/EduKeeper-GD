@@ -14,5 +14,4 @@ public interface SpecializedService {
 
     int getDocumentsCountBySpecialized(Long specializedId);
 
-    List<Document> getDocumentsFromDay(Long id, Long day);
 }

@@ -17,9 +17,9 @@ public class UploadDTO {
     private Long category;
     private String author;
 
-//    private Long userId;
-//    private Long subject;
-//    private Long teacherId;
+    // private Long userId;
+    // private Long subject;
+    // private Long teacherId;
 
     @NotNull
     private MultipartFile document;
