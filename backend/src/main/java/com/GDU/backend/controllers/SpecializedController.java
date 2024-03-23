@@ -34,10 +34,4 @@ public class SpecializedController {
         return specializedService.getDocumentsCountBySpecialized(specializedId);
     }
     
-    @GetMapping("/documents/{id}?day={day}")
-    public List<Document> getDocumentsByDay( @PathVariable("id") Long specializedId, @PathVariable("day") Long day) {
-        System.out.println(day);
-        return specializedService.getDocumentsFromDay(specializedId, day);
-    }
-    
 }
