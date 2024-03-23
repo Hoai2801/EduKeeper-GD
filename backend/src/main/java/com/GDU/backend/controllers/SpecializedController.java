@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/v1/specialized")
 @RequiredArgsConstructor
@@ -24,14 +25,14 @@ public class SpecializedController {
         return specializedService.getSpecializedsByDepartment(id);
     }
     
-    @GetMapping("/documents/{id}")
-    public List<Document> getDocumentsBySpecialized(@PathVariable("id") Long id) {
-        return specializedService.getDocumentsBySpecialized(id);
+    @GetMapping("/documents/{slug}")
+    public List<Document> getDocumentsBySpecialized(@PathVariable("slug") String slug) {
+        return specializedService.getDocumentsBySpecialized(slug);
     }
     
-    @GetMapping("/documents/count/{id}")
-    public int getDocumentsCountBySpecialized(@PathVariable("id") Long specializedId) {
-        return specializedService.getDocumentsCountBySpecialized(specializedId);
+    @GetMapping("/documents/count/{slug}")
+    public int getDocumentsCountBySpecialized(@PathVariable("slug") String slug) {
+        return specializedService.getDocumentsCountBySpecialized(slug);
     }
     
     @GetMapping("/documents/{id}?day={day}")

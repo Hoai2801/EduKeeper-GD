@@ -24,4 +24,7 @@ public class Specialized {
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department departmentID;
+    
+    @Column(name = "specialized_slug", nullable = false, length = 200)
+    private String specializedSlug;
 }

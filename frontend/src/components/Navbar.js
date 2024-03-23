@@ -1,13 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 const Navbar = () => {
-  const user = 1;
+  const user = 0;
+  const isAdmin = 0;
 
   const [isShowProfile, setIsShownProfile] = useState(false);
-  const [isShowDepartment, setIsShownDepartment] = useState(false);
+  const [isShowSpecialized, setIsShownSpecialized] = useState(false);
   const [isShowBook, setIsShownBook] = useState(false);
   const [isShowCategory, setIsShownCategory] = useState(false);
   const [isSubMenShow, setIsSubMenuShown] = useState(false);
+
+  const [specialized, setSpecialized] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/v1/specialized")
+      .then((res) => res.json())
+      .then((data) => {
+        setSpecialized(data);
+        // console.log(data)
+      });
+  }, [])
 
   return (
     <div className="sticky top-0 bg-white z-50">
@@ -23,19 +35,18 @@ const Navbar = () => {
             </div>
           </Link>
         </div>
-        <div className="lg:gap-4 text-[12px] w-[700px] hidden lg:flex ">
+        <div className="lg:gap-4 text-[12px] lg:min-w-[700px] hidden lg:flex">
           <Link
             to="/"
             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
-            onMouseEnter={() => setIsShownDepartment(false)}
+            onMouseEnter={() => setIsShownSpecialized(false)}
           >
             Trang chủ
           </Link>
           <Link
-            to="/nganh"
             className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
             onMouseEnter={() => {
-              setIsShownDepartment(true)
+              setIsShownSpecialized(true)
               setIsShownCategory(false)
               setIsShownBook(false)
             }}
@@ -44,9 +55,10 @@ const Navbar = () => {
               <p className="group-hover/department:text-blue-700">
                 Tài liệu
               </p>
-              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowDepartment ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
-                <p>IT</p>
-                <p>CNTT</p>
+              <div className={`w-[500px] h-[300px] overflow-scroll absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
+                {specialized && specialized.map((item, index) => (
+                  <Link to={`/specialized/${item.specializedSlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                ))}
               </div>
             </div>
           </Link>
@@ -55,7 +67,7 @@ const Navbar = () => {
             className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
             onMouseEnter={() => {
               setIsShownBook(true)
-              setIsShownDepartment(false)
+              setIsShownSpecialized(false)
               setIsShownCategory(false)
             }
             }
@@ -64,9 +76,10 @@ const Navbar = () => {
               <p className="group-hover/department:text-blue-700">
                 Sách/Giáo trình
               </p>
-              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowBook ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
-                <p>IT</p>
-                <p>CNTT</p>
+              <div className={`w-[500px] h-[300px] overflow-scroll flex flex-col absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowBook ? "" : "hidden"}`} onMouseLeave={() => setIsShownBook(false)}>
+                {specialized && specialized.map((item, index) => (
+                  <Link to={`/book/${item.specializedSlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                ))}
               </div>
             </div>
           </Link>
@@ -75,28 +88,30 @@ const Navbar = () => {
             className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
             onMouseEnter={() => {
               setIsShownCategory(true)
-              setIsShownDepartment(false)
+              setIsShownSpecialized(false)
               setIsShownBook(false)
             }
             }
           >
             <div className="" >
               <p className="group-hover/department:text-blue-700">
-                Powerpoint
+                Thể loại
               </p>
-              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownDepartment(false)}>
+              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
                 <p>IT</p>
                 <p>CNTT</p>
               </div>
             </div>
           </Link>
-          <Link
+          { isAdmin ? (
+            <Link
             to="/upload"
             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
             onMouseEnter={() => setIsShownCategory(false)}
           >
             Upload tài liệu
           </Link>
+          ) : " "}
         </div>
         <div className="w-[500px] min-w-[300px] lg:block hidden">
           <div className="">
@@ -148,13 +163,13 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            <div className="flex gap-5 justify-end w-full">
-              <button
-                onClick={null}
-                className="bg-blue-400 px-5 py-1 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300"
+            <div className="flex gap-5 justify-end w-[500px]">
+              <Link
+                to={"/login"}
+                className="bg-blue-400 px-5 py-1 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-center pt-2"
               >
                 Đăng nhập
-              </button>
+              </Link>
             </div>
           </>
         )}

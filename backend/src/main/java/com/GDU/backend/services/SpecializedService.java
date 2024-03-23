@@ -10,9 +10,9 @@ public interface SpecializedService {
 
     List<Specialized> getSpecializedsByDepartment(Long departmentID);
 
-    List<Document> getDocumentsBySpecialized(Long specializedId);
+    List<Document> getDocumentsBySpecialized(String specializedSlug);
 
-    int getDocumentsCountBySpecialized(Long specializedId);
+    int getDocumentsCountBySpecialized(String specializedSlug);
 
     List<Document> getDocumentsFromDay(Long id, Long day);
 }

@@ -126,7 +126,6 @@ DROP TABLE IF EXISTS `document`;
 -- dùng để lưu thông tin của tài liệu 
 CREATE TABLE `document` (
                             `id` int NOT NULL AUTO_INCREMENT,
-                            `user_id` int NOT NULL,
                             `title` varchar(200) NOT NULL,
                             `slug` varchar(300) NOT NULL,
                             `document_type` varchar(30) NOT NULL,
@@ -170,7 +169,6 @@ CREATE TABLE token (
                        user_id int,
                        FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
 
 
 

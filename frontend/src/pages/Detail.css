@@ -1,0 +1,171 @@
+.page {
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    padding-right: 24px;
+    padding-left: 24px; 
+}
+
+.content_at_the_top_of_the_page{
+    width: 100%;
+    height: 21px;
+    background-color: rgb(255, 255, 255);
+}
+
+.icon{
+    width: 14px;
+    height: 14px;
+}
+
+.text_data{
+    font-size: 13px;
+    font-weight: 550;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+    right: -25px;
+    top: -30px;
+}
+.data_two{
+    position: relative;
+    right: -100px;
+    top: -89px;
+}
+.data_three{
+    position: relative;
+    right: -187px;
+    top: -148.6px;
+}
+
+.character_data{
+    font-size: 14px;
+    position: relative;
+    right: -81px;
+    top: -57px;
+}
+.character_two{
+    position: relative;
+    right: -167px;
+    top: -116px;
+}   
+
+.title{
+    width: 100%;
+    height: 86px;
+    background-color: rgb(255, 255, 255);
+    position: relative;
+    top: -22px;
+}
+
+.lecturers{
+    width: 100%;
+    height: 44px;
+    background-color: rgb(255, 255, 255);
+    position: relative;
+    top: -35px;
+}
+
+.trans{
+    font-size: 16px;
+    position: relative;
+    bottom: -15px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.par{
+    text-decoration: none;
+    color: #1E7B85;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    position: relative;
+    right: -110px;
+    top: -15px;
+}
+
+.describe{
+    width: 100%;
+    height: 22px;
+    background-color: rgb(255, 255, 255);
+    margin-top: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    top: -36px;
+}
+
+.des{
+    text-decoration: none;
+    color: #1E7B85;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+}
+
+.doc_actions{
+    width: 57px;
+    height: 57px;
+    background-color: burlywood;
+    position: relative;
+    top: -36.5px;
+    float: left;
+    margin-right: 20px;
+
+}
+
+.actions_one{
+    width: 64px;
+    height: 57px;
+    background-color: rgb(255, 255, 255);
+}
+.icon_action{
+    width: 20px;
+    height: 20px;
+    position: relative;
+    right: -21px;
+    
+}
+.text_action{
+    position: relative;
+    font-size: 15px;
+    text-align: center;
+}
+
+.page_bottom{
+    width: 100%;
+    height: 65px;
+    background-color: rgb(255, 255, 255);
+    position: relative;
+    bottom: -45px;
+}
+
+.button{
+    width: 240px;
+    height: 50px;
+    background-color: #1E7B85;
+    color: white;
+    border-radius: 5px;
+    position: relative;
+    left: -462px;
+    bottom: -7px;
+    border: none;
+    outline: none;
+}
+
+.search_bar{
+    width: 160px;
+    height: 20px;
+    position: relative;
+    bottom: -15px;
+    padding-left: 20px;
+    border-radius: 4px;
+    border-color: #1E7B85;
+}
+.glass_icon{
+    width: 17px;
+    height: 17px;
+    position: relative;
+    left: -186px;
+    bottom: -19px;
+}
+.icon_arrow{
+    width: 28px;
+    height: 28px;
+    position: relative;
+    bottom: -26px;
+    left: -20px;
+}

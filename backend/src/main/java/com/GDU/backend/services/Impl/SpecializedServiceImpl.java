@@ -31,13 +31,13 @@ public class SpecializedServiceImpl implements SpecializedService {
     }
 
     @Override
-    public List<Document> getDocumentsBySpecialized(Long specializedId) {
+    public List<Document> getDocumentsBySpecialized(String specializedId) {
         return specializedRepository.getLastestDocumentsBySpecialized(specializedId);
     }
 
     @Override
-    public int getDocumentsCountBySpecialized(Long specializedId) {
-        return specializedRepository.getLastestDocumentsBySpecialized(specializedId).size();
+    public int getDocumentsCountBySpecialized(String specializedSlug) {
+        return specializedRepository.getLastestDocumentsBySpecialized(specializedSlug).size();
     }
 
     @Override

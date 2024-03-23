@@ -16,4 +16,7 @@ public class Department {
 
     @Column(name = "department_name", nullable = false, length = 200)
     private String departmentName;
+    
+    @Column(name = "department_slug", nullable = false, length = 200)
+    private String departmentSlug;
 }
