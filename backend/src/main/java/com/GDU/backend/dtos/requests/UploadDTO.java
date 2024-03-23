@@ -16,11 +16,11 @@ public class UploadDTO {
     private Long specialized;
     private Long category;
     private String author;
-    
+
 //    private Long userId;
 //    private Long subject;
 //    private Long teacherId;
-    
+
     @NotNull
     private MultipartFile document;
 }

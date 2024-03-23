@@ -27,14 +27,14 @@ public class Document {
     private LocalDate upload_date;
 
     private String path;
-    
+
     @Column(name = "author_name", nullable = false, length = 100)
     private String author;
-    
+
     @ManyToOne
     @JoinColumn(name = "specialized_id")
     private Specialized specialized;
-    
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

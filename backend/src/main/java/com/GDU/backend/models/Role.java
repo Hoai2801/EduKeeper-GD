@@ -1,5 +1,10 @@
 package com.GDU.backend.models;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum Role {
-    ADMIN, STUDENT, TEACHER
+    STUDENT,
+    TEACHER,
+    ADMIN
 }
