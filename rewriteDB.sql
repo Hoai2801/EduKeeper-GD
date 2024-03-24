@@ -91,15 +91,11 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
                          `id` int NOT NULL AUTO_INCREMENT,
                          `user_name` varchar(200) NOT NULL,
-                         `department_id` smallint NOT NULL,
                          `password` varchar(200) NOT NULL,
+                         `email` varchar(200) NOT NULL,
                          `role` varchar(50) NOT NULL,
                          PRIMARY KEY (`id`),
-                         KEY `department_id` (`department_id`),
-                         CONSTRAINT `users_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
 );
-
-INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN');
 
 DROP TABLE IF EXISTS `category`;
 
@@ -159,7 +155,7 @@ CREATE TABLE `favorite` (
 CREATE TABLE token (
                        id int AUTO_INCREMENT PRIMARY KEY,
                        token VARCHAR(255) UNIQUE NOT NULL,
-                       tokenType VARCHAR(50),
+                       token_type VARCHAR(50),
                        revoked BOOLEAN,
                        expired BOOLEAN,
                        user_id int,

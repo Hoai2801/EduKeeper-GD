@@ -1,6 +1,6 @@
 package com.GDU.backend.services;
 
-import com.GDU.backend.models.ChangePasswordRequest;
+import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;

@@ -60,7 +60,7 @@ public class DocumentController {
 
     @Validated
     @Async
-    @PostMapping
+    @PostMapping("upload")
     public CompletableFuture<ResponseEntity<String>> uploadDocument(
             @Valid @ModelAttribute UploadDTO uploadDto) {
         return CompletableFuture.supplyAsync(() -> {

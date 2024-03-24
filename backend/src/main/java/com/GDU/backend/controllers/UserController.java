@@ -1,13 +1,10 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.models.ChangePasswordRequest;
+import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import com.GDU.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -25,4 +22,5 @@ public class UserController {
         userService.changePassword(request, connectedUser);
         return ResponseEntity.ok().build();
     }
+
 }

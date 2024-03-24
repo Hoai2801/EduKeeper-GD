@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,11 +25,7 @@ public class User implements UserDetails {
     @Column(name = "user_name")
     private String username;
 
-//    @ManyToOne
-//    @Getter
-//    @Setter
-//    @JoinColumn(name = "department_id")
-//    private Department department;
+    private String email;
 
     private String password;
 

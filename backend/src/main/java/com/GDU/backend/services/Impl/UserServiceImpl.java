@@ -1,6 +1,6 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.models.ChangePasswordRequest;
+import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.UserRepository;
 import com.GDU.backend.services.UserService;

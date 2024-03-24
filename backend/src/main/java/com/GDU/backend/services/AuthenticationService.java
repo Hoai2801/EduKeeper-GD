@@ -3,6 +3,8 @@ package com.GDU.backend.services;
 import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
 import com.GDU.backend.dtos.response.AuthenticationResponse;
+import com.GDU.backend.exceptions.PermissionDenyException;
+import com.GDU.backend.models.Role;
 import com.GDU.backend.models.Token;
 import com.GDU.backend.models.TokenType;
 import com.GDU.backend.models.User;
@@ -29,12 +31,29 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest registerRequest) {
+    public AuthenticationResponse register(RegisterRequest registerRequest) throws PermissionDenyException {
+        String username = registerRequest.getUsername();
+        String email = registerRequest.getEmail();
+
+        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
+            throw new PermissionDenyException("Username or email already exists");
+        }
+
+        Role role = null;
+        try {
+            role = registerRequest.getRole();
+        } catch (IllegalArgumentException e) {
+            throw new PermissionDenyException("Invalid role");
+        }
+
+        if (role == Role.ADMIN) {
+            throw new PermissionDenyException("You cannot register an admin account");
+        }
         var user = User.builder()
                 .username(registerRequest.getUsername())
+                .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(registerRequest.getRole())
-//                .department(registerRequest.getDepartment())
                 .build();
         userRepository.save(user);
         var jwtToken = jwtService.generateToken(user);
@@ -43,7 +62,6 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
-//                .token(jwtToken)
                 .build();
     }
 
@@ -61,7 +79,6 @@ public class AuthenticationService {
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
-//                .token(jwtToken)
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();

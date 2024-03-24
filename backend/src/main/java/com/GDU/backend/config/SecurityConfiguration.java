@@ -16,6 +16,12 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
+import static com.GDU.backend.models.Permission.*;
+import static com.GDU.backend.models.Role.ADMIN;
+import static com.GDU.backend.models.Role.TEACHER;
+import static org.springframework.http.HttpMethod.*;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -26,14 +32,29 @@ public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
 
+    private static final String[] WHITE_LIST_URL = {
+            "/api/v1/auth/**",
+            "/api/v1/users/**",
+            "/api/v1/document/**",
+
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeRequests()
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
+                .authorizeHttpRequests(req ->
+                        req.requestMatchers(WHITE_LIST_URL)
+                                .permitAll()
+                                .requestMatchers("/api/v1/document/upload/**").hasAnyRole(ADMIN.name(), TEACHER.name())
+                                .requestMatchers(GET, "/api/v1/document/upload**").hasAnyAuthority(ADMIN_READ.name(), TEACHER_READ.name())
+                                .requestMatchers(POST, "/api/v1/document/upload/**").hasAnyAuthority(ADMIN_CREATE.name(), TEACHER_CREATE.name())
+                                .requestMatchers(PUT, "/api/v1/document/upload/**").hasAnyAuthority(ADMIN_UPDATE.name(), TEACHER_UPDATE.name())
+                                .requestMatchers(DELETE, "/api/v1/document/upload/**").hasAnyAuthority(ADMIN_DELETE.name(), TEACHER_DELETE.name())
+                                .anyRequest()
+                                .authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
