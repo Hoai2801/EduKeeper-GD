@@ -3,9 +3,9 @@ package com.GDU.backend.controllers;
 import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
 import com.GDU.backend.dtos.response.AuthenticationResponse;
-import com.GDU.backend.exceptions.MessagingException;
 import com.GDU.backend.services.AuthenticationService;
 import com.GDU.backend.services.ForgotPasswordService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -48,17 +48,17 @@ public class AuthController {
     public ResponseEntity<String> verifyAccount(
             @RequestParam String email,
             @RequestParam String otp) {
-        return new ResponseEntity<>(forgotPasswordService.verifyAccount(email, otp), HttpStatus.OK);
+        return ResponseEntity.ok(forgotPasswordService.verifyAccount(email, otp));
     }
     @PutMapping("/regenerate-otp")
     public ResponseEntity<String> regenerateOtp(
             @RequestParam String email) {
-        return new ResponseEntity<>(forgotPasswordService.regenerateOtp(email), HttpStatus.OK);
+        return ResponseEntity.ok(forgotPasswordService.regenerateOtp(email));
     }
 
     @PutMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(
             @RequestParam String email) throws MessagingException {
-        return new ResponseEntity<>(forgotPasswordService.forgotPassword(email), HttpStatus.OK);
+        return ResponseEntity.ok(forgotPasswordService.forgotPassword(email));
     }
 }

@@ -11,6 +11,7 @@ import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.TokenRepository;
 import com.GDU.backend.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -112,18 +113,33 @@ public class AuthenticationService {
             HttpServletResponse response
     ) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String refreshToken;
-        final String userEmail;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
-        refreshToken = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(refreshToken);
-        if (userEmail != null) {
-            var user = this.userRepository.findByUsername(userEmail)
-                    .orElseThrow();
-            if (jwtService.isTokenValid(refreshToken, user)) {
+        try {
+            final String refreshToken = authHeader.substring(7);
+            String userEmail = jwtService.extractUsername(refreshToken);
+            if (userEmail != null) {
+                var user = this.userRepository.findByUsername(userEmail)
+                        .orElseThrow();
+                if (jwtService.isTokenValid(refreshToken, user)) {
+                    var accessToken = jwtService.generateToken(user);
+                    revokeAllUserTokens(user);
+                    saveUserToken(user, accessToken);
+                    var authResponse = AuthenticationResponse.builder()
+                            .accessToken(accessToken)
+                            .refreshToken(refreshToken)
+                            .build();
+                    new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+                }
+            }
+        } catch (ExpiredJwtException ex) {
+            try {
+                String userEmail = ex.getClaims().getSubject();
+                var user = this.userRepository.findByEmail(userEmail)
+                        .orElseThrow();
                 var accessToken = jwtService.generateToken(user);
+                var refreshToken = jwtService.generateRefreshToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
                 var authResponse = AuthenticationResponse.builder()
@@ -131,7 +147,10 @@ public class AuthenticationService {
                         .refreshToken(refreshToken)
                         .build();
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
         }
     }
+
 }
