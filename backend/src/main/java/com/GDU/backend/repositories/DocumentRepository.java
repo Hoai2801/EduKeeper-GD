@@ -57,4 +57,20 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                         @Param("title") String title,
                         @Param("specializedSlug") String spicializedSlug, @Param("categoryName") String categoryName,
                         @Param("authorName") String authorName);
+
+        // Get total number of documents this year
+        @Query(value = "SELECT count(*) FROM Document d WHERE YEAR(d.upload_date) = YEAR(NOW())", nativeQuery = true)
+        Integer getNumberOfDocumentsThisYear();
+
+        // Get total number of documents from the previous year
+        @Query(value = "SELECT count(*) FROM Document d WHERE YEAR(d.upload_date) = YEAR(DATE_SUB(NOW(), INTERVAL 1 YEAR))", nativeQuery = true)
+        Integer getNumberOfDocumentPreviousYear();
+
+        // Get total number of documents this year
+        @Query(value = "SELECT count(*) FROM Document d WHERE MONTH(d.upload_date) = MONTH(NOW()) AND YEAR(d.upload_date) = YEAR(NOW())", nativeQuery = true)
+        Integer getNumberOfDocumentsThisMonth();
+
+        // Get total number of documents from the previous year
+        @Query(value = "SELECT count(*) FROM Document d WHERE MONTH(d.upload_date) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH)) AND YEAR(d.upload_date) = YEAR(NOW())", nativeQuery = true)
+        Integer getNumberOfDocumentPreviousMonth();
 }
