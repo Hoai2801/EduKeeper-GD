@@ -20,6 +20,7 @@
 // @RequiredArgsConstructor
 // public class AuthController {
 
+// <<<<<<<<< Temporary merge branch 1
 // private final AuthenticationService authenticationService;
 
 // @PostMapping("/register")
@@ -27,6 +28,10 @@
 // @RequestBody RegisterRequest request
 // ) {
 // return ResponseEntity.ok(authenticationService.register(request));
+// =========
+// String helloAuth() {
+// return "Hello user";
+// >>>>>>>>> Temporary merge branch 2
 // }
 // @PostMapping("/authenticate")
 // public ResponseEntity<AuthenticationResponse> authenticate(
