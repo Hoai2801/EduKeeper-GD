@@ -4,12 +4,10 @@ import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
 import com.GDU.backend.dtos.response.AuthenticationResponse;
 import com.GDU.backend.services.AuthenticationService;
-import com.GDU.backend.services.ForgotPasswordService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +19,6 @@ import java.io.IOException;
 public class AuthController {
 
     private final AuthenticationService authenticationService;
-    private final ForgotPasswordService forgotPasswordService;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
@@ -48,17 +45,24 @@ public class AuthController {
     public ResponseEntity<String> verifyAccount(
             @RequestParam String email,
             @RequestParam String otp) {
-        return ResponseEntity.ok(forgotPasswordService.verifyAccount(email, otp));
+        return ResponseEntity.ok(authenticationService.verifyAccount(email, otp));
     }
     @PutMapping("/regenerate-otp")
     public ResponseEntity<String> regenerateOtp(
             @RequestParam String email) {
-        return ResponseEntity.ok(forgotPasswordService.regenerateOtp(email));
+        return ResponseEntity.ok(authenticationService.regenerateOtp(email));
     }
 
     @PutMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(
-            @RequestParam String email) throws MessagingException {
-        return ResponseEntity.ok(forgotPasswordService.forgotPassword(email));
+            @RequestParam String email) {
+        return ResponseEntity.ok(authenticationService.forgotPassword(email));
+    }
+
+    @PutMapping("/set-password")
+    public ResponseEntity<String> setPassword(
+            @RequestParam String email,
+            @RequestParam String newPassword) {
+        return ResponseEntity.ok(authenticationService.setPassword(email, newPassword));
     }
 }

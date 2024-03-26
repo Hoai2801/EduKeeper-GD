@@ -31,4 +31,6 @@ public class EmailConfig {
         props.put("mail.smtp.starttls.enable", "true");
         return javaMailSender;
     }
+
+
 }

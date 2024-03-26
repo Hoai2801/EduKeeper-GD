@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class EmailUtil {
     private final JavaMailSender javaMailSender;
 
+
     public void sendOtpEmail(String email, String otp) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
@@ -19,7 +20,7 @@ public class EmailUtil {
         mimeMessageHelper.setSubject("Verify OTP");
         mimeMessageHelper.setText("""
                 <div>
-                  <a href="http://localhost:8080/verify-account?email=%s&otp=%s" target="_blank">click link to verify</a>
+                  <a href="http://localhost:8080/api/v1/auth/verify-account?email=%s&otp=%s" target="_blank">click link to verify</a>
                 </div>
                 """.formatted(email, otp), true);
 
@@ -33,12 +34,15 @@ public class EmailUtil {
         mimeMessageHelper.setSubject("Set Password");
         mimeMessageHelper.setText("""
                 <div>
-                  <a href="http://localhost:8080/set-password?email=%s" target="_blank">click link to set passowrd</a>
+                  <a href="http://localhost:8080/api/v1/auth/set-password?email=%s" target="_blank">click link to set passowrd</a>
                 </div>
                 """.formatted(email), true);
 
         javaMailSender.send(mimeMessage);
     }
+
+
+
 }
 
 

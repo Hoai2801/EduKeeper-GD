@@ -95,6 +95,8 @@ CREATE TABLE `users` (
                          `email` varchar(200) NOT NULL,
                          `role` varchar(50) NOT NULL,
                          PRIMARY KEY (`id`),
+                         `otp` varchar(20),
+                         `otp_generated_time` date
 );
 
 DROP TABLE IF EXISTS `category`;
@@ -123,7 +125,7 @@ CREATE TABLE `document` (
                             `document_type` varchar(30) NOT NULL,
                             `document_size` smallint NOT NULL,
                             `upload_date` date NOT NULL,
-							-- chứa đường dẫn đến nơi lưu file
+    -- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
                             `specialized_id` smallint DEFAULT NULL,
                             `category_id` tinyint DEFAULT NULL,

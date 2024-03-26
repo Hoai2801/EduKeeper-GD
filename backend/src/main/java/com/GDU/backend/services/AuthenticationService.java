@@ -10,8 +10,11 @@ import com.GDU.backend.models.TokenType;
 import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.TokenRepository;
 import com.GDU.backend.repositories.UserRepository;
+import com.GDU.backend.utils.EmailUtil;
+import com.GDU.backend.utils.OtpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -31,21 +36,26 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailUtil emailUtil;
+    private final OtpUtil otpUtil;
 
     public AuthenticationResponse register(RegisterRequest registerRequest) throws PermissionDenyException {
         String username = registerRequest.getUsername();
         String email = registerRequest.getEmail();
-
+        String otp = otpUtil.generateOtp();
         if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
             throw new PermissionDenyException("Username or email already exists");
         }
 
         Role role = null;
         try {
+//            emailUtil.sendOtpEmail(registerRequest.getEmail(), otp);
             role = registerRequest.getRole();
         } catch (IllegalArgumentException e) {
             throw new PermissionDenyException("Invalid role");
-        }
+        } /* catch (MessagingException e) {
+            throw new RuntimeException("Unable to send otp please try again");
+        }*/
 
         if (role == Role.ADMIN) {
             throw new PermissionDenyException("You cannot register an admin account");
@@ -153,4 +163,50 @@ public class AuthenticationService {
         }
     }
 
+    public String verifyAccount(String email, String otp) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
+        if (user.getOtp().equals(otp) && Duration.between(user.getOtpGeneratedTime(),
+                LocalDateTime.now()).getSeconds() < (1 * 60)) {
+            userRepository.save(user);
+            return "OTP verified you can login";
+        }
+        return "Please regenerate otp and try again";
+    }
+
+    public String regenerateOtp(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
+        String otp = otpUtil.generateOtp();
+        try {
+            emailUtil.sendOtpEmail(email, otp);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Unable to send otp please try again");
+        }
+        user.setOtp(otp);
+        user.setOtpGeneratedTime(LocalDateTime.now());
+        userRepository.save(user);
+        return "Email sent... please verify account within 1 minute";
+    }
+
+
+    public String forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
+        try {
+            emailUtil.sendSetPasswordEmail(email);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Unable to send set password please try again");
+        }
+        return "Email sent... please verify account within 1 minute";
+    }
+
+    public String setPassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
+        return "Set password successfully";
+    }
 }
