@@ -1,5 +1,7 @@
 package com.GDU.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.*;
 
