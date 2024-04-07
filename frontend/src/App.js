@@ -23,7 +23,7 @@ function App() {
           <Route path='/specialized/:slug' element={<Specialized />} />
         </Route>
       </Route>
-        <Route path='/dashboard' element={<Dashboard />} />
+      <Route path='/dashboard' element={<Dashboard />} />
     </Routes>
   );
 }

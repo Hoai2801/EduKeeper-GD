@@ -3,7 +3,7 @@ package com.GDU.backend.controllers;
 import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
 import com.GDU.backend.dtos.response.AuthenticationResponse;
-import com.GDU.backend.services.AuthenticationService;
+import com.GDU.backend.services.Impl.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

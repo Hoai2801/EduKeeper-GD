@@ -21,8 +21,16 @@ const Navbar = () => {
       });
   }, [])
 
+  const out = () => {
+      setIsShownSpecialized(false);
+      setIsShownBook(false);
+      setIsShownCategory(false);
+      setIsSubMenuShown(false);
+      setIsShownProfile(false);
+  }
+
   return (
-    <div className="sticky top-0 bg-white z-50">
+    <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
       <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
         <div className="flex gap-4 w-[250px] h-full">
           <Link to="/">
@@ -35,7 +43,7 @@ const Navbar = () => {
             </div>
           </Link>
         </div>
-        <div className="lg:gap-4 text-[12px] lg:min-w-[700px] hidden lg:flex">
+        <div className="lg:gap-4 text-[12px] lg:min-w-[500px] hidden lg:flex">
           <Link
             to="/"
             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
@@ -103,27 +111,30 @@ const Navbar = () => {
               </div>
             </div>
           </Link>
-          { isAdmin ? (
+          {isAdmin ? (
             <Link
-            to="/upload"
-            className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
-            onMouseEnter={() => setIsShownCategory(false)}
-          >
-            Upload tài liệu
-          </Link>
+              to="/upload"
+              className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
+              onMouseEnter={() => setIsShownCategory(false)}
+            >
+              Upload tài liệu
+            </Link>
           ) : " "}
         </div>
-        <div className="w-[500px] min-w-[300px] lg:block hidden">
-          <div className="">
-            <input
-              type="text"
-              name=""
-              id=""
-              placeholder="Nhập tên tài liệu hoặc giáo viên cần tìm"
-              className="border border-gray-600 p-4 rounded-3xl h-10 w-full"
-            />
+
+        <form className="max-w-md mx-auto w-full md:block hidden min-w-[400px] mt-[-7px]">
+          {/* <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label> */}
+          <div className="relative">
+            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <svg className="w-4 h-4 text-gray-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+              </svg>
+            </div>
+            <input type="search" id="default-search" className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Tìm sách theo tên, chủ đề..." required />
+            <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Tìm</button>
           </div>
-        </div>
+        </form>
+
         {user ? (
           <>
             <div
@@ -166,7 +177,7 @@ const Navbar = () => {
             <div className="flex gap-5 justify-end w-[500px]">
               <Link
                 to={"/login"}
-                className="bg-blue-400 px-5 py-1 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-center pt-2"
+                className="bg-blue-600 px-5 py-3 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
               >
                 Đăng nhập
               </Link>

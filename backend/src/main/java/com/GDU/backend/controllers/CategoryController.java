@@ -36,7 +36,6 @@ public class CategoryController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 
     @GetMapping("")

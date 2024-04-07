@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf';
 import './Detail.css'
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -12,7 +12,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 const Detail = () => {
   const slug = useParams().slug
   const [numPages, setNumPages] = useState();
-  const [pageNumber, setPageNumber] = useState(1);
+  const [pageNumber, setPageNumber] = useState(20);
   const [file, setFile] = useState(null);
   const [data, setData] = useState(null);
 
@@ -33,28 +33,82 @@ const Detail = () => {
         setFile(blob)
       });
 
-  }, [slug])
+      const increaseView = setTimeout(() => {
+        fetch("http://localhost:8080/api/v1/document/increase-view/" + data?.id)
+      }, 30000);
+
+      return () => clearTimeout(increaseView);
+
+  }, [slug, data?.id])
+
+  const width = window.innerWidth > 800 ? 800 : window.innerWidth - 80;
+
+  const onButtonClick = () => {
+
+    // Creating new object of PDF file
+    const fileURL =
+      window.URL.createObjectURL(new Blob([file], { type: "application/pdf" }));
+
+    // Setting various property values
+    let alink = document.createElement("a");
+    alink.href = fileURL;
+    alink.download = data?.title;
+    alink.click();
+
+    // increase download value of document
+    fetch("http://localhost:8080/api/v1/document/increase-download/" + data?.id)
+  };
 
   return (
     <div>
-      <h2 className='text-[28px] font-bold'>{data?.title}</h2>
-      <p>{file?.name}</p>
-      <Document file={`http://localhost:8080/api/v1/document/giao-trinh-mon-cong-nghe-thong-tin-1710943699142/file`} onLoadSuccess={onDocumentLoadSuccess}>
-        {Array.apply(null, Array(numPages))
-          .map((x, i) => {
-            return (
-                <Page
-                  key={i}
-                  pageNumber={i + 1}
-                  renderTextLayer={false}
-                  renderAnnotationLayer={false}
-                  // renderMode="canvas"
-                  width={900}
-                />
-            );
-          })
-        }
-      </Document>
+      <div className=''>
+        <p className='text-blue-500'><Link to={`/category/${data?.category.slug}`}>{data?.category.category_name}</Link> - <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.departmentID.departmentName}</Link> - <Link to={`/specialized/${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
+        <h2 className='text-[28px] font-bold max-w-[900px] text-justify'>{data?.title}</h2>
+        <div className='flex justify-between mt-3'>
+          <div>
+            <p>Tác giả: <span className='text-blue-500'>{data?.author}</span></p>
+            <p>Ngày đăng: {data?.upload_date}</p>
+            <p>Trang: {data?.pages}</p>
+          </div>
+          <div className='flex flex-col gap-5'>
+            <button
+              onClick={() => onButtonClick()}
+              className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Tải tài liệu</button>
+              <div className='flex gap-5'>
+                  
+            <p>Lượt xem: {data?.views}</p>
+            <p>Lượt tải về: {data?.download}</p>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
+        <Document file={file} onLoadSuccess={onDocumentLoadSuccess} className={'flex flex-col items-center'}>
+          {Array.apply(null, Array(numPages))
+            .map((x, i) => {
+              if (i <= pageNumber) {
+                return (
+                  <div className='lg:w-full w-[80%]'>
+
+                    <Page
+                      key={i}
+                      pageNumber={i + 1}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                      // renderMode="svg"
+                      width={width}
+                      className="mt-3"
+                    />
+                  </div>
+                );
+              }
+            })
+          }
+        </Document>
+        <div className='w-full h-[100px] flex justify-center align-middle mt-8'>
+          <button onClick={() => setPageNumber(pageNumber + 10)} className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm</button>
+        </div>
+      </div>
     </div>
   );
 }

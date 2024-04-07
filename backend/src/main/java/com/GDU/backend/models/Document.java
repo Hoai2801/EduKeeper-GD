@@ -43,4 +43,5 @@ public class Document {
 
     private int download;
 
+    private int pages;
 }

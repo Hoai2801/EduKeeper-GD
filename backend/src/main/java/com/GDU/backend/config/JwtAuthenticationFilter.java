@@ -1,7 +1,7 @@
 package com.GDU.backend.config;
 
 import com.GDU.backend.repositories.TokenRepository;
-import com.GDU.backend.services.JwtService;
+import com.GDU.backend.services.Impl.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

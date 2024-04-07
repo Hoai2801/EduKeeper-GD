@@ -130,6 +130,7 @@ CREATE TABLE `document` (
                             `slug` varchar(300) NOT NULL,
                             `document_type` varchar(30) NOT NULL,
                             `document_size` smallint NOT NULL,
+                            `pages` smallint not null,
                             `upload_date` date NOT NULL,
 							-- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,

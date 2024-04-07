@@ -16,17 +16,17 @@ public class SpecializedController {
     private final SpecializedServiceImpl specializedService;
     
     @GetMapping
-    public List<Specialized> getSpecializeds() {
+    public List<Specialized> getSpecializes() {
         return specializedService.getSpecializeds();
     }
     
     @GetMapping("/department/{id}")
-    public List<Specialized> getSpecializedsByDepartment(@PathVariable Long id) {
+    public List<Specialized> getSpecializesByDepartmentId(@PathVariable Long id) {
         return specializedService.getSpecializedsByDepartment(id);
     }
     
     @GetMapping("/documents/{slug}")
-    public List<Document> getDocumentsBySpecialized(@PathVariable("slug") String slug) {
+    public List<Document> getDocumentsBySpecializedSlug(@PathVariable("slug") String slug) {
         return specializedService.getDocumentsBySpecialized(slug);
     }
     
@@ -37,7 +37,6 @@ public class SpecializedController {
     
     @GetMapping("/documents/{id}?day={day}")
     public List<Document> getDocumentsByDay( @PathVariable("id") Long specializedId, @PathVariable("day") Long day) {
-        System.out.println(day);
         return specializedService.getDocumentsFromDay(specializedId, day);
     }
     

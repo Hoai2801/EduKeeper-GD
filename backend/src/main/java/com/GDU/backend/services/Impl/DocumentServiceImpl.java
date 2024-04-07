@@ -7,6 +7,7 @@ import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.services.DocumentService;
+import com.itextpdf.text.pdf.PdfReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +37,16 @@ public class DocumentServiceImpl implements DocumentService {
      * @return a string indicating the success of the document upload
      */
     @Override
-    public String uploadDocument(UploadDTO uploadDto) {
+    public String uploadDocument(UploadDTO uploadDto) throws IOException {
         // Get the category and specialized from the UploadDto
         Category category = Category.builder().id(uploadDto.getCategory()).build();
 
         Specialized specialized = Specialized.builder().id(uploadDto.getSpecialized()).build();
 
+        PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
+        int numberOfPages = pdfReader.getNumberOfPages();
+        
         // Create a new Document instance with the provided document information
-        System.out.println(uploadDto.getDocument().getSize());
         Document newDocument = Document.builder()
                 .title(uploadDto.getTitle())
                 .author(uploadDto.getAuthor())
@@ -52,6 +56,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .document_type(uploadDto.getDocument().getContentType())
                 // Calculate and set the document size in megabytes
                 .document_size(uploadDto.getDocument().getSize() / 1_000_000)
+                .pages(numberOfPages)
                 .category(category)
                 .specialized(specialized)
                 .upload_date(LocalDate.now())
@@ -90,6 +95,43 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public Document getDocumentBySlug(String slug) {
         return documentRepository.getDocumentBySlug(slug);
+    }
+
+    @Override
+    public List<Document> getMostViewedDocuments(int limit) {
+        return documentRepository.getMostViewedDocuments(limit);
+    }
+
+    @Override
+    public String deleteDocument(Long id) {
+        documentRepository.deleteById(id);
+        return "Document deleted successfully";
+    }
+
+    @Override
+    public String increaseViewCount(Long id) {
+        Document document = getDocumentById(id);
+        document.setViews(document.getViews() + 1);
+        documentRepository.save(document);
+        return "View count increased successfully"; 
+    }
+
+    @Override
+    public String increaseDownloadCount(Long id) {
+        Document document = getDocumentById(id);
+        document.setDownload(document.getDownload() + 1);
+        documentRepository.save(document);
+        return "Download count increased successfully";
+    }
+
+    @Override
+    public List<Document> getMostDownloadedDocuments(int limit) {
+        return documentRepository.getMostDownloadedDocuments(limit);
+    }
+
+    @Override
+    public List<Document> getLastedDocuments(int limit) {
+        return documentRepository.getLastedDocuments(limit);
     }
 
 }

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @CrossOrigin
@@ -23,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class DocumentController {
 
-    private final DocumentServiceImpl DocumentService;
+    private final DocumentServiceImpl documentService;
 
     /**
      * Get file by slug
@@ -34,8 +36,8 @@ public class DocumentController {
     @GetMapping("/{slug}/file")
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
-            // Get the file by slug using DocumentService
-            Document document = DocumentService.getDocumentBySlug(slug);
+            // Get the file by slug using document service
+            Document document = documentService.getDocumentBySlug(slug);
             File file = new File(document.getPath());
             return ResponseEntity.ok().contentType(MediaType.parseMediaType(document.getDocument_type()))
                     .body(new FileSystemResource(file));
@@ -48,7 +50,35 @@ public class DocumentController {
     @GetMapping("/{slug}")
     public ResponseEntity<?> getDocumentBySlug(@PathVariable("slug") String slug) {
         try {
-            return ResponseEntity.ok(DocumentService.getDocumentBySlug(slug));
+            return ResponseEntity.ok(documentService.getDocumentBySlug(slug));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    
+    @GetMapping("/most-viewed")
+    public ResponseEntity<?> getMostViewedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
+        try {
+            return ResponseEntity.ok(documentService.getMostViewedDocuments(limit));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    
+    @GetMapping("/most-downloaded")
+    public ResponseEntity<?> getMostDownloadedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
+        try {
+            return ResponseEntity.ok(documentService.getMostDownloadedDocuments(limit));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // get the list of lasted documents
+    @GetMapping("/lasted")
+    public ResponseEntity<List<Document>> lastedDocument(@RequestParam("limit") int limit) {
+        try {
+            return ResponseEntity.ok().body(documentService.getLastedDocuments(limit));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -62,10 +92,37 @@ public class DocumentController {
     ) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return ResponseEntity.ok(DocumentService.uploadDocument(uploadDto));
+                return ResponseEntity.ok(documentService.uploadDocument(uploadDto));
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading document: " + e.getMessage());
             }
         });
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDocumentById(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.deleteDocument(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting document: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/increase-view/{id}")
+    public ResponseEntity<String> increaseViewCountDocument(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok().body(documentService.increaseViewCount(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    
+    @GetMapping("/increase-download/{id}")
+    public ResponseEntity<String> increaseDownloadDocument(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok().body(documentService.increaseDownloadCount(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }
