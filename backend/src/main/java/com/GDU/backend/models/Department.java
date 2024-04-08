@@ -16,7 +16,11 @@ public class Department {
 
     @Column(name = "department_name", nullable = false, length = 200)
     private String departmentName;
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 8633cccc05c3023d8df067af56d618e06cc06e9a
     @Column(name = "department_slug", nullable = false, length = 200)
     private String departmentSlug;
 }

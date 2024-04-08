@@ -17,7 +17,7 @@ public class Document {
     private Long id;
 
     private String title;
-    
+
     private String slug;
 
     private String document_type;

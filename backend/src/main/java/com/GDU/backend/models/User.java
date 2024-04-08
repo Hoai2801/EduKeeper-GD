@@ -2,9 +2,9 @@ package com.GDU.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.GrantedAuthority;
+// import org.springframework.security.core.authority.SimpleGrantedAuthority;
+// import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User// implements UserDetails
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,11 +25,11 @@ public class User implements UserDetails {
     @Column(name = "user_name")
     private String username;
 
-//    @ManyToOne
-//    @Getter
-//    @Setter
-//    @JoinColumn(name = "department_id")
-//    private Department department;
+    // @ManyToOne
+    // @Getter
+    // @Setter
+    // @JoinColumn(name = "department_id")
+    // private Department department;
 
     private String password;
 
@@ -40,35 +41,37 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+    return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
     public String getPassword() {
-        return password;
+    return password;
     }
 
     @Override
     public String getUsername() {
-        return username;
+    return username;
     }
+
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+    return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+    return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+    return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+    return true;
     }
+
 }

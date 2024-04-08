@@ -1,55 +1,66 @@
-package com.GDU.backend.config;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-
-@Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-@Slf4j
-public class SecurityConfiguration {
-
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
-    private final LogoutHandler logoutHandler;
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeRequests()
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
-                .anyRequest().permitAll()
-                .and()
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout ->
-                        logout.logoutUrl("/api/v1/auth/logout")
-                                .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler(
-                                        (request, response, authentication) -> SecurityContextHolder.clearContext())
-                );
-        return http.build();
-    }
-
-    @Bean
-    public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new NullAuthenticatedSessionStrategy();
-    }
-
-}
+//package com.GDU.backend.config;
+//
+//import com.GDU.backend.repositories.TokenRepository;
+//import com.GDU.backend.services.JwtService;
+//import jakarta.servlet.FilterChain;
+//import jakarta.servlet.ServletException;
+//import jakarta.servlet.http.HttpServletRequest;
+//import jakarta.servlet.http.HttpServletResponse;
+//import lombok.NonNull;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+//import org.springframework.security.core.context.SecurityContextHolder;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetailsService;
+//import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+//import org.springframework.stereotype.Component;
+//import org.springframework.web.filter.OncePerRequestFilter;
+//
+//import java.io.IOException;
+//
+//@RequiredArgsConstructor
+//@Component
+//public class JwtAuthenticationFilter extends OncePerRequestFilter {
+//
+//    private final JwtService jwtService;
+//    private final UserDetailsService userDetailsService;
+//    private final TokenRepository tokenRepository;
+//
+//    @Override
+//    public void doFilterInternal(
+//            @NonNull HttpServletRequest request,
+//            @NonNull HttpServletResponse response,
+//            @NonNull FilterChain filterChain)
+//            throws ServletException, IOException {
+//        final String authHeader = request.getHeader("Authorization");
+//
+//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//            String jwt = authHeader.substring(7);
+//            String userName = jwtService.extractUsername(jwt);
+//
+//            if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userName);
+//
+//                if (jwtService.isTokenValid(jwt, userDetails)) {
+//                    boolean isTokenValid = tokenRepository.findByToken(jwt)
+//                            .map(t -> !t.isExpired() && !t.isRevoked())
+//                            .orElse(false);
+//
+//                    if (isTokenValid) {
+//                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+//                                userDetails,
+//                                null,
+//                                userDetails.getAuthorities()
+//                        );
+//                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                        SecurityContextHolder.getContext().setAuthentication(authToken);
+//                    }
+//                }
+//            }
+//        }
+//
+//        filterChain.doFilter(request, response);
+//    }
+//
+//}
+//

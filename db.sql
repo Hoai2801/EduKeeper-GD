@@ -134,6 +134,7 @@ CREATE TABLE `document` (
                             `upload_date` date NOT NULL,
 							-- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
+                            `pages` smallint not null,
                             `specialized_id` smallint DEFAULT NULL,
                             `category_id` tinyint DEFAULT NULL,
                             `author_name` varchar(100) NOT NULL,
