@@ -2,11 +2,15 @@ package com.GDU.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-// import org.springframework.security.core.GrantedAuthority;
-// import org.springframework.security.core.authority.SimpleGrantedAuthority;
-// import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
+import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,62 +20,77 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User// implements UserDetails
-{
+@EntityListeners(AuditingEntityListener.class)
+public class User implements UserDetails, Principal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String staffCode;
+
     @Column(name = "user_name")
     private String username;
 
-    // @ManyToOne
-    // @Getter
-    // @Setter
-    // @JoinColumn(name = "department_id")
-    // private Department department;
+    @Column(unique = true)
+    private String email;
 
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role roles;
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
+    @Column(name = "account_locked")
+    private boolean accountLocked;
+
+    private boolean enabled;
+
+    @CreatedDate
+    @Column(name = "created_date", updatable = false, nullable = false)
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    @Column(insertable = false)
+    private LocalDateTime lastModifiedDate;
+
+    @Override
+    public String getName() {
+        return username;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(roles.getName()));
     }
 
     @Override
     public String getPassword() {
-    return password;
+        return password;
     }
 
     @Override
     public String getUsername() {
-    return username;
+        return staffCode;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-    return true;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-    return true;
+        return !accountLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-    return true;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-    return true;
+        return enabled;
     }
-
 }

@@ -184,7 +184,7 @@ public class DocumentController {
         }
     }
 
-    @PostMapping("/recomment")
+    @PostMapping("/recommend")
     public ResponseEntity<?> getDocumentsSuggested(@ModelAttribute RecommentDTO recomment) {
         try {
             return ResponseEntity.ok(documentService.getDocumentsSuggested(recomment));

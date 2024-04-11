@@ -27,7 +27,7 @@ public class FavoriteServiceImpl implements FavoriteService {
             favoriteRepository.save(newFavorite);
             return "Create favorite success";
         } catch (Exception e) {
-            return "Create faile " + e;
+            return "Create fail " + e;
         }
     }
 

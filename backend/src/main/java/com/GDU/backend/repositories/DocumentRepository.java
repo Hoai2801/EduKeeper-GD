@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
-//    Document getDocumentBySlug(String slug);
+    Document getDocumentBySlug(String slug);
 
     @Query("SELECT d FROM Document d WHERE MONTH(d.upload_date) = MONTH(CURRENT_DATE())\n" +
             "AND YEAR(d.upload_date) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")

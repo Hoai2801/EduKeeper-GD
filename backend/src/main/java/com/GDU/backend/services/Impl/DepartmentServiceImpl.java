@@ -56,7 +56,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             existDepartment.setDepartmentName(departmentDTO.getDepartmentName());
             existDepartment.setDepartmentSlug(departmentDTO.getDepartmentName().replace(" ", "-").toLowerCase());
             departmentRepository.save(existDepartment);
-            return "Update departmetn success";
+            return "Update department success";
         } catch (Exception e) {
             throw new UnsupportedOperationException(
                     "Unimplemented method 'updateDepartmentById'" + e.getLocalizedMessage());

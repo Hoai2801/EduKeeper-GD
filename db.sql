@@ -97,7 +97,13 @@ CREATE TABLE `users` (
                          `user_name` varchar(200) NOT NULL,
 --                          `department_id` smallint NOT NULL,
                          `password` varchar(200) NOT NULL,
-                         `role` varchar(50) NOT NULL,
+                         `role_id` tinyint NOT NULL,
+                         `account_locked` boolean not null default false,
+                         `enable` boolean not null default false,
+                         `email` varchar(50) not null,
+                         `created_date` datetime not null,
+                         `last_modified_date` datetime not null,
+						`staff_code` varchar(20) not null,
                          PRIMARY KEY (`id`)
 --                          KEY `department_id` (`department_id`),
 --                          CONSTRAINT `users_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)

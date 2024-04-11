@@ -1,5 +1,7 @@
 package com.GDU.backend.dtos.requests;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,14 +14,27 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadDTO {
+    @NotEmpty
+    @NotBlank
     private String title;
-    private Long specialized;
-    private Long category;
-    private String author;
 
-    // private Long userId;
-    // private Long subject;
-    // private Long teacherId;
+    @NotEmpty
+    @NotBlank
+    private String description;
+
+    @NotEmpty
+    @NotBlank
+    private Long specialized;
+
+    @NotEmpty
+    @NotBlank
+    private Long subject;
+
+    @NotEmpty
+    @NotBlank
+    private Long category;
+    
+    private String author;
 
     @NotNull
     private MultipartFile document;

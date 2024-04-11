@@ -34,13 +34,4 @@ public class SpecializedController {
     public int getDocumentsCountBySpecialized(@PathVariable("slug") String slug) {
         return specializedService.getDocumentsCountBySpecialized(slug);
     }
-    
-<<<<<<< HEAD
-    @GetMapping("/documents/{id}?day={day}")
-    public List<Document> getDocumentsByDay( @PathVariable("id") Long specializedId, @PathVariable("day") Long day) {
-        return specializedService.getDocumentsFromDay(specializedId, day);
-    }
-    
-=======
->>>>>>> 8633cccc05c3023d8df067af56d618e06cc06e9a
 }

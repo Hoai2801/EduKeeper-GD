@@ -1,34 +1,33 @@
-// package com.GDU.backend.models;
+package com.GDU.backend.models;
 
-// import jakarta.persistence.*;
-// import lombok.AllArgsConstructor;
-// import lombok.Builder;
-// import lombok.Data;
-// import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-// @Data
-// @Builder
-// @NoArgsConstructor
-// @AllArgsConstructor
-// @Entity
-// @Table(name = "token")
-// public class Token {
-// @Id
-// @GeneratedValue(strategy = GenerationType.IDENTITY)
-// public Long id;
+import java.time.LocalDateTime;
 
-// @Column(unique = true)
-// public String token;
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class Token {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-// @Column(name = "token_type")
-// @Enumerated(EnumType.STRING)
-// private TokenType tokenType = TokenType.BEARER;
+    @Column(unique = true)
+    private String token;
+    
+    private LocalDateTime createdDate; 
+    
+    private LocalDateTime expiresDate;
+    
+    private LocalDateTime validatedAt;
 
-// public boolean revoked;
-
-// public boolean expired;
-
-// @ManyToOne(fetch = FetchType.LAZY)
-// @JoinColumn(name = "user_id")
-// public User user;
-// }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+}
