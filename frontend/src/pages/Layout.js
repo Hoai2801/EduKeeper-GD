@@ -7,7 +7,7 @@ const Layout = () => {
   return (
     <div>
         <Navbar />
-        <div className='bg-slate-200 flex justify-center py-5'>
+        <div className='bg-slate-200 flex justify-center py-5 min-h-[100vh]'>
           <Outlet />
         </div>
         <Footer />

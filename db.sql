@@ -33,7 +33,6 @@ VALUES
     ('Quan hệ công chúng', 'quan-he-cong-chung');
 
 
-
 DROP TABLE IF EXISTS `specialized`;
 
 -- Chuyên ngành
@@ -104,9 +103,9 @@ CREATE TABLE `users` (
                          `created_date` datetime not null,
                          `last_modified_date` datetime not null,
 						`staff_code` varchar(20) not null,
-                         PRIMARY KEY (`id`)
---                          KEY `department_id` (`department_id`),
---                          CONSTRAINT `users_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
+                         PRIMARY KEY (`id`),
+                         KEY `role_id` (`role_id`),
+                         CONSTRAINT `role_fk` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
 );
 
 -- INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN'); 
@@ -156,25 +155,25 @@ CREATE TABLE `document` (
 DROP TABLE IF EXISTS `favorite`;
 
 -- dùng để lưu thông tin các tài liệu mà người dùng ưu thích, muốn đọc lại, tham khảo nhiều lần
-CREATE TABLE `favorite` (
-                            `id` int NOT NULL AUTO_INCREMENT,
-                            `user_id` int NOT NULL,
-                            `document_id` int NOT NULL,
-                            PRIMARY KEY (`id`),
-                            KEY `user_id` (`user_id`),
-                            KEY `document_id` (`document_id`),
-                            CONSTRAINT `access_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-                            CONSTRAINT `access_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
-);
+-- CREATE TABLE `favorite` (
+--                             `id` int NOT NULL AUTO_INCREMENT,
+--                             `user_id` int NOT NULL,
+--                             `document_id` int NOT NULL,
+--                             PRIMARY KEY (`id`),
+--                             KEY `user_id` (`user_id`),
+--                             KEY `document_id` (`document_id`),
+--                             CONSTRAINT `access_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+--                             CONSTRAINT `access_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
+-- );
 
 
 CREATE TABLE token (
                        id int AUTO_INCREMENT PRIMARY KEY,
                        token VARCHAR(255) UNIQUE NOT NULL,
-                       token_type VARCHAR(50),
-                       revoked BOOLEAN,
-                       expired BOOLEAN,
                        user_id int,
+                       created_date datetime not null,
+                       expires_date datetime not null,
+                       validated_at datetime,
                        FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

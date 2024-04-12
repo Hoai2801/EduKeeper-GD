@@ -26,12 +26,16 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
 
     @Async
-    public void sendEmail(String to, String username, EmailTemplateName emailTemplateName, String confirmationUrl) throws MessagingException {
+    public void sendEmail(
+            String to, 
+            String username, 
+            EmailTemplateName emailTemplateName, 
+            String url
+    ) throws MessagingException {
        String templateName;
        if (emailTemplateName == null) {
            templateName = "confirm-email";
        } else {
-           System.out.println(emailTemplateName.getName());
            templateName = emailTemplateName.getName();
        }
         MimeMessage message = javaMailSender.createMimeMessage();
@@ -44,7 +48,7 @@ public class EmailService {
         String formattedDate = today.format(DateTimeFormatter.ofPattern("dd-MM-yyyy (EEEE)"));
         Map<String, Object> properties = Map.of(
                 "username", username,
-                "confirmationUrl", confirmationUrl,
+                "url", url,
                 "today", formattedDate
         );
 

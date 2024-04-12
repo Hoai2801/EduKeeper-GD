@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/favorite")
+@Deprecated
 public class FavoriteController {
     private final FavoriteService favoriteService;
 

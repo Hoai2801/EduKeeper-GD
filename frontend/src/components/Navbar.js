@@ -1,7 +1,10 @@
+import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 const Navbar = () => {
-  const user = 0;
+  const token = localStorage.getItem("token");
+  const isLogin = token !== null ? 1 : 0;
+  const jwt = token ? jwtDecode(token) : null;
   const isAdmin = 0;
 
   const [isShowProfile, setIsShownProfile] = useState(false);
@@ -27,6 +30,11 @@ const Navbar = () => {
       setIsShownCategory(false);
       setIsSubMenuShown(false);
       setIsShownProfile(false);
+  }
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/";
   }
 
   return (
@@ -135,12 +143,13 @@ const Navbar = () => {
           </div>
         </form>
 
-        {user ? (
+        {isLogin ? (
           <>
             <div
               className="pt-1 relative group mr-0 w-[500px] justify-end lg:flex hidden"
               onMouseEnter={() => setIsShownProfile(true)}
             >
+              <p className="mt-1 mr-3">Chào {jwt?.user_name}</p>
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"
                 alt=""
@@ -152,7 +161,7 @@ const Navbar = () => {
                 onMouseLeave={() => setIsShownProfile(false)}
               >
                 <Link to={"/profile"}>Profile</Link>
-                <Link>Dang xuat</Link>
+                <button onClick={() => logout()} className="text-left">Đăng xuất</button>
               </div>
             </div>
             <div className="lg:hidden flex w-full justify-end">
@@ -167,7 +176,7 @@ const Navbar = () => {
                   onMouseLeave={() => setIsSubMenuShown(false)}
                 >
                   <Link to={"/profile"}>Profile</Link>
-                  <Link>Dang xuat</Link>
+                  <button onClick={() => logout()} className="text-left">Đăng xuất</button>
                 </div>
               </div>
             </div>
