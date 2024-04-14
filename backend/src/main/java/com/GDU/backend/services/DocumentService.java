@@ -3,12 +3,11 @@ package com.GDU.backend.services;
 import java.util.List;
 
 import com.GDU.backend.dtos.requests.FilterDTO;
-import com.GDU.backend.dtos.requests.RecommentDTO;
+import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.models.Document;
 
 import java.io.IOException;
-import java.util.List;
 
 public interface DocumentService {
     String uploadDocument(UploadDTO uploadDto) throws IOException;
@@ -39,10 +38,8 @@ public interface DocumentService {
     List<Document> getPopularDocumentsOfThisMonth();
 
     List<Document> getDocumentsByAuthorName(String authorName);
-    //
-    // List<Document> getDocumentsByTeacherId(Long teacherId);
 
-    List<Document> getDocumentsSuggested(RecommentDTO recommentDTO);
+    List<Document> getDocumentsSuggested(RecommendDTO recommendDTO);
 
     List<Document> getDocumentsBySlugSpecialized(String slug);
 

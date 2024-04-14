@@ -1,7 +1,7 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.FilterDTO;
-import com.GDU.backend.dtos.requests.RecommentDTO;
+import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.Category;
@@ -217,22 +217,17 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getDocumentsSuggested(RecommentDTO recommentDTO) {
+    public List<Document> getDocumentsSuggested(RecommendDTO recommendDTO) {
         // return list document which have a same specialized and category, title or
         // author
-        return documentRepository.getDocumentsSuggested(recommentDTO.getSpecialized(), recommentDTO.getCategory(),
-                recommentDTO.getTitle(), recommentDTO.getAuthor());
+        return documentRepository.getDocumentsSuggested(recommendDTO.getSpecialized(), recommendDTO.getCategory(),
+                recommendDTO.getTitle(), recommendDTO.getAuthor());
     }
 
     @Override
     public List<Document> getDocumentsByAuthorName(String authorName) {
         return documentRepository.getDocumentsByAuthorName(authorName);
     }
-
-    // @Override
-    // public List<Document> getDocumentsByTeacherId(Long teacherId) {
-    // return documentRepository.getDocumentsByTeacherId(teacherId);
-    // }
 
     @Override
     public List<Document> getDocumentsBySlugSpecialized(String slug) {
@@ -242,14 +237,17 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<Document> getDocumentsByFilter(FilterDTO filterDTO) {
         List<Document> documents = documentRepository.getDocumentsByFilter(filterDTO.getDepartmentSlug(),
-                filterDTO.getTitle(),
+                filterDTO.getSearchTerm(),
+                filterDTO.getSubjectName(),
                 filterDTO.getSpecializedSlug(),
-                filterDTO.getCategoryName(), filterDTO.getAuthorName());
-        if (filterDTO.getOrder().equalsIgnoreCase("ASC")) {
-            documents.sort(Comparator.comparing(Document::getUpload_date));
+                filterDTO.getCategoryName());
+        if (filterDTO.getOrder().equalsIgnoreCase("mostViewed")) {
+            documents.sort(Comparator.comparing(Document::getViews).reversed());
+        }
+        if (filterDTO.getOrder().equalsIgnoreCase("mostDownloaded")) {
+            documents.sort(Comparator.comparing(Document::getDownload).reversed());
         } else {
             documents.sort(Comparator.comparing(Document::getUpload_date).reversed());
-
         }
         return documents;
     }

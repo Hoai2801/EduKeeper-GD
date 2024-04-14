@@ -1,7 +1,7 @@
 package com.GDU.backend.controllers;
 
 import com.GDU.backend.dtos.requests.FilterDTO;
-import com.GDU.backend.dtos.requests.RecommentDTO;
+import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @CrossOrigin
@@ -175,8 +173,9 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/author/{name}")
-    public ResponseEntity<?> getDocumentsByUserId(@PathVariable("name") String authorName) {
+    // Author
+    @GetMapping("/author/{authorName}")
+    public ResponseEntity<?> getDocumentsByAuthorName(@PathVariable("authorName") String authorName) {
         try {
             return ResponseEntity.ok(documentService.getDocumentsByAuthorName(authorName));
         } catch (Exception e) {
@@ -185,7 +184,7 @@ public class DocumentController {
     }
 
     @PostMapping("/recommend")
-    public ResponseEntity<?> getDocumentsSuggested(@ModelAttribute RecommentDTO recomment) {
+    public ResponseEntity<?> getDocumentsSuggested(@ModelAttribute RecommendDTO recomment) {
         try {
             return ResponseEntity.ok(documentService.getDocumentsSuggested(recomment));
         } catch (Exception e) {
@@ -203,12 +202,23 @@ public class DocumentController {
         }
     }
 
-    @PostMapping("/filter")
-    public ResponseEntity<?> getDocumentsByFilter(@ModelAttribute FilterDTO filter) {
+    @GetMapping("/filter")
+    public ResponseEntity<?> getDocumentsByFilter(
+            @RequestParam(required = false, name = "searchTerm") String searchTerm,
+            @RequestParam(required = false, name = "categoryName") String categoryName,
+            @RequestParam(required = false, name = "subjectName") String subjectName,
+            @RequestParam(required = false, name = "departmentSlug") String departmentSlug,
+            @RequestParam(required = false, name = "specializedSlug") String specializedSlug,
+            @RequestParam(required = false, name = "order") String order) {
         try {
-            return ResponseEntity.ok(documentService.getDocumentsByFilter(filter));
+            FilterDTO req = FilterDTO.builder().searchTerm(searchTerm).categoryName(categoryName)
+                    .subjectName(subjectName)
+                    .departmentSlug(departmentSlug).specializedSlug(specializedSlug).order(order)
+                    .build();
+            return ResponseEntity.ok(documentService.getDocumentsByFilter(req));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }
+

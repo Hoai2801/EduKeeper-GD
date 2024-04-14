@@ -16,7 +16,7 @@ public class SpecializedServiceImpl implements SpecializedService {
 
     @Override
     public List<Specialized> getSpecializeds() {
-        return specializedRepository.findAllFromId(1L);
+        return specializedRepository.findAll();
     }
 
     @Override

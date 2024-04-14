@@ -21,5 +21,5 @@ public interface SpecializedRepository extends JpaRepository<Specialized, Long> 
 
     @Query("SELECT d FROM Document d WHERE d.specialized.id = :specializedId ORDER BY d.id DESC")
     List<Document> getLastestDocumentsBySpecialized(Long specializedId);
-    
+
 }

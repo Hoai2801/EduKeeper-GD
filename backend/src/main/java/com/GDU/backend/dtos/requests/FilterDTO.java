@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FilterDTO {
-    String title;
-    String categoryName;
-    String departmentSlug;
-    String specializedSlug;
-    String authorName;
-    String order;
+    private String searchTerm;
+    private String categoryName;
+    private String subjectName;
+    private String departmentSlug;
+    private String specializedSlug;
+    private String order;
 }

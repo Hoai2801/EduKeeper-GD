@@ -178,4 +178,12 @@ CREATE TABLE token (
 );
 
 
-
+-- Performance
+create index idx_slug on document (slug);
+create index idx_download on document (download);
+create index idx_views on document (views);
+create index idx_upload_date on document (upload_date);
+create index idx_department_slug on department (department_slug);
+create index idx_specialized_slug on specialized (specialized_slug);
+create index idx_category_name on category (category_name);
+alter table document add fulltext(title);

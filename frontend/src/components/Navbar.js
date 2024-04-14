@@ -73,7 +73,7 @@ const Navbar = () => {
               </p>
               <div className={`w-[500px] h-[300px] overflow-scroll absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                 {specialized && specialized.map((item, index) => (
-                  <Link to={`/specialized/${item.specializedSlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                  <Link to={`/search?specialized=${item.specializedSlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
                 ))}
               </div>
             </div>
@@ -94,7 +94,7 @@ const Navbar = () => {
               </p>
               <div className={`w-[500px] h-[300px] overflow-scroll flex flex-col absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowBook ? "" : "hidden"}`} onMouseLeave={() => setIsShownBook(false)}>
                 {specialized && specialized.map((item, index) => (
-                  <Link to={`/book/${item.specializedSlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                  <Link to={`/search?specialized=${item.specializedSlug}&&category=${item.categorySlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
                 ))}
               </div>
             </div>

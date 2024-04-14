@@ -35,6 +35,9 @@ public class Document {
     @JoinColumn(name = "specialized_id")
     private Specialized specialized;
 
+    @JoinColumn(name = "subject_id")
+    private long subjectId;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;

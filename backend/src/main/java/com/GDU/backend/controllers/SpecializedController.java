@@ -4,6 +4,7 @@ import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.services.Impl.SpecializedServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,4 +35,9 @@ public class SpecializedController {
     public int getDocumentsCountBySpecialized(@PathVariable("slug") String slug) {
         return specializedService.getDocumentsCountBySpecialized(slug);
     }
+    
+//    @GetMapping("/{slug}")
+//    public Specialized getSpecializedBySlug(@PathVariable("slug") String slug) {
+//        return specializedService.getSpecializedBySlug(slug);
+//    }
 }

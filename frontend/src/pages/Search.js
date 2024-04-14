@@ -23,10 +23,18 @@ const Search = () => {
   //       setDocument(data)
   //     });
   // }, [slugSpecialized])
-  const [title, setTitle] = useState('');
-  switch(hightlight) {
+  useEffect(() => {
+
+    // fetch("http://localhost:8080/api/v1/document/search/" + hightlight + "/" + slugSpecialized + "/" + slugSubject + "/" + publishYear + "/" + category + "/" + documentType)
+    // .then((res) => res.json())
+    // .then((data) => {
+    //   console.log(data)
+    //   setDocument(data)
+    // });
+
+    switch(hightlight) {
     case 'mostViewed': {
-      setTitle('Tải nhất nhất')
+      setTitle('Xem nhiều nhất')
       break;
     }
     case 'mostDownloaded': {
@@ -36,10 +44,15 @@ const Search = () => {
     default: {
       setTitle('Tìm kiếm')
     }
+
   }
+  }, [])
+  
+  const [title, setTitle] = useState('');
+  
   return (
     <div>
-      <h2 className='text-[28px] font-bold'>{title} trong tháng</h2>
+      <h2 className='text-[28px] font-bold'>{title} {slugSpecialized}</h2>
       <div className='my-5'>
         {documents && documents.map((item, index) =>
           <DocumentCard slug={item.slug} title={item.title} author={item.author} views={item.views} download={item.download} upload_date={item.upload_date} key={index} />
