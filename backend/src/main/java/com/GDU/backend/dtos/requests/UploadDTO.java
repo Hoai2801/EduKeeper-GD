@@ -28,10 +28,6 @@ public class UploadDTO {
 
     @NotEmpty
     @NotBlank
-    private Long subject;
-
-    @NotEmpty
-    @NotBlank
     private Long category;
     
     private String author;

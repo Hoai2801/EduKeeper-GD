@@ -124,7 +124,8 @@ INSERT INTO `category` (`category_name`)
 VALUES
     ('Sách'),
     ('Tiểu luận'),
-    ('Nghiên cứu khoa học');
+    ('Nghiên cứu khoa học'),
+    ('Giáo trình');
 
 DROP TABLE IF EXISTS `document`;
 

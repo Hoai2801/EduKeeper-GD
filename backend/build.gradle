@@ -23,6 +23,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'net.datafaker:datafaker:2.1.0'
 	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.0.6'
@@ -36,6 +37,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+	implementation group: 'org.springframework', name: 'spring-test', version: '6.1.6'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
