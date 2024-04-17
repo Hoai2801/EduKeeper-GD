@@ -7,6 +7,7 @@ import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.Category;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Specialized;
+import com.GDU.backend.models.Subject;
 import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.services.DocumentService;
 import com.itextpdf.text.pdf.PdfReader;
@@ -45,6 +46,8 @@ public class DocumentServiceImpl implements DocumentService {
 
         Specialized specialized = Specialized.builder().id(uploadDto.getSpecialized()).build();
 
+        Subject subject = Subject.builder().id(uploadDto.getSubject()).build();
+
         PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
         int numberOfPages = pdfReader.getNumberOfPages();
         
@@ -58,6 +61,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .document_type(uploadDto.getDocument().getContentType())
                 // Calculate and set the document size in megabytes
                 .document_size(uploadDto.getDocument().getSize() / 1_000_000)
+                .subject(subject)
                 .pages(numberOfPages)
                 .category(category)
                 .specialized(specialized)
@@ -236,11 +240,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<Document> getDocumentsByFilter(FilterDTO filterDTO) {
-        List<Document> documents = documentRepository.getDocumentsByFilter(filterDTO.getDepartmentSlug(),
+        List<Document> documents = documentRepository.getDocumentsByFilter(
+                filterDTO.getDepartmentSlug(),
                 filterDTO.getSearchTerm(),
                 filterDTO.getSubjectName(),
                 filterDTO.getSpecializedSlug(),
-                filterDTO.getCategoryName());
+                filterDTO.getCategoryName()
+        );
         if (filterDTO.getOrder().equalsIgnoreCase("mostViewed")) {
             documents.sort(Comparator.comparing(Document::getViews).reversed());
         }

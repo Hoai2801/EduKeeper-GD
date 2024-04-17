@@ -1,5 +1,6 @@
 package com.GDU.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class Specialized {
 
     @ManyToOne
     @JoinColumn(name = "department_id")
+    @JsonIgnore
     private Department departmentID;
     
     @Column(name = "specialized_slug", nullable = false, length = 200)

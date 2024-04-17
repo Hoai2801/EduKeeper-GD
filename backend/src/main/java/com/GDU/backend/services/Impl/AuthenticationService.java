@@ -38,8 +38,9 @@ public class AuthenticationService {
     private String activationUrl;
 
     public String register(RegisterRequest registerRequest) throws MessagingException {
+        System.out.println(registerRequest.getRoles());
         // role is optional<Role>
-        var role = roleRepository.findByName("USER").orElseThrow(
+        var role = roleRepository.findByName(registerRequest.getRoles()).orElseThrow(
                 () -> new RuntimeException("Role not found"));
 
         // check if user exists
@@ -110,6 +111,7 @@ public class AuthenticationService {
         var user = (User) auth.getPrincipal();
         claims.put("staff_code", user.getUsername());
         claims.put("user_name", user.getName());
+        claims.put("role", user.getRoles().getName());
         var jwt = jwtService.generateToken(claims, user);
         return AuthenticationResponse.builder()
                 .token(jwt)

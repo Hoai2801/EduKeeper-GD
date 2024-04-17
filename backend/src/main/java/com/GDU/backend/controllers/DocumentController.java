@@ -184,9 +184,9 @@ public class DocumentController {
     }
 
     @PostMapping("/recommend")
-    public ResponseEntity<?> getDocumentsSuggested(@ModelAttribute RecommendDTO recomment) {
+    public ResponseEntity<?> getDocumentsSuggested(@ModelAttribute RecommendDTO recommend) {
         try {
-            return ResponseEntity.ok(documentService.getDocumentsSuggested(recomment));
+            return ResponseEntity.ok(documentService.getDocumentsSuggested(recommend));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -211,9 +211,13 @@ public class DocumentController {
             @RequestParam(required = false, name = "specializedSlug") String specializedSlug,
             @RequestParam(required = false, name = "order") String order) {
         try {
-            FilterDTO req = FilterDTO.builder().searchTerm(searchTerm).categoryName(categoryName)
+            FilterDTO req = FilterDTO.builder()
+                    .searchTerm(searchTerm)
+                    .categoryName(categoryName)
                     .subjectName(subjectName)
-                    .departmentSlug(departmentSlug).specializedSlug(specializedSlug).order(order)
+                    .departmentSlug(departmentSlug)
+                    .specializedSlug(specializedSlug)
+                    .order(order)
                     .build();
             return ResponseEntity.ok(documentService.getDocumentsByFilter(req));
         } catch (Exception e) {

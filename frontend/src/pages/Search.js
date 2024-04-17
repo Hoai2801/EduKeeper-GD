@@ -1,62 +1,56 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import DocumentCard from '../components/DocumentCard'
 
 const Search = () => {
+  const url = window.location.href;
   const [searchParams, setSearchParams] = useSearchParams();
 
   // lasted, most download or most views
-  const hightlight = searchParams.get('highlight');
-  const slugSpecialized = searchParams.get('specialized');
-  const slugSubject = searchParams.get('subject');
-  const publishYear = searchParams.get('publishYear');
-  const category = searchParams.get('category');
-  // pdf, word, ppt
-  const documentType = searchParams.get('documentType');
+  const order = searchParams.get('order') || 'lasted';
+  const slugSpecialized = searchParams.get('specialized')
+  const slugSubject = searchParams.get('subject')
+  const publishYear = searchParams.get('publishYear')
+  const category = searchParams.get('category')
+  const [searchTerm, setSearchTerm] = useState(null)
 
   const [documents, setDocument] = useState(null)
 
-  // useEffect(() => {
-  //   fetch("http://localhost:8080/api/v1/specialized/documents/" + slugSpecialized)
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setDocument(data)
-  //     });
-  // }, [slugSpecialized])
   useEffect(() => {
+    const search = searchParams.get('searchTerm')
+    console.log(search)
+    setSearchTerm(search)
+      const api = "http://localhost:8080/api/v1/document/filter?order=" + order
+      + (slugSpecialized ? `&slugSpecialized=${slugSpecialized}` : '')
+      + (publishYear ? `&publishYear=${publishYear}` : '')
+      + (category ? `&category=${category}` : '')
+      + (slugSubject ? `&slugSubject=${slugSubject}` : '')
+      + (search ? `&searchTerm=${search}` : '&searchTerm=')
+      console.log(api)
+    fetch(api)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data)
+        setDocument(data)
+      });
+  }, [url])
 
-    // fetch("http://localhost:8080/api/v1/document/search/" + hightlight + "/" + slugSpecialized + "/" + slugSubject + "/" + publishYear + "/" + category + "/" + documentType)
-    // .then((res) => res.json())
-    // .then((data) => {
-    //   console.log(data)
-    //   setDocument(data)
-    // });
+  const [limit, setLimit] = useState(30)
+  const [page, setPage] = useState(1)
 
-    switch(hightlight) {
-    case 'mostViewed': {
-      setTitle('Xem nhiều nhất')
-      break;
-    }
-    case 'mostDownloaded': {
-      setTitle('Tải nhiều nhất')
-      break;
-    }
-    default: {
-      setTitle('Tìm kiếm')
-    }
-
-  }
-  }, [])
-  
-  const [title, setTitle] = useState('');
-  
   return (
     <div>
-      <h2 className='text-[28px] font-bold'>{title} {slugSpecialized}</h2>
-      <div className='my-5'>
-        {documents && documents.map((item, index) =>
-          <DocumentCard slug={item.slug} title={item.title} author={item.author} views={item.views} download={item.download} upload_date={item.upload_date} key={index} />
+      <h2 className='text-[28px] font-bold text-center mt-10 mb-5'>Tài liệu {slugSpecialized}</h2>
+      <div className='my-5 flex flex-col gap-5 h-fit'>
+        {documents && documents.map((item, index) => {
+          if (index < limit) {
+            return (
+              <DocumentCard slug={item.slug} title={item.title} author={item.author} views={item.views} download={item.download} upload_date={item.upload_date} key={index} />
+            )
+          }
+        }
         )}
+        <button onClick={() => setLimit(limit + 30)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
       </div>
     </div>
   )

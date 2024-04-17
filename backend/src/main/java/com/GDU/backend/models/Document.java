@@ -36,6 +36,10 @@ public class Document {
     private Specialized specialized;
 
     @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+    
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 

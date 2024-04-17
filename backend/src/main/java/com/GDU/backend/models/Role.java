@@ -25,16 +25,5 @@ public class Role {
     private Long id;
 
     private String name;
-
-//    @ManyToMany(mappedBy = "roles")
-//    @JsonIgnore
-//    private List<User> users;
-
-//    @CreatedDate
-//    @Column(name = "created_date", updatable = false, nullable = false)
-//    private LocalDateTime createdDate;
-//
-//    @LastModifiedDate
-//    @Column(insertable = false)
-//    private LocalDateTime lastModifiedDate;
+    
 }

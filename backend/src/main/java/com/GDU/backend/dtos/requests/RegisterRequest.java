@@ -37,4 +37,9 @@ public class RegisterRequest {
     @NotNull
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
+
+    @NotEmpty
+    @NotBlank
+    @NotNull
+    private String roles;
 }

@@ -22,26 +22,26 @@ const Login = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data)
-                if (data.status !== 200) {
-                    setError('Sai mật khẩu');
-                    // return;
-                }
-                if (data.token !== null) {
+                
+                
+                if (data.token !== undefined) {
+                    console.log(data.token)
+                    
                     localStorage.setItem('token', data.token);
                     if (rememberMe) {
                         localStorage.setItem('staffCode', staffCode);
                         localStorage.setItem('password', password);
                     }
 
-                    if (data.role === "admin") {
-                        window.location.href = "/dashboard";
-                    }
-
-                    window.location.href = "/";
+                    window.location.href = "/"; 
+                } 
+                if (data.status !== 200) {
+                    setError('Sai mật khẩu');
+                    return
                 } else {
-                    alert(data.message);
+                    setError('');
                 }
+                
             })
     };
 

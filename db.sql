@@ -86,8 +86,22 @@ VALUES
 ('Truyền thông giao tiếp', 'truyen-thong-giao-tiep', 16),
 ('Truyền hình điện ảnh quảng cáo', 'truyen-hinh-dien-anh-quang-cao', 16),
 ('Xây dựng - Quản trị kênh truyền thông độc lập', 'xay-dung-quan-tri-kenh-truyen-thong-doc-lap', 16),
-('Quan hệ công chúng', 'quan-he-cong-chung', 17);
+('Quan hệ công chúng', 'quan-he-cong-chung', 17),
+('Tất cả', 'tat-ca', 18);
 
+DROP TABLE IF EXISTS `subject`;
+
+CREATE TABLE subject(
+	`id` int primary key not null auto_increment,
+    `subject_name` varchar(50) not null,
+    `subject_slug` varchar(80) not null,
+    `specialized_id` smallint not null,
+    CONSTRAINT `specialized_fk`
+	FOREIGN KEY (`specialized_id`)
+	REFERENCES `specialized` (`id`)
+);
+
+insert into	`subject` values(1, 'toán cao cấp', 'toan-cao-cap', 18);
 
 DROP TABLE IF EXISTS `users`;
 
@@ -140,8 +154,8 @@ CREATE TABLE `document` (
                             `upload_date` date NOT NULL,
 							-- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
-                            `pages` smallint not null,
                             `specialized_id` smallint DEFAULT NULL,
+                            `subject_id` int not null,
                             `category_id` tinyint DEFAULT NULL,
                             `author_name` varchar(100) NOT NULL,
                             `download` int not null,
@@ -149,8 +163,10 @@ CREATE TABLE `document` (
                             PRIMARY KEY (`id`),
                             KEY `document_ibfk_1` (`specialized_id`),
                             KEY `document_ibfk_2` (`category_id`),
+                            KEY `document_ibfk_3` (`subject_id`),
                             CONSTRAINT `document_ibfk_1` FOREIGN KEY (`specialized_id`) REFERENCES `specialized` (`id`),
-                            CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
+                            CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
+                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`)
 );
 
 DROP TABLE IF EXISTS `favorite`;
@@ -187,4 +203,4 @@ create index idx_upload_date on document (upload_date);
 create index idx_department_slug on department (department_slug);
 create index idx_specialized_slug on specialized (specialized_slug);
 create index idx_category_name on category (category_name);
-alter table document add fulltext(title);
+ALTER TABLE `document` ADD FULLTEXT INDEX `title_index` (`title`);

@@ -1,7 +1,10 @@
 package com.GDU.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +22,9 @@ public class Department {
 
     @Column(name = "department_slug", nullable = false, length = 200)
     private String departmentSlug;
+    
+    @OneToMany
+    @JoinColumn(name = "department_id")
+//    @JsonIgnore
+    private List<Specialized> specializeds;
 }

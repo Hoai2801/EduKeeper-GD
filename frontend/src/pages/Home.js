@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Hero from '../components/Hero'
 import Post from '../components/DocumentCard'
+import { Link } from 'react-router-dom'
 
 const Home = () => {
   const [mostViewed, setMostViewed] = useState([])
@@ -26,7 +27,7 @@ const Home = () => {
             <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} />
           ))}
           <div className='flex justify-center'>
-            <button onClick={null} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
+            <Link to={`/search?order=lastest&searchTerm=`} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
           </div>
         </div>
         <h2 className='font-bold text-[28px] mb-5'>Tải nhiều nhất tháng này</h2>
@@ -35,7 +36,7 @@ const Home = () => {
             <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} />
           ))}
           <div className='flex justify-center'>
-            <button onClick={null} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
+            <Link to={`/search?order=mostDownloaded&searchTerm=`} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
           </div>
         </div>
         <h2 className='font-bold text-[28px]'>Xem nhiều nhất tháng này</h2>

@@ -7,9 +7,12 @@ import SideBar from './components/SideBar';
 import Detail from './pages/Detail';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
-import Dashboard from './pages/Dashboard';
 import Search from './pages/Search';
 import AccoutAction from './pages/AccoutAction';
+import User from './pages/User';
+import Admin from './pages/Admin';
+import Dashboard from './pages/Dashboard';
+import Department from './pages/Department';
 
 function App() {
   return (
@@ -25,7 +28,11 @@ function App() {
           <Route path='/search' element={<Search />} />
         </Route>
       </Route>
-      <Route path='/dashboard' element={<Dashboard />} />
+      <Route path='/dashboard' element={<Admin />} >
+        <Route path='home' element={<Dashboard />} />
+        <Route path='users' element={<User />} />
+        <Route path='department' element={<Department />} />
+      </Route>
     </Routes>
   );
 }

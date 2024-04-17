@@ -16,14 +16,12 @@ const SideBar = () => {
         fetch("http://localhost:8080/api/v1/specialized")
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setSpecialiesList(data);
             });
 
         fetch('http://localhost:8080/api/v1/department')
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setDepartmentList(data)
             })
     }, [])
@@ -49,10 +47,9 @@ const SideBar = () => {
         setSpecialized(event.target.value);
     }
 
-    console.log(department)
     return (
         <div className='flex justify-between w-full gap-5 p-5'>
-            <div className='flex justify-between w-full gap-5 p-5'>
+            <div className='flex justify-between w-full gap-5 h-fit px-10'>
                 <div className='w-[25%] h-full rounded-lg shadow-lg bg-white flex items-center flex-col gap-5 px-5'>
                     <p className='text-2xl font-bold mt-2'>Lọc</p>
 
@@ -87,7 +84,7 @@ const SideBar = () => {
                             onChange={handleDepartment}
                             // value={department}
                         >
-                            <option value="" disabled>Chọn khoa</option>
+                            <option value="">Chọn khoa</option>
 
                             {departmentList.map((department) => (
                                 <option key={department.id} value={department.departmentSlug}>{department.departmentName}</option>
@@ -143,9 +140,8 @@ const SideBar = () => {
                             <input type="text" id="range" className='border border-black rounded-lg w-[60px] h-[40px] p-2' />
                         </div>
                     </div>
-                    <button onClick={null} className='bg-blue-500 rounded-3xl w-[100px] h-[40px] text-center text-white text-xl'>Lọc</button>
+                    <button onClick={null} className='bg-blue-500 rounded-3xl w-[100px] h-[40px] text-center text-white text-x mb-10'>Lọc</button>
                 </div>
-                <p className='text-center'>{department}</p>
                 <div className='flex justify-center w-full bg-white rounded-lg'>
                     <Outlet />
                 </div>

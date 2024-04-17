@@ -3,8 +3,12 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 const Navbar = () => {
   const token = localStorage.getItem("token");
-  const isLogin = token !== null ? 1 : 0;
-  const jwt = token ? jwtDecode(token) : null;
+  console.log(token)
+  let jwt = null;
+  if (token !== "undefined" && token !== null) {
+    jwt = jwtDecode(token);
+  }
+  
   const isAdmin = 0;
 
   const [isShowProfile, setIsShownProfile] = useState(false);
@@ -22,6 +26,11 @@ const Navbar = () => {
         setSpecialized(data);
         // console.log(data)
       });
+
+      if (jwt && jwt.exp < Date.now() / 1000) {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }
   }, [])
 
   const out = () => {
@@ -73,7 +82,7 @@ const Navbar = () => {
               </p>
               <div className={`w-[500px] h-[300px] overflow-scroll absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                 {specialized && specialized.map((item, index) => (
-                  <Link to={`/search?specialized=${item.specializedSlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                  <Link to={`/search?specialized=${item.specializedSlug}&searchTerm=&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
                 ))}
               </div>
             </div>
@@ -94,7 +103,7 @@ const Navbar = () => {
               </p>
               <div className={`w-[500px] h-[300px] overflow-scroll flex flex-col absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowBook ? "" : "hidden"}`} onMouseLeave={() => setIsShownBook(false)}>
                 {specialized && specialized.map((item, index) => (
-                  <Link to={`/search?specialized=${item.specializedSlug}&&category=${item.categorySlug}`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                  <Link to={`/search?specialized=${item.specializedSlug}&&category=1`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
                 ))}
               </div>
             </div>
@@ -143,7 +152,7 @@ const Navbar = () => {
           </div>
         </form>
 
-        {isLogin ? (
+        {jwt ? (
           <>
             <div
               className="pt-1 relative group mr-0 w-[500px] justify-end lg:flex hidden"

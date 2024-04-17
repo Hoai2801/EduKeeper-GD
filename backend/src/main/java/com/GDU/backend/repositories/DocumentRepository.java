@@ -60,15 +60,15 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                                         @Param("specializedSlug") String spicializedSlug, @Param("categoryName") String categoryName);
 
     // Get total number of documents this year
-    @Query(value = "SELECT count(*) FROM Document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01'))", nativeQuery = true)
+    @Query(value = "SELECT count(*) FROM document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01'))", nativeQuery = true)
     Integer getNumberOfDocumentsThisYear();
 
     // Get total number of documents from the previous year
-    @Query(value = "SELECT count(*) FROM Document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) - 1,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()),'-01-01'))", nativeQuery = true)
+    @Query(value = "SELECT count(*) FROM document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) - 1,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()),'-01-01'))", nativeQuery = true)
     Integer getNumberOfDocumentPreviousYear();
 
     // Get total number of documents this year
-    @Query(value = "SELECT count(*) FROM Document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01')) AND MONTH(d.upload_date) = MONTH(NOW())", nativeQuery = true)
+    @Query(value = "SELECT count(*) FROM document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01')) AND MONTH(d.upload_date) = MONTH(NOW())", nativeQuery = true)
     Integer getNumberOfDocumentsThisMonth();
 
     // Get total number of documents from the previous year

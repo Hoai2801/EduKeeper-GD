@@ -1,8 +1,11 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.DepartmentDTO;
+import com.GDU.backend.dtos.response.DepartmentResponse;
 import com.GDU.backend.models.Department;
+import com.GDU.backend.models.Specialized;
 import com.GDU.backend.repositories.DepartmentRepository;
+import com.GDU.backend.repositories.SpecializedRepository;
 import com.GDU.backend.services.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,12 +19,20 @@ import java.util.List;
 public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final SpecializedRepository specializedRepository;
 
     @Override
     public List<Department> getDepartments() {
         List<Department> departments = departmentRepository.findAll();
-        departments.sort(Comparator.comparingLong(Department::getId));
         return departments;
+//        return departments.stream().map(department -> {
+//            List<Specialized> specializeds = specializedRepository.getSpecializedsByDepartmentId(department.getId());
+//            return DepartmentResponse.builder()
+//                    .departmentName(department.getDepartmentName())
+//                    .id(department.getId())
+//                    .specializeds(specializeds)
+//                    .build();
+//        }).toList();
     }
 
     @Override

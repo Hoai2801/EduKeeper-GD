@@ -1,20 +1,18 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.models.ChangePasswordRequest;
+import com.GDU.backend.dtos.response.UserResponse;
 import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.UserRepository;
 import com.GDU.backend.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import
-        org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +21,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public void changePassword(ChangePasswordRequest request, Principal
-            connectedUser) {
-        var user = (User) ((UsernamePasswordAuthenticationToken)
-                connectedUser).getPrincipal();
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
 
-        if (!passwordEncoder.matches(request.getCurrentPassword(),
-                user.getPassword())) {
-            throw new IllegalStateException("Wrong password");
-        }
-        if (!request.getNewPassword().equals(request.getConfirmationPassword())) {
-            throw new IllegalStateException("Password are not the same");
-        }
+        return users.stream()
+                .map(user -> UserResponse.builder()
+                        .email(user.getEmail())
+                        .staffCode(user.getStaffCode())
+                        .username(user.getName())
+                        .accountLocked(user.isAccountLocked())
+                        .createdDate(user.getCreatedDate())
+                        .lastModifiedDate(user.getLastModifiedDate())
+                        .roles(user.getRoles())
+                        .id(user.getId())
+                        .build())
+                .toList();
+    }
 
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(user);
+    @Override
+    public String deleteUserById(Long id) {
+        userRepository.deleteById(id);
+        return "deleted";
     }
 
     @Override
