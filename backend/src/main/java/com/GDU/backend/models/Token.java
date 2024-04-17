@@ -20,11 +20,11 @@ public class Token {
 
     @Column(unique = true)
     private String token;
-    
-    private LocalDateTime createdDate; 
-    
+
+    private LocalDateTime createdDate;
+
     private LocalDateTime expiresDate;
-    
+
     private LocalDateTime validatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -58,7 +58,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    
+
     @GetMapping("/most-viewed")
     public ResponseEntity<?> getMostViewedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
         try {
@@ -67,7 +67,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    
+
     @GetMapping("/most-downloaded")
     public ResponseEntity<?> getMostDownloadedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
         try {
@@ -101,16 +101,17 @@ public class DocumentController {
             }
         });
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDocumentById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(documentService.deleteDocument(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting document: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting document: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/increase-view/{id}")
     public ResponseEntity<String> increaseViewCountDocument(@PathVariable("id") Long id) {
         try {
@@ -119,7 +120,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    
+
     @GetMapping("/increase-download/{id}")
     public ResponseEntity<String> increaseDownloadDocument(@PathVariable("id") Long id) {
         try {
@@ -128,6 +129,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(@PathVariable("id") Long id, @RequestBody UploadDTO uploadDTO) {
         try {
@@ -202,9 +204,9 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/filter")
+    @PostMapping("/filter")
     public ResponseEntity<?> getDocumentsByFilter(
-            @RequestParam(required = false, name = "searchTerm") String searchTerm,
+            @RequestBody FilterDTO searchTerm,
             @RequestParam(required = false, name = "categoryName") String categoryName,
             @RequestParam(required = false, name = "subjectName") String subjectName,
             @RequestParam(required = false, name = "departmentSlug") String departmentSlug,
@@ -212,7 +214,7 @@ public class DocumentController {
             @RequestParam(required = false, name = "order") String order) {
         try {
             FilterDTO req = FilterDTO.builder()
-                    .searchTerm(searchTerm)
+                    .searchTerm(searchTerm.getSearchTerm())
                     .categoryName(categoryName)
                     .subjectName(subjectName)
                     .departmentSlug(departmentSlug)
@@ -225,4 +227,3 @@ public class DocumentController {
         }
     }
 }
-

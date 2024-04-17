@@ -19,6 +19,9 @@ public class AdminServiceImpl implements AdminService {
             Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
             Integer numberOfDocsPreYear = documentRepository.getNumberOfDocumentPreviousYear();
             float percentage = ((float) ((numberOfDocsThisYear - numberOfDocsPreYear) * 100)) / numberOfDocsPreYear;
+            if (numberOfDocsPreYear == 0) {
+                percentage = 100;
+            }
             float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
             DocumentResponse res = DocumentResponse.builder()
                     .totalDocumentsCurrent(numberOfDocsThisYear)
@@ -35,6 +38,9 @@ public class AdminServiceImpl implements AdminService {
             Integer numberOfDocsThisMonth = documentRepository.getNumberOfDocumentsThisMonth();
             Integer numberOfDocsPreMonth = documentRepository.getNumberOfDocumentPreviousMonth();
             float percentage = ((float) ((numberOfDocsThisMonth - numberOfDocsPreMonth) * 100)) / numberOfDocsPreMonth;
+            if (numberOfDocsPreMonth == 0) {
+                percentage = 100;
+            }
             float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
             DocumentResponse res = DocumentResponse.builder()
                     .totalDocumentsCurrent(numberOfDocsThisMonth)

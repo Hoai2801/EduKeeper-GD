@@ -50,7 +50,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
         int numberOfPages = pdfReader.getNumberOfPages();
-        
+
         // Create a new Document instance with the provided document information
         Document newDocument = Document.builder()
                 .title(uploadDto.getTitle())
@@ -167,7 +167,7 @@ public class DocumentServiceImpl implements DocumentService {
         Document document = getDocumentById(id);
         document.setViews(document.getViews() + 1);
         documentRepository.save(document);
-        return "View count increased successfully"; 
+        return "View count increased successfully";
     }
 
     @Override
@@ -187,7 +187,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<Document> getLastedDocuments(int limit) {
         return documentRepository.getLastedDocuments(limit);
     }
-    
+
     public String updateDownloads(Long id) {
         Document existsDocument = documentRepository.findById(id).orElse(null);
         if (existsDocument == null) {
@@ -245,13 +245,14 @@ public class DocumentServiceImpl implements DocumentService {
                 filterDTO.getSearchTerm(),
                 filterDTO.getSubjectName(),
                 filterDTO.getSpecializedSlug(),
-                filterDTO.getCategoryName()
-        );
-        if (filterDTO.getOrder().equalsIgnoreCase("mostViewed")) {
-            documents.sort(Comparator.comparing(Document::getViews).reversed());
-        }
-        if (filterDTO.getOrder().equalsIgnoreCase("mostDownloaded")) {
-            documents.sort(Comparator.comparing(Document::getDownload).reversed());
+                filterDTO.getCategoryName());
+        if (filterDTO.getOrder() != null) {
+            if (filterDTO.getOrder().equalsIgnoreCase("mostviewed")) {
+                documents.sort(Comparator.comparing(Document::getViews).reversed());
+            }
+            if (filterDTO.getOrder().equalsIgnoreCase("mostdownloaded")) {
+                documents.sort(Comparator.comparing(Document::getDownload).reversed());
+            }
         } else {
             documents.sort(Comparator.comparing(Document::getUpload_date).reversed());
         }

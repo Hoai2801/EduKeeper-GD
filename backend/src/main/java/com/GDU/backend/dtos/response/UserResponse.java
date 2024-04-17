@@ -22,10 +22,10 @@ public class UserResponse {
     private String email;
 
     private Role roles;
-    
+
     private boolean accountLocked;
 
     private LocalDateTime createdDate;
-    
+
     private LocalDateTime lastModifiedDate;
 }

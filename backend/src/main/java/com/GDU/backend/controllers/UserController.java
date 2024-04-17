@@ -20,13 +20,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() { 
-        return ResponseEntity.ok(userService.getAllUsers()); 
-    } 
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
 
     @Secured("ADMIN")
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id, Principal principal) {
+    public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id,
+            Principal principal) {
         return ResponseEntity.ok(userService.deleteUserById(id));
     }
 }

@@ -18,54 +18,51 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
 @CrossOrigin
 public class SecurityConfiguration {
-    private final JwtAuthenticationFilter JwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
+        // private final JwtAuthenticationFilter JwtAuthFilter;
+        private final AuthenticationProvider authenticationProvider;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
-        corsConfiguration.setAllowCredentials(true);
-        return http
-                .cors(corsSpec -> corsSpec.configurationSource(request -> corsConfiguration))
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/api/v1/user/**",
-                                "/api/v1/document/**",
-                                "/api/v1/specialized/**",
-                                "/api/v1/department/**",
-                                "/api/v1/role/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs",
-                                "/configuration/ui",
-                                "/swagger-resources/**",
-                                "/configuration/security",
-                                "/swagger-ui/**",
-                                "/api/v1/admin/**",
-                                "/webjars/**"
-                        ).permitAll()
-//                        .requestMatchers(
-//                                "/api/v1/admin/**"
-//                        ).hasRole("ADMIN")
-                        .anyRequest().permitAll()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS
-                ))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                CorsConfiguration corsConfiguration = new CorsConfiguration();
+                corsConfiguration.setAllowedHeaders(List.of("*"));
+                corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
+                corsConfiguration.setAllowedMethods(
+                                List.of("GET", "POST", "PUT", "DELETE", "PUT", "OPTIONS", "PATCH", "DELETE"));
+                corsConfiguration.setAllowCredentials(true);
+                return http
+                                .cors(corsSpec -> corsSpec.configurationSource(request -> corsConfiguration))
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .authorizeHttpRequests((requests) -> requests
+                                                .requestMatchers(
+                                                                "/api/v1/auth/**",
+                                                                "/api/v1/user/**",
+                                                                "/api/v1/document/**",
+                                                                "/api/v1/specialized/**",
+                                                                "/api/v1/department/**",
+                                                                "/api/v1/role/**",
+                                                                "/swagger-ui.html",
+                                                                "/v3/api-docs",
+                                                                "/configuration/ui",
+                                                                "/swagger-resources/**",
+                                                                "/configuration/security",
+                                                                "/swagger-ui/**",
+                                                                "/api/v1/admin/**",
+                                                                "/webjars/**")
+                                                .permitAll()
+                                                // .requestMatchers(
+                                                // "/api/v1/admin/**"
+                                                // ).hasRole("ADMIN")
+                                                .anyRequest().permitAll())
+                                .sessionManagement(session -> session.sessionCreationPolicy(
+                                                SessionCreationPolicy.STATELESS))
+                                .authenticationProvider(authenticationProvider)
+                                .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                                .build();
+        }
 }
-

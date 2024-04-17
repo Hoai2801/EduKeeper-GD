@@ -47,7 +47,7 @@ public class AuthenticationService {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return "Email already exists";
         }
-        
+
         // check if staffCode exists
         if (userRepository.existsByStaffCode(registerRequest.getStaffCode())) {
             return "StaffCode already exists";
@@ -71,7 +71,8 @@ public class AuthenticationService {
     private void sendValidationEmail(User user) throws MessagingException {
         var newToken = GenerateToken(user);
         // send email
-        emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.ACTIVATION,
+        emailService.sendEmail(user.getEmail(), user.getName(),
+                EmailTemplateName.ACTIVATION,
                 activationUrl + "/" + newToken);
     }
 
@@ -98,15 +99,12 @@ public class AuthenticationService {
         return sb.toString();
     }
 
-
     public AuthenticationResponse login(AuthenticationRequest loginRequest) {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         // use staff code to log in
                         loginRequest.getStaffCode(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
         var claims = new HashMap<String, Object>();
         var user = (User) auth.getPrincipal();
         claims.put("staff_code", user.getUsername());
@@ -120,8 +118,7 @@ public class AuthenticationService {
 
     public String activate(String token) {
         var dbToken = tokenRepository.findByToken(token).orElseThrow(
-                () -> new RuntimeException("Invalid token")
-        );
+                () -> new RuntimeException("Invalid token"));
         if (dbToken.getExpiresDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token expired");
         }
@@ -137,8 +134,7 @@ public class AuthenticationService {
 
     public String forgotPassword(String staffCode) {
         var user = userRepository.findByStaffCode(staffCode).orElseThrow(
-                () -> new RuntimeException("User not found")
-        );
+                () -> new RuntimeException("User not found"));
 
         // generate token
         String generatedToken = generateActivationCode(6);
@@ -152,8 +148,10 @@ public class AuthenticationService {
         tokenRepository.save(newToken);
         // send email
         try {
-            String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" + newToken.getToken();
-            emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.FORGOT_PASSWORD,
+            String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" +
+                    newToken.getToken();
+            emailService.sendEmail(user.getEmail(), user.getName(),
+                    EmailTemplateName.FORGOT_PASSWORD,
                     forgotPasswordUrl);
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -163,8 +161,7 @@ public class AuthenticationService {
 
     public String resetPassword(String token, ChangePasswordRequest changePasswordRequest) {
         var dbToken = tokenRepository.findByToken(token).orElseThrow(
-                () -> new RuntimeException("Invalid token")
-        );
+                () -> new RuntimeException("Invalid token"));
         if (dbToken.getExpiresDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token expired");
         }
