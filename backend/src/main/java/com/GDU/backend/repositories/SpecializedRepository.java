@@ -24,4 +24,7 @@ public interface SpecializedRepository extends JpaRepository<Specialized, Long> 
 
     @Query("SELECT s FROM Specialized s WHERE s.departmentID.id = :id")
     List<Specialized> getSpecializedsByDepartmentId(Long id);
+
+    @Query("SELECT s FROM Specialized s WHERE s.departmentID.departmentSlug = :slug")
+    List<Specialized> getSpecializedsByDepartmentSlug(String slug);
 }

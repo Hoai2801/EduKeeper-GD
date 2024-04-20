@@ -34,4 +34,9 @@ public class SpecializedServiceImpl implements SpecializedService {
         return specializedRepository.getLastestDocumentsBySpecializedSlug(specializedSlug).size();
     }
 
+    @Override
+    public List<Specialized> getSpecializedsByDepartmentSlug(String slug) {
+        return specializedRepository.getSpecializedsByDepartmentSlug(slug);
+    }
+
 }

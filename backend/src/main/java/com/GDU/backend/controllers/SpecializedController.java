@@ -25,6 +25,11 @@ public class SpecializedController {
     public List<Specialized> getSpecializesByDepartmentId(@PathVariable Long id) {
         return specializedService.getSpecializedsByDepartment(id);
     }
+
+//    @GetMapping("/department/{slug}")
+//    public List<Specialized> getSpecializesByDepartmentSlug(@PathVariable String slug) {
+//        return specializedService.getSpecializedsByDepartmentSlug(slug);
+//    }
     
     @GetMapping("/documents/{slug}")
     public List<Document> getDocumentsBySpecializedSlug(@PathVariable("slug") String slug) {

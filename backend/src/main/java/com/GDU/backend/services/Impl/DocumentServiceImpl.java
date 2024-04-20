@@ -247,11 +247,13 @@ public class DocumentServiceImpl implements DocumentService {
                 filterDTO.getSpecializedSlug(),
                 filterDTO.getCategoryName()
         );
-        if (filterDTO.getOrder().equalsIgnoreCase("mostViewed")) {
-            documents.sort(Comparator.comparing(Document::getViews).reversed());
-        }
-        if (filterDTO.getOrder().equalsIgnoreCase("mostDownloaded")) {
-            documents.sort(Comparator.comparing(Document::getDownload).reversed());
+        if (filterDTO.getOrder() != null) {
+            if (filterDTO.getOrder().equalsIgnoreCase("mostviewed")) {
+                documents.sort(Comparator.comparing(Document::getViews).reversed());
+            }
+            if (filterDTO.getOrder().equalsIgnoreCase("mostdownloaded")) {
+                documents.sort(Comparator.comparing(Document::getDownload).reversed());
+            }
         } else {
             documents.sort(Comparator.comparing(Document::getUpload_date).reversed());
         }

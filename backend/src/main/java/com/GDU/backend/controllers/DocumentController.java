@@ -202,15 +202,16 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/filter")
+    @PostMapping("/filter")
     public ResponseEntity<?> getDocumentsByFilter(
-            @RequestParam(required = false, name = "searchTerm") String searchTerm,
-            @RequestParam(required = false, name = "categoryName") String categoryName,
-            @RequestParam(required = false, name = "subjectName") String subjectName,
-            @RequestParam(required = false, name = "departmentSlug") String departmentSlug,
-            @RequestParam(required = false, name = "specializedSlug") String specializedSlug,
+            @RequestBody String searchTerm,
+            @RequestParam(required = false, name = "category") String categoryName,
+            @RequestParam(required = false, name = "subject") String subjectName,
+            @RequestParam(required = false, name = "department") String departmentSlug,
+            @RequestParam(required = false, name = "specialized") String specializedSlug,
             @RequestParam(required = false, name = "order") String order) {
         try {
+            System.out.println(searchTerm);
             FilterDTO req = FilterDTO.builder()
                     .searchTerm(searchTerm)
                     .categoryName(categoryName)

@@ -13,7 +13,7 @@ const Admin = () => {
     window.location.href = "/";
   }
 
-  if (jwt !== null && jwt.exp < Date.now() / 1000 && jwt.role !== "admin") {
+  if (jwt !== null && jwt.exp < Date.now() / 1000 && jwt.role !== "ADMIN") {
     window.location.href = "/";
   }
 
@@ -33,11 +33,11 @@ const Admin = () => {
                 <span className="text-gray-500 text-sm antialiased font-sans font-normal leading-normal mx-2 pointer-events-none select-none">/</span>
               </li>
               <li className="flex items-center text-blue-900 antialiased font-sans text-sm font-normal leading-normal cursor-pointer transition-colors duration-300 hover:text-blue-500">
-                <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">home</p>
+                <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">user</p>
               </li>
             </ol>
           </nav>
-          <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-gray-900">home</h6>
+          <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-gray-900">user</h6>
         </div>
         <div className="flex items-center">
           <div className="mr-auto md:mr-4 md:w-56">

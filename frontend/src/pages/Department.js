@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import removeIcon from '../assets/logo192.png'
+import editIcon from '../assets/edit-246.png'
 
 const Department = () => {
     const [department, setDepartment] = useState(null);
@@ -15,16 +17,24 @@ const Department = () => {
     <div>
         {department && department.map((dep) => (
             <div key={dep.id}>
-                <div className='flex justify-between w-full bg-slate-500 text-white'>
+                <div className='flex justify-between w-full border shadow-lg rounded-xl border-black p-4 mt-5'>
                 <h1 className='text-3xl'>{dep.departmentName}</h1>
                     <div>
-                        <button onClick={null}>Remove</button>
-                        <button onClick={null}>Edit</button>
+                        <button onClick={null}>
+                            <img src={removeIcon} alt="" className='w-10 h-10'/>
+                        </button>
+                        <button onClick={null}>
+                            <img src={editIcon} alt="" className='w-10 h-10'/>
+                        </button>
                     </div>
                 </div>
+                
                 {dep.specializeds && dep.specializeds.map((specialized) => (
-                    <div key={specialized.id}>
-                        <h2>{specialized.specializedName}</h2>
+                    <div key={specialized.id} className='flex pl-10 gap-2'>
+                        <span className='text-3xl'>
+                            L
+                        </span>
+                        <h2 className='mt-3 text-xl'>{specialized.specializedName}</h2>
                     </div>
                 ))}
             </div>

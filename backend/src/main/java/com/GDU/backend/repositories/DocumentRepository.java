@@ -47,17 +47,18 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "JOIN department dm ON dm.id = s.department_id " +
             "WHERE (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
             +
-            "AND (MATCH (d.title) AGAINST (:searchTerm IN BOOLEAN MODE) OR  (d.author_name) LIKE %:searchTerm%)"
+            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author_name LIKE CONCAT('%', :searchTerm, '%')))"
             +
-            "AND (:categoryName IS NULL OR c.category_name LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))"
+            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))"
             +
-            "AND (:subjectName IS NULL OR sj.subject_name LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))"
+            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))"
             +
             "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) ", nativeQuery = true)
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,
                                         @Param("subjectName") String subjectName,
-                                        @Param("specializedSlug") String spicializedSlug, @Param("categoryName") String categoryName);
+                                        @Param("specializedSlug") String specializedSlug, 
+                                        @Param("categoryName") String categoryName);
 
     // Get total number of documents this year
     @Query(value = "SELECT count(*) FROM document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01'))", nativeQuery = true)

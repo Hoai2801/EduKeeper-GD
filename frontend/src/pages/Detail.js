@@ -62,7 +62,7 @@ const Detail = () => {
   return (
     <div>
       <div className='pt-[50px]'>
-        <p className='text-blue-500'><Link to={`/category/${data?.category.slug}`}>{data?.category.category_name}</Link> - <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.departmentID.departmentName}</Link> - <Link to={`/specialized/${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
+        <p className='text-blue-500'><Link to={`/category/${data?.category.slug}`}>{data?.category.category_name}</Link> - <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - <Link to={`/specialized/${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
         <h2 className='text-[28px] font-bold max-w-[900px] text-justify'>{data?.title}</h2>
         <div className='flex justify-between mt-3'>
           <div>

@@ -20,9 +20,9 @@ const Home = () => {
     <div>
       {/* <Hero /> */}
       {/* <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfOjCiVe8eY0jvXueGf7lGOgOEd5xr2bHbrz7LYqa-6w5KRLw/viewform?embedded=true" width="640" height="1118" frameborder="0" marginheight="0" marginwidth="0">Đang tải…</iframe> */}
-      <div className='bg-white rounded-lg w-[1280px] h-fit shadow-lg pt-5 mt-10 flex flex-col p-10'>
-      <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
-        <div className='ml-5 flex flex-col gap-5 items-center'>
+      <div className='bg-white rounded-lg lg:w-[1280px] w-full h-fit shadow-lg pt-5 mt-10 flex flex-col p-10'>
+        <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
+        <div className='lg:ml-5 flex flex-col gap-5 items-center'>
           {lastedDocuments.map((item, index) => (
             <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} />
           ))}

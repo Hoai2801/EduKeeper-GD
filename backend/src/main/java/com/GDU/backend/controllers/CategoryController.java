@@ -39,8 +39,8 @@ public class CategoryController {
     }
 
     @GetMapping("")
-    public ResponseEntity<String> getCategory() {
-        return ResponseEntity.ok("Get:: category");
+    public ResponseEntity<?> getCategory() {
+        return ResponseEntity.ok().body(categoryService.findAll());
     }
 
     @PutMapping("/{id}")

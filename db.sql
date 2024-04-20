@@ -129,7 +129,8 @@ DROP TABLE IF EXISTS `category`;
 -- dùng để phân loại tài liệu như là tiểu luận, sách, bài báo nghiên cứu khoa học, tài liệu tham khảo, giáo trình...
 CREATE TABLE `category` (
                             `id` tinyint NOT NULL AUTO_INCREMENT,
-                            `category_name` varchar(200) NOT NULL,
+                            `category_name` varchar(50) NOT NULL,
+                            `category_slug` varchar(100) not null,
                             PRIMARY KEY (`id`),
                             KEY `idx_category_name` (`category_name`)
 );

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const DocumentCard = ({title, author, upload_date, views, download, pages, slug}) => {
   return (
-    <div className='p-2 rounded-lg bg-white flex border h-[200px] w-[820px] gap-5 shadow-sm'>
+    <div className='p-2 rounded-lg bg-white flex border h-[200px] lg:w-[820px] gap-5 shadow-sm w-[95%]'>
         <div className='w-[150px] h-full border rounded-xl pt-2'>
             <img src="https://static.vecteezy.com/system/resources/previews/006/692/271/non_2x/document-icon-template-black-color-editable-document-icon-symbol-flat-illustration-for-graphic-and-web-design-free-vector.jpg" alt="" />
         </div>

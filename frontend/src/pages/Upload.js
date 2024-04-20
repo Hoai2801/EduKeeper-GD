@@ -6,39 +6,25 @@ export const Upload = () => {
   const [selectedFile, setFile] = useState(null);
 
   const [department, setDepartment] = useState(null);
-  // const [category, setCategory] = useState(null);
-  // const [specialized, setSpecialized] = useState(null);
-  // const [object, setObject] = useState(null);
-  // const [teacher, setTeacher] = useState(null);
+  const [category, setCategory] = useState(null);
+  const [specialized, setSpecialized] = useState(null);
+  const [object, setObject] = useState(null);
+  const [teacher, setTeacher] = useState(null);
 
   const [selectedDepartment, setSelectedDepartment] = useState(null);
-
-  // const department = [
-  //   {
-  //     id: 1,
-  //     name: 'Khoa học máy tính'
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Khoa học điện tử'
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Hệ thống thông tin'
-  //   },
-  //   {
-  //     id: 4,
-  //     name: 'Khoa học dữ liệu'
-  //   },
-  //   {
-  //     id: 5,
-  //     name: 'Quản trị kinh doanh'
-  //   }
-  // ]
+  const [listSpecialized, setListSpecialized] = useState(null);
 
   const handleFiles = (updatedFile) => {
     setFile(updatedFile[0]);
   };
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/v1/specialized/department/' + selectedDepartment).then(response => response.json())
+    .then(data => {
+      setListSpecialized(data)
+    })
+    .catch(error => console.error(error));
+  }, [selectedDepartment])
 
   useEffect(() => {
     fetch('http://localhost:8080/api/v1/department').then(response => response.json())
@@ -65,7 +51,7 @@ export const Upload = () => {
   console.log(selectedDepartment)
   return (
     <div>
-      <h2 className='text-3xl font-bold mb-5'>Đăng tài liệu</h2>
+      <h2 className='text-3xl font-bold mb-5 mt-10'>Đăng tài liệu</h2>
       <DragDropFile handleFiles={handleFiles} />
       <div className="max-w-md mx-auto p-8 bg-white rounded-md shadow-md mt-5">
         <h2 className="text-2xl font-semibold mb-6">Thông tin tài liệu</h2>
@@ -88,10 +74,21 @@ export const Upload = () => {
             </select>
           </div>
 
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Chuyên ngành</label>
             <input type="email" id="email" name="email" placeholder="" required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500" />
+          </div> */}
+          <div className="max-w-sm mx-auto mb-3">
+            <label htmlFor="department" className="block mb-2 text-sm font-semibold text-gray-900">Khoa</label>
+            <select id="department" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"  onChange={e => setSpecialized(e.target.value)}>
+              <option>Chọn khoa</option>
+              {
+                Array.isArray(listSpecialized) && listSpecialized.map(specialized => (
+                  <option value={specialized.id} key={specialized.id}>{specialized.specializedName}</option>
+                ))
+              }
+            </select>
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Môn học</label>

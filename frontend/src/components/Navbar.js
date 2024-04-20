@@ -3,21 +3,21 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 const Navbar = () => {
   const token = localStorage.getItem("token");
-  console.log(token)
   let jwt = null;
   if (token !== "undefined" && token !== null) {
     jwt = jwtDecode(token);
   }
-  
-  const isAdmin = 0;
 
   const [isShowProfile, setIsShownProfile] = useState(false);
   const [isShowSpecialized, setIsShownSpecialized] = useState(false);
-  const [isShowBook, setIsShownBook] = useState(false);
   const [isShowCategory, setIsShownCategory] = useState(false);
   const [isSubMenShow, setIsSubMenuShown] = useState(false);
 
+  const [searchTerm, setSearch] = useState("");
+
   const [specialized, setSpecialized] = useState(null);
+
+  const [category, setCategory] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/specialized")
@@ -26,19 +26,25 @@ const Navbar = () => {
         setSpecialized(data);
         // console.log(data)
       });
+    
+    fetch("http://localhost:8080/api/v1/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        setCategory(data);
+        console.log(data)
+      });
 
-      if (jwt && jwt.exp < Date.now() / 1000) {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      }
+    if (jwt && jwt.exp < Date.now() / 1000) {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
   }, [])
 
   const out = () => {
-      setIsShownSpecialized(false);
-      setIsShownBook(false);
-      setIsShownCategory(false);
-      setIsSubMenuShown(false);
-      setIsShownProfile(false);
+    setIsShownSpecialized(false);
+    setIsShownCategory(false);
+    setIsSubMenuShown(false);
+    setIsShownProfile(false);
   }
 
   const logout = () => {
@@ -46,11 +52,17 @@ const Navbar = () => {
     window.location.href = "/";
   }
 
+  const search = () => {
+    localStorage.setItem('search', searchTerm);
+    window.location.href = `http://localhost:3000/search?filter=&order=lasted`; // corrected URL
+}
+
+
   return (
     <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
       <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
         <div className="flex gap-4 w-[250px] h-full">
-          <Link to="/">
+          <Link to={"/"}>
             <div className="min-w-[135px]">
               <img
                 src="https://giadinh.edu.vn/upload/photo/logofooter-8814.png"
@@ -60,9 +72,9 @@ const Navbar = () => {
             </div>
           </Link>
         </div>
-        <div className="lg:gap-4 text-[12px] lg:min-w-[500px] hidden lg:flex">
+        <div className="lg:gap-4 text-[12px] lg:min-w-[600px] hidden lg:flex">
           <Link
-            to="/"
+            to={"/"}
             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
             onMouseEnter={() => setIsShownSpecialized(false)}
           >
@@ -73,48 +85,24 @@ const Navbar = () => {
             onMouseEnter={() => {
               setIsShownSpecialized(true)
               setIsShownCategory(false)
-              setIsShownBook(false)
             }}
           >
             <div className="" >
               <p className="group-hover/department:text-blue-700">
-                Tài liệu
+                Ngành
               </p>
               <div className={`w-[500px] h-[300px] overflow-scroll absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                 {specialized && specialized.map((item, index) => (
-                  <Link to={`/search?specialized=${item.specializedSlug}&searchTerm=&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                  <Link to={`/search?specialized=${item.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
                 ))}
               </div>
             </div>
           </Link>
           <Link
-            to="/book"
-            className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
-            onMouseEnter={() => {
-              setIsShownBook(true)
-              setIsShownSpecialized(false)
-              setIsShownCategory(false)
-            }
-            }
-          >
-            <div className="" >
-              <p className="group-hover/department:text-blue-700">
-                Sách/Giáo trình
-              </p>
-              <div className={`w-[500px] h-[300px] overflow-scroll flex flex-col absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowBook ? "" : "hidden"}`} onMouseLeave={() => setIsShownBook(false)}>
-                {specialized && specialized.map((item, index) => (
-                  <Link to={`/search?specialized=${item.specializedSlug}&&category=1`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
-                ))}
-              </div>
-            </div>
-          </Link>
-          <Link
-            to="/category"
             className="hover:rounded-3xl hover:bg-[#C5D6F8] py-3 px-5 group/department"
             onMouseEnter={() => {
               setIsShownCategory(true)
               setIsShownSpecialized(false)
-              setIsShownBook(false)
             }
             }
           >
@@ -122,13 +110,14 @@ const Navbar = () => {
               <p className="group-hover/department:text-blue-700">
                 Thể loại
               </p>
-              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
-                <p>IT</p>
-                <p>CNTT</p>
+              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border p-5 ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
+                {category && category?.map((item, index) => (
+                  <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] rounded-xl`}>{item.categoryName}</Link>
+                ))}
               </div>
             </div>
           </Link>
-          {isAdmin ? (
+          {jwt?.role === "ADMIN" ? (
             <Link
               to="/upload"
               className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
@@ -147,8 +136,8 @@ const Navbar = () => {
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
               </svg>
             </div>
-            <input type="search" id="default-search" className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Tìm sách theo tên, chủ đề..." required />
-            <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Tìm</button>
+            <input type="search" id="default-search" className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Tìm sách theo tên, chủ đề..." required value={searchTerm} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}/>
+            <button type="reset" onClick={search} className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Tìm</button>
           </div>
         </form>
 

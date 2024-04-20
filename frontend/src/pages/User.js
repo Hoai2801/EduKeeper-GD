@@ -147,7 +147,7 @@ const User = () => {
             <thead>
               <tr className="bg-gray-200">
                 <th className="px-4 py-2">Họ và tên</th>
-                <th className="px-4 py-2">Mã giáo viên</th>
+                <th className="px-4 py-2">Mã nhân viên</th>
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Quyền</th>
                 <th className="px-4 py-2">Tình trạng</th>
