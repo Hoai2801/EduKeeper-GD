@@ -65,9 +65,9 @@ public class FakeController {
         UploadDTO uploadDTO = UploadDTO.builder()
                 .title(faker.book().title())
                 .author(faker.name().fullName())
-                .specialized((long) faker.number().numberBetween(1, 39))
-                .subject(1L)
-                .category((long) faker.number().numberBetween(1, 4))
+                .specialized(faker.number().numberBetween(1, 39))
+                .subject(1)
+                .category(faker.number().numberBetween(1, 4))
                 .description(faker.chuckNorris().fact())
                 .document(result)
                 .build();

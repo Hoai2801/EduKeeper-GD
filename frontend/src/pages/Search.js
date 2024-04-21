@@ -7,14 +7,14 @@ const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // lasted, most download or most views
-  const order = searchParams.get('order') || 'lasted';
+  const order = searchParams.get('order');
   const slugSpecialized = searchParams.get('specialized')
   const slugDepartment = searchParams.get('department')
   const slugSubject = searchParams.get('subject')
   const publishYear = searchParams.get('publishYear')
   const category = searchParams.get('category')
 
-  const [documents, setDocument] = useState(null)
+  const [documents, setDocument] = useState([])
 
   const search = localStorage.getItem('search') || '';
 

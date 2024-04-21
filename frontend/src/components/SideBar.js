@@ -43,7 +43,7 @@ const SideBar = () => {
     // }
 
     const filter = () => {
-        const redirect = "http://localhost:3000/search?filter?order=" + sort
+        const redirect = "http://localhost:3000/search?filter&order=" + sort
             + (department  ? `&department=${department}` : '')
             + (specialized ? `&specialized=${specialized}` : '')
 

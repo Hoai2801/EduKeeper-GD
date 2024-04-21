@@ -24,17 +24,17 @@ public class UploadDTO {
 
     @NotEmpty
     @NotBlank
-    private Long specialized;
+    private int specialized;
 
     @NotEmpty
     @NotBlank
-    private Long category;
+    private int category;
     
-    private Long subject;
+    private int subject;
     
-    @NotEmpty
-    @NotBlank
-    private String department;
+//    @NotEmpty
+//    @NotBlank
+//    private String department;
     
     private String author;
 

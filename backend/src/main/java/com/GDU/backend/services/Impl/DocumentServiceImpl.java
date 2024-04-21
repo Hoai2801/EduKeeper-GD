@@ -8,6 +8,7 @@ import com.GDU.backend.models.Category;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.models.Subject;
+import com.GDU.backend.repositories.CategoryRepo;
 import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.services.DocumentService;
 import com.itextpdf.text.pdf.PdfReader;
@@ -30,6 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
+    private final CategoryRepo categoryRepo;
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
@@ -42,11 +44,11 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public String uploadDocument(UploadDTO uploadDto) throws IOException {
         // Get the category and specialized from the UploadDto
-        Category category = Category.builder().id(uploadDto.getCategory()).build();
+        Category category = Category.builder().id((long) uploadDto.getCategory()).build();
 
-        Specialized specialized = Specialized.builder().id(uploadDto.getSpecialized()).build();
+        Specialized specialized = Specialized.builder().id((long) uploadDto.getSpecialized()).build();
 
-        Subject subject = Subject.builder().id(uploadDto.getSubject()).build();
+        Subject subject = Subject.builder().id((long) uploadDto.getSubject()).build();
 
         PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
         int numberOfPages = pdfReader.getNumberOfPages();
@@ -105,17 +107,15 @@ public class DocumentServiceImpl implements DocumentService {
             return "Document not existing";
         }
 
+        Category category = categoryRepo.findById((long) uploadDTO.getCategory()).orElse(null);
         // Update document
         existDocument
-                .setCategory(uploadDTO.getCategory() != null ? Category.builder().id(uploadDTO.getCategory()).build()
-                        : existDocument.getCategory());
+                .setCategory(category);
         existDocument.setAuthor(uploadDTO.getAuthor() != null ? uploadDTO.getAuthor() : existDocument.getAuthor());
         existDocument.setTitle(uploadDTO.getTitle() != null ? uploadDTO.getTitle() : existDocument.getTitle());
         existDocument.setSlug(uploadDTO.getTitle() != null ? uploadDTO.getTitle().replace(" ", "-").toLowerCase()
                 + "-" + new Date().getTime() : existDocument.getSlug());
-        existDocument.setSpecialized(
-                uploadDTO.getSpecialized() != null ? Specialized.builder().id(uploadDTO.getSpecialized()).build()
-                        : existDocument.getSpecialized());
+        existDocument.setSpecialized(existDocument.getSpecialized());
 
         // Handle Path
         if (uploadDTO.getDocument() != null) {

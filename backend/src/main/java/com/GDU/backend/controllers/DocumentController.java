@@ -91,8 +91,9 @@ public class DocumentController {
     @Async
     @PostMapping
     public CompletableFuture<ResponseEntity<String>> uploadDocument(
-            @Valid @ModelAttribute UploadDTO uploadDto) {
+            @ModelAttribute UploadDTO uploadDto) {
         return CompletableFuture.supplyAsync(() -> {
+            System.out.println("Uploading document: " + uploadDto.toString());
             try {
                 return ResponseEntity.ok(documentService.uploadDocument(uploadDto));
             } catch (Exception e) {
