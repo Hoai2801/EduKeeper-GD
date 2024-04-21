@@ -1,13 +1,12 @@
 package com.GDU.backend.repositories;
 
 import com.GDU.backend.models.Document;
-
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
@@ -57,7 +56,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,
                                         @Param("subjectName") String subjectName,
-                                        @Param("specializedSlug") String specializedSlug, 
+                                        @Param("specializedSlug") String specializedSlug,
                                         @Param("categoryName") String categoryName);
 
     // Get total number of documents this year

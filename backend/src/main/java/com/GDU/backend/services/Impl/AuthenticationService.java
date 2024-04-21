@@ -4,6 +4,9 @@ import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
 import com.GDU.backend.dtos.response.AuthenticationResponse;
+import com.GDU.backend.exceptions.InvalidTokenException;
+import com.GDU.backend.exceptions.PasswordsDoNotMatchException;
+import com.GDU.backend.exceptions.TokenExpiredException;
 import com.GDU.backend.exceptions.UserNotFoundException;
 import com.GDU.backend.models.Token;
 import com.GDU.backend.models.User;
@@ -12,10 +15,8 @@ import com.GDU.backend.repositories.TokenRepository;
 import com.GDU.backend.repositories.UserRepository;
 import com.GDU.backend.services.Impl.enums.EmailTemplateName;
 import jakarta.mail.MessagingException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,6 +35,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
+    private final UserServiceImpl userService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
@@ -50,7 +52,7 @@ public class AuthenticationService {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return "Email already exists";
         }
-        
+
         // check if staffCode exists
         if (userRepository.existsByStaffCode(registerRequest.getStaffCode())) {
             return "StaffCode already exists";
@@ -72,13 +74,14 @@ public class AuthenticationService {
     }
 
     private void sendValidationEmail(User user) throws MessagingException {
-        var newToken = GenerateToken(user);
+        var newToken = generateToken(user);
         // send email
-        emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.ACTIVATION,
+        emailService.sendEmail(user.getEmail(), user.getName(),
+                EmailTemplateName.ACTIVATION,
                 activationUrl + "/" + newToken);
     }
 
-    private String GenerateToken(User user) {
+    private String generateToken(User user) {
         // generate token
         String generatedToken = generateActivationCode(6);
         var token = Token.builder()
@@ -101,15 +104,12 @@ public class AuthenticationService {
         return sb.toString();
     }
 
-
     public AuthenticationResponse login(AuthenticationRequest loginRequest) {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         // use staff code to log in
                         loginRequest.getStaffCode(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
         var claims = new HashMap<String, Object>();
         var user = (User) auth.getPrincipal();
         claims.put("staff_code", user.getUsername());
@@ -123,8 +123,7 @@ public class AuthenticationService {
 
     public String activate(String token) {
         var dbToken = tokenRepository.findByToken(token).orElseThrow(
-                () -> new RuntimeException("Invalid token")
-        );
+                () -> new RuntimeException("Invalid token"));
         if (dbToken.getExpiresDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token expired");
         }
@@ -143,24 +142,11 @@ public class AuthenticationService {
             var user = userRepository.findByStaffCode(staffCode).orElseThrow(
                     () -> new UserNotFoundException("User not found")
             );
-
-            // generate token
-            String generatedToken = generateActivationCode(6);
-
-            // save token
-            var newToken = Token.builder()
-                    .token(generatedToken)
-                    .createdDate(LocalDateTime.now())
-                    .expiresDate(LocalDateTime.now().plusMinutes(5))
-                    .user(user)
-                    .build();
-            tokenRepository.save(newToken);
-        
+            String newToken = generateToken(user);
             // send email
-            String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" + newToken.getToken();
+            String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" + newToken;
             emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.FORGOT_PASSWORD,
                     forgotPasswordUrl);
-        
             return "sent";
         } catch (UserNotFoundException e) {
             throw new UserNotFoundException("User not found");
@@ -172,19 +158,17 @@ public class AuthenticationService {
 
     public String resetPassword(String token, ChangePasswordRequest changePasswordRequest) {
         var dbToken = tokenRepository.findByToken(token).orElseThrow(
-                () -> new RuntimeException("Invalid token")
-        );
+                () -> new InvalidTokenException("Invalid token"));
         if (dbToken.getExpiresDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
+            throw new TokenExpiredException("Token expired");
         }
         if (!changePasswordRequest.getPassword().equals(changePasswordRequest.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
+            throw new PasswordsDoNotMatchException("Passwords do not match");
         }
         User user = dbToken.getUser();
-        System.out.println(user);
-        System.out.println(changePasswordRequest.getPassword());
-        user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
-        userRepository.save(user);
+        log.info("User: {}", user);
+        log.info("Password: {}", changePasswordRequest.getPassword());
+        userService.changePassword(user, changePasswordRequest.getPassword());
         tokenRepository.delete(dbToken);
         return "reset";
     }

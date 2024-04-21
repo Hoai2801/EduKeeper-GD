@@ -5,9 +5,7 @@ import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
-
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -28,14 +26,7 @@ import java.util.concurrent.CompletableFuture;
 public class DocumentController {
 
     private final DocumentServiceImpl documentService;
-
-    /**
-     * Get file by slug
-     *
-     * @param slug - the slug of the file
-     * @return ResponseEntity with the file and 200 status code if successful, or
-     *         500 status code if an error occurs
-     */
+    
     @GetMapping("/{slug}/file")
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
@@ -58,7 +49,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    
+
     @GetMapping("/most-viewed")
     public ResponseEntity<?> getMostViewedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
         try {
@@ -67,7 +58,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    
+
     @GetMapping("/most-downloaded")
     public ResponseEntity<?> getMostDownloadedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
         try {
@@ -102,16 +93,17 @@ public class DocumentController {
             }
         });
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDocumentById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(documentService.deleteDocument(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting document: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting document: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/increase-view/{id}")
     public ResponseEntity<String> increaseViewCountDocument(@PathVariable("id") Long id) {
         try {
@@ -120,7 +112,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    
+
     @GetMapping("/increase-download/{id}")
     public ResponseEntity<String> increaseDownloadDocument(@PathVariable("id") Long id) {
         try {
@@ -129,6 +121,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(@PathVariable("id") Long id, @RequestBody UploadDTO uploadDTO) {
         try {
@@ -174,6 +167,24 @@ public class DocumentController {
         }
     }
 
+    @GetMapping("/year")
+    public ResponseEntity<?> getDocsThisYear() {
+        try {
+            return ResponseEntity.ok(documentService.getDocumentThisYear());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+//    @GetMapping("/month")
+//    public ResponseEntity<?> getDocsThisMonth() {
+//        try {
+//            return ResponseEntity.ok(documentService.getDocumentThisMonth());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
+
     // Author
     @GetMapping("/author/{authorName}")
     public ResponseEntity<?> getDocumentsByAuthorName(@PathVariable("authorName") String authorName) {
@@ -212,7 +223,6 @@ public class DocumentController {
             @RequestParam(required = false, name = "specialized") String specializedSlug,
             @RequestParam(required = false, name = "order") String order) {
         try {
-            System.out.println(searchTerm);
             FilterDTO req = FilterDTO.builder()
                     .searchTerm(searchTerm)
                     .categoryName(categoryName)
@@ -227,4 +237,3 @@ public class DocumentController {
         }
     }
 }
-

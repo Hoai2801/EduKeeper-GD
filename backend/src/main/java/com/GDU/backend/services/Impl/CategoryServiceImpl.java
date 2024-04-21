@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepo categoryRepo;
+
     @Override
     public Category createCategory(CategoryDto categoryDto) {
         String categorySlug = categoryDto.getCategory_name().replace(" ", "-").toLowerCase();

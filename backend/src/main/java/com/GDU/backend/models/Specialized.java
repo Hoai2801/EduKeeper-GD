@@ -26,7 +26,7 @@ public class Specialized {
     @JoinColumn(name = "department_id")
     @JsonIgnore
     private Department departmentID;
-    
+
     @Column(name = "specialized_slug", nullable = false, length = 200)
     private String specializedSlug;
 }

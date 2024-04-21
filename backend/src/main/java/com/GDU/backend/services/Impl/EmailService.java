@@ -27,17 +27,17 @@ public class EmailService {
 
     @Async
     public void sendEmail(
-            String to, 
-            String username, 
-            EmailTemplateName emailTemplateName, 
+            String to,
+            String username,
+            EmailTemplateName emailTemplateName,
             String url
     ) throws MessagingException {
-       String templateName;
-       if (emailTemplateName == null) {
-           templateName = "confirm-email";
-       } else {
-           templateName = emailTemplateName.getName();
-       }
+        String templateName;
+        if (emailTemplateName == null) {
+            templateName = "confirm-email";
+        } else {
+            templateName = emailTemplateName.getName();
+        }
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(
                 message,
@@ -58,12 +58,10 @@ public class EmailService {
         helper.setFrom("dreamhoaihack@gmail.com");
         helper.setTo(to);
         helper.setSubject(emailTemplateName.name());
-        
+
         String template = templateEngine.process(templateName, context);
         helper.setText(template, true);
         javaMailSender.send(message);
-        
     }
-    
 }
 

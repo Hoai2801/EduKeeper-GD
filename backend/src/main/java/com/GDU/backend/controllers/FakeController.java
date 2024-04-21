@@ -2,7 +2,7 @@ package com.GDU.backend.controllers;
 
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
-import com.itextpdf.text.*;
+import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

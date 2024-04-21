@@ -1,13 +1,13 @@
 package com.GDU.backend.services;
 
-import java.util.List;
-
 import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
+import com.GDU.backend.dtos.response.DocumentResponse;
 import com.GDU.backend.models.Document;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface DocumentService {
     String uploadDocument(UploadDTO uploadDto) throws IOException;
@@ -23,16 +23,17 @@ public interface DocumentService {
     Document getDocumentBySlug(String slug);
 
     String deleteDocument(Long id);
-    
+
     String increaseViewCount(Long id);
 
     String increaseDownloadCount(Long id);
-    
+
     List<Document> getMostViewedDocuments(int limit);
 
     List<Document> getMostDownloadedDocuments(int limit);
 
     List<Document> getLastedDocuments(int limit);
+
     List<Document> getPopularDocumentsOfThisWeek();
 
     List<Document> getPopularDocumentsOfThisMonth();
@@ -44,4 +45,8 @@ public interface DocumentService {
     List<Document> getDocumentsBySlugSpecialized(String slug);
 
     List<Document> getDocumentsByFilter(FilterDTO filterDTO);
+
+    DocumentResponse getDocumentThisYear();
+
+//    DocumentResponse getDocumentThisMonth();
 }

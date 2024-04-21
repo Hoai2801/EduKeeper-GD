@@ -17,13 +17,13 @@ public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "subject_name", nullable = false, length = 50)
     private String name;
-    
+
     @Column(name = "subject_slug", nullable = false, length = 50)
     private String slug;
-    
+
     @ManyToOne()
     @JoinColumn(name = "specialized_id")
     private Specialized specialized;

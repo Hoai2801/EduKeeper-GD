@@ -1,7 +1,6 @@
 package com.GDU.backend.services;
 
 import com.GDU.backend.dtos.requests.DepartmentDTO;
-import com.GDU.backend.dtos.response.DepartmentResponse;
 import com.GDU.backend.models.Department;
 
 import java.util.List;

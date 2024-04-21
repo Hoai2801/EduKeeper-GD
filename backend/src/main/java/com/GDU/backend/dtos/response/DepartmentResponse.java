@@ -12,6 +12,6 @@ public class DepartmentResponse {
     private Long id;
 
     private String departmentName;
-    
+
     private List<Specialized> specializeds;
 }

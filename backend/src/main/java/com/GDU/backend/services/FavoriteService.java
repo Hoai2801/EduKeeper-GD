@@ -1,9 +1,9 @@
 package com.GDU.backend.services;
 
-import java.util.List;
-
 import com.GDU.backend.dtos.requests.FavoriteDTO;
 import com.GDU.backend.models.Favorite;
+
+import java.util.List;
 
 public interface FavoriteService {
     String createFavorite(FavoriteDTO favoriteDTO);

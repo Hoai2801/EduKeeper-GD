@@ -29,13 +29,13 @@ public class UploadDTO {
     @NotEmpty
     @NotBlank
     private int category;
-    
+
     private int subject;
-    
+
 //    @NotEmpty
 //    @NotBlank
 //    private String department;
-    
+
     private String author;
 
     @NotNull

@@ -1,10 +1,5 @@
 package com.GDU.backend.dtos.requests;
 
-import com.GDU.backend.models.Department;
-import com.GDU.backend.models.Role;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
-    
+
     @NotEmpty(message = "Student code must not be null")
     @NotBlank(message = "Student code must not be blank")
     @NotNull

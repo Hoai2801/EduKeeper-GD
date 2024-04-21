@@ -13,6 +13,4 @@ public interface SpecializedService {
     List<Document> getDocumentsBySpecialized(String specializedSlug);
 
     int getDocumentsCountBySpecialized(String specializedSlug);
-
-    List<Specialized> getSpecializedsByDepartmentSlug(String slug);
 }

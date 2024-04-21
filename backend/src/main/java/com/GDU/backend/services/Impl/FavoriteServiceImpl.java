@@ -6,15 +6,14 @@ import com.GDU.backend.models.Favorite;
 import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.FavoriteRepository;
 import com.GDU.backend.services.FavoriteService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 @Service
 @RequiredArgsConstructor
+@Deprecated
 public class FavoriteServiceImpl implements FavoriteService {
     private final FavoriteRepository favoriteRepository;
 

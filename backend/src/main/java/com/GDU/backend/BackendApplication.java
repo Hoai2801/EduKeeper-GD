@@ -14,19 +14,19 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class BackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BackendApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BackendApplication.class, args);
+    }
 
-	@Bean
-	public CommandLineRunner commendLineRunner(RoleRepository roleRepository) {
-		return args -> {
-			if (roleRepository.findByName("USER").isEmpty()) {
-				Role role = Role.builder()
-						.name("USER")
-						.build();
-				roleRepository.save(role);
-			}
-		};
-	}
+    @Bean
+    public CommandLineRunner commendLineRunner(RoleRepository roleRepository) {
+        return args -> {
+            if (roleRepository.findByName("USER").isEmpty()) {
+                Role role = Role.builder()
+                        .name("USER")
+                        .build();
+                roleRepository.save(role);
+            }
+        };
+    }
 }

@@ -3,6 +3,7 @@ package com.GDU.backend.services.Impl;
 import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
+import com.GDU.backend.dtos.response.DocumentResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.Category;
 import com.GDU.backend.models.Document;
@@ -30,10 +31,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
     private final DocumentRepository documentRepository;
     private final CategoryRepo categoryRepo;
-
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     /**
      * Uploads a document based on the provided UploadDto
@@ -52,7 +52,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
         int numberOfPages = pdfReader.getNumberOfPages();
-        
+
         // Create a new Document instance with the provided document information
         Document newDocument = Document.builder()
                 .title(uploadDto.getTitle())
@@ -167,7 +167,7 @@ public class DocumentServiceImpl implements DocumentService {
         Document document = getDocumentById(id);
         document.setViews(document.getViews() + 1);
         documentRepository.save(document);
-        return "View count increased successfully"; 
+        return "View count increased successfully";
     }
 
     @Override
@@ -187,7 +187,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<Document> getLastedDocuments(int limit) {
         return documentRepository.getLastedDocuments(limit);
     }
-    
+
     public String updateDownloads(Long id) {
         Document existsDocument = documentRepository.findById(id).orElse(null);
         if (existsDocument == null) {
@@ -259,5 +259,41 @@ public class DocumentServiceImpl implements DocumentService {
         }
         return documents;
     }
+
+    @Override
+    public DocumentResponse getDocumentThisYear() {
+        try {
+            Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
+            Integer numberOfDocsPreYear = documentRepository.getNumberOfDocumentPreviousYear();
+            float percentage = ((float) ((numberOfDocsThisYear - numberOfDocsPreYear) * 100)) / numberOfDocsPreYear;
+            if (numberOfDocsPreYear == 0) {
+                percentage = 100;
+            }
+            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
+            return DocumentResponse.builder()
+                    .totalDocumentsCurrent(numberOfDocsThisYear)
+                    .totalDocumentsPrev(numberOfDocsPreYear).percentage(roundedPercentage).build();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisYear'" + e.getMessage());
+        }
+    }
+
+//    @Override
+//    public DocumentResponse getDocumentThisMonth() {
+//        try {
+//            Integer numberOfDocsThisMonth = documentRepository.getNumberOfDocumentsThisMonth();
+//            Integer numberOfDocsPreMonth = documentRepository.getNumberOfDocumentPreviousMonth();
+//            float percentage = ((float) ((numberOfDocsThisMonth - numberOfDocsPreMonth) * 100)) / numberOfDocsPreMonth;
+//            if (numberOfDocsPreMonth == 0) {
+//                percentage = 100;
+//            }
+//            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
+//            return DocumentResponse.builder()
+//                    .totalDocumentsCurrent(numberOfDocsThisMonth)
+//                    .totalDocumentsPrev(numberOfDocsPreMonth).percentage(roundedPercentage).build();
+//        } catch (Exception e) {
+//            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisMonth'");
+//        }
+//    }
 
 }
