@@ -26,6 +26,10 @@ export const Upload = () => {
     jwt = jwtDecode(token);
   }
 
+  if (!jwt) {
+    window.location.href = "/";
+  }
+
   const handleFiles = (updatedFile) => {
     setFile(updatedFile[0]);
   };

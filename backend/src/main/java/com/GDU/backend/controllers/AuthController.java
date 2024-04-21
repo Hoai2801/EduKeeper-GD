@@ -22,9 +22,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthenticationService authenticationService;
     
-    private final UserRepository userRepository;
-    
-
     @PostMapping("/register")
     public ResponseEntity<String> register(
             @RequestBody RegisterRequest registerRequest
@@ -58,6 +55,8 @@ public class AuthController {
             @PathVariable("token") String token,
             @RequestBody ChangePasswordRequest changePasswordRequest
     ) {
-        return ResponseEntity.ok().body(authenticationService.resetPassword(token, changePasswordRequest));
+        return ResponseEntity.ok().body(
+                authenticationService.resetPassword(token, changePasswordRequest)
+        );
     }
 }

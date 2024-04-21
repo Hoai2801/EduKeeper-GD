@@ -33,11 +33,11 @@ const Detail = () => {
         setFile(blob)
       });
 
-      const increaseView = setTimeout(() => {
-        fetch("http://localhost:8080/api/v1/document/increase-view/" + data?.id)
-      }, 30000);
+    const increaseView = setTimeout(() => {
+      fetch("http://localhost:8080/api/v1/document/increase-view/" + data?.id)
+    }, 30000);
 
-      return () => clearTimeout(increaseView);
+    return () => clearTimeout(increaseView);
 
   }, [slug, data?.id])
 
@@ -62,7 +62,8 @@ const Detail = () => {
   return (
     <div>
       <div className='pt-[50px]'>
-        <p className='text-blue-500'><Link to={`/category/${data?.category.slug}`}>{data?.category.category_name}</Link> - <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - <Link to={`/specialized/${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
+        <p className='text-blue-500'><Link to={`/category/${data?.category.slug}`}>{data?.category.categoryName}</Link> - <Link to={`/specialized/${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
+        {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
         <h2 className='text-[28px] font-bold max-w-[900px] text-justify'>{data?.title}</h2>
         <div className='flex justify-between mt-3'>
           <div>
@@ -74,11 +75,11 @@ const Detail = () => {
             <button
               onClick={() => onButtonClick()}
               className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Tải tài liệu</button>
-              <div className='flex gap-5'>
-                  
-            <p>Lượt xem: {data?.views}</p>
-            <p>Lượt tải về: {data?.download}</p>
-              </div>
+            <div className='flex gap-5'>
+
+              <p>Lượt xem: {data?.views}</p>
+              <p>Lượt tải về: {data?.download}</p>
+            </div>
           </div>
         </div>
       </div>

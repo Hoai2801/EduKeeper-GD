@@ -4,6 +4,7 @@ import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
 import com.GDU.backend.dtos.response.AuthenticationResponse;
+import com.GDU.backend.exceptions.UserNotFoundException;
 import com.GDU.backend.models.Token;
 import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.RoleRepository;
@@ -13,6 +14,7 @@ import com.GDU.backend.services.Impl.enums.EmailTemplateName;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class AuthenticationService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -136,29 +139,35 @@ public class AuthenticationService {
     }
 
     public String forgotPassword(String staffCode) {
-        var user = userRepository.findByStaffCode(staffCode).orElseThrow(
-                () -> new RuntimeException("User not found")
-        );
-
-        // generate token
-        String generatedToken = generateActivationCode(6);
-        // save token
-        var newToken = Token.builder()
-                .token(generatedToken)
-                .createdDate(LocalDateTime.now())
-                .expiresDate(LocalDateTime.now().plusMinutes(5))
-                .user(user)
-                .build();
-        tokenRepository.save(newToken);
-        // send email
         try {
+            var user = userRepository.findByStaffCode(staffCode).orElseThrow(
+                    () -> new UserNotFoundException("User not found")
+            );
+
+            // generate token
+            String generatedToken = generateActivationCode(6);
+
+            // save token
+            var newToken = Token.builder()
+                    .token(generatedToken)
+                    .createdDate(LocalDateTime.now())
+                    .expiresDate(LocalDateTime.now().plusMinutes(5))
+                    .user(user)
+                    .build();
+            tokenRepository.save(newToken);
+        
+            // send email
             String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" + newToken.getToken();
             emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.FORGOT_PASSWORD,
                     forgotPasswordUrl);
+        
+            return "sent";
+        } catch (UserNotFoundException e) {
+            throw new UserNotFoundException("User not found");
         } catch (MessagingException e) {
-            e.printStackTrace();
+            log.error("Error sending forgot password email", e);
+            return "Failed to send forgot password email";
         }
-        return "sent";
     }
 
     public String resetPassword(String token, ChangePasswordRequest changePasswordRequest) {
