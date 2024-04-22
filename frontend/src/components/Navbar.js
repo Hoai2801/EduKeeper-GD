@@ -31,7 +31,6 @@ const Navbar = () => {
       .then((res) => res.json())
       .then((data) => {
         setCategory(data);
-        console.log(data)
       });
 
     if (jwt && jwt.exp < Date.now() / 1000) {

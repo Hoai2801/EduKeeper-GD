@@ -30,6 +30,7 @@ public class DocumentController {
     @GetMapping("/{slug}/file")
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
+            System.out.println("slug: " + slug);
             // Get the file by slug using document service
             Document document = documentService.getDocumentBySlug(slug);
             File file = new File(document.getPath());
@@ -84,7 +85,6 @@ public class DocumentController {
     public CompletableFuture<ResponseEntity<String>> uploadDocument(
             @ModelAttribute UploadDTO uploadDto) {
         return CompletableFuture.supplyAsync(() -> {
-            System.out.println("Uploading document: " + uploadDto.toString());
             try {
                 return ResponseEntity.ok(documentService.uploadDocument(uploadDto));
             } catch (Exception e) {

@@ -10,6 +10,8 @@ const Home = () => {
 
   const [lastedDocuments, setLastedDocuments] = useState([])
 
+  console.log(lastedDocuments)
+
   useEffect(() => {
     fetch('http://localhost:8080/api/v1/document/most-viewed?limit=10').then(res => res.json()).then(data => setMostViewed(data))
     fetch('http://localhost:8080/api/v1/document/most-downloaded?limit=10').then(res => res.json()).then(data => setMostDownloaded(data))
@@ -24,7 +26,7 @@ const Home = () => {
         <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
         <div className='lg:ml-5 flex flex-col gap-5 items-center'>
           {lastedDocuments.map((item, index) => (
-            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} />
+            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} thumbnail={item.thumbnail} />
           ))}
           <div className='flex justify-center'>
             <Link to={`/search?order=lastest&searchTerm=`} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
@@ -33,7 +35,7 @@ const Home = () => {
         <h2 className='font-bold text-[28px] mb-5'>Tải nhiều nhất tháng này</h2>
         <div className='ml-5 flex flex-col gap-5 items-center'>
           {mostDownloaded.map((item, index) => (
-            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} />
+            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} thumbnail={item.thumbnail} />
           ))}
           <div className='flex justify-center'>
             <Link to={`/search?order=mostDownloaded&searchTerm=`} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
@@ -42,7 +44,7 @@ const Home = () => {
         <h2 className='font-bold text-[28px]'>Xem nhiều nhất tháng này</h2>
         <div className='ml-5 flex flex-col gap-5 mt-5 items-center'>
           {mostViewed.map((item, index) => (
-            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} />
+            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} thumbnail={item.thumbnail} />
           ))}
           <div className='flex justify-center'>
             <button onClick={null} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>

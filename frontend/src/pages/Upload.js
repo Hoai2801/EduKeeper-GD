@@ -10,6 +10,7 @@ export const Upload = () => {
   const [selectedFile, setFile] = useState(null);
 
   const [department, setDepartment] = useState(null);
+  const [listCategory, setListCategory] = useState(null);
   const [category, setCategory] = useState(null);
   const [description, setDescription] = useState(null);
   const [specialized, setSpecialized] = useState(null);
@@ -41,6 +42,13 @@ export const Upload = () => {
         setDepartment(data)
       })
       .catch(error => console.error(error));
+
+    fetch('http://localhost:8080/api/v1/categories').then(response => response.json())
+      .then(data => {
+        console.log(data)
+        setListCategory(data)
+      })
+      .catch(error => console.error(error));
   }, [])
 
   const uploadDocument = (event) => {
@@ -59,7 +67,16 @@ export const Upload = () => {
       method: 'POST',
       body: formData,
     }).then(response => response.json())
-      .then(data => console.log(data))
+      .then(data => {
+          console.log(data)
+          setCategory('')
+          setDepartment('')
+          setDescription('')
+          setSpecialized('')
+          setSubject('')
+          setTeacher('')
+          setTitle('')
+      })
       .catch(error => console.error(error));
   }
 
@@ -118,6 +135,17 @@ export const Upload = () => {
               {
                 Array.isArray(listSpecialized) && listSpecialized.map(specialized => (
                   <option value={specialized.id} key={specialized.id}>{specialized.specializedName}</option>
+                ))
+              }
+            </select>
+          </div>
+          <div className="max-w-sm mx-auto mb-3">
+            <label htmlFor="department" className="block mb-2 text-sm font-semibold text-gray-900">Thể loại</label>
+            <select id="department" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" onChange={e => setCategory(e.target.value)}>
+              <option>Chọn thể loại</option>
+              {
+                Array.isArray(listCategory) && listCategory.map(category => (
+                  <option value={category.id} key={category.id}>{category.categoryName}</option>
                 ))
               }
             </select>

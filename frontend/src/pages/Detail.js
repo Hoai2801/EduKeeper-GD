@@ -10,7 +10,18 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 
 const Detail = () => {
-  const slug = useParams().slug
+  function extractSlugFromURL(url) {
+    // Split the URL by '/'
+    const parts = url.split('/');
+    // Get the last part of the URL
+    const lastPart = parts[parts.length - 1];
+    // Return the last part as the slug
+    return lastPart;
+  }
+
+  const url = window.location.href;
+  const slug = extractSlugFromURL(url);
+  console.log(slug)
   const [numPages, setNumPages] = useState();
   const [pageNumber, setPageNumber] = useState(20);
   const [file, setFile] = useState(null);

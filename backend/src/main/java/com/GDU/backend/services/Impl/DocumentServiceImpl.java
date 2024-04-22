@@ -12,13 +12,23 @@ import com.GDU.backend.models.Subject;
 import com.GDU.backend.repositories.CategoryRepo;
 import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.services.DocumentService;
+import com.ironsoftware.ironpdf.PdfDocument;
+import com.ironsoftware.ironpdf.edit.PageSelection;
+import com.ironsoftware.ironpdf.image.ToImageOptions;
 import com.itextpdf.text.pdf.PdfReader;
 import lombok.RequiredArgsConstructor;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,12 +45,6 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
     private final CategoryRepo categoryRepo;
 
-    /**
-     * Uploads a document based on the provided UploadDto
-     *
-     * @param uploadDto the data transfer object containing document information
-     * @return a string indicating the success of the document upload
-     */
     @Override
     public String uploadDocument(UploadDTO uploadDto) throws IOException {
         // Get the category and specialized from the UploadDto
@@ -52,6 +56,8 @@ public class DocumentServiceImpl implements DocumentService {
 
         PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
         int numberOfPages = pdfReader.getNumberOfPages();
+        String thumbnail = generateThumbnail(uploadDto.getDocument().getInputStream());
+        System.out.println(thumbnail);
 
         // Create a new Document instance with the provided document information
         Document newDocument = Document.builder()
@@ -66,6 +72,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .subject(subject)
                 .pages(numberOfPages)
                 .category(category)
+                .thumbnail(thumbnail)
                 .specialized(specialized)
                 .upload_date(LocalDate.now())
                 .build();
@@ -92,6 +99,24 @@ public class DocumentServiceImpl implements DocumentService {
 
         // Return a success message
         return "Document uploaded successfully";
+    }
+
+    private String generateThumbnail(InputStream inputStream) throws IOException {
+        try (PDDocument document = PDDocument.load(inputStream)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            // Render the first page of the PDF to an image
+            BufferedImage image = pdfRenderer.renderImage(0);
+
+            String url = "src/main/resources/static/thumbnail/";
+            String fileName = System.currentTimeMillis() + ".png";
+            String thumbnailPath = url + fileName;
+            ImageIO.write(image, "PNG", new File(thumbnailPath));
+
+            return fileName;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

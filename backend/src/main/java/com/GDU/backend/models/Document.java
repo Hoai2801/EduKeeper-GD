@@ -28,6 +28,8 @@ public class Document {
     private Long document_size;
 
     private LocalDate upload_date;
+    
+    private String thumbnail;
 
     private String path;
 
