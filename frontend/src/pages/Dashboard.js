@@ -1,5 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
 import React from 'react'
+import FileRow from '../components/FileRow';
 
 const Dashboard = () => {
   const token = localStorage.getItem("token");
@@ -203,11 +204,14 @@ const Dashboard = () => {
                     </div>
                   </td>
                 </tr>
-                
               </tbody>
             </table>
           </div>
         </div>
+      </div>
+      <div className='w-full h-full'>
+        <h2 className='text-3xl text-center my-10'>Danh sách tài liệu</h2>
+          <FileRow />
       </div>
     </div>
   )

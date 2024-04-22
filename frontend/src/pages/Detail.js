@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf';
 import './Detail.css'
-import { Link, useParams } from 'react-router-dom';
+import { Link} from 'react-router-dom';
+import 'react-pdf/dist/esm/Page/TextLayer.css'
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -34,6 +36,7 @@ const Detail = () => {
     fetch("http://localhost:8080/api/v1/document/" + slug)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data)
         setData(data)
       });
     fetch("http://localhost:8080/api/v1/document/" + slug + "/file")
@@ -76,7 +79,7 @@ const Detail = () => {
         <h2 className='text-[28px] font-bold max-w-[900px] text-justify'>{data?.title}</h2>
         <div className='flex justify-between mt-3'>
           <div>
-            <p>Tác giả: <span className='text-blue-500'>{data?.author}</span></p>
+            <p>Tác giả: <span className='text-blue-500'>{data?.author.username}</span></p>
             <p>Ngày đăng: {data?.upload_date}</p>
             <p>Trang: {data?.pages}</p>
           </div>

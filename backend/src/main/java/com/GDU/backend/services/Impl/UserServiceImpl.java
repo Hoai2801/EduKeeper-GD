@@ -1,5 +1,6 @@
 package com.GDU.backend.services.Impl;
 
+import com.GDU.backend.dtos.response.DocumentResponse;
 import com.GDU.backend.dtos.response.UserResponse;
 import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.UserRepository;
@@ -51,12 +52,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public User getUserByStaffCode(String staffCode) {
+        return userRepository.findByStaffCode(staffCode).orElseThrow(
+                () -> new UsernameNotFoundException("User not found")
+        );
+    }
+
+    @Override
     @Transactional
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         return userRepository.findByEmail(userEmail).orElseThrow(
                 () -> new UsernameNotFoundException("User not found")
         );
     }
-
-
 }

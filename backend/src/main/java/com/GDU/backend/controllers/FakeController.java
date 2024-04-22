@@ -1,6 +1,7 @@
 package com.GDU.backend.controllers;
 
 import com.GDU.backend.dtos.requests.UploadDTO;
+import com.GDU.backend.models.User;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
 import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,7 @@ public class FakeController {
         // create fake dto for testing
         Path path = Paths.get("src/main/resources/static/uploads/1712404687275_Java.Professional.Interview.Guide.939103005X.pdf");
         String name = faker.book().title();
+        String[] files = {"pdf", "doc", "docx"};
         String originalFileName = "1712404687275_Java.Professional.Interview.Guide.939103005X.pdf";
         String contentType = "application/pdf";
         byte[] content = null;
@@ -64,10 +66,10 @@ public class FakeController {
 
         UploadDTO uploadDTO = UploadDTO.builder()
                 .title(faker.book().title())
-                .author(faker.name().fullName())
+                .author(faker.job().title())
                 .specialized(faker.number().numberBetween(1, 39))
                 .subject(1)
-                .category(faker.number().numberBetween(1, 4))
+                .category(faker.number().numberBetween(1, 5))
                 .description(faker.chuckNorris().fact())
                 .document(result)
                 .build();

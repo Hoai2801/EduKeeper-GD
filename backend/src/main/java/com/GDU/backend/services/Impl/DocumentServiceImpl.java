@@ -4,27 +4,19 @@ import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.dtos.response.DocumentResponse;
+import com.GDU.backend.dtos.response.UserResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
-import com.GDU.backend.models.Category;
-import com.GDU.backend.models.Document;
-import com.GDU.backend.models.Specialized;
-import com.GDU.backend.models.Subject;
+import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.CategoryRepo;
 import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.services.DocumentService;
-import com.ironsoftware.ironpdf.PdfDocument;
-import com.ironsoftware.ironpdf.edit.PageSelection;
-import com.ironsoftware.ironpdf.image.ToImageOptions;
 import com.itextpdf.text.pdf.PdfReader;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -46,24 +38,28 @@ public class DocumentServiceImpl implements DocumentService {
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
     private final DocumentRepository documentRepository;
     private final CategoryRepo categoryRepo;
+    private final UserServiceImpl userService;
 
     @Override
     public String uploadDocument(UploadDTO uploadDto) throws IOException {
         // Get the category and specialized from the UploadDto
         Category category = Category.builder().id((long) uploadDto.getCategory()).build();
-
         Specialized specialized = Specialized.builder().id((long) uploadDto.getSpecialized()).build();
 
         Subject subject = Subject.builder().id((long) uploadDto.getSubject()).build();
 
+        User author = userService.getUserByStaffCode(uploadDto.getAuthor());
+
+        // get number of pages
         PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
         int numberOfPages = pdfReader.getNumberOfPages();
+        
         String thumbnail = generateThumbnail(uploadDto.getDocument().getInputStream());
 
         // Create a new Document instance with the provided document information
         Document newDocument = Document.builder()
                 .title(uploadDto.getTitle())
-                .author(uploadDto.getAuthor())
+                .author(author)
                 .slug(createSlug(uploadDto.getTitle()))
                 .document_type(uploadDto.getDocument().getContentType())
                 // Calculate and set the document size in megabytes
@@ -139,12 +135,16 @@ public class DocumentServiceImpl implements DocumentService {
         if (existDocument == null) {
             return "Document not existing";
         }
+        
+        var newAuthor = userService.getUserByStaffCode(uploadDTO.getAuthor());
+        if (newAuthor == null) {
+            return "Author not existing";
+        }
+        existDocument.setAuthor(newAuthor);
 
         Category category = categoryRepo.findById((long) uploadDTO.getCategory()).orElse(null);
         // Update document
-        existDocument
-                .setCategory(category);
-        existDocument.setAuthor(uploadDTO.getAuthor() != null ? uploadDTO.getAuthor() : existDocument.getAuthor());
+        existDocument.setCategory(category);
         existDocument.setTitle(uploadDTO.getTitle() != null ? uploadDTO.getTitle() : existDocument.getTitle());
         existDocument.setSlug(uploadDTO.getTitle() != null ? uploadDTO.getTitle().replace(" ", "-").toLowerCase()
                 + "-" + new Date().getTime() : existDocument.getSlug());
@@ -180,13 +180,14 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Document getDocumentBySlug(String slug) {
-        return documentRepository.getDocumentBySlug(slug);
+    public DocumentResponse getDocumentBySlug(String slug) {
+        return convertToDocumentResponse(documentRepository.getDocumentBySlug(slug));
     }
 
     @Override
-    public List<Document> getMostViewedDocuments(int limit) {
-        return documentRepository.getMostViewedDocuments(limit);
+    public List<DocumentResponse> getMostViewedDocuments(int limit) {
+        List<Document> documents = documentRepository.getMostViewedDocuments(limit);
+        return documents.stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
@@ -212,13 +213,15 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getMostDownloadedDocuments(int limit) {
-        return documentRepository.getMostDownloadedDocuments(limit);
+    public List<DocumentResponse> getMostDownloadedDocuments(int limit) {
+        return documentRepository.getMostDownloadedDocuments(limit)
+                .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<Document> getLastedDocuments(int limit) {
-        return documentRepository.getLastedDocuments(limit);
+    public List<DocumentResponse> getLastedDocuments(int limit) {
+        return documentRepository.getLastedDocuments(limit)
+                .stream().map(this::convertToDocumentResponse).toList();
     }
 
     public String updateDownloads(Long id) {
@@ -244,35 +247,43 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getPopularDocumentsOfThisWeek() {
-        return documentRepository.getPopularDocumentThisWeek();
+    public List<DocumentResponse> getPopularDocumentsOfThisWeek() {
+        return documentRepository.getPopularDocumentThisWeek()
+                .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<Document> getPopularDocumentsOfThisMonth() {
-        return documentRepository.getPopularDocumentThisMonth();
+    public List<DocumentResponse> getPopularDocumentsOfThisMonth() {
+        return documentRepository.getPopularDocumentThisMonth()
+                .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<Document> getDocumentsSuggested(RecommendDTO recommendDTO) {
+    public List<DocumentResponse> getDocumentsSuggested(RecommendDTO recommendDTO) {
         // return list document which have a same specialized and category, title or
         // author
-        return documentRepository.getDocumentsSuggested(recommendDTO.getSpecialized(), recommendDTO.getCategory(),
-                recommendDTO.getTitle(), recommendDTO.getAuthor());
+        return documentRepository.getDocumentsSuggested(
+                recommendDTO.getSpecialized(), 
+                recommendDTO.getCategory(),
+                recommendDTO.getTitle(), 
+                recommendDTO.getAuthor())
+                .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<Document> getDocumentsByAuthorName(String authorName) {
-        return documentRepository.getDocumentsByAuthorName(authorName);
+    public List<DocumentResponse> getDocumentsByAuthorName(String authorName) {
+        return documentRepository.getDocumentsByAuthorName(authorName)
+                .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<Document> getDocumentsBySlugSpecialized(String slug) {
-        return documentRepository.getDocumentsBySlugSpecialized(slug);
+    public List<DocumentResponse> getDocumentsBySlugSpecialized(String slug) {
+        return documentRepository.getDocumentsBySlugSpecialized(slug)
+                .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<Document> getDocumentsByFilter(FilterDTO filterDTO) {
+    public List<DocumentResponse> getDocumentsByFilter(FilterDTO filterDTO) {
         List<Document> documents = documentRepository.getDocumentsByFilter(
                 filterDTO.getDepartmentSlug(),
                 filterDTO.getSearchTerm(),
@@ -290,26 +301,26 @@ public class DocumentServiceImpl implements DocumentService {
         } else {
             documents.sort(Comparator.comparing(Document::getUpload_date).reversed());
         }
-        return documents;
+        return documents.stream().map(this::convertToDocumentResponse).toList();
     }
 
-    @Override
-    public DocumentResponse getDocumentThisYear() {
-        try {
-            Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
-            Integer numberOfDocsPreYear = documentRepository.getNumberOfDocumentPreviousYear();
-            float percentage = ((float) ((numberOfDocsThisYear - numberOfDocsPreYear) * 100)) / numberOfDocsPreYear;
-            if (numberOfDocsPreYear == 0) {
-                percentage = 100;
-            }
-            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
-            return DocumentResponse.builder()
-                    .totalDocumentsCurrent(numberOfDocsThisYear)
-                    .totalDocumentsPrev(numberOfDocsPreYear).percentage(roundedPercentage).build();
-        } catch (Exception e) {
-            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisYear'" + e.getMessage());
-        }
-    }
+//    @Override
+//    public DocumentResponse getDocumentThisYear() {
+//        try {
+//            Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
+//            Integer numberOfDocsPreYear = documentRepository.getNumberOfDocumentPreviousYear();
+//            float percentage = ((float) ((numberOfDocsThisYear - numberOfDocsPreYear) * 100)) / numberOfDocsPreYear;
+//            if (numberOfDocsPreYear == 0) {
+//                percentage = 100;
+//            }
+//            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
+//            return DocumentResponse.builder()
+//                    .totalDocumentsCurrent(numberOfDocsThisYear)
+//                    .totalDocumentsPrev(numberOfDocsPreYear).percentage(roundedPercentage).build();
+//        } catch (Exception e) {
+//            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisYear'" + e.getMessage());
+//        }
+//    }
 
 //    @Override
 //    public DocumentResponse getDocumentThisMonth() {
@@ -328,5 +339,30 @@ public class DocumentServiceImpl implements DocumentService {
 //            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisMonth'");
 //        }
 //    }
+    
+    public DocumentResponse convertToDocumentResponse(Document document) {
+        // only need show name of user
+        UserResponse author = UserResponse.builder()
+                .id(document.getAuthor().getId())
+                .username(document.getAuthor().getName())
+                .staffCode(document.getAuthor().getStaffCode())
+                .build();
+        return DocumentResponse.builder()
+                .title(document.getTitle())
+                .slug(document.getSlug())
+                .views(document.getViews())
+                .download(document.getDownload())
+                .author(author)
+                .specialized(document.getSpecialized())
+                .category(document.getCategory())
+                .subject(document.getSubject())
+                .upload_date(document.getUpload_date())
+                .path(document.getPath())
+                .thumbnail(document.getThumbnail())
+                .pages(document.getPages())
+                .document_type(document.getDocument_type())
+                .document_size(document.getDocument_size())
+                .build();
+    }
 
 }

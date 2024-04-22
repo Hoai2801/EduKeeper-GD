@@ -33,8 +33,9 @@ public class Document {
 
     private String path;
 
-    @Column(name = "author_name", nullable = false, length = 100)
-    private String author;
+    @ManyToOne
+    @JoinColumn(name = "author", nullable = false)
+    private User author;
 
     @ManyToOne
     @JoinColumn(name = "specialized_id")

@@ -11,7 +11,7 @@ const DocumentCard = ({title, author, upload_date, views, download, pages, slug,
         <Link to={`/document/${slug}`} className='w-full relative'>
             <h3 className='font-bold text-blue-500 text-[20px]'>{title}</h3>
             <div className='absolute bottom-0 left-0'>
-                <span className='text-blue-500'>{author}</span>
+                <span className='text-blue-500'>{author.username}</span>
                 | {pages} trang | {upload_date} | {views} views | {download} download
             </div>
         </Link>

@@ -20,7 +20,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "AND YEAR(d.upload_date) = YEAR(CURRENT_DATE()) ORDER BY d.download DESC LIMIT :limit")
     List<Document> getMostDownloadedDocuments(int limit);
 
-    @Query("SELECT d FROM Document d ORDER BY d.upload_date DESC LIMIT :limit")
+    @Query("SELECT d FROM Document d ORDER BY d.id DESC LIMIT :limit")
     List<Document> getLastedDocuments(int limit);
 
     @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)

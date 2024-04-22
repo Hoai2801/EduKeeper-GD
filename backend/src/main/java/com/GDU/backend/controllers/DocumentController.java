@@ -3,6 +3,7 @@ package com.GDU.backend.controllers;
 import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
+import com.GDU.backend.dtos.response.DocumentResponse;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -31,7 +32,7 @@ public class DocumentController {
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
             // Get the file by slug using document service
-            Document document = documentService.getDocumentBySlug(slug);
+            DocumentResponse document = documentService.getDocumentBySlug(slug);
             File file = new File(document.getPath());
             return ResponseEntity.ok().contentType(MediaType.parseMediaType(document.getDocument_type()))
                     .body(new FileSystemResource(file));
@@ -85,7 +86,9 @@ public class DocumentController {
             @ModelAttribute UploadDTO uploadDto) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return ResponseEntity.ok(documentService.uploadDocument(uploadDto));
+                String message = documentService.uploadDocument(uploadDto);
+                System.out.println(message);
+                return ResponseEntity.ok(message);
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Error uploading document: " + e.getMessage());
@@ -157,23 +160,23 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/month")
-    public ResponseEntity<?> getListPopularDocumentOfMonth() {
-        try {
-            return ResponseEntity.ok(documentService.getPopularDocumentsOfThisMonth());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
-
-    @GetMapping("/year")
-    public ResponseEntity<?> getDocsThisYear() {
-        try {
-            return ResponseEntity.ok(documentService.getDocumentThisYear());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+//    @GetMapping("/month")
+//    public ResponseEntity<?> getListPopularDocumentOfMonth() {
+//        try {
+//            return ResponseEntity.ok(documentService.getPopularDocumentsOfThisMonth());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+//        }
+//    }
+//
+//    @GetMapping("/year")
+//    public ResponseEntity<?> getDocsThisYear() {
+//        try {
+//            return ResponseEntity.ok(documentService.getDocumentThisYear());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
 
 //    @GetMapping("/month")
 //    public ResponseEntity<?> getDocsThisMonth() {

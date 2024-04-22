@@ -13,4 +13,6 @@ public interface UserService {
     String deleteUserById(Long id);
 
     void changePassword(User user, String newPassword);
+
+    User getUserByStaffCode(String staffCode);
 }

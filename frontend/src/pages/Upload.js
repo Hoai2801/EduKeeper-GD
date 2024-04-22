@@ -15,7 +15,6 @@ export const Upload = () => {
   const [description, setDescription] = useState(null);
   const [specialized, setSpecialized] = useState(null);
   const [subject, setSubject] = useState(null);
-  const [teacher, setTeacher] = useState(null);
   const [title, setTitle] = useState(null);
 
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -62,19 +61,22 @@ export const Upload = () => {
     formData.append('description', description);
     formData.append('subject', 1);
     formData.append('specialized', specialized);
-    formData.append('author', "Tang Gia Hoai");
+    formData.append('author', jwt.staff_code);
     fetch('http://localhost:8080/api/v1/document', {
       method: 'POST',
       body: formData,
     })
-      .then(data => {
-          console.log(data)
+      .then(response => {
+        console.log(response)
+          if (response.status === 200) {
+            alert("Đăng tài liệu thành công")
+          }
+          setFile(null)
           setCategory('')
-          setDepartment('')
+          setSelectedDepartment('')
           setDescription('')
-          setSpecialized('')
+          setSpecialized(null)
           setSubject('')
-          setTeacher('')
           setTitle('')
       })
       .catch(error => console.error(error));
@@ -119,7 +121,9 @@ export const Upload = () => {
               console.log(selectedDepartment)
               setSelectedDepartment(selectedDepartment)
               setListSpecialized(selectedDepartment.specializeds)
-            }}>
+            }}
+            value={JSON.stringify(selectedDepartment)}
+              >
               <option>Chọn khoa</option>
               {
                 department && department.map(dep => (
@@ -153,7 +157,9 @@ export const Upload = () => {
           <div className="mb-4">
             <label htmlFor="subject" className="block text-gray-700 text-sm font-bold mb-2">Môn học</label>
             <input type="text" id="subject" name="subject" placeholder="" required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500" />
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500" 
+              value={subject}
+              />
           </div>
           <div className="mb-4">
             <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Giáo viên</label>
@@ -164,7 +170,7 @@ export const Upload = () => {
             <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Mô tả</label>
             <CKEditor
               editor={ClassicEditor}
-              data="<p>Mô tả về tài liệu</p>"
+              data={description}
               onChange={(event, editor) => {
                 setDescription(editor.getData())
               }}

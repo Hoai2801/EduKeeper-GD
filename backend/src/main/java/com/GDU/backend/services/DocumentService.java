@@ -20,7 +20,7 @@ public interface DocumentService {
 
     Document getDocumentById(Long id);
 
-    Document getDocumentBySlug(String slug);
+    DocumentResponse getDocumentBySlug(String slug);
 
     String deleteDocument(Long id);
 
@@ -28,25 +28,25 @@ public interface DocumentService {
 
     String increaseDownloadCount(Long id);
 
-    List<Document> getMostViewedDocuments(int limit);
+    List<DocumentResponse> getMostViewedDocuments(int limit);
 
-    List<Document> getMostDownloadedDocuments(int limit);
+    List<DocumentResponse> getMostDownloadedDocuments(int limit);
 
-    List<Document> getLastedDocuments(int limit);
+    List<DocumentResponse> getLastedDocuments(int limit);
 
-    List<Document> getPopularDocumentsOfThisWeek();
+    List<DocumentResponse> getPopularDocumentsOfThisWeek();
 
-    List<Document> getPopularDocumentsOfThisMonth();
+    List<DocumentResponse> getPopularDocumentsOfThisMonth();
 
-    List<Document> getDocumentsByAuthorName(String authorName);
+    List<DocumentResponse> getDocumentsByAuthorName(String authorName);
 
-    List<Document> getDocumentsSuggested(RecommendDTO recommendDTO);
+    List<DocumentResponse> getDocumentsSuggested(RecommendDTO recommendDTO);
 
-    List<Document> getDocumentsBySlugSpecialized(String slug);
+    List<DocumentResponse> getDocumentsBySlugSpecialized(String slug);
 
-    List<Document> getDocumentsByFilter(FilterDTO filterDTO);
+    List<DocumentResponse> getDocumentsByFilter(FilterDTO filterDTO);
 
-    DocumentResponse getDocumentThisYear();
+//    DocumentResponse getDocumentThisYear();
 
 //    DocumentResponse getDocumentThisMonth();
 }
