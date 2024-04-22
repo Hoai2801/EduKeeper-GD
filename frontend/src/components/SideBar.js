@@ -69,7 +69,6 @@ const SideBar = () => {
             <div className='flex justify-between w-full gap-5 h-fit px-10'>
                 <div className='w-[25%] h-full rounded-lg shadow-lg bg-white flex items-center flex-col gap-5 px-5'>
                     <p className='text-2xl font-bold mt-2'>Lọc</p>
-                    <h2>{department}</h2>
                     <form className="w-full mx-auto">
                         <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
                         <div className="relative">

@@ -29,10 +29,10 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL '30' DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
     List<Document> getPopularDocumentThisMonth();
 
-    @Query(value = "SELECT d.* FROM Document d JOIN Users u ON u.id = d.user_id WHERE u.role = 'teacher' AND MATCH(d.author_name) AGAINST (:authorName IN BOOLEAN MODE)", nativeQuery = true)
+    @Query(value = "SELECT d.* FROM Document d JOIN Users u ON u.id = d.user_id WHERE u.role = 'teacher' AND MATCH(d.author) AGAINST (:authorName IN BOOLEAN MODE)", nativeQuery = true)
     List<Document> getDocumentsByAuthorName(@Param("authorName") String authorName);
 
-    @Query(value = "SELECT d.* FROM document d WHERE d.category_id = :category AND d.specialized_id = :specialized AND MATCH (d.title) AGAINST (:title IN BOOLEAN MODE) AND MATCH (d.author_name) AGAINST (:author IN BOOLEAN MODE) ORDER BY d.upload_date DESC, d.download DESC, d.views DESC LIMIT 5", nativeQuery = true)
+    @Query(value = "SELECT d.* FROM document d WHERE d.category_id = :category AND d.specialized_id = :specialized AND MATCH (d.title) AGAINST (:title IN BOOLEAN MODE) AND MATCH (d.author) AGAINST (:author IN BOOLEAN MODE) ORDER BY d.upload_date DESC, d.download DESC, d.views DESC LIMIT 5", nativeQuery = true)
     List<Document> getDocumentsSuggested(@Param("specialized") Long specialized, @Param("category") Long category,
                                          @Param("title") String title, @Param("author") String author);
 
@@ -46,7 +46,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "JOIN department dm ON dm.id = s.department_id " +
             "WHERE (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
             +
-            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author_name LIKE CONCAT('%', :searchTerm, '%')))"
+            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))"
             +
             "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))"
             +
@@ -72,6 +72,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     Integer getNumberOfDocumentsThisMonth();
 
     // Get total number of documents from the previous year
-    @Query(value = "SELECT count(*) FROM Document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01'))  AND MONTH(d.upload_date) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH)) ", nativeQuery = true)
+    @Query(value = "SELECT count(*) FROM document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01'))  AND MONTH(d.upload_date) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH)) ", nativeQuery = true)
     Integer getNumberOfDocumentPreviousMonth();
+
+    @Query(value = "SELECT count(*) FROM document", nativeQuery = true)
+    int countAllDocuments();
 }

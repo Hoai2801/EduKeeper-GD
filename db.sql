@@ -159,16 +159,18 @@ CREATE TABLE `document` (
                             `subject_id` int not null,
                             `category_id` tinyint DEFAULT NULL,
                             `thumbnail` varchar(200),
-                            `author_name` varchar(100) NOT NULL,
+                            `author` int NOT NULL,
                             `download` int not null,
                             `views` int not null,
                             PRIMARY KEY (`id`),
                             KEY `document_ibfk_1` (`specialized_id`),
                             KEY `document_ibfk_2` (`category_id`),
                             KEY `document_ibfk_3` (`subject_id`),
+                            KEY `document_ibfk_4` (`author`),
                             CONSTRAINT `document_ibfk_1` FOREIGN KEY (`specialized_id`) REFERENCES `specialized` (`id`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`)
+                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
+                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`author`) REFERENCES `users` (`id`)
 );
 
 DROP TABLE IF EXISTS `favorite`;

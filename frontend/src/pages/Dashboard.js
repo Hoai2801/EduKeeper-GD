@@ -1,5 +1,5 @@
 import { jwtDecode } from 'jwt-decode';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import FileRow from '../components/FileRow';
 
 const Dashboard = () => {
@@ -11,6 +11,32 @@ const Dashboard = () => {
   if (jwt.role !== "ADMIN" || !jwt) {
     window.location.href = "/";
   }
+
+  const [documentMonth, setDocumentMonth] = useState([]);
+  const [documentYear, setDocumentYear] = useState([]);
+
+  const [countAllDocument, setCount] = useState(0);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/v1/document/month")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data)
+        setDocumentMonth(data)
+      });
+
+      fetch("http://localhost:8080/api/v1/document/year")
+      .then((res) => res.json())
+      .then((data) => {
+        setDocumentYear(data)
+      });
+
+      fetch("http://localhost:8080/api/v1/document/count")
+      .then((res) => res.json())
+      .then((data) => {
+        setCount(data)
+      });
+  }, []);
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
@@ -21,11 +47,11 @@ const Dashboard = () => {
           </div>
           <div className="p-4 text-right">
             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Tổng số tài liệu</p>
-            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">1356</h4>
+            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{countAllDocument}</h4>
           </div>
           <div className="border-t border-blue-gray-50 p-4">
             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-              <strong className="text-green-500">+55%</strong>&nbsp;so với năm trước
+              <strong className="text-green-500">{documentYear.percentage}%</strong>&nbsp;so với năm trước
             </p>
           </div>
         </div>
@@ -35,15 +61,15 @@ const Dashboard = () => {
           </div>
           <div className="p-4 text-right">
             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Tài liệu tháng này</p>
-            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">24</h4>
+            <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">{documentMonth.totalDocumentsCurrent}</h4>
           </div>
           <div className="border-t border-blue-gray-50 p-4">
             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-              <strong className="text-green-500">+3%</strong>&nbsp;so với tháng trước
+              <strong className="text-green-500">{documentMonth.percentage}%</strong>&nbsp;so với tháng trước
             </p>
           </div>
         </div>
-        <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+        {/* <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
           <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-6 h-6 text-white">
               <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"></path>
@@ -74,10 +100,10 @@ const Dashboard = () => {
               <strong className="text-green-500">+5%</strong>&nbsp;than yesterday
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
       
-      <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
+      {/* <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md overflow-hidden xl:col-span-2">
           <div className="relative bg-clip-border rounded-xl overflow-hidden bg-transparent text-gray-700 shadow-none m-0 flex items-center justify-between p-6">
             <div>
@@ -208,7 +234,7 @@ const Dashboard = () => {
             </table>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className='w-full h-full'>
         <h2 className='text-3xl text-center my-10'>Danh sách tài liệu</h2>
           <FileRow />

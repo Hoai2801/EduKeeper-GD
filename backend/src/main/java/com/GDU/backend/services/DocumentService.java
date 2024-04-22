@@ -4,6 +4,7 @@ import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.dtos.response.DocumentResponse;
+import com.GDU.backend.dtos.response.TotalResponse;
 import com.GDU.backend.models.Document;
 
 import java.io.IOException;
@@ -46,7 +47,9 @@ public interface DocumentService {
 
     List<DocumentResponse> getDocumentsByFilter(FilterDTO filterDTO);
 
-//    DocumentResponse getDocumentThisYear();
+    TotalResponse getDocumentThisYear();
 
-//    DocumentResponse getDocumentThisMonth();
+    TotalResponse getDocumentThisMonth();
+
+    int countAllDocuments();
 }

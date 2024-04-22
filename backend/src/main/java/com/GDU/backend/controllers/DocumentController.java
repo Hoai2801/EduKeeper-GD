@@ -151,41 +151,32 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/week")
-    public ResponseEntity<?> getListPopularDocumentOfWeek() {
+    @GetMapping("/count")
+    public ResponseEntity<?> countAllDocuments() {
         try {
-            return ResponseEntity.ok(documentService.getPopularDocumentsOfThisWeek());
+            return ResponseEntity.ok(documentService.countAllDocuments());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
+    
+    @GetMapping("/year")
+    public ResponseEntity<?> getDocsThisYear() {
+        try {
+            return ResponseEntity.ok(documentService.getDocumentThisYear());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
-//    @GetMapping("/month")
-//    public ResponseEntity<?> getListPopularDocumentOfMonth() {
-//        try {
-//            return ResponseEntity.ok(documentService.getPopularDocumentsOfThisMonth());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-//        }
-//    }
-//
-//    @GetMapping("/year")
-//    public ResponseEntity<?> getDocsThisYear() {
-//        try {
-//            return ResponseEntity.ok(documentService.getDocumentThisYear());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
-
-//    @GetMapping("/month")
-//    public ResponseEntity<?> getDocsThisMonth() {
-//        try {
-//            return ResponseEntity.ok(documentService.getDocumentThisMonth());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
+    @GetMapping("/month")
+    public ResponseEntity<?> getDocsThisMonth() {
+        try {
+            return ResponseEntity.ok(documentService.getDocumentThisMonth());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
     // Author
     @GetMapping("/author/{authorName}")

@@ -29,7 +29,7 @@ function App() {
         </Route>
       </Route>
       <Route path='/dashboard' element={<Admin />} >
-        <Route path='home' element={<Dashboard />} />
+        <Route index path='home' element={<Dashboard />} />
         <Route path='users' element={<User />} />
         <Route path='department' element={<Department />} />
       </Route>

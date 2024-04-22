@@ -4,6 +4,7 @@ import com.GDU.backend.dtos.requests.FilterDTO;
 import com.GDU.backend.dtos.requests.RecommendDTO;
 import com.GDU.backend.dtos.requests.UploadDTO;
 import com.GDU.backend.dtos.response.DocumentResponse;
+import com.GDU.backend.dtos.response.TotalResponse;
 import com.GDU.backend.dtos.response.UserResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
@@ -304,42 +305,48 @@ public class DocumentServiceImpl implements DocumentService {
         return documents.stream().map(this::convertToDocumentResponse).toList();
     }
 
-//    @Override
-//    public DocumentResponse getDocumentThisYear() {
-//        try {
-//            Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
-//            Integer numberOfDocsPreYear = documentRepository.getNumberOfDocumentPreviousYear();
-//            float percentage = ((float) ((numberOfDocsThisYear - numberOfDocsPreYear) * 100)) / numberOfDocsPreYear;
-//            if (numberOfDocsPreYear == 0) {
-//                percentage = 100;
-//            }
-//            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
-//            return DocumentResponse.builder()
-//                    .totalDocumentsCurrent(numberOfDocsThisYear)
-//                    .totalDocumentsPrev(numberOfDocsPreYear).percentage(roundedPercentage).build();
-//        } catch (Exception e) {
-//            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisYear'" + e.getMessage());
-//        }
-//    }
+    @Override
+    public TotalResponse getDocumentThisYear() {
+        try {
+            Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
+            Integer numberOfDocsPreYear = documentRepository.getNumberOfDocumentPreviousYear();
+            float percentage = ((float) ((numberOfDocsThisYear - numberOfDocsPreYear) * 100)) / numberOfDocsPreYear;
+            if (numberOfDocsPreYear == 0) {
+                percentage = 100;
+            }
+            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
+            return TotalResponse.builder()
+                    .totalDocumentsCurrent(numberOfDocsThisYear)
+                    .totalDocumentsPrevious(numberOfDocsPreYear)
+                    .percentage(roundedPercentage).build();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisYear'" + e.getMessage());
+        }
+    }
 
-//    @Override
-//    public DocumentResponse getDocumentThisMonth() {
-//        try {
-//            Integer numberOfDocsThisMonth = documentRepository.getNumberOfDocumentsThisMonth();
-//            Integer numberOfDocsPreMonth = documentRepository.getNumberOfDocumentPreviousMonth();
-//            float percentage = ((float) ((numberOfDocsThisMonth - numberOfDocsPreMonth) * 100)) / numberOfDocsPreMonth;
-//            if (numberOfDocsPreMonth == 0) {
-//                percentage = 100;
-//            }
-//            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
-//            return DocumentResponse.builder()
-//                    .totalDocumentsCurrent(numberOfDocsThisMonth)
-//                    .totalDocumentsPrev(numberOfDocsPreMonth).percentage(roundedPercentage).build();
-//        } catch (Exception e) {
-//            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisMonth'");
-//        }
-//    }
-    
+    @Override
+    public TotalResponse getDocumentThisMonth() {
+        try {
+            Integer numberOfDocsThisMonth = documentRepository.getNumberOfDocumentsThisMonth();
+            Integer numberOfDocsPreMonth = documentRepository.getNumberOfDocumentPreviousMonth();
+            float percentage = ((float) ((numberOfDocsThisMonth - numberOfDocsPreMonth) * 100)) / numberOfDocsPreMonth;
+            if (numberOfDocsPreMonth == 0) {
+                percentage = 100;
+            }
+            float roundedPercentage = Math.round(percentage * 100.0f) / 100.0f;
+            return TotalResponse.builder()
+                    .totalDocumentsCurrent(numberOfDocsThisMonth)
+                    .totalDocumentsPrevious(numberOfDocsPreMonth).percentage(roundedPercentage).build();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method 'getDocumentThisMonth'");
+        }
+    }
+
+    @Override
+    public int countAllDocuments() {
+        return documentRepository.countAllDocuments();
+    }
+
     public DocumentResponse convertToDocumentResponse(Document document) {
         // only need show name of user
         UserResponse author = UserResponse.builder()
