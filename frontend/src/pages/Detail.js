@@ -21,7 +21,6 @@ const Detail = () => {
 
   const url = window.location.href;
   const slug = extractSlugFromURL(url);
-  console.log(slug)
   const [numPages, setNumPages] = useState();
   const [pageNumber, setPageNumber] = useState(20);
   const [file, setFile] = useState(null);
@@ -36,7 +35,6 @@ const Detail = () => {
       .then((res) => res.json())
       .then((data) => {
         setData(data)
-        console.log(data)
       });
     fetch("http://localhost:8080/api/v1/document/" + slug + "/file")
       .then((res) => res.blob())

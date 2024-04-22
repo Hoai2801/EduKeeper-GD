@@ -17,10 +17,12 @@ import com.ironsoftware.ironpdf.edit.PageSelection;
 import com.ironsoftware.ironpdf.image.ToImageOptions;
 import com.itextpdf.text.pdf.PdfReader;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -57,15 +59,12 @@ public class DocumentServiceImpl implements DocumentService {
         PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
         int numberOfPages = pdfReader.getNumberOfPages();
         String thumbnail = generateThumbnail(uploadDto.getDocument().getInputStream());
-        System.out.println(thumbnail);
 
         // Create a new Document instance with the provided document information
         Document newDocument = Document.builder()
                 .title(uploadDto.getTitle())
                 .author(uploadDto.getAuthor())
-                .slug(
-                        uploadDto.getTitle().replace(" ", "-").toLowerCase()
-                                + "-" + new Date().getTime())
+                .slug(createSlug(uploadDto.getTitle()))
                 .document_type(uploadDto.getDocument().getContentType())
                 // Calculate and set the document size in megabytes
                 .document_size(uploadDto.getDocument().getSize() / 1_000_000)
@@ -99,6 +98,15 @@ public class DocumentServiceImpl implements DocumentService {
 
         // Return a success message
         return "Document uploaded successfully";
+    }
+
+    public static String createSlug(String title) {
+        title = StringEscapeUtils.escapeHtml4(title);
+        String slug = title.replaceAll("[^a-zA-Z0-9\\s]", "");
+        slug = slug.replaceAll("\\s+", "-");
+        slug = slug.toLowerCase();
+
+        return slug + "-" + System.currentTimeMillis();
     }
 
     private String generateThumbnail(InputStream inputStream) throws IOException {

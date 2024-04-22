@@ -30,7 +30,6 @@ public class DocumentController {
     @GetMapping("/{slug}/file")
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
-            System.out.println("slug: " + slug);
             // Get the file by slug using document service
             Document document = documentService.getDocumentBySlug(slug);
             File file = new File(document.getPath());

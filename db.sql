@@ -158,6 +158,7 @@ CREATE TABLE `document` (
                             `specialized_id` smallint DEFAULT NULL,
                             `subject_id` int not null,
                             `category_id` tinyint DEFAULT NULL,
+                            `thumbnail` varchar(200),
                             `author_name` varchar(100) NOT NULL,
                             `download` int not null,
                             `views` int not null,

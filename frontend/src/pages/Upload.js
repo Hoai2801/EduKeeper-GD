@@ -66,7 +66,7 @@ export const Upload = () => {
     fetch('http://localhost:8080/api/v1/document', {
       method: 'POST',
       body: formData,
-    }).then(response => response.json())
+    })
       .then(data => {
           console.log(data)
           setCategory('')
