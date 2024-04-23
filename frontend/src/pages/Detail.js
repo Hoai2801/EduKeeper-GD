@@ -74,7 +74,7 @@ const Detail = () => {
   return (
     <div>
       <div className='pt-[50px]'>
-        <p className='text-blue-500'><Link to={`/category/${data?.category.slug}`}>{data?.category.categoryName}</Link> - <Link to={`/specialized/${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
+        <p className='text-blue-500'><Link to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> - <Link to={`/search?specialized=${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
         {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
         <h2 className='text-[28px] font-bold max-w-[900px] text-justify'>{data?.title}</h2>
         <div className='flex justify-between mt-3'>
@@ -86,7 +86,7 @@ const Detail = () => {
           <div className='flex flex-col gap-5'>
             <button
               onClick={() => onButtonClick()}
-              className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Tải tài liệu</button>
+              className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Tải tài liệu ({data?.document_size} MB)</button>
             <div className='flex gap-5'>
 
               <p>Lượt xem: {data?.views}</p>

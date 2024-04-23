@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -187,8 +188,11 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponse> getMostViewedDocuments(int limit) {
-        List<Document> documents = documentRepository.getMostViewedDocuments(limit);
-        return documents.stream().map(this::convertToDocumentResponse).toList();
+        return documentRepository.getMostViewedDocuments(limit)
+                .stream()
+                .filter(document -> document.getViews() > 0)
+                .map(this::convertToDocumentResponse)
+                .toList();
     }
 
     @Override
@@ -215,8 +219,11 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponse> getMostDownloadedDocuments(int limit) {
-        return documentRepository.getMostDownloadedDocuments(limit)
-                .stream().map(this::convertToDocumentResponse).toList();
+        // only get document has download more than 0
+        return documentRepository.getMostDownloadedDocuments(limit).stream()
+                .filter(document -> document.getDownload() > 0)
+                .map(this::convertToDocumentResponse)
+                .toList();
     }
 
     @Override
@@ -297,10 +304,16 @@ public class DocumentServiceImpl implements DocumentService {
                 documents.sort(Comparator.comparing(Document::getViews).reversed());
             }
             if (filterDTO.getOrder().equalsIgnoreCase("mostdownloaded")) {
-                documents.sort(Comparator.comparing(Document::getDownload).reversed());
+                // Filter documents with download > 0 first
+                // Sort the filtered documents
+                documents = documents.stream()
+                        .filter(document -> document.getDownload() > 0).sorted(Comparator.comparing(Document::getDownload).reversed()).collect(Collectors.toList()); // Update documents with filtered and sorted list
+            }
+            if (filterDTO.getOrder().equalsIgnoreCase("lastest")) {
+                documents.sort(Comparator.comparing(Document::getId).reversed());
             }
         } else {
-            documents.sort(Comparator.comparing(Document::getUpload_date).reversed());
+            documents.sort(Comparator.comparing(Document::getId).reversed());
         }
         return documents.stream().map(this::convertToDocumentResponse).toList();
     }

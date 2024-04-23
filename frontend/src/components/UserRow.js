@@ -11,6 +11,9 @@ const UserRow = ({user}) => {
             },
         })
         console.log(response)
+        if (response.status === 200) {
+            alert("Xóa người dùng thành công")
+        }
     }
   return (
     <tr key={user.id} className={`p-2 mt-5 ${user.enabled ? "bg-white" : "bg-gray-100"} w-full`}>

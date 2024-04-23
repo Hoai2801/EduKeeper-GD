@@ -21,10 +21,10 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @Secured("ADMIN")
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id,
-                                                 Principal principal) {
+//    @Secured("ADMIN")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
+        System.out.println("deleting user " + id );
         return ResponseEntity.ok(userService.deleteUserById(id));
     }
 }

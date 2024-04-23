@@ -51,10 +51,11 @@ public class FakeController {
         Faker faker = new Faker();
 
         // create fake dto for testing
-        Path path = Paths.get("src/main/resources/static/uploads/1712404687275_Java.Professional.Interview.Guide.939103005X.pdf");
+        String pathUrl = "src/main/resources/static/uploads/";
+        String[] files = {"1713791537559_Packt.ASP.NET.8.Best.Practices.183763212X.pdf", "1713792927454_Algorithmic Thinking, 2nd Edition_ Unlock Your Programming Potential by Daniel Zingaro.pdf"};
+        Path path = Paths.get(pathUrl + files[(int)  Math.round(Math.random())]);
         String name = faker.book().title();
-        String[] files = {"pdf", "doc", "docx"};
-        String originalFileName = "1712404687275_Java.Professional.Interview.Guide.939103005X.pdf";
+        String originalFileName = "file.pdf";
         String contentType = "application/pdf";
         byte[] content = null;
         try {
@@ -66,7 +67,7 @@ public class FakeController {
 
         UploadDTO uploadDTO = UploadDTO.builder()
                 .title(faker.book().title())
-                .author(faker.job().title())
+                .author("22140044")
                 .specialized(faker.number().numberBetween(1, 39))
                 .subject(1)
                 .category(faker.number().numberBetween(1, 5))

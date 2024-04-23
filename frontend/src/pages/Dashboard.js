@@ -17,6 +17,9 @@ const Dashboard = () => {
 
   const [countAllDocument, setCount] = useState(0);
 
+  const [limit, setLimit] = useState(30)
+  const [limitValue, setLimitValue] = useState(30)
+
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/document/month")
       .then((res) => res.json())
@@ -25,13 +28,13 @@ const Dashboard = () => {
         setDocumentMonth(data)
       });
 
-      fetch("http://localhost:8080/api/v1/document/year")
+    fetch("http://localhost:8080/api/v1/document/year")
       .then((res) => res.json())
       .then((data) => {
         setDocumentYear(data)
       });
 
-      fetch("http://localhost:8080/api/v1/document/count")
+    fetch("http://localhost:8080/api/v1/document/count")
       .then((res) => res.json())
       .then((data) => {
         setCount(data)
@@ -42,7 +45,7 @@ const Dashboard = () => {
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
           <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Documents_icon_-_noun_project_5020_-_white.svg/1200px-Documents_icon_-_noun_project_5020_-_white.svg.png" alt="" className='w-5 h-5'/>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Documents_icon_-_noun_project_5020_-_white.svg/1200px-Documents_icon_-_noun_project_5020_-_white.svg.png" alt="" className='w-5 h-5' />
 
           </div>
           <div className="p-4 text-right">
@@ -57,7 +60,7 @@ const Dashboard = () => {
         </div>
         <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
           <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-            <img src="https://www.shareicon.net/data/2015/10/29/663772_arrows_512x512.png" alt="" className='w-6 h-6'/>
+            <img src="https://www.shareicon.net/data/2015/10/29/663772_arrows_512x512.png" alt="" className='w-6 h-6' />
           </div>
           <div className="p-4 text-right">
             <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600">Tài liệu tháng này</p>
@@ -102,7 +105,7 @@ const Dashboard = () => {
           </div>
         </div> */}
       </div>
-      
+
       {/* <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md overflow-hidden xl:col-span-2">
           <div className="relative bg-clip-border rounded-xl overflow-hidden bg-transparent text-gray-700 shadow-none m-0 flex items-center justify-between p-6">
@@ -237,7 +240,18 @@ const Dashboard = () => {
       </div> */}
       <div className='w-full h-full'>
         <h2 className='text-3xl text-center my-10'>Danh sách tài liệu</h2>
-          <FileRow />
+        <div className='flex justify-center mb-5 gap-5'>
+          <input type="number" name="" id="" value={limitValue} onChange={(e) => setLimitValue(e.target.value)} className='border border-gray-300 rounded-md p-4'/>
+          <div className='flex gap-5 text-xl font-semibold pt-3'>    
+          <p>trên</p>
+          <p>{countAllDocument}</p>
+          </div>
+          <button onClick={() => setLimit(limitValue)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
+        </div>
+        <FileRow limit={limit} />
+        <div className='flex justify-center my-10'>
+          <button onClick={() => setLimit(limit + 10)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
+        </div>
       </div>
     </div>
   )

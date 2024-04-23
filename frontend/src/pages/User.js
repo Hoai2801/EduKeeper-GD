@@ -36,7 +36,11 @@ const User = () => {
       },
       body: JSON.stringify(formData)
     })
-    console.log(response)
+    if (response) {
+      setIsModalOpen(false)
+      alert("Tạo người dùng thành công")
+      
+    }
   };
 
 

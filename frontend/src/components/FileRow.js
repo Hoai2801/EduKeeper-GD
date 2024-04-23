@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react'
 import pdfIcon from '../assets/pdf-icon.jpg'
 import wordicon from '../assets/word.png'
 import { Link } from 'react-router-dom';
-const FileRow = () => {
+const FileRow = ({limit}) => {
     const [document, setDocument] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/v1/document/lasted?limit=10")
+        fetch(`http://localhost:8080/api/v1/document/lasted?limit=${limit}`)
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
                 setDocument(data)
             });
-    }, []);
+    }, [limit]);
     return (
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg border">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">

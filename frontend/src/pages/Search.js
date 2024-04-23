@@ -52,7 +52,7 @@ const Search = () => {
         {documents && documents.map((item, index) => {
           if (index < limit) {
             return (
-              <DocumentCard slug={item.slug} title={item.title} author={item.author} views={item.views} download={item.download} upload_date={item.upload_date} key={index} thumbnail={item.thumbnail} />
+              <DocumentCard slug={item.slug} pages={item.pages} title={item.title} author={item.author} views={item.views} download={item.download} upload_date={item.upload_date} key={index} thumbnail={item.thumbnail} />
             )
           }
         }
