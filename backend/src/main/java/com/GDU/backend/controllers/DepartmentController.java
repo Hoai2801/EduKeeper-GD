@@ -1,6 +1,7 @@
 package com.GDU.backend.controllers;
 
 import com.GDU.backend.dtos.requests.DepartmentDTO;
+import com.GDU.backend.services.DepartmentService;
 import com.GDU.backend.services.Impl.DepartmentServiceImpl;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api/v1/department")
+@RequestMapping("api/v1/departments")
 @RequiredArgsConstructor
 public class DepartmentController {
 
-    private final DepartmentServiceImpl departmentService;
+    private final DepartmentService departmentService;
 
     @PostMapping("")
     public ResponseEntity<?> createDepartment(@RequestBody DepartmentDTO departmentDTO) {
@@ -43,16 +44,7 @@ public class DepartmentController {
         }
     }
 
-    @GetMapping("/name/{name}")
-    public ResponseEntity<?> getDepartmentByName(@PathVariable("name") String name) {
-        try {
-            return ResponseEntity.ok(departmentService.getDepartmentByName(name));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateDepartmentById(@PathVariable("id") Long id,
                                                   @RequestBody DepartmentDTO departmentDTO
     ) {
@@ -63,7 +55,7 @@ public class DepartmentController {
         }
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteDepartmentById(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(departmentService.deleteDepartmentById(id));

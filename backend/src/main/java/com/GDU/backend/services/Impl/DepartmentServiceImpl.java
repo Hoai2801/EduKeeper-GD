@@ -27,16 +27,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public Department getDepartmentByName(String name) {
-        return departmentRepository.findByDepartmentName(name);
-    }
-
-    @Override
     public String createDepartment(DepartmentDTO departmentDTO) {
         try {
             Department newDepartment = Department.builder()
                     .departmentName(departmentDTO.getDepartmentName())
-                    .departmentSlug(departmentDTO.getDepartmentName().replace(" ", "-").toLowerCase()).build();
+                    .departmentSlug(departmentDTO.getDepartmentName()
+                                    .replace(" ", "-")
+                                    .toLowerCase())
+                    .build();
             departmentRepository.save(newDepartment);
             return "Create department success";
         } catch (Exception e) {
