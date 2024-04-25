@@ -43,11 +43,10 @@ public class AuthenticationService {
     private String activationUrl;
 
     public String register(RegisterRequest registerRequest) throws MessagingException {
-        System.out.println(registerRequest.getRoles());
         // role is optional<Role>
         var role = roleRepository.findByName(registerRequest.getRoles()).orElseThrow(
                 () -> new RuntimeException("Role not found"));
-
+        
         // check if user exists
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return "Email already exists";
@@ -57,6 +56,7 @@ public class AuthenticationService {
         if (userRepository.existsByStaffCode(registerRequest.getStaffCode())) {
             return "StaffCode already exists";
         }
+        System.out.println("before user");
         // save user
         var user = User.builder()
                 .username(registerRequest.getUsername())
@@ -69,6 +69,7 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(user);
+        System.out.println("user done");
         sendValidationEmail(user);
         return "registered";
     }
@@ -133,7 +134,7 @@ public class AuthenticationService {
         }
         user.setEnabled(true);
         userRepository.save(user);
-        tokenRepository.delete(dbToken);
+//        tokenRepository.delete(dbToken);
         return "activated";
     }
 

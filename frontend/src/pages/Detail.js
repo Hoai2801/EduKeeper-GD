@@ -68,7 +68,9 @@ const Detail = () => {
     alink.click();
 
     // increase download value of document
-    fetch("http://localhost:8080/api/v1/document/increase-download/" + data?.id)
+    fetch("http://localhost:8080/api/v1/document/increase-download/" + data?.id, {
+      method: "GET",
+    })
   };
 
   return (

@@ -1,8 +1,9 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.dtos.response.DocumentResponse;
 import com.GDU.backend.dtos.response.UserResponse;
+import com.GDU.backend.models.Token;
 import com.GDU.backend.models.User;
+import com.GDU.backend.repositories.TokenRepository;
 import com.GDU.backend.repositories.UserRepository;
 import com.GDU.backend.services.UserService;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -41,6 +43,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public String deleteUserById(Long id) {
+        List<Token> tokens = tokenRepository.findTokensByUserId(id);
+        tokenRepository.deleteAll(tokens);
         userRepository.deleteById(id);
         return "deleted";
     }

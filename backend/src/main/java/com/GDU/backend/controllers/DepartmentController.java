@@ -54,7 +54,8 @@ public class DepartmentController {
 
     @PutMapping("{id}")
     public ResponseEntity<?> updateDepartmentById(@PathVariable("id") Long id,
-                                                  @RequestBody DepartmentDTO departmentDTO) {
+                                                  @RequestBody DepartmentDTO departmentDTO
+    ) {
         try {
             return ResponseEntity.ok(departmentService.updateDepartmentById(id, departmentDTO));
         } catch (Exception e) {

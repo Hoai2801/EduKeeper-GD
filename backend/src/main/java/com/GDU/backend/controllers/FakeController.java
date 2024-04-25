@@ -1,7 +1,6 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.dtos.requests.UploadDTO;
-import com.GDU.backend.models.User;
+import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
 import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +64,7 @@ public class FakeController {
         MultipartFile result = new MockMultipartFile(name,
                 originalFileName, contentType, content);
 
-        UploadDTO uploadDTO = UploadDTO.builder()
+        UploadRequestDTO uploadRequestDTO = UploadRequestDTO.builder()
                 .title(faker.book().title())
                 .author("22140044")
                 .specialized(faker.number().numberBetween(1, 39))
@@ -75,6 +74,6 @@ public class FakeController {
                 .document(result)
                 .build();
 
-        documentService.uploadDocument(uploadDTO);
+        documentService.uploadDocument(uploadRequestDTO);
     }
 }

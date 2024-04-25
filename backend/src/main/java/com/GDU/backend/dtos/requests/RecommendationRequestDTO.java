@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecommendDTO {
+public class RecommendationRequestDTO {
     private String title;
     private Long specialized;
     private Long category;

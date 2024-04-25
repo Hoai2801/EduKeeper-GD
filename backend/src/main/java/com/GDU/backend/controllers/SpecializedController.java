@@ -25,11 +25,6 @@ public class SpecializedController {
         return specializedService.getSpecializedsByDepartment(id);
     }
 
-//    @GetMapping("/department/{slug}")
-//    public List<Specialized> getSpecializesByDepartmentSlug(@PathVariable String slug) {
-//        return specializedService.getSpecializedsByDepartmentSlug(slug);
-//    }
-
     @GetMapping("/documents/{slug}")
     public List<Document> getDocumentsBySpecializedSlug(@PathVariable("slug") String slug) {
         return specializedService.getDocumentsBySpecialized(slug);
@@ -39,9 +34,4 @@ public class SpecializedController {
     public int getDocumentsCountBySpecialized(@PathVariable("slug") String slug) {
         return specializedService.getDocumentsCountBySpecialized(slug);
     }
-
-//    @GetMapping("/{slug}")
-//    public Specialized getSpecializedBySlug(@PathVariable("slug") String slug) {
-//        return specializedService.getSpecializedBySlug(slug);
-//    }
 }
