@@ -19,26 +19,17 @@ public class CategoryController {
 
     @PostMapping("")
     public ResponseEntity<?> insertCategory(
-            @Valid @RequestBody CategoryDto categoryDto,
-            BindingResult bindingResult
+            @Valid @RequestBody CategoryDto categoryDto
     ) {
         try {
-            if (bindingResult.hasErrors()) {
-                List<String> errMess = bindingResult.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errMess);
-            }
-            categoryService.createCategory(categoryDto);
-            return ResponseEntity.ok("Post:: category");
+            return ResponseEntity.ok(categoryService.insertCategory(categoryDto));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getCategory() {
+    public ResponseEntity<?> getCategories() {
         return ResponseEntity.ok().body(categoryService.findAll());
     }
 
@@ -47,13 +38,11 @@ public class CategoryController {
             @PathVariable Long id,
             @RequestBody CategoryDto categoryDto
     ) {
-        categoryService.updateCategory(id, categoryDto);
-        return ResponseEntity.ok("Put:: category");
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryDto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
-        categoryService.deleteCategory(id);
-        return ResponseEntity.ok("Delete:: category");
+        return ResponseEntity.ok(categoryService.deleteCategory(id));
     }
 }

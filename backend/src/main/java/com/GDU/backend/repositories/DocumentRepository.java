@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
@@ -77,4 +78,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     @Query(value = "SELECT count(*) FROM document", nativeQuery = true)
     int countAllDocuments();
+
+    @Query("SELECT d FROM Document d WHERE d.slug = :slug")
+    Optional<Document> findBySlug(String slug);
 }

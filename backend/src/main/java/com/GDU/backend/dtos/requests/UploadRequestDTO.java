@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadDTO {
+public class UploadRequestDTO {
     @NotEmpty
     @NotBlank
     private String title;

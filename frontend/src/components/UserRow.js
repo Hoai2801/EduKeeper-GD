@@ -11,7 +11,7 @@ const UserRow = ({user}) => {
             },
         })
         console.log(response)
-        if (response.status === 200) {
+        if (response) {
             alert("Xóa người dùng thành công")
         }
     }

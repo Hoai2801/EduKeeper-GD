@@ -3,9 +3,6 @@ package com.GDU.backend.dtos.response;
 import com.GDU.backend.models.Category;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.models.Subject;
-import com.GDU.backend.models.User;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +14,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DocumentResponse {
+public class DocumentResponseDTO {
     private String title;
 
     private String slug;

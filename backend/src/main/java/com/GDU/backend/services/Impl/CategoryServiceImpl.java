@@ -15,14 +15,15 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepo categoryRepo;
 
     @Override
-    public Category createCategory(CategoryDto categoryDto) {
+    public String insertCategory(CategoryDto categoryDto) {
         String categorySlug = categoryDto.getCategory_name().replace(" ", "-").toLowerCase();
         Category newCategory = Category
                 .builder()
                 .categoryName(categoryDto.getCategory_name())
                 .categorySlug(categorySlug)
                 .build();
-        return categoryRepo.save(newCategory);
+        categoryRepo.save(newCategory);
+        return "insert category success";
     }
 
     @Override
@@ -37,16 +38,21 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category updateCategory(long categoryId, CategoryDto categoryDto) {
+    public String updateCategory(long categoryId, CategoryDto categoryDto) {
         Category existingCategory = getCategoryById(categoryId);
         existingCategory.setCategoryName(categoryDto.getCategory_name());
         categoryRepo.save(existingCategory);
-        return existingCategory;
+        return "update category success";
     }
 
     @Override
-    public void deleteCategory(long id) {
+    public String deleteCategory(long id) {
+        Category category = getCategoryById(id);
+        if (category == null) {
+            return "category not found";
+        }
         categoryRepo.deleteById(id);
+        return "delete category success";
     }
 
     @Override

@@ -1,21 +1,23 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.dtos.requests.FilterDTO;
-import com.GDU.backend.dtos.requests.RecommendDTO;
-import com.GDU.backend.dtos.requests.UploadDTO;
-import com.GDU.backend.dtos.response.DocumentResponse;
+import com.GDU.backend.dtos.requests.FilterRequestDTO;
+import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
+import com.GDU.backend.dtos.requests.UploadRequestDTO;
+import com.GDU.backend.dtos.response.DocumentResponseDTO;
 import com.GDU.backend.dtos.response.TotalResponse;
 import com.GDU.backend.dtos.response.UserResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.CategoryRepo;
 import com.GDU.backend.repositories.DocumentRepository;
+import com.GDU.backend.repositories.SpecializedRepository;
 import com.GDU.backend.services.DocumentService;
-import com.itextpdf.text.pdf.PdfReader;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,34 +40,48 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
+    private static final Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
     private final DocumentRepository documentRepository;
-    private final CategoryRepo categoryRepo;
+    private final CategoryRepo categoryRepository;
+    private final SpecializedRepository specializedRepository;
     private final UserServiceImpl userService;
 
     @Override
-    public String uploadDocument(UploadDTO uploadDto) throws IOException {
-        // Get the category and specialized from the UploadDto
-        Category category = Category.builder().id((long) uploadDto.getCategory()).build();
-        Specialized specialized = Specialized.builder().id((long) uploadDto.getSpecialized()).build();
-
-        Subject subject = Subject.builder().id((long) uploadDto.getSubject()).build();
-
-        User author = userService.getUserByStaffCode(uploadDto.getAuthor());
-
-        // get number of pages
-        PdfReader pdfReader = new PdfReader(uploadDto.getDocument().getInputStream());
-        int numberOfPages = pdfReader.getNumberOfPages();
+    public String uploadDocument(UploadRequestDTO uploadRequestDTO) throws IOException {
+        Category category = categoryRepository.findById((long) uploadRequestDTO.getCategory())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        Specialized specialized = specializedRepository.findById((long) uploadRequestDTO.getSpecialized())
+                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
         
-        String thumbnail = generateThumbnail(uploadDto.getDocument().getInputStream());
+        // todo: add subject model
+        Subject subject = Subject.builder()
+                .id((long) uploadRequestDTO.getSubject())
+                .build();
+        
+        // author is the user who uploads by default
+        User author = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
 
-        // Create a new Document instance with the provided document information
+        int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
+
+        String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
+
+        // generate file name and path
+        String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
+        File destFile = new File(UPLOAD_DIR + fileName);
+
+        // save file
+        MultipartFile multipartFile = uploadRequestDTO.getDocument();
+        Path uploadDir = Paths.get(UPLOAD_DIR);
+        Files.createDirectories(uploadDir);
+        Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
         Document newDocument = Document.builder()
-                .title(uploadDto.getTitle())
+                .title(uploadRequestDTO.getTitle())
                 .author(author)
-                .slug(createSlug(uploadDto.getTitle()))
-                .document_type(uploadDto.getDocument().getContentType())
-                // Calculate and set the document size in megabytes
-                .document_size(uploadDto.getDocument().getSize() / 1_000_000)
+                .slug(createSlug(uploadRequestDTO.getTitle()))
+                .path(destFile.getAbsolutePath())
+                .document_type(uploadRequestDTO.getDocument().getContentType())
+                .document_size(uploadRequestDTO.getDocument().getSize() / 1_000_000)
                 .subject(subject)
                 .pages(numberOfPages)
                 .category(category)
@@ -73,38 +89,23 @@ public class DocumentServiceImpl implements DocumentService {
                 .specialized(specialized)
                 .upload_date(LocalDate.now())
                 .build();
-        String fileName = System.currentTimeMillis() + "_" + uploadDto.getDocument().getOriginalFilename();
-        File destFile = new File(UPLOAD_DIR + fileName);
-
-        // Save the uploaded document to the file system
-        MultipartFile multipartFile = uploadDto.getDocument();
-        Path uploadDir = Paths.get(UPLOAD_DIR);
-        try {
-            Files.createDirectories(uploadDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        newDocument.setPath(destFile.getAbsolutePath());
-        // Save the new document to the document repository
+        
         documentRepository.save(newDocument);
 
-        // Return a success message
         return "Document uploaded successfully";
     }
 
-    public static String createSlug(String title) {
+    private int calculateNumberOfPages(InputStream inputStream) throws IOException {
+        try (PDDocument document = PDDocument.load(inputStream)) {
+            return document.getNumberOfPages();
+        }
+    }
+
+    private String createSlug(String title) {
         title = StringEscapeUtils.escapeHtml4(title);
         String slug = title.replaceAll("[^a-zA-Z0-9\\s]", "");
         slug = slug.replaceAll("\\s+", "-");
-        slug = slug.toLowerCase();
-
-        return slug + "-" + System.currentTimeMillis();
+        return slug.toLowerCase() + "-" + System.currentTimeMillis();
     }
 
     private String generateThumbnail(InputStream inputStream) throws IOException {
@@ -120,59 +121,61 @@ public class DocumentServiceImpl implements DocumentService {
 
             return fileName;
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error generating thumbnail: {}", e.getMessage());
             return null;
         }
     }
 
     @Override
-    public Document getDocumentById(Long id) {
-        return documentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-    }
-
-    @Override
-    public String updateDocumentById(Long id, UploadDTO uploadDTO) {
+    public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) {
         Document existDocument = documentRepository.findById(id).orElse(null);
         if (existDocument == null) {
             return "Document not existing";
         }
         
-        var newAuthor = userService.getUserByStaffCode(uploadDTO.getAuthor());
+        User newAuthor = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
         if (newAuthor == null) {
             return "Author not existing";
         }
         existDocument.setAuthor(newAuthor);
 
-        Category category = categoryRepo.findById((long) uploadDTO.getCategory()).orElse(null);
+        Category category = categoryRepository.findById((long) uploadRequestDTO.getCategory()).orElse(null);
         // Update document
         existDocument.setCategory(category);
-        existDocument.setTitle(uploadDTO.getTitle() != null ? uploadDTO.getTitle() : existDocument.getTitle());
-        existDocument.setSlug(uploadDTO.getTitle() != null ? uploadDTO.getTitle().replace(" ", "-").toLowerCase()
-                + "-" + new Date().getTime() : existDocument.getSlug());
+        existDocument.setTitle(
+                uploadRequestDTO.getTitle() != null ? 
+                uploadRequestDTO.getTitle() : 
+                existDocument.getTitle()
+        );
+        existDocument.setSlug(
+                uploadRequestDTO.getTitle() != null ? 
+                uploadRequestDTO.getTitle()
+                        .replace(" ", "-")
+                        .toLowerCase() + "-" + new Date().getTime() : 
+                existDocument.getSlug()
+        );
         existDocument.setSpecialized(existDocument.getSpecialized());
 
         // Handle Path
-        if (uploadDTO.getDocument() != null) {
-            existDocument.setDocument_type(uploadDTO.getDocument().getContentType());
-            existDocument
-                    .setDocument_size(uploadDTO.getDocument().getSize() / 1_000_000);
+        if (uploadRequestDTO.getDocument() != null) {
+            existDocument.setDocument_type(uploadRequestDTO.getDocument().getContentType());
+            existDocument.setDocument_size(uploadRequestDTO.getDocument().getSize() / 1_000_000);
 
-            String fileName = System.currentTimeMillis() + "_" + uploadDTO.getDocument().getOriginalFilename();
+            String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
             File destFile = new File(UPLOAD_DIR + fileName);
 
             // Save the uploaded document to the file system
-            MultipartFile multipartFile = uploadDTO.getDocument();
+            MultipartFile multipartFile = uploadRequestDTO.getDocument();
             Path uploadDir = Paths.get(UPLOAD_DIR);
             try {
                 Files.createDirectories(uploadDir);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error creating directories: {}", e.getMessage());
             }
             try {
                 Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error copying file: {}", e.getMessage());
             }
 
             existDocument.setPath(destFile.getAbsolutePath());
@@ -182,12 +185,14 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public DocumentResponse getDocumentBySlug(String slug) {
-        return convertToDocumentResponse(documentRepository.getDocumentBySlug(slug));
+    public DocumentResponseDTO getDocumentBySlug(String slug) {
+        Document document = documentRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+        return convertToDocumentResponse(document);
     }
 
     @Override
-    public List<DocumentResponse> getMostViewedDocuments(int limit) {
+    public List<DocumentResponseDTO> getMostViewedDocuments(int limit) {
         return documentRepository.getMostViewedDocuments(limit)
                 .stream()
                 .filter(document -> document.getViews() > 0)
@@ -197,28 +202,16 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public String deleteDocument(Long id) {
+        Document document = documentRepository.findById(id).orElse(null);
+        if (document == null) {
+            return "Document not existing";
+        }
         documentRepository.deleteById(id);
         return "Document deleted successfully";
     }
 
     @Override
-    public String increaseViewCount(Long id) {
-        Document document = getDocumentById(id);
-        document.setViews(document.getViews() + 1);
-        documentRepository.save(document);
-        return "View count increased successfully";
-    }
-
-    @Override
-    public String increaseDownloadCount(Long id) {
-        Document document = getDocumentById(id);
-        document.setDownload(document.getDownload() + 1);
-        documentRepository.save(document);
-        return "Download count increased successfully";
-    }
-
-    @Override
-    public List<DocumentResponse> getMostDownloadedDocuments(int limit) {
+    public List<DocumentResponseDTO> getMostDownloadedDocuments(int limit) {
         // only get document has download more than 0
         return documentRepository.getMostDownloadedDocuments(limit).stream()
                 .filter(document -> document.getDownload() > 0)
@@ -227,12 +220,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponse> getLastedDocuments(int limit) {
+    public List<DocumentResponseDTO> getLatestDocuments(int limit) {
         return documentRepository.getLastedDocuments(limit)
                 .stream().map(this::convertToDocumentResponse).toList();
     }
 
-    public String updateDownloads(Long id) {
+    public String updateDownloadCount(Long id) {
         Document existsDocument = documentRepository.findById(id).orElse(null);
         if (existsDocument == null) {
             return "Document is not existing";
@@ -244,7 +237,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public String updateViews(Long id) {
+    public String updateViewCount(Long id) {
         Document existsDocument = documentRepository.findById(id).orElse(null);
         if (existsDocument == null) {
             return "Document is not existing";
@@ -255,61 +248,46 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponse> getPopularDocumentsOfThisWeek() {
-        return documentRepository.getPopularDocumentThisWeek()
-                .stream().map(this::convertToDocumentResponse).toList();
-    }
-
-    @Override
-    public List<DocumentResponse> getPopularDocumentsOfThisMonth() {
-        return documentRepository.getPopularDocumentThisMonth()
-                .stream().map(this::convertToDocumentResponse).toList();
-    }
-
-    @Override
-    public List<DocumentResponse> getDocumentsSuggested(RecommendDTO recommendDTO) {
+    public List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO) {
         // return list document which have a same specialized and category, title or
         // author
         return documentRepository.getDocumentsSuggested(
-                recommendDTO.getSpecialized(), 
-                recommendDTO.getCategory(),
-                recommendDTO.getTitle(), 
-                recommendDTO.getAuthor())
+                    recommendationRequestDTO.getSpecialized(), 
+                    recommendationRequestDTO.getCategory(),
+                    recommendationRequestDTO.getTitle(), 
+                    recommendationRequestDTO.getAuthor()
+                )
                 .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<DocumentResponse> getDocumentsByAuthorName(String authorName) {
+    public List<DocumentResponseDTO> getDocumentsByAuthorName(String authorName) {
         return documentRepository.getDocumentsByAuthorName(authorName)
                 .stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
-    public List<DocumentResponse> getDocumentsBySlugSpecialized(String slug) {
-        return documentRepository.getDocumentsBySlugSpecialized(slug)
-                .stream().map(this::convertToDocumentResponse).toList();
-    }
-
-    @Override
-    public List<DocumentResponse> getDocumentsByFilter(FilterDTO filterDTO) {
+    public List<DocumentResponseDTO> filterDocuments(FilterRequestDTO filterRequestDTO) {
         List<Document> documents = documentRepository.getDocumentsByFilter(
-                filterDTO.getDepartmentSlug(),
-                filterDTO.getSearchTerm(),
-                filterDTO.getSubjectName(),
-                filterDTO.getSpecializedSlug(),
-                filterDTO.getCategoryName()
+                filterRequestDTO.getDepartmentSlug(),
+                filterRequestDTO.getSearchTerm(),
+                filterRequestDTO.getSubjectName(),
+                filterRequestDTO.getSpecializedSlug(),
+                filterRequestDTO.getCategoryName()
         );
-        if (filterDTO.getOrder() != null) {
-            if (filterDTO.getOrder().equalsIgnoreCase("mostviewed")) {
+        if (filterRequestDTO.getOrder() != null) {
+            if (filterRequestDTO.getOrder().equalsIgnoreCase("most-viewed")) {
                 documents.sort(Comparator.comparing(Document::getViews).reversed());
             }
-            if (filterDTO.getOrder().equalsIgnoreCase("mostdownloaded")) {
+            if (filterRequestDTO.getOrder().equalsIgnoreCase("most-downloaded")) {
                 // Filter documents with download > 0 first
-                // Sort the filtered documents
+                // Update documents with filtered and sorted list
                 documents = documents.stream()
-                        .filter(document -> document.getDownload() > 0).sorted(Comparator.comparing(Document::getDownload).reversed()).collect(Collectors.toList()); // Update documents with filtered and sorted list
+                        .filter(document -> document.getDownload() > 0)
+                        .sorted(Comparator.comparing(Document::getDownload)
+                        .reversed()).collect(Collectors.toList()); 
             }
-            if (filterDTO.getOrder().equalsIgnoreCase("lastest")) {
+            if (filterRequestDTO.getOrder().equalsIgnoreCase("latest")) {
                 documents.sort(Comparator.comparing(Document::getId).reversed());
             }
         } else {
@@ -319,7 +297,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public TotalResponse getDocumentThisYear() {
+    public TotalResponse getDocumentsThisYear() {
         try {
             Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
             Integer numberOfDocsPreYear = documentRepository.getNumberOfDocumentPreviousYear();
@@ -338,7 +316,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public TotalResponse getDocumentThisMonth() {
+    public TotalResponse getDocumentsThisMonth() {
         try {
             Integer numberOfDocsThisMonth = documentRepository.getNumberOfDocumentsThisMonth();
             Integer numberOfDocsPreMonth = documentRepository.getNumberOfDocumentPreviousMonth();
@@ -360,14 +338,14 @@ public class DocumentServiceImpl implements DocumentService {
         return documentRepository.countAllDocuments();
     }
 
-    public DocumentResponse convertToDocumentResponse(Document document) {
+    public DocumentResponseDTO convertToDocumentResponse(Document document) {
         // only need show name of user
         UserResponse author = UserResponse.builder()
                 .id(document.getAuthor().getId())
                 .username(document.getAuthor().getName())
                 .staffCode(document.getAuthor().getStaffCode())
                 .build();
-        return DocumentResponse.builder()
+        return DocumentResponseDTO.builder()
                 .title(document.getTitle())
                 .slug(document.getSlug())
                 .views(document.getViews())

@@ -1,7 +1,6 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.dtos.requests.UploadDTO;
-import com.GDU.backend.models.User;
+import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
 import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
@@ -28,23 +27,22 @@ import java.util.concurrent.Executors;
 public class FakeController {
 
     private final DocumentServiceImpl documentService;
-
-
+    
     @GetMapping("/{amount}")
     public String fake(@PathVariable("amount") int amount) throws DocumentException, IOException {
         int numThreads = 4; // Adjust the number of threads as needed
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-
-        for (int i = 0; i < amount; i++) {
-            executor.execute(() -> {
-                try {
-                    createFakeDocument();
-                } catch (IOException | DocumentException e) {
-                    e.printStackTrace();
-                }
-            });
+        try (ExecutorService executor = Executors.newFixedThreadPool(numThreads)) {
+            for (int i = 0; i < amount; i++) {
+                executor.execute(() -> {
+                    try {
+                        createFakeDocument();
+                    } catch (IOException | DocumentException e) {
+                        log.error("Error creating fake document: {}", e.getMessage());
+                    }
+                });
+            }
         }
-        return "fake";
+        return "faking";
     }
 
     private void createFakeDocument() throws IOException, DocumentException {
@@ -61,12 +59,13 @@ public class FakeController {
         try {
             content = Files.readAllBytes(path);
         } catch (final IOException e) {
+            log.error("Error reading file: {}", e.getMessage());
         }
-        MultipartFile result = new MockMultipartFile(name,
-                originalFileName, contentType, content);
+        MultipartFile result = new MockMultipartFile(name, originalFileName, contentType, content);
 
-        UploadDTO uploadDTO = UploadDTO.builder()
+        UploadRequestDTO uploadRequestDTO = UploadRequestDTO.builder()
                 .title(faker.book().title())
+                // todo: fix author
                 .author("22140044")
                 .specialized(faker.number().numberBetween(1, 39))
                 .subject(1)
@@ -75,6 +74,6 @@ public class FakeController {
                 .document(result)
                 .build();
 
-        documentService.uploadDocument(uploadDTO);
+        documentService.uploadDocument(uploadRequestDTO);
     }
 }

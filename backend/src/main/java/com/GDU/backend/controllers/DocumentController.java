@@ -1,12 +1,11 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.dtos.requests.FilterDTO;
-import com.GDU.backend.dtos.requests.RecommendDTO;
-import com.GDU.backend.dtos.requests.UploadDTO;
-import com.GDU.backend.dtos.response.DocumentResponse;
+import com.GDU.backend.dtos.requests.FilterRequestDTO;
+import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
+import com.GDU.backend.dtos.requests.UploadRequestDTO;
+import com.GDU.backend.dtos.response.DocumentResponseDTO;
 import com.GDU.backend.models.Document;
-import com.GDU.backend.services.Impl.DocumentServiceImpl;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import com.GDU.backend.services.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -22,22 +21,21 @@ import java.util.concurrent.CompletableFuture;
 
 @CrossOrigin
 @RestController
-@RequestMapping("api/v1/document")
+@RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
 public class DocumentController {
 
-    private final DocumentServiceImpl documentService;
-    
+    private final DocumentService documentService;
+
     @GetMapping("/{slug}/file")
-    public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
+    public ResponseEntity<Resource> downloadFileBySlug(@PathVariable("slug") String slug) {
         try {
-            // Get the file by slug using document service
-            DocumentResponse document = documentService.getDocumentBySlug(slug);
+            DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
             File file = new File(document.getPath());
-            return ResponseEntity.ok().contentType(MediaType.parseMediaType(document.getDocument_type()))
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(document.getDocument_type()))
                     .body(new FileSystemResource(file));
         } catch (Exception e) {
-            // Return 500 status code if an error occurs
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -47,12 +45,12 @@ public class DocumentController {
         try {
             return ResponseEntity.ok(documentService.getDocumentBySlug(slug));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Document not found");
         }
     }
 
     @GetMapping("/most-viewed")
-    public ResponseEntity<?> getMostViewedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
+    public ResponseEntity<?> getMostViewedDocuments(@RequestParam("limit") int limit) {
         try {
             return ResponseEntity.ok(documentService.getMostViewedDocuments(limit));
         } catch (Exception e) {
@@ -61,7 +59,7 @@ public class DocumentController {
     }
 
     @GetMapping("/most-downloaded")
-    public ResponseEntity<?> getMostDownloadedDocumentsInCurrentMonth(@RequestParam("limit") int limit) {
+    public ResponseEntity<?> getMostDownloadedDocuments(@RequestParam("limit") int limit) {
         try {
             return ResponseEntity.ok(documentService.getMostDownloadedDocuments(limit));
         } catch (Exception e) {
@@ -69,11 +67,10 @@ public class DocumentController {
         }
     }
 
-    // get the list of lasted documents
-    @GetMapping("/lasted")
-    public ResponseEntity<?> lastedDocument(@RequestParam("limit") int limit) {
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestDocuments(@RequestParam("limit") int limit) {
         try {
-            return ResponseEntity.ok().body(documentService.getLastedDocuments(limit));
+            return ResponseEntity.ok().body(documentService.getLatestDocuments(limit));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -81,14 +78,13 @@ public class DocumentController {
 
     @Validated
     @Async
-    @PostMapping
+    @PostMapping("/upload")
     public CompletableFuture<ResponseEntity<String>> uploadDocument(
-            @ModelAttribute UploadDTO uploadDto) {
+            @ModelAttribute UploadRequestDTO uploadRequestDTO
+    ) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                String message = documentService.uploadDocument(uploadDto);
-                System.out.println(message);
-                return ResponseEntity.ok(message);
+                return ResponseEntity.ok(documentService.uploadDocument(uploadRequestDTO));
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Error uploading document: " + e.getMessage());
@@ -106,46 +102,31 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/increase-view/{id}")
-    public ResponseEntity<String> increaseViewCountDocument(@PathVariable("id") Long id) {
-        try {
-            return ResponseEntity.ok().body(documentService.increaseViewCount(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
-    @GetMapping("/increase-download/{id}")
-    public ResponseEntity<String> increaseDownloadDocument(@PathVariable("id") Long id) {
-        try {
-            return ResponseEntity.ok().body(documentService.increaseDownloadCount(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDocumentById(@PathVariable("id") Long id, @RequestBody UploadDTO uploadDTO) {
+    public ResponseEntity<?> updateDocumentById(
+            @PathVariable("id") Long id, 
+            @RequestBody UploadRequestDTO uploadRequestDTO
+    ) {
         try {
-            return ResponseEntity.ok(documentService.updateDocumentById(id, uploadDTO));
+            return ResponseEntity.ok(documentService.updateDocumentById(id, uploadRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
 
     @PutMapping("/download/{id}")
-    public ResponseEntity<?> updateDownLoad(@PathVariable("id") Long id) {
+    public ResponseEntity<?> updateDownloadCount(@PathVariable("id") Long id) {
         try {
-            return ResponseEntity.ok(documentService.updateDownloads(id));
+            return ResponseEntity.ok(documentService.updateDownloadCount(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
 
     @PutMapping("/views/{id}")
-    public ResponseEntity<?> updateViews(@PathVariable("id") Long id) {
+    public ResponseEntity<?> updateViewCount(@PathVariable("id") Long id) {
         try {
-            return ResponseEntity.ok(documentService.updateViews(id));
+            return ResponseEntity.ok(documentService.updateViewCount(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -159,26 +140,25 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
-    
-    @GetMapping("/year")
-    public ResponseEntity<?> getDocsThisYear() {
+
+    @GetMapping("/this-year")
+    public ResponseEntity<?> getDocumentsThisYear() {
         try {
-            return ResponseEntity.ok(documentService.getDocumentThisYear());
+            return ResponseEntity.ok(documentService.getDocumentsThisYear());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @GetMapping("/month")
-    public ResponseEntity<?> getDocsThisMonth() {
+    @GetMapping("/this-month")
+    public ResponseEntity<?> getDocumentsThisMonth() {
         try {
-            return ResponseEntity.ok(documentService.getDocumentThisMonth());
+            return ResponseEntity.ok(documentService.getDocumentsThisMonth());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    // Author
     @GetMapping("/author/{authorName}")
     public ResponseEntity<?> getDocumentsByAuthorName(@PathVariable("authorName") String authorName) {
         try {
@@ -189,42 +169,24 @@ public class DocumentController {
     }
 
     @PostMapping("/recommend")
-    public ResponseEntity<?> getDocumentsSuggested(@ModelAttribute RecommendDTO recommend) {
+    public ResponseEntity<?> getRecommendedDocuments(
+            @ModelAttribute RecommendationRequestDTO recommendationRequestDTO
+    ) {
         try {
-            return ResponseEntity.ok(documentService.getDocumentsSuggested(recommend));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
-
-    // Specialized
-    @GetMapping("/specialized/{slug}")
-    public ResponseEntity<?> getDocumentsBySlugSpecialized(@PathVariable("slug") String slug) {
-        try {
-            return ResponseEntity.ok(documentService.getDocumentsBySlugSpecialized(slug));
+            return ResponseEntity.ok(documentService.getRecommendedDocuments(recommendationRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<?> getDocumentsByFilter(
-            @RequestBody String searchTerm,
-            @RequestParam(required = false, name = "category") String categoryName,
-            @RequestParam(required = false, name = "subject") String subjectName,
-            @RequestParam(required = false, name = "department") String departmentSlug,
-            @RequestParam(required = false, name = "specialized") String specializedSlug,
-            @RequestParam(required = false, name = "order") String order) {
+    public ResponseEntity<?> filterDocuments(
+            @RequestBody FilterRequestDTO filterRequestDTO,
+            @RequestParam(required = false, name = "order") String order
+    ) {
         try {
-            FilterDTO req = FilterDTO.builder()
-                    .searchTerm(searchTerm)
-                    .categoryName(categoryName)
-                    .subjectName(subjectName)
-                    .departmentSlug(departmentSlug)
-                    .specializedSlug(specializedSlug)
-                    .order(order)
-                    .build();
-            return ResponseEntity.ok(documentService.getDocumentsByFilter(req));
+            filterRequestDTO.setOrder(order);
+            return ResponseEntity.ok(documentService.filterDocuments(filterRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
