@@ -40,4 +40,6 @@ public interface DocumentService {
     TotalResponse getDocumentsThisMonth();
 
     int countAllDocuments();
+
+    int countAllDocumentsBySpecialized(Long id);
 }

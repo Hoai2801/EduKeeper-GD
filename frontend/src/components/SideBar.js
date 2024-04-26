@@ -18,7 +18,7 @@ const SideBar = () => {
     const [specialized, setSpecialized] = useState();
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/v1/department')
+        fetch('http://localhost:8080/api/v1/departments')
             .then((res) => res.json())
             .then((data) => {
                 setDepartmentList(data)
@@ -83,13 +83,13 @@ const SideBar = () => {
                     </form>
 
                     <div className='flex gap-3 mt-5'>
-                        <div className={`text-center border py-2 px-3 rounded-3xl border-black hover:bg-slate-500 hover:cursor-pointer hover:text-white ${sort === 'lastest' ? 'bg-slate-500 text-white' : ''}`} onClick={handleSort('lastest')}>
+                        <div className={`text-center border py-2 px-3 rounded-3xl border-black hover:bg-slate-500 hover:cursor-pointer hover:text-white ${sort === 'latest' ? 'bg-slate-500 text-white' : ''}`} onClick={handleSort('lastest')}>
                             Mới nhất
                         </div>
-                        <div className={`text-center border py-2 px-3 rounded-3xl border-black hover:bg-slate-500 hover:cursor-pointer hover:text-white ${sort === 'mostviewed' ? 'bg-slate-500 text-white' : ''}`} onClick={handleSort('mostviewed')}>
+                        <div className={`text-center border py-2 px-3 rounded-3xl border-black hover:bg-slate-500 hover:cursor-pointer hover:text-white ${sort === 'most-viewed' ? 'bg-slate-500 text-white' : ''}`} onClick={handleSort('most-viewed')}>
                             Xem nhiều
                         </div>
-                        <div className={`text-center border py-2 px-3 rounded-3xl border-black hover:bg-slate-500 hover:cursor-pointer hover:text-white ${sort === 'mostdownloaded' ? 'bg-slate-500 text-white' : ''}`} onClick={handleSort('mostdownloaded')}>
+                        <div className={`text-center border py-2 px-3 rounded-3xl border-black hover:bg-slate-500 hover:cursor-pointer hover:text-white ${sort === 'most-downloaded' ? 'bg-slate-500 text-white' : ''}`} onClick={handleSort('most-downloaded')}>
                             Tải nhiều
                         </div>
                     </div>

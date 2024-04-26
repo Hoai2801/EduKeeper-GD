@@ -33,20 +33,22 @@ const Detail = () => {
   }
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/document/" + slug)
+    fetch("http://localhost:8080/api/v1/documents/" + slug)
       .then((res) => res.json())
       .then((data) => {
         console.log(data)
         setData(data)
       });
-    fetch("http://localhost:8080/api/v1/document/" + slug + "/file")
+    fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
       .then((res) => res.blob())
       .then((blob) => {
         setFile(blob)
       });
 
     const increaseView = setTimeout(() => {
-      fetch("http://localhost:8080/api/v1/document/increase-view/" + data?.id)
+      fetch("http://localhost:8080/api/v1/documents/views/" + data?.id, {
+        method: "PUT",
+      })
     }, 30000);
 
     return () => clearTimeout(increaseView);
@@ -67,9 +69,11 @@ const Detail = () => {
     alink.download = data?.title;
     alink.click();
 
+    console.log("id: " + data?.id);
+
     // increase download value of document
-    fetch("http://localhost:8080/api/v1/document/increase-download/" + data?.id, {
-      method: "GET",
+    fetch("http://localhost:8080/api/v1/documents/download/" + data?.id, {
+      method: "PUT",
     })
   };
 

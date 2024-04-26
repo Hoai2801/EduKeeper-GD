@@ -33,11 +33,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAllCategories() {
-        return categoryRepo.findAll();
-    }
-
-    @Override
     public String updateCategory(long categoryId, CategoryDto categoryDto) {
         Category existingCategory = getCategoryById(categoryId);
         existingCategory.setCategoryName(categoryDto.getCategory_name());

@@ -275,6 +275,8 @@ public class DocumentServiceImpl implements DocumentService {
                 filterRequestDTO.getSpecializedSlug(),
                 filterRequestDTO.getCategoryName()
         );
+
+        // Sort documents
         if (filterRequestDTO.getOrder() != null) {
             if (filterRequestDTO.getOrder().equalsIgnoreCase("most-viewed")) {
                 documents.sort(Comparator.comparing(Document::getViews).reversed());
@@ -338,6 +340,11 @@ public class DocumentServiceImpl implements DocumentService {
         return documentRepository.countAllDocuments();
     }
 
+    @Override
+    public int countAllDocumentsBySpecialized(Long id) {
+        return documentRepository.countDocumentsBySpecializedId(id);
+    }
+
     public DocumentResponseDTO convertToDocumentResponse(Document document) {
         // only need show name of user
         UserResponse author = UserResponse.builder()
@@ -346,6 +353,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .staffCode(document.getAuthor().getStaffCode())
                 .build();
         return DocumentResponseDTO.builder()
+                .id(document.getId())
                 .title(document.getTitle())
                 .slug(document.getSlug())
                 .views(document.getViews())

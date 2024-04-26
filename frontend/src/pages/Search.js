@@ -23,13 +23,14 @@ const Search = () => {
     const data = new FormData()
     data.append('searchTerm', search)
 
-    const api = "http://localhost:8080/api/v1/document/filter?order=" + order
+    const api = "http://localhost:8080/api/v1/documents/filter?order=" + order
       + (slugSpecialized ? `&specialized=${slugSpecialized}` : '')
       + (slugDepartment ? `&department=${slugDepartment}` : '')
       + (publishYear ? `&publishYear=${publishYear}` : '')
       + (category ? `&category=${category}` : '')
       + (slugSubject ? `&subject=${slugSubject}` : '')
     console.log(api)
+    console.log(data)
     fetch(api, {
       method: 'POST',
       body: data,
