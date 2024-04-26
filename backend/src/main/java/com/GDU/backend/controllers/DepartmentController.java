@@ -17,7 +17,7 @@ public class DepartmentController {
 
     private final DepartmentService departmentService;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<?> createDepartment(@RequestBody DepartmentDTO departmentDTO) {
         try {
             return ResponseEntity.ok(departmentService.createDepartment(departmentDTO));
@@ -26,7 +26,7 @@ public class DepartmentController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> getDepartments() {
         try {
             return ResponseEntity.ok(departmentService.getDepartments());

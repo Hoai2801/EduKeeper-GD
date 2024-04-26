@@ -1,6 +1,7 @@
 package com.GDU.backend.controllers;
 
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
+import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.Impl.DocumentServiceImpl;
 import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor
 public class FakeController {
 
-    private final DocumentServiceImpl documentService;
+    private final DocumentService documentService;
     
     @GetMapping("/{amount}")
     public String fake(@PathVariable("amount") int amount) throws DocumentException, IOException {

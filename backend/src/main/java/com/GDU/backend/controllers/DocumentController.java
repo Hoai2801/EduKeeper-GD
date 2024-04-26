@@ -4,9 +4,10 @@ import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.response.DocumentResponseDTO;
-import com.GDU.backend.models.Document;
 import com.GDU.backend.services.DocumentService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class DocumentController {
 
+    private static final Logger log = LoggerFactory.getLogger(DocumentController.class);
     private final DocumentService documentService;
 
     @GetMapping("/{slug}/file")
@@ -180,13 +182,23 @@ public class DocumentController {
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<?> filterDocuments(
-            @RequestBody FilterRequestDTO filterRequestDTO,
-            @RequestParam(required = false, name = "order") String order
-    ) {
+    public ResponseEntity<?> getDocumentsByFilter(
+            @RequestBody(required = false) String searchTerm,
+            @RequestParam(required = false, name = "category") String categoryName,
+            @RequestParam(required = false, name = "subject") String subjectName,
+            @RequestParam(required = false, name = "department") String departmentSlug,
+            @RequestParam(required = false, name = "specialized") String specializedSlug,
+            @RequestParam(required = false, name = "order") String order) {
         try {
-            filterRequestDTO.setOrder(order);
-            return ResponseEntity.ok(documentService.filterDocuments(filterRequestDTO));
+            FilterRequestDTO req = FilterRequestDTO.builder()
+                    .searchTerm(searchTerm)
+                    .categoryName(categoryName)
+                    .subjectName(subjectName)
+                    .departmentSlug(departmentSlug)
+                    .specializedSlug(specializedSlug)
+                    .order(order)
+                    .build();
+            return ResponseEntity.ok(documentService.filterDocuments(req));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

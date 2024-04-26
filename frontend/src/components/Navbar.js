@@ -20,11 +20,11 @@ const Navbar = () => {
   const [category, setCategory] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/specialized")
+    fetch("http://localhost:8080/api/v1/specializes/count")
       .then((res) => res.json())
       .then((data) => {
+        console.log(data)
         setSpecialized(data);
-        // console.log(data)
       });
     
     fetch("http://localhost:8080/api/v1/categories")
@@ -92,7 +92,7 @@ const Navbar = () => {
               </p>
               <div className={`w-[500px] h-[300px] overflow-scroll absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                 {specialized && specialized.map((item, index) => (
-                  <Link to={`/search?specialized=${item.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8]`}>{item.specializedName}</Link>
+                  <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
                 ))}
               </div>
             </div>
@@ -109,7 +109,7 @@ const Navbar = () => {
               <p className="group-hover/department:text-blue-700">
                 Thể loại
               </p>
-              <div className={`w-[500px] h-full absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border p-5 ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
+              <div className={`w-fit p-5 absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
                 {category && category?.map((item, index) => (
                   <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] rounded-xl`}>{item.categoryName}</Link>
                 ))}

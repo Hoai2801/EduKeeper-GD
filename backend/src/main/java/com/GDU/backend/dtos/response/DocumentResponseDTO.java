@@ -15,6 +15,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DocumentResponseDTO {
+
+    private Long id;
+    
     private String title;
 
     private String slug;

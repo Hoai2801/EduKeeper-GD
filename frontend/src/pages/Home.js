@@ -10,12 +10,10 @@ const Home = () => {
 
   const [lastedDocuments, setLastedDocuments] = useState([])
 
-  console.log(lastedDocuments)
-
   useEffect(() => {
-    fetch('http://localhost:8080/api/v1/document/most-viewed?limit=10').then(res => res.json()).then(data => setMostViewed(data))
-    fetch('http://localhost:8080/api/v1/document/most-downloaded?limit=10').then(res => res.json()).then(data => setMostDownloaded(data))
-    fetch('http://localhost:8080/api/v1/document/lasted?limit=10').then(res => res.json()).then(data => setLastedDocuments(data))
+    fetch('http://localhost:8080/api/v1/documents/most-viewed?limit=10').then(res => res.json()).then(data => setMostViewed(data))
+    fetch('http://localhost:8080/api/v1/documents/most-downloaded?limit=10').then(res => res.json()).then(data => setMostDownloaded(data))
+    fetch('http://localhost:8080/api/v1/documents/latest?limit=10').then(res => res.json()).then(data => setLastedDocuments(data))
   }, [])
 
   return (

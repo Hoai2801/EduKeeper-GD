@@ -81,4 +81,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     @Query("SELECT d FROM Document d WHERE d.slug = :slug")
     Optional<Document> findBySlug(String slug);
+
+    @Query("select count(d) from Document d where d.specialized.id = :id")
+    int countDocumentsBySpecializedId(@Param("id") Long id);
+
 }
