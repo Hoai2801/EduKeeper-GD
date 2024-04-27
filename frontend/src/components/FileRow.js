@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react'
 import pdfIcon from '../assets/pdf-icon.jpg'
 import wordicon from '../assets/word.png'
 import { Link } from 'react-router-dom';
-const FileRow = ({limit}) => {
+const FileRow = ({ limit, title }) => {
     const [document, setDocument] = useState([]);
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/v1/document/lasted?limit=${limit}`)
+        fetch(`http://localhost:8080/api/v1/documents/latest?limit=${limit}`)
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
                 setDocument(data)
             });
     }, [limit]);
+    console.log(title + " null")
     return (
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg border">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
@@ -42,39 +43,42 @@ const FileRow = ({limit}) => {
                             </th>
                         </tr>
                     </thead>
-                    {document && document.map((document) => (
+                    {document && document.map((document) => {
+                        console.log(document.title)
+                        if (document.title.toLowerCase().includes(title?.toLowerCase()) || title == null) {
+                            return (
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <Link to={`/document/${document.slug}`} key={document.id}>
+                                            <div className="flex items-center">
+                                                <div className="flex-shrink-0">
+                                                    {document.document_type === "application/pdf" ? (
+                                                        <img src={pdfIcon} alt="PDF" className="w-10 h-10" />
+                                                    ) : (
+                                                        <img src={wordicon} alt="Word" className="w-10 h-10" />
+                                                    )}
+                                                </div>
+                                                <div className="ml-4">
+                                                    <p className="text-lg font-medium text-gray-900">{document.title}</p>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{document.author.username}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{document.author.staffCode}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{document.specialized.specializedName}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{document.category.categoryName}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{document.upload_date}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right flex gap-3">
+                                        <button onClick={() => console.log(document.id)} className="text-blue-600 hover:underline">Edit</button>
+                                        <button onClick={() => console.log(document.id)} className="text-blue-600 hover:underline">Edit</button>
+                                    </td>
 
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                                <Link to={`/document/${document.slug}`} key={document.id}>
-                                    <div className="flex items-center">
-                                        <div className="flex-shrink-0">
-                                            {document.document_type === "application/pdf" ? (
-                                                <img src={pdfIcon} alt="PDF" className="w-10 h-10" />
-                                            ) : (
-                                                <img src={wordicon} alt="Word" className="w-10 h-10" />
-                                            )}
-                                        </div>
-                                        <div className="ml-4">
-                                            <p className="text-lg font-medium text-gray-900">{document.title}</p>
-                                        </div>
-                                    </div>
-                                </Link>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">{document.author.username}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{document.author.staffCode}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{document.specialized.specializedName}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{document.category.categoryName}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{document.upload_date}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                                <a href="#" className="text-blue-600 hover:underline">Edit</a>
-                            </td>
+                                </tbody>
+                            )
 
-                        </tbody>
-
-
-                        // </Link> 
-                    ))}
+                        }
+                    })}
                 </table>
             </table >
         </div >

@@ -254,7 +254,7 @@ public class DocumentServiceImpl implements DocumentService {
         return documentRepository.getDocumentsSuggested(
                     recommendationRequestDTO.getSpecialized(), 
                     recommendationRequestDTO.getCategory(),
-                    recommendationRequestDTO.getTitle(), 
+                    recommendationRequestDTO.getTitle(),
                     recommendationRequestDTO.getAuthor()
                 )
                 .stream().map(this::convertToDocumentResponse).toList();

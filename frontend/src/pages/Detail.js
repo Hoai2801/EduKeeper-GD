@@ -4,6 +4,7 @@ import './Detail.css'
 import { Link} from 'react-router-dom';
 import 'react-pdf/dist/esm/Page/TextLayer.css'
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
+import Recommend from '../components/Recommend';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -100,6 +101,12 @@ const Detail = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className='mt-10'>
+          {
+            data &&
+            <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
+          }
       </div>
       <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
         <Document file={file} onLoadSuccess={onDocumentLoadSuccess} className={'flex flex-col items-center'}>
