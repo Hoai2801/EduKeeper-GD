@@ -183,22 +183,9 @@ public class DocumentController {
 
     @PostMapping("/filter")
     public ResponseEntity<?> getDocumentsByFilter(
-            @RequestBody(required = false) String searchTerm,
-            @RequestParam(required = false, name = "category") String categoryName,
-            @RequestParam(required = false, name = "subject") String subjectName,
-            @RequestParam(required = false, name = "department") String departmentSlug,
-            @RequestParam(required = false, name = "specialized") String specializedSlug,
-            @RequestParam(required = false, name = "order") String order) {
+            @RequestBody FilterRequestDTO filterRequestDTO) {
         try {
-            FilterRequestDTO req = FilterRequestDTO.builder()
-                    .searchTerm(searchTerm)
-                    .categoryName(categoryName)
-                    .subjectName(subjectName)
-                    .departmentSlug(departmentSlug)
-                    .specializedSlug(specializedSlug)
-                    .order(order)
-                    .build();
-            return ResponseEntity.ok(documentService.filterDocuments(req));
+            return ResponseEntity.ok(documentService.filterDocuments(filterRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

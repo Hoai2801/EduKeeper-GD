@@ -35,7 +35,7 @@ export const Upload = () => {
   };
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/v1/department').then(response => response.json())
+    fetch('http://localhost:8080/api/v1/departments').then(response => response.json())
       .then(data => {
         console.log(data)
         setDepartment(data)
@@ -57,12 +57,12 @@ export const Upload = () => {
     formData.append('title', title);
     // formData.append('department', selectedDepartment);
     // category is long type
-    formData.append('category', 1);
+    formData.append('category', category);
     formData.append('description', description);
     formData.append('subject', 1);
     formData.append('specialized', specialized);
     formData.append('author', jwt.staff_code);
-    fetch('http://localhost:8080/api/v1/document', {
+    fetch('http://localhost:8080/api/v1/documents/upload', {
       method: 'POST',
       body: formData,
     })
@@ -76,6 +76,7 @@ export const Upload = () => {
           setSelectedDepartment('')
           setDescription('')
           setSpecialized(null)
+          setListSpecialized(null)
           setSubject('')
           setTitle('')
       })

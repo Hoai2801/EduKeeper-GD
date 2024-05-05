@@ -19,27 +19,36 @@ const Search = () => {
   const search = localStorage.getItem('search') || '';
 
   useEffect(() => {
-    
-    const data = new FormData()
-    data.append('searchTerm', search)
 
-    const api = "http://localhost:8080/api/v1/documents/filter?order=" + order
-      + (slugSpecialized ? `&specialized=${slugSpecialized}` : '')
-      + (slugDepartment ? `&department=${slugDepartment}` : '')
-      + (publishYear ? `&publishYear=${publishYear}` : '')
-      + (category ? `&category=${category}` : '')
-      + (slugSubject ? `&subject=${slugSubject}` : '')
-    console.log(api)
-    console.log(data)
+    const dataSearch = {
+      searchTerm: search || '',
+      subjectName: slugSubject || '',
+      categoryName: category || '',
+      departmentSlug: slugDepartment || '',
+      specializedSlug: slugSpecialized || '',
+      order: order
+    };
+
+    console.log(dataSearch)
+
+
+    const api = "http://localhost:8080/api/v1/documents/filter"
     fetch(api, {
       method: 'POST',
-      body: data,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dataSearch),
     })
       .then((res) => res.json())
       .then((data) => {
         console.log(data)
-        setDocument(data)
-        localStorage.removeItem('search')
+        if (data) {
+          setDocument(data)
+          setTimeout(() => {
+            localStorage.removeItem('search')
+          }, 3000)
+        }
       });
   }, [url, order, slugSpecialized, slugSubject, publishYear, category])
 

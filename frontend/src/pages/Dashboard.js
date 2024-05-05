@@ -1,6 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react'
 import FileRow from '../components/FileRow';
+import EditDocument from '../components/EditDocument';
 
 const Dashboard = () => {
   const token = localStorage.getItem("token");
@@ -20,26 +21,37 @@ const Dashboard = () => {
   const [limit, setLimit] = useState(30)
   const [limitValue, setLimitValue] = useState(30)
 
+  const [title, setTitle] = useState(null);
+
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/document/month")
+    fetch("http://localhost:8080/api/v1/documents/this-month")
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
         setDocumentMonth(data)
       });
 
-    fetch("http://localhost:8080/api/v1/document/year")
+    fetch("http://localhost:8080/api/v1/documents/this-year")
       .then((res) => res.json())
       .then((data) => {
         setDocumentYear(data)
       });
 
-    fetch("http://localhost:8080/api/v1/document/count")
+    fetch("http://localhost:8080/api/v1/documents/count")
       .then((res) => res.json())
       .then((data) => {
         setCount(data)
       });
   }, []);
+
+  const [documentEdit, setDocumentEdit] = useState([]);
+
+  const [isShowEdit, setIsShowEdit] = useState(false);
+
+  const editDocument = (document) => {
+    setDocumentEdit(document);
+    setIsShowEdit(!isShowEdit);
+  }
+
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
@@ -241,17 +253,21 @@ const Dashboard = () => {
       <div className='w-full h-full'>
         <h2 className='text-3xl text-center my-10'>Danh sách tài liệu</h2>
         <div className='flex justify-center mb-5 gap-5'>
-          <input type="number" name="" id="" value={limitValue} onChange={(e) => setLimitValue(e.target.value)} className='border border-gray-300 rounded-md p-4'/>
-          <div className='flex gap-5 text-xl font-semibold pt-3'>    
-          <p>trên</p>
-          <p>{countAllDocument}</p>
+          <input type="number" name="" id="" value={limitValue} onChange={(e) => setLimitValue(e.target.value)} className='border border-gray-300 rounded-md p-4' />
+          <div className='flex gap-5 text-xl font-semibold pt-3'>
+            <p>trên</p>
+            <p>{countAllDocument}</p>
           </div>
           <button onClick={() => setLimit(limitValue)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
         </div>
-        <FileRow limit={limit} />
-        <div className='flex justify-center my-10'>
-          <button onClick={() => setLimit(limit + 10)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
+        <div className='flex justify-center'>
+        <input type="text" name="" id="" value={title} onChange={(e) => setTitle(e.target.value)} className='border border-gray-300 rounded-md p-4 my-5' placeholder='Nhập tên tài liệu' />
         </div>
+      </div>
+      <FileRow limit={limit} title={title} editDocument={editDocument}/>
+      <EditDocument isShowEdit={isShowEdit} setIsShowEdit={setIsShowEdit} documentEdit={documentEdit}/>
+      <div className='flex justify-center my-10'>
+        <button onClick={() => setLimit(limit + 10)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
       </div>
     </div>
   )

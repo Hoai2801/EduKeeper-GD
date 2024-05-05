@@ -33,9 +33,18 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT d.* FROM Document d JOIN Users u ON u.id = d.user_id WHERE u.role = 'teacher' AND MATCH(d.author) AGAINST (:authorName IN BOOLEAN MODE)", nativeQuery = true)
     List<Document> getDocumentsByAuthorName(@Param("authorName") String authorName);
 
-    @Query(value = "SELECT d.* FROM document d WHERE d.category_id = :category AND d.specialized_id = :specialized AND MATCH (d.title) AGAINST (:title IN BOOLEAN MODE) AND MATCH (d.author) AGAINST (:author IN BOOLEAN MODE) ORDER BY d.upload_date DESC, d.download DESC, d.views DESC LIMIT 5", nativeQuery = true)
-    List<Document> getDocumentsSuggested(@Param("specialized") Long specialized, @Param("category") Long category,
-                                         @Param("title") String title, @Param("author") String author);
+    @Query(value = "SELECT d.* FROM document d " +
+            "INNER JOIN users u ON d.author = u.id " +
+            "WHERE d.category_id = :category " +
+            "AND d.specialized_id = :specialized " +
+            "AND (MATCH (d.title) AGAINST (:title IN BOOLEAN MODE) " +
+            "OR u.user_name LIKE CONCAT('%', :author, '%')) " +
+            "ORDER BY d.upload_date DESC, d.download DESC, d.views DESC " +
+            "LIMIT 15", nativeQuery = true)
+    List<Document> getDocumentsSuggested(@Param("specialized") Long specialized,
+                                         @Param("category") Long category,
+                                         @Param("title") String title,
+                                         @Param("author") String author);
 
     @Query(value = "SELECT d.* FROM document d JOIN specialized s ON s.id = d.specialized_id where s.specialized_slug like %:slug%", nativeQuery = true)
     List<Document> getDocumentsBySlugSpecialized(@Param("slug") String slug);

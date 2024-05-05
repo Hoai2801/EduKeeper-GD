@@ -6,7 +6,7 @@ const Department = () => {
     const [department, setDepartment] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/v1/department")
+        fetch("http://localhost:8080/api/v1/departments")
           .then((res) => res.json())
           .then((data) => {
             setDepartment(data);
