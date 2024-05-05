@@ -17,6 +17,7 @@ const UserRow = ({user}) => {
     }
   return (
     <tr key={user.id} className={`p-2 mt-5 ${user.enabled ? "bg-white" : "bg-gray-100"} w-full`}>
+                    <td className="px-4 py-2">{user.id}</td>
                     <td className="px-4 py-2">{user.username}</td>
                     <td className="px-4 py-2">{user.staffCode}</td>
                     <td className="px-4 py-2">{user.email}</td>

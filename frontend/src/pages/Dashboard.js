@@ -1,6 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useState } from 'react'
 import FileRow from '../components/FileRow';
+import EditDocument from '../components/EditDocument';
 
 const Dashboard = () => {
   const token = localStorage.getItem("token");
@@ -41,6 +42,16 @@ const Dashboard = () => {
         setCount(data)
       });
   }, []);
+
+  const [documentEdit, setDocumentEdit] = useState([]);
+
+  const [isShowEdit, setIsShowEdit] = useState(false);
+
+  const editDocument = (document) => {
+    setDocumentEdit(document);
+    setIsShowEdit(!isShowEdit);
+  }
+
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
@@ -253,7 +264,8 @@ const Dashboard = () => {
         <input type="text" name="" id="" value={title} onChange={(e) => setTitle(e.target.value)} className='border border-gray-300 rounded-md p-4 my-5' placeholder='Nhập tên tài liệu' />
         </div>
       </div>
-      <FileRow limit={limit} title={title} />
+      <FileRow limit={limit} title={title} editDocument={editDocument}/>
+      <EditDocument isShowEdit={isShowEdit} setIsShowEdit={setIsShowEdit} documentEdit={documentEdit}/>
       <div className='flex justify-center my-10'>
         <button onClick={() => setLimit(limit + 10)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
       </div>

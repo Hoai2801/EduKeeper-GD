@@ -57,7 +57,7 @@ export const Upload = () => {
     formData.append('title', title);
     // formData.append('department', selectedDepartment);
     // category is long type
-    formData.append('category', 1);
+    formData.append('category', category);
     formData.append('description', description);
     formData.append('subject', 1);
     formData.append('specialized', specialized);
@@ -76,6 +76,7 @@ export const Upload = () => {
           setSelectedDepartment('')
           setDescription('')
           setSpecialized(null)
+          setListSpecialized(null)
           setSubject('')
           setTitle('')
       })

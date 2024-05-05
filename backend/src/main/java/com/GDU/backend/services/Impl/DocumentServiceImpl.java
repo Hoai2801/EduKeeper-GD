@@ -206,7 +206,17 @@ public class DocumentServiceImpl implements DocumentService {
         if (document == null) {
             return "Document not existing";
         }
-        documentRepository.deleteById(id);
+
+        String path = document.getPath();
+        File file = new File(path);
+        if (file.exists()) {
+            boolean deleted = file.delete(); 
+            if (!deleted) {
+                return "Delete file failed";
+            } else {
+                documentRepository.delete(document);
+            }
+        }
         return "Document deleted successfully";
     }
 
