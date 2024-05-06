@@ -23,6 +23,18 @@ const Dashboard = () => {
 
   const [title, setTitle] = useState(null);
 
+  const [documentEdit, setDocumentEdit] = useState([]);
+
+  const [isShowEdit, setIsShowEdit] = useState(false);
+
+  const [change, setChange] = useState(0);
+
+  const editDocument = (document) => {
+    setDocumentEdit(document);
+    setChange(change + 1)
+    setIsShowEdit(!isShowEdit);
+  }
+
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/documents/this-month")
       .then((res) => res.json())
@@ -43,14 +55,7 @@ const Dashboard = () => {
       });
   }, []);
 
-  const [documentEdit, setDocumentEdit] = useState([]);
 
-  const [isShowEdit, setIsShowEdit] = useState(false);
-
-  const editDocument = (document) => {
-    setDocumentEdit(document);
-    setIsShowEdit(!isShowEdit);
-  }
 
   return (
     <div className="mt-12">
@@ -264,8 +269,8 @@ const Dashboard = () => {
         <input type="text" name="" id="" value={title} onChange={(e) => setTitle(e.target.value)} className='border border-gray-300 rounded-md p-4 my-5' placeholder='Nhập tên tài liệu' />
         </div>
       </div>
-      <FileRow limit={limit} title={title} editDocument={editDocument}/>
-      <EditDocument isShowEdit={isShowEdit} setIsShowEdit={setIsShowEdit} documentEdit={documentEdit}/>
+      <FileRow limit={limit} title={title} editDocument={editDocument} change={change} setChange={setChange}/>
+      <EditDocument isShowEdit={isShowEdit} setIsShowEdit={setIsShowEdit} documentEdit={documentEdit} change={change} setChange={setChange}/>
       <div className='flex justify-center my-10'>
         <button onClick={() => setLimit(limit + 10)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
       </div>

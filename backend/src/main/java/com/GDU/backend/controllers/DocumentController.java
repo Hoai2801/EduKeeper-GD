@@ -107,7 +107,7 @@ public class DocumentController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(
             @PathVariable("id") Long id, 
-            @RequestBody UploadRequestDTO uploadRequestDTO
+            @ModelAttribute UploadRequestDTO uploadRequestDTO
     ) {
         try {
             return ResponseEntity.ok(documentService.updateDocumentById(id, uploadRequestDTO));

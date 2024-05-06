@@ -2,16 +2,13 @@ import React, { useEffect, useState } from 'react'
 import pdfIcon from '../assets/pdf-icon.jpg'
 import wordicon from '../assets/word.png'
 import { Link } from 'react-router-dom';
-const FileRow = ({ limit, title, editDocument }) => {
+const FileRow = ({ limit, title, editDocument, change, setChange }) => {
     const [document, setDocument] = useState([]);
-
-    const [change, setChange] = useState(0);
 
     useEffect(() => {
         fetch(`http://localhost:8080/api/v1/documents/latest?limit=${limit}`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setDocument(data)
             });
     }, [limit, change]);

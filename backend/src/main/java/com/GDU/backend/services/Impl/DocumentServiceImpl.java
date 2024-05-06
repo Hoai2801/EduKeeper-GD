@@ -156,30 +156,33 @@ public class DocumentServiceImpl implements DocumentService {
         );
         existDocument.setSpecialized(existDocument.getSpecialized());
 
+        // I think we don't need update a document file 
+        // any more because we should upload a new one instead
+        
         // Handle Path
-        if (uploadRequestDTO.getDocument() != null) {
-            existDocument.setDocument_type(uploadRequestDTO.getDocument().getContentType());
-            existDocument.setDocument_size(uploadRequestDTO.getDocument().getSize() / 1_000_000);
-
-            String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
-            File destFile = new File(UPLOAD_DIR + fileName);
-
-            // Save the uploaded document to the file system
-            MultipartFile multipartFile = uploadRequestDTO.getDocument();
-            Path uploadDir = Paths.get(UPLOAD_DIR);
-            try {
-                Files.createDirectories(uploadDir);
-            } catch (IOException e) {
-                log.error("Error creating directories: {}", e.getMessage());
-            }
-            try {
-                Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                log.error("Error copying file: {}", e.getMessage());
-            }
-
-            existDocument.setPath(destFile.getAbsolutePath());
-        }
+//        if (uploadRequestDTO.getDocument() != null) {
+//            existDocument.setDocument_type(uploadRequestDTO.getDocument().getContentType());
+//            existDocument.setDocument_size(uploadRequestDTO.getDocument().getSize() / 1_000_000);
+//
+//            String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
+//            File destFile = new File(UPLOAD_DIR + fileName);
+//
+//            // Save the uploaded document to the file system
+//            MultipartFile multipartFile = uploadRequestDTO.getDocument();
+//            Path uploadDir = Paths.get(UPLOAD_DIR);
+//            try {
+//                Files.createDirectories(uploadDir);
+//            } catch (IOException e) {
+//                log.error("Error creating directories: {}", e.getMessage());
+//            }
+//            try {
+//                Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//            } catch (IOException e) {
+//                log.error("Error copying file: {}", e.getMessage());
+//            }
+//
+//            existDocument.setPath(destFile.getAbsolutePath());
+//        }
         documentRepository.save(existDocument);
         return "Update document successfully";
     }

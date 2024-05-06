@@ -32,10 +32,6 @@ public class UploadRequestDTO {
 
     private int subject;
 
-//    @NotEmpty
-//    @NotBlank
-//    private String department;
-
     private String author;
 
     @NotNull
