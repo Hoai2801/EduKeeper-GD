@@ -7,6 +7,8 @@ const User = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const [isEditOpen, setIsEditOpen] = useState(false)
+
   const [formData, setFormData] = useState({
     staffCode: '',
     username: '',
@@ -14,6 +16,16 @@ const User = () => {
     password: '',
     roles: 'USER' // Default role is 'user'
   });
+
+  const [editUser, setEditUser] = useState({
+    staffCode: '',
+    username: '',
+    email: '',
+    password: '',
+    roles: 'USER' // Default role is 'user'
+  });
+
+  console.log(editUser)
 
 
   // Handle form input change
@@ -49,7 +61,6 @@ const User = () => {
     fetch("http://localhost:8080/api/v1/users")
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
         setUsers(data)
       });
   }, [])
@@ -163,10 +174,36 @@ const User = () => {
             </thead>
             <tbody className='h-fit mt-5 w-full'>
               {users.map(user => (
-                <UserRow key={user.id} user={user} />
+                <UserRow key={user.id} user={user} setIsEditOpen={setIsEditOpen} setEditUser={setEditUser} />
               ))}
             </tbody>
           </table>
+        </div>
+        <div className={`absolute bottom-0 right-0 w-full h-full  justify-center items-center ${isEditOpen ? 'flex' : 'hidden'}`}>
+            <div className='bg-white w-[50%] h-[50%] rounded-2xl border'>
+                <div className='w-full flex justify-end p-2'>
+                    <button onClick={() => setIsEditOpen(false)} className='bg-red-500 text-white rounded-lg w-10 p-2'>X</button>
+                </div>
+                <div>
+                    <div className='w-full flex justify-center gap-5'>
+                        <button onClick={null} className='bg-red-400 text-white rounded-lg w-fit p-2'>Disable user</button>
+                        <button onClick={null} className='bg-red-400 text-white rounded-lg w-fit p-2'>Xóa user</button>
+                    </div>
+                    <div className='w-full p-5'>
+                        <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Tên người dùng</label>
+                        <input type="text" id="message" name="message" placeholder="" required value={editUser.username}/>
+                        <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Quyền người dùng</label>
+                        <select name="message" id="message" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" >
+                            <option>Quyền người dùng</option>
+                            <option value="USER">Người dùng</option>
+                            <option value="ADMIN">Quản trị</option>
+                        </select>
+                    </div>
+                </div>
+                <div className='w-full flex justify-center p-2'>
+                  <button onClick={null} className='bg-blue-500 hover:bg-blue-700 text-white rounded-lg w-[50%] p-2'>Lưu</button>
+                </div>
+            </div>
         </div>
     </div>
   );

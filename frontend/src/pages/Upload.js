@@ -11,7 +11,7 @@ export const Upload = () => {
 
   const [department, setDepartment] = useState(null);
   const [listCategory, setListCategory] = useState(null);
-  const [category, setCategory] = useState(null);
+  const [category, setCategory] = useState(1);
   const [description, setDescription] = useState(null);
   const [specialized, setSpecialized] = useState(null);
   const [subject, setSubject] = useState(null);
@@ -50,6 +50,8 @@ export const Upload = () => {
       .catch(error => console.error(error));
   }, [])
 
+  console.log(selectedFile)
+
   const uploadDocument = (event) => {
     event.preventDefault();
     const formData = new FormData();
@@ -57,28 +59,31 @@ export const Upload = () => {
     formData.append('title', title);
     // formData.append('department', selectedDepartment);
     // category is long type
+    console.log(category)
     formData.append('category', category);
     formData.append('description', description);
     formData.append('subject', 1);
     formData.append('specialized', specialized);
     formData.append('author', jwt.staff_code);
+
+    console.log(formData)
     fetch('http://localhost:8080/api/v1/documents/upload', {
       method: 'POST',
       body: formData,
     })
       .then(response => {
         console.log(response)
-          if (response.status === 200) {
-            alert("Đăng tài liệu thành công")
-          }
-          setFile(null)
-          setCategory('')
-          setSelectedDepartment('')
-          setDescription('')
-          setSpecialized(null)
-          setListSpecialized(null)
-          setSubject('')
-          setTitle('')
+        if (response.status === 200) {
+          alert("Đăng tài liệu thành công")
+        }
+        setFile(null)
+        setCategory('')
+        setSelectedDepartment('')
+        setDescription('')
+        setSpecialized(null)
+        setListSpecialized(null)
+        setSubject('')
+        setTitle('')
       })
       .catch(error => console.error(error));
   }
@@ -89,19 +94,18 @@ export const Upload = () => {
       <DragDropFile handleFiles={handleFiles} />
       <div>
         {selectedFile && (
-          <div className='bg-white p-5 rounded-2xl flex gap-3 max-w-md mt-2'>
-          <Document file={selectedFile} >
-            <div className='max-h-[50px] overflow-hidden'>
-            <Page pageNumber={1} width={40} height={50}/>
+        <div className='bg-white p-5 rounded-2xl flex gap-3 max-w-md mt-2'>
+            <Document file={selectedFile} type={selectedFile.type}>
+              <div className='max-h-[50px] overflow-hidden' >
+                <Page pageNumber={1} width={40} height={50} />
+              </div>
+            </Document>
+            <div className='max-w-md overflow-hidden flex flex-col gap-2'>
+              <p className='w-full'>{selectedFile?.name}</p>
+              <p>{(selectedFile?.size / (1024 * 1024)).toFixed(1)} MB</p>
             </div>
-          </Document>
-          <div className='max-w-md overflow-hidden flex flex-col gap-2'>
-              
-          <p className='w-full'>{selectedFile.name}</p>
-          <p>{(selectedFile.size / (1024 * 1024)).toFixed(1)} MB</p>
           </div>
-          </div>
-        )}
+        )} 
       </div>
       <div className="max-w-md mx-auto p-8 bg-white rounded-md shadow-md mt-5">
         <h2 className="text-2xl font-semibold mb-6">Thông tin tài liệu</h2>
@@ -109,10 +113,10 @@ export const Upload = () => {
           <div className="mb-4">
             <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">Tên tài liệu</label>
             <input type="text" id="name" name="name" placeholder="Báo cáo môn học ..." required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500" 
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
               onChange={event => setTitle(event.target.value)}
               value={title}
-              />
+            />
           </div>
 
           <div className="max-w-sm mx-auto mb-3">
@@ -123,8 +127,8 @@ export const Upload = () => {
               setSelectedDepartment(selectedDepartment)
               setListSpecialized(selectedDepartment.specializeds)
             }}
-            value={JSON.stringify(selectedDepartment)}
-              >
+              value={JSON.stringify(selectedDepartment)}
+            >
               <option>Chọn khoa</option>
               {
                 department && department.map(dep => (
@@ -158,9 +162,10 @@ export const Upload = () => {
           <div className="mb-4">
             <label htmlFor="subject" className="block text-gray-700 text-sm font-bold mb-2">Môn học</label>
             <input type="text" id="subject" name="subject" placeholder="" required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500" 
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              onChange={event => setSubject(event.target.value)}
               value={subject}
-              />
+            />
           </div>
           <div className="mb-4">
             <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Giáo viên</label>

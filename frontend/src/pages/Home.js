@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Hero from '../components/Hero'
 import Post from '../components/DocumentCard'
 import { Link } from 'react-router-dom'
 

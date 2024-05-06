@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,9 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,7 +34,10 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Service
 @RequiredArgsConstructor
@@ -52,17 +55,23 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Specialized specialized = specializedRepository.findById((long) uploadRequestDTO.getSpecialized())
                 .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
-        
+
         // todo: add subject model
         Subject subject = Subject.builder()
                 .id((long) uploadRequestDTO.getSubject())
                 .build();
-        
+
         // author is the user who uploads by default
         User author = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
 
-        int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
+        int numberOfPages = 0;
+        if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".pdf")) {
+            numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
+        } else if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".docx") || uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".doc")) {
+            // ToDO: add docx support
+        }
 
+        System.out.println(numberOfPages);
         String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
 
         // generate file name and path
@@ -89,7 +98,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .specialized(specialized)
                 .upload_date(LocalDate.now())
                 .build();
-        
+
         documentRepository.save(newDocument);
 
         return "Document uploaded successfully";
@@ -132,7 +141,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (existDocument == null) {
             return "Document not existing";
         }
-        
+
         User newAuthor = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
         if (newAuthor == null) {
             return "Author not existing";
@@ -143,22 +152,22 @@ public class DocumentServiceImpl implements DocumentService {
         // Update document
         existDocument.setCategory(category);
         existDocument.setTitle(
-                uploadRequestDTO.getTitle() != null ? 
-                uploadRequestDTO.getTitle() : 
-                existDocument.getTitle()
+                uploadRequestDTO.getTitle() != null ?
+                        uploadRequestDTO.getTitle() :
+                        existDocument.getTitle()
         );
         existDocument.setSlug(
-                uploadRequestDTO.getTitle() != null ? 
-                uploadRequestDTO.getTitle()
-                        .replace(" ", "-")
-                        .toLowerCase() + "-" + new Date().getTime() : 
-                existDocument.getSlug()
+                uploadRequestDTO.getTitle() != null ?
+                        uploadRequestDTO.getTitle()
+                                .replace(" ", "-")
+                                .toLowerCase() + "-" + new Date().getTime() :
+                        existDocument.getSlug()
         );
         existDocument.setSpecialized(existDocument.getSpecialized());
 
         // I think we don't need update a document file 
         // any more because we should upload a new one instead
-        
+
         // Handle Path
 //        if (uploadRequestDTO.getDocument() != null) {
 //            existDocument.setDocument_type(uploadRequestDTO.getDocument().getContentType());
@@ -213,7 +222,7 @@ public class DocumentServiceImpl implements DocumentService {
         String path = document.getPath();
         File file = new File(path);
         if (file.exists()) {
-            boolean deleted = file.delete(); 
+            boolean deleted = file.delete();
             if (!deleted) {
                 return "Delete file failed";
             } else {
@@ -265,10 +274,10 @@ public class DocumentServiceImpl implements DocumentService {
         // return list document which have a same specialized and category, title or
         // author
         return documentRepository.getDocumentsSuggested(
-                    recommendationRequestDTO.getSpecialized(), 
-                    recommendationRequestDTO.getCategory(),
-                    recommendationRequestDTO.getTitle(),
-                    recommendationRequestDTO.getAuthor()
+                        recommendationRequestDTO.getSpecialized(),
+                        recommendationRequestDTO.getCategory(),
+                        recommendationRequestDTO.getTitle(),
+                        recommendationRequestDTO.getAuthor()
                 )
                 .stream().map(this::convertToDocumentResponse).toList();
     }
@@ -300,7 +309,7 @@ public class DocumentServiceImpl implements DocumentService {
                 documents = documents.stream()
                         .filter(document -> document.getDownload() > 0)
                         .sorted(Comparator.comparing(Document::getDownload)
-                        .reversed()).collect(Collectors.toList()); 
+                                .reversed()).collect(Collectors.toList());
             }
             if (filterRequestDTO.getOrder().equalsIgnoreCase("latest")) {
                 documents.sort(Comparator.comparing(Document::getId).reversed());
