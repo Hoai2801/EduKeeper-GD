@@ -16,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,10 +32,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +63,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".pdf")) {
             numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
         } else if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".docx") || uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".doc")) {
-            // ToDO: add docx support
+            // ToDo: add docx support
         }
 
         System.out.println(numberOfPages);

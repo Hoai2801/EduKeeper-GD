@@ -53,12 +53,11 @@ const Search = () => {
   }, [url, order, slugSpecialized, slugSubject, publishYear, category])
 
   const [limit, setLimit] = useState(30)
-  const [page, setPage] = useState(1)
 
   return (
     <div>
       <h2 className='text-[28px] font-bold text-center mt-10 mb-5'>Tài liệu ({documents && documents.length})</h2>
-      <div className='my-5 flex flex-col gap-5 h-fit'>
+      <div className='my-5 flex gap-5 h-fit flex-wrap justify-center'>
         {documents && documents.map((item, index) => {
           if (index < limit) {
             return (

@@ -20,7 +20,6 @@ const FileRow = ({ limit, title, editDocument, change, setChange }) => {
         }).then(() => {
             console.log("Deleted")
             setChange(change + 1)
-
         })
     }
 

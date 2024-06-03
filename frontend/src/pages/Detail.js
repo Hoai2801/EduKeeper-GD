@@ -104,8 +104,8 @@ const Detail = () => {
       </div>
       <div className='mt-10'>
           {
-            data &&
-            <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
+            // data &&
+            // <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
           }
       </div>
       <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
