@@ -75,22 +75,22 @@ export const Upload = () => {
         console.log(response)
         if (response.status === 200) {
           alert("Đăng tài liệu thành công")
+          setFile(null)
+          setCategory('')
+          setSelectedDepartment('')
+          setDescription('')
+          setSpecialized(null)
+          setListSpecialized(null)
+          setSubject('')
+          setTitle('')
         }
-        setFile(null)
-        setCategory('')
-        setSelectedDepartment('')
-        setDescription('')
-        setSpecialized(null)
-        setListSpecialized(null)
-        setSubject('')
-        setTitle('')
       })
       .catch(error => console.error(error));
   }
 
   return (
     <div>
-      <h2 className='text-3xl font-bold mb-5 mt-10'>Đăng tài liệu</h2>
+      <h2 className='text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0'>Đăng tài liệu</h2>
       <DragDropFile handleFiles={handleFiles} />
       <div>
         {selectedFile && (

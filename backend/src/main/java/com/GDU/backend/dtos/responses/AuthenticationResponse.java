@@ -1,4 +1,4 @@
-package com.GDU.backend.dtos.response;
+package com.GDU.backend.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

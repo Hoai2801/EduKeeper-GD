@@ -1,4 +1,4 @@
-package com.GDU.backend.dtos;
+package com.GDU.backend.dtos.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

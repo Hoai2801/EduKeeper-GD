@@ -30,17 +30,17 @@ public class FakeController {
     @GetMapping("/{amount}")
     public String fake(@PathVariable("amount") int amount) {
         int numThreads = 4; // Adjust the number of threads as needed
-//        try (ExecutorService executor = Executors.newFixedThreadPool(numThreads)) {
-//            for (int i = 0; i < amount; i++) {
-//                executor.execute(() -> {
-//                    try {
-//                        createFakeDocument();
-//                    } catch (IOException e) {
-//                        log.error("Error creating fake document: {}", e.getMessage());
-//                    }
-//                });
-//            }
-//        }
+        try (ExecutorService executor = Executors.newFixedThreadPool(numThreads)) {
+            for (int i = 0; i < amount; i++) {
+                executor.execute(() -> {
+                    try {
+                        createFakeDocument();
+                    } catch (IOException e) {
+                        log.error("Error creating fake document: {}", e.getMessage());
+                    }
+                });
+            }
+        }
         return "faking";
     }
 

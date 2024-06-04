@@ -1,4 +1,4 @@
-package com.GDU.backend.dtos.response;
+package com.GDU.backend.dtos.responses;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,8 +7,6 @@ import lombok.Data;
 @Builder
 public class TotalResponse {
     int totalDocumentsCurrent;
-
     int totalDocumentsPrevious;
-    
     float percentage;
 }

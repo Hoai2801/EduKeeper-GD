@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf';
 import './Detail.css'
-import { Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import 'react-pdf/dist/esm/Page/TextLayer.css'
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
-import Recommend from '../components/Recommend';
-
+import { DocumentViewer } from 'react-documents';
+import DocViewer, { DocViewerRenderers, PDFRenderer } from "react-doc-viewer";
+import { logDOM } from '@testing-library/react';
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url,
@@ -62,7 +63,7 @@ const Detail = () => {
 
     // Creating new object of PDF file
     const fileURL =
-      window.URL.createObjectURL(new Blob([file], { type: "application/pdf" }));
+      window.URL.createObjectURL(new Blob([file], { type: data?.document_type }));
 
     // Setting various property values
     let alink = document.createElement("a");
@@ -77,7 +78,12 @@ const Detail = () => {
       method: "PUT",
     })
   };
-
+  console.log("file://" + data?.path)
+  let pathOfFile = data ? "file://" + data?.path : "file:///home/talos/Desktop/Learn/git/beginning-git-github-management-2nd.pdf";
+  const docs = [
+    // { uri: "http://localhost:8080/api/v1/documents/agjjfk-1717514917467/file", fileType: "docx" }
+    { uri: require(pathOfFile ?? ""), fileType: "docx" }, // Local File
+  ];
   return (
     <div>
       <div className='pt-[50px]'>
@@ -103,12 +109,28 @@ const Detail = () => {
         </div>
       </div>
       <div className='mt-10'>
-          {
-            // data &&
-            // <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
-          }
+        {
+          // data &&
+          // <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
+        }
       </div>
-      <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
+      {data?.document_type !== "application/pdf" ? (
+        <div>
+
+      <DocumentViewer
+        // url={"http://localhost:8080/api/v1/documents/" + slug + "/file"}
+        url="https://www2.hu-berlin.de/stadtlabor/wp-content/uploads/2021/12/sample3.docx"
+        viewer="office"
+        >
+      </DocumentViewer>
+
+      <DocViewer
+  pluginRenderers={DocViewerRenderers}
+  documents={docs}
+/>
+  </div>
+      ) : (
+        <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
         <Document file={file} onLoadSuccess={onDocumentLoadSuccess} className={'flex flex-col items-center'}>
           {Array.apply(null, Array(numPages))
             .map((x, i) => {
@@ -135,6 +157,9 @@ const Detail = () => {
           <button onClick={() => setPageNumber(pageNumber + 10)} className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm</button>
         </div>
       </div>
+      )}
+      {/* </DocumentViewer> */}
+      
     </div>
   );
 }

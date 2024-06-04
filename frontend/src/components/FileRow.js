@@ -86,9 +86,7 @@ const FileRow = ({ limit, title, editDocument, change, setChange }) => {
                                         <button onClick={() => handleDelete(document.id)} className="text-blue-600 hover:underline">Remove</button>
                                     </td>
                                 </tbody>
-
                             )
-
                         }
                     })}
                 </table>

@@ -3,9 +3,8 @@ package com.GDU.backend.services;
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
-import com.GDU.backend.dtos.response.DocumentResponseDTO;
-import com.GDU.backend.dtos.response.TotalResponse;
-import com.GDU.backend.models.Document;
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
+import com.GDU.backend.dtos.responses.TotalResponse;
 
 import java.io.IOException;
 import java.util.List;

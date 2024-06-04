@@ -3,12 +3,12 @@ package com.GDU.backend.services.Impl;
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
-import com.GDU.backend.dtos.response.DocumentResponseDTO;
-import com.GDU.backend.dtos.response.TotalResponse;
-import com.GDU.backend.dtos.response.UserResponse;
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
+import com.GDU.backend.dtos.responses.TotalResponse;
+import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
-import com.GDU.backend.repositories.CategoryRepo;
+import com.GDU.backend.repositories.CategoryRepository;
 import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.repositories.SpecializedRepository;
 import com.GDU.backend.services.DocumentService;
@@ -23,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +42,7 @@ public class DocumentServiceImpl implements DocumentService {
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
     private static final Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
     private final DocumentRepository documentRepository;
-    private final CategoryRepo categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final SpecializedRepository specializedRepository;
     private final UserServiceImpl userService;
 
@@ -58,17 +60,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         // author is the user who uploads by default
         User author = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
-
-        int numberOfPages = 0;
-        if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".pdf")) {
-            numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
-        } else if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".docx") || uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".doc")) {
-            // ToDo: add docx support
-        }
-
-        System.out.println(numberOfPages);
-        String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
-
+        log.info("inside upload document");
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
         File destFile = new File(UPLOAD_DIR + fileName);
@@ -78,6 +70,26 @@ public class DocumentServiceImpl implements DocumentService {
         Path uploadDir = Paths.get(UPLOAD_DIR);
         Files.createDirectories(uploadDir);
         Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        
+        int numberOfPages = 0;
+        String thumbnail = "";
+
+        // check file type
+        if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".pdf")) {
+            numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
+            thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
+
+        } else if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".docx") || uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".doc")) {
+            try {
+                File file = new File(destFile.getAbsolutePath());
+                System.out.println(file.isFile());
+                PDDocument doc = PDDocument.load(file);
+                numberOfPages = doc.getNumberOfPages();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            log.info("number of pages: " + numberOfPages);
+        }
 
         Document newDocument = Document.builder()
                 .title(uploadRequestDTO.getTitle())

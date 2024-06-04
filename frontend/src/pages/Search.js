@@ -61,11 +61,13 @@ const Search = () => {
         {documents && documents.map((item, index) => {
           if (index < limit) {
             return (
-              <DocumentCard slug={item.slug} pages={item.pages} title={item.title} author={item.author} views={item.views} download={item.download} upload_date={item.upload_date} key={index} thumbnail={item.thumbnail} />
+              <DocumentCard key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug} />
             )
           }
         }
         )}
+      </div>
+      <div className='flex justify-center my-10'>
         <button onClick={() => setLimit(limit + 30)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
       </div>
     </div>

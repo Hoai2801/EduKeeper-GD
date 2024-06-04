@@ -1,6 +1,6 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.dtos.response.UserResponse;
+import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.models.Token;
 import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.TokenRepository;

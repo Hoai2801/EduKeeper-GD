@@ -18,24 +18,25 @@ const Home = () => {
     })
   }, [])
 
+  console.log(lastedDocuments)
+
   return (
     <div>
-      {/* <Hero /> */}
-      {/* <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfOjCiVe8eY0jvXueGf7lGOgOEd5xr2bHbrz7LYqa-6w5KRLw/viewform?embedded=true" width="640" height="1118" frameborder="0" marginheight="0" marginwidth="0">Đang tải…</iframe> */}
       <div className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col p-10'>
         <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
         <div className='lg:ml-5 flex justify-between gap-5 overflow-auto flex-wrap'>
           {lastedDocuments.map((item, index) => (
-            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} specialized={item.specialized.specializedName} />
+            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug} />
           ))}
         </div>
-          <div className='flex justify-center'>
+          {/* button "see more" */}
+          <div className='flex justify-center mt-5'>
             <Link to={`/search?order=lastest&searchTerm=`} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
           </div>
         <h2 className='font-bold text-[28px] mb-5'>Tải nhiều nhất tháng này</h2>
         <div className='ml-5 flex flex-col gap-5 items-center'>
           {mostDownloaded.map((item, index) => (
-            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} thumbnail={item.thumbnail} />
+            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug} />
           ))}
           <div className='flex justify-center'>
             <Link to={`/search?order=mostDownloaded&searchTerm=`} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
@@ -44,7 +45,7 @@ const Home = () => {
         <h2 className='font-bold text-[28px]'>Xem nhiều nhất tháng này</h2>
         <div className='ml-5 flex flex-col gap-5 mt-5 items-center'>
           {mostViewed.map((item, index) => (
-            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} views={item.views} download={item.download} pages={item.pages} slug={item.slug} thumbnail={item.thumbnail} />
+            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug} />
           ))}
           <div className='flex justify-center'>
             <button onClick={null} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
