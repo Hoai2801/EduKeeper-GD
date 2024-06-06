@@ -22,8 +22,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Department getDepartmentById(Long id) {
-        return departmentRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Department not found"));
+        return departmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Department not found"));
     }
 
     @Override
@@ -50,7 +49,8 @@ public class DepartmentServiceImpl implements DepartmentService {
                 return "Department no exist";
             }
             existDepartment.setDepartmentName(departmentDTO.getDepartmentName());
-            existDepartment.setDepartmentSlug(departmentDTO.getDepartmentName().replace(" ", "-").toLowerCase());
+            existDepartment.setDepartmentSlug(
+                    departmentDTO.getDepartmentName().replace(" ", "-").toLowerCase());
             departmentRepository.save(existDepartment);
             return "Update department success";
         } catch (Exception e) {

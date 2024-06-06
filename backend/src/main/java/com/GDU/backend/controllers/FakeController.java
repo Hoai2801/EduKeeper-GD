@@ -2,8 +2,6 @@ package com.GDU.backend.controllers;
 
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.services.DocumentService;
-import com.GDU.backend.services.Impl.DocumentServiceImpl;
-import com.itextpdf.text.DocumentException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
@@ -30,14 +28,14 @@ public class FakeController {
     private final DocumentService documentService;
     
     @GetMapping("/{amount}")
-    public String fake(@PathVariable("amount") int amount) throws DocumentException, IOException {
+    public String fake(@PathVariable("amount") int amount) {
         int numThreads = 4; // Adjust the number of threads as needed
         try (ExecutorService executor = Executors.newFixedThreadPool(numThreads)) {
             for (int i = 0; i < amount; i++) {
                 executor.execute(() -> {
                     try {
                         createFakeDocument();
-                    } catch (IOException | DocumentException e) {
+                    } catch (IOException e) {
                         log.error("Error creating fake document: {}", e.getMessage());
                     }
                 });
@@ -46,12 +44,12 @@ public class FakeController {
         return "faking";
     }
 
-    private void createFakeDocument() throws IOException, DocumentException {
+    private void createFakeDocument() throws IOException{
         Faker faker = new Faker();
 
         // create fake dto for testing
         String pathUrl = "src/main/resources/static/uploads/";
-        String[] files = {"1713791537559_Packt.ASP.NET.8.Best.Practices.183763212X.pdf", "1713792927454_Algorithmic Thinking, 2nd Edition_ Unlock Your Programming Potential by Daniel Zingaro.pdf"};
+        String[] files = {"1713791537559_Packt.ASP.NET.8.Best.Practices.183763212X.pdf", "1713792927454_Algorithmic Thinking, 2nd Edition_ Unlock Your Programming Potential by Daniel Zingaro.pdf", "1715004861451_mongodb-the-definitive-guide-powerful-and-scalable-data-storage-3rd-edition-3nbsped-9781491954461_compress.pdf"};
         Path path = Paths.get(pathUrl + files[(int)  Math.round(Math.random())]);
         String name = faker.book().title();
         String originalFileName = "file.pdf";

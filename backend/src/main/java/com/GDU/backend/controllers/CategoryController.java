@@ -1,23 +1,20 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.dtos.CategoryDto;
+import com.GDU.backend.dtos.requests.CategoryDto;
 import com.GDU.backend.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/categories")
 public class CategoryController {
+    
     private final CategoryService categoryService;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<?> insertCategory(
             @Valid @RequestBody CategoryDto categoryDto
     ) {
@@ -28,7 +25,7 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> getCategories() {
         return ResponseEntity.ok().body(categoryService.findAll());
     }

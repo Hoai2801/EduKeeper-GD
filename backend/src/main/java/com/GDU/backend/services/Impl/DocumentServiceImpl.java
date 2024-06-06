@@ -3,12 +3,12 @@ package com.GDU.backend.services.Impl;
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
-import com.GDU.backend.dtos.response.DocumentResponseDTO;
-import com.GDU.backend.dtos.response.TotalResponse;
-import com.GDU.backend.dtos.response.UserResponse;
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
+import com.GDU.backend.dtos.responses.TotalResponse;
+import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
-import com.GDU.backend.repositories.CategoryRepo;
+import com.GDU.backend.repositories.CategoryRepository;
 import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.repositories.SpecializedRepository;
 import com.GDU.backend.services.DocumentService;
@@ -42,7 +42,7 @@ public class DocumentServiceImpl implements DocumentService {
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
     private static final Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
     private final DocumentRepository documentRepository;
-    private final CategoryRepo categoryRepository;
+    private final CategoryRepository categoryRepository;
     private final SpecializedRepository specializedRepository;
     private final UserServiceImpl userService;
 
@@ -52,19 +52,15 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
         Specialized specialized = specializedRepository.findById((long) uploadRequestDTO.getSpecialized())
                 .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
-        
+
         // todo: add subject model
         Subject subject = Subject.builder()
                 .id((long) uploadRequestDTO.getSubject())
                 .build();
-        
+
         // author is the user who uploads by default
         User author = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
-
-        int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
-
-        String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
-
+        log.info("inside upload document");
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
         File destFile = new File(UPLOAD_DIR + fileName);
@@ -74,6 +70,26 @@ public class DocumentServiceImpl implements DocumentService {
         Path uploadDir = Paths.get(UPLOAD_DIR);
         Files.createDirectories(uploadDir);
         Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        
+        int numberOfPages = 0;
+        String thumbnail = "";
+
+        // check file type
+        if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".pdf")) {
+            numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
+            thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
+
+        } else if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".docx") || uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".doc")) {
+            try {
+                File file = new File(destFile.getAbsolutePath());
+                System.out.println(file.isFile());
+                PDDocument doc = PDDocument.load(file);
+                numberOfPages = doc.getNumberOfPages();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            log.info("number of pages: " + numberOfPages);
+        }
 
         Document newDocument = Document.builder()
                 .title(uploadRequestDTO.getTitle())
@@ -89,7 +105,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .specialized(specialized)
                 .upload_date(LocalDate.now())
                 .build();
-        
+
         documentRepository.save(newDocument);
 
         return "Document uploaded successfully";
@@ -132,7 +148,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (existDocument == null) {
             return "Document not existing";
         }
-        
+
         User newAuthor = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
         if (newAuthor == null) {
             return "Author not existing";
@@ -143,22 +159,22 @@ public class DocumentServiceImpl implements DocumentService {
         // Update document
         existDocument.setCategory(category);
         existDocument.setTitle(
-                uploadRequestDTO.getTitle() != null ? 
-                uploadRequestDTO.getTitle() : 
-                existDocument.getTitle()
+                uploadRequestDTO.getTitle() != null ?
+                        uploadRequestDTO.getTitle() :
+                        existDocument.getTitle()
         );
         existDocument.setSlug(
-                uploadRequestDTO.getTitle() != null ? 
-                uploadRequestDTO.getTitle()
-                        .replace(" ", "-")
-                        .toLowerCase() + "-" + new Date().getTime() : 
-                existDocument.getSlug()
+                uploadRequestDTO.getTitle() != null ?
+                        uploadRequestDTO.getTitle()
+                                .replace(" ", "-")
+                                .toLowerCase() + "-" + new Date().getTime() :
+                        existDocument.getSlug()
         );
         existDocument.setSpecialized(existDocument.getSpecialized());
 
         // I think we don't need update a document file 
         // any more because we should upload a new one instead
-        
+
         // Handle Path
 //        if (uploadRequestDTO.getDocument() != null) {
 //            existDocument.setDocument_type(uploadRequestDTO.getDocument().getContentType());
@@ -213,7 +229,7 @@ public class DocumentServiceImpl implements DocumentService {
         String path = document.getPath();
         File file = new File(path);
         if (file.exists()) {
-            boolean deleted = file.delete(); 
+            boolean deleted = file.delete();
             if (!deleted) {
                 return "Delete file failed";
             } else {
@@ -265,10 +281,10 @@ public class DocumentServiceImpl implements DocumentService {
         // return list document which have a same specialized and category, title or
         // author
         return documentRepository.getDocumentsSuggested(
-                    recommendationRequestDTO.getSpecialized(), 
-                    recommendationRequestDTO.getCategory(),
-                    recommendationRequestDTO.getTitle(),
-                    recommendationRequestDTO.getAuthor()
+                        recommendationRequestDTO.getSpecialized(),
+                        recommendationRequestDTO.getCategory(),
+                        recommendationRequestDTO.getTitle(),
+                        recommendationRequestDTO.getAuthor()
                 )
                 .stream().map(this::convertToDocumentResponse).toList();
     }
@@ -300,7 +316,7 @@ public class DocumentServiceImpl implements DocumentService {
                 documents = documents.stream()
                         .filter(document -> document.getDownload() > 0)
                         .sorted(Comparator.comparing(Document::getDownload)
-                        .reversed()).collect(Collectors.toList()); 
+                                .reversed()).collect(Collectors.toList());
             }
             if (filterRequestDTO.getOrder().equalsIgnoreCase("latest")) {
                 documents.sort(Comparator.comparing(Document::getId).reversed());

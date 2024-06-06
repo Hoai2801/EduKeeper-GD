@@ -1,6 +1,10 @@
 import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+
+// asset
+import menuIcon from "../assets/menu-hamburge.png";
+
 const Navbar = () => {
   const token = localStorage.getItem("token");
   let jwt = null;
@@ -8,10 +12,10 @@ const Navbar = () => {
     jwt = jwtDecode(token);
   }
 
-  const [isShowProfile, setIsShownProfile] = useState(false);
+  // const [isShowProfile, setIsShownProfile] = useState(false);
   const [isShowSpecialized, setIsShownSpecialized] = useState(false);
   const [isShowCategory, setIsShownCategory] = useState(false);
-  const [isSubMenShow, setIsSubMenuShown] = useState(false);
+  // const [isSubMenShow, setIsSubMenuShown] = useState(false);
 
   const [searchTerm, setSearch] = useState("");
 
@@ -23,10 +27,9 @@ const Navbar = () => {
     fetch("http://localhost:8080/api/v1/specializes/count")
       .then((res) => res.json())
       .then((data) => {
-        console.log(data)
         setSpecialized(data);
       });
-    
+
     fetch("http://localhost:8080/api/v1/categories")
       .then((res) => res.json())
       .then((data) => {
@@ -42,8 +45,8 @@ const Navbar = () => {
   const out = () => {
     setIsShownSpecialized(false);
     setIsShownCategory(false);
-    setIsSubMenuShown(false);
-    setIsShownProfile(false);
+    // setIsSubMenuShown(false);
+    // setIsShownProfile(false);
   }
 
   const logout = () => {
@@ -53,8 +56,12 @@ const Navbar = () => {
 
   const search = () => {
     localStorage.setItem('search', searchTerm);
-    window.location.href = `http://localhost:3000/search?filter=&order=lasted`; 
-}
+    if (localStorage.getItem('search') !== null) {
+      window.location.href = `http://localhost:3000/search?filter=&order=lasted`;
+    }
+  }
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
 
   return (
@@ -71,7 +78,7 @@ const Navbar = () => {
             </div>
           </Link>
         </div>
-        <div className="lg:gap-4 text-[12px] lg:min-w-[600px] hidden lg:flex">
+        <div className="lg:gap-4 text-[12px] lg:min-w-[400px] hidden lg:flex">
           <Link
             to={"/"}
             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
@@ -127,68 +134,90 @@ const Navbar = () => {
           ) : " "}
         </div>
 
-        <form className="max-w-md mx-auto w-full md:block hidden min-w-[400px] mt-[-7px]">
+        <form className="max-w-md mx-auto w-full md:block hidden min-w-[400px] mt-[-7px]" onKeyDown={(event) => {
+          // press enter make page reload before search
+          if (event.keyCode === 13) {
+            search();
+            event.preventDefault();
+          }
+        }}>
           <div className="relative">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg className="w-4 h-4 text-gray-500 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
               </svg>
             </div>
-            <input type="search" id="default-search" className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Tìm sách theo tên, chủ đề..." required value={searchTerm} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}/>
+            <input type="search" id="default-search" className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Tìm sách theo tên, chủ đề..." required value={searchTerm} onChange={(e) => setSearch(e.target.value)} />
             <button type="reset" onClick={search} className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Tìm</button>
           </div>
         </form>
 
-        {jwt ? (
-          <>
-            <div
-              className="pt-1 relative group mr-0 w-[500px] justify-end lg:flex hidden"
-              onMouseEnter={() => setIsShownProfile(true)}
-            >
-              <p className="mt-1 mr-3">Chào {jwt?.user_name}</p>
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"
-                alt=""
-                className="w-10 min-w-10 mt-[-5px] h-10"
-              />
-              <div
-                className={` ${isShowProfile ? "flex" : "hidden"
-                  } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
-                onMouseLeave={() => setIsShownProfile(false)}
-              >
-                <Link to={"/profile"}>Profile</Link>
-                <button onClick={() => logout()} className="text-left">Đăng xuất</button>
-              </div>
+
+        <>
+          <div className="flex gap-5 justify-end w-[500px]">
+
+            {/* mobile menu button */}
+            <div className="lg:hidden w-[50px]">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="w-[50px] pr-5 mt-3">
+                <img src={menuIcon} alt="" className="w-full" />
+              </button>
             </div>
-            <div className="lg:hidden flex w-full justify-end">
-              <div className="w-10 min-w-10" onClick={() => setIsSubMenuShown(true)}>
-                <img
-                  src="https://www.svgrepo.com/show/509382/menu.svg"
-                  alt=""
-                />
-                <div
-                  className={` ${isSubMenShow ? "flex" : "hidden"
-                    } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
-                  onMouseLeave={() => setIsSubMenuShown(false)}
+            <div className={`w-full absolute top-[80px] right-0 h-[90vh] bg-slate-200 ${isMobileMenuOpen ? "flex" : "hidden"}`}>
+              <div className="flex flex-col items-center w-full mt-3 gap-3">
+                <Link
+                  to={"/"}
+                  onMouseEnter={() => setIsShownSpecialized(false)}
                 >
-                  <Link to={"/profile"}>Profile</Link>
-                  <button onClick={() => logout()} className="text-left">Đăng xuất</button>
+                  Trang chủ
+                </Link>
+                <div className="flex flex-col gap-3 items-center">
+                  <button onClick={() => setIsShownSpecialized(!isShowSpecialized)} className="group-hover/department:text-blue-700">
+                    Ngành
+                  </button>
+                  <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
+                    {specialized && specialized.map((item, index) => (
+                      <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`} onClick={() => setIsMobileMenuOpen(false)}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
+                    ))}
+                  </div>
                 </div>
+                <div className="flex flex-col gap-3 w-full items-center" >
+                  <button onClick={() => setIsShownCategory(!isShowCategory)} className="group-hover/department:text-blue-700">
+                    Thể loại
+                  </button>
+                  <div className={`w-[90%] flex flex-col items-center bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
+                    {category && category?.map((item, index) => (
+                    <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index} className={`py-3 px-2 w-full hover:bg-[#C5D6F8] rounded-xl`} onClick={() => setIsMobileMenuOpen(false)}>{item.categoryName}</Link>
+                    ))}
+                  </div>
+                </div>
+                {jwt?.role === "ADMIN" ? (
+                  <Link
+                    to="/upload"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Upload tài liệu
+                  </Link>
+                ) : " "}
+                {jwt ? (
+                  <>
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <Link to={"/profile"}>Profile</Link>
+                        <button onClick={() => logout()} className="text-left">Đăng xuất</button>
+                      </div>
+                  </>
+                ) : (
+                  <Link
+                    to={"/login"}
+                    className="bg-blue-600 px-5 py-3 mt-5 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Đăng nhập
+                  </Link>
+                )}
               </div>
             </div>
-          </>
-        ) : (
-          <>
-            <div className="flex gap-5 justify-end w-[500px]">
-              <Link
-                to={"/login"}
-                className="bg-blue-600 px-5 py-3 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
-              >
-                Đăng nhập
-              </Link>
-            </div>
-          </>
-        )}
+          </div>
+        </>
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.dtos.response.SpecializesWithCount;
-import com.GDU.backend.models.Document;
+import com.GDU.backend.dtos.responses.SpecializesWithCount;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.repositories.SpecializedRepository;
 import com.GDU.backend.services.DocumentService;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

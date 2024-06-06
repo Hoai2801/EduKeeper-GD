@@ -3,7 +3,7 @@ package com.GDU.backend.controllers;
 import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
-import com.GDU.backend.dtos.response.AuthenticationResponse;
+import com.GDU.backend.dtos.responses.AuthenticationResponse;
 import com.GDU.backend.services.Impl.AuthenticationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;

@@ -1,6 +1,6 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.dtos.response.UserResponse;
+import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,11 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
+    
+//    @PostMapping("/update")
+//    public ResponseEntity<?> updateUser(@RequestBody User user) {
+//        
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {

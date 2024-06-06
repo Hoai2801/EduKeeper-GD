@@ -3,34 +3,30 @@ package com.GDU.backend.controllers;
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
-import com.GDU.backend.dtos.response.DocumentResponseDTO;
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.services.DocumentService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
 public class DocumentController {
 
-    private static final Logger log = LoggerFactory.getLogger(DocumentController.class);
     private final DocumentService documentService;
 
     @GetMapping("/{slug}/file")
-    public ResponseEntity<Resource> downloadFileBySlug(@PathVariable("slug") String slug) {
+    public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
             File file = new File(document.getPath());
@@ -51,6 +47,7 @@ public class DocumentController {
         }
     }
 
+    // get most views in 30 days
     @GetMapping("/most-viewed")
     public ResponseEntity<?> getMostViewedDocuments(@RequestParam("limit") int limit) {
         try {
@@ -60,6 +57,7 @@ public class DocumentController {
         }
     }
 
+    // get most downloaded in 30 days
     @GetMapping("/most-downloaded")
     public ResponseEntity<?> getMostDownloadedDocuments(@RequestParam("limit") int limit) {
         try {
@@ -78,7 +76,6 @@ public class DocumentController {
         }
     }
 
-    @Validated
     @Async
     @PostMapping("/upload")
     public CompletableFuture<ResponseEntity<String>> uploadDocument(

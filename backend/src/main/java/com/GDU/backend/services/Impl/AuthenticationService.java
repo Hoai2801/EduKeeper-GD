@@ -3,7 +3,7 @@ package com.GDU.backend.services.Impl;
 import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
-import com.GDU.backend.dtos.response.AuthenticationResponse;
+import com.GDU.backend.dtos.responses.AuthenticationResponse;
 import com.GDU.backend.exceptions.InvalidTokenException;
 import com.GDU.backend.exceptions.PasswordsDoNotMatchException;
 import com.GDU.backend.exceptions.TokenExpiredException;
@@ -69,7 +69,6 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(user);
-        System.out.println("user done");
         sendValidationEmail(user);
         return "registered";
     }

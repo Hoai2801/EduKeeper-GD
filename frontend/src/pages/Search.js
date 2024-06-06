@@ -53,20 +53,21 @@ const Search = () => {
   }, [url, order, slugSpecialized, slugSubject, publishYear, category])
 
   const [limit, setLimit] = useState(30)
-  const [page, setPage] = useState(1)
 
   return (
-    <div>
+    <div className='w-full'>
       <h2 className='text-[28px] font-bold text-center mt-10 mb-5'>Tài liệu ({documents && documents.length})</h2>
-      <div className='my-5 flex flex-col gap-5 h-fit'>
+      <div className='my-5 flex gap-5 h-fit flex-wrap justify-center'>
         {documents && documents.map((item, index) => {
           if (index < limit) {
             return (
-              <DocumentCard slug={item.slug} pages={item.pages} title={item.title} author={item.author} views={item.views} download={item.download} upload_date={item.upload_date} key={index} thumbnail={item.thumbnail} />
+              <DocumentCard key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug} />
             )
           }
         }
         )}
+      </div>
+      <div className='flex justify-center my-10'>
         <button onClick={() => setLimit(limit + 30)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
       </div>
     </div>

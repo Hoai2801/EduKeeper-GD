@@ -1,6 +1,6 @@
 package com.GDU.backend.controllers;
 
-import com.GDU.backend.dtos.response.SpecializesWithCount;
+import com.GDU.backend.dtos.responses.SpecializesWithCount;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.services.SpecializedService;
 import lombok.RequiredArgsConstructor;

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf';
 import './Detail.css'
-import { Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import 'react-pdf/dist/esm/Page/TextLayer.css'
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
-import Recommend from '../components/Recommend';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
@@ -43,6 +42,7 @@ const Detail = () => {
     fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
       .then((res) => res.blob())
       .then((blob) => {
+        console.log(blob)
         setFile(blob)
       });
 
@@ -62,7 +62,7 @@ const Detail = () => {
 
     // Creating new object of PDF file
     const fileURL =
-      window.URL.createObjectURL(new Blob([file], { type: "application/pdf" }));
+      window.URL.createObjectURL(new Blob([file], { type: data?.document_type }));
 
     // Setting various property values
     let alink = document.createElement("a");
@@ -80,11 +80,11 @@ const Detail = () => {
 
   return (
     <div>
-      <div className='pt-[50px]'>
+      <div className='pt-[50px] md:px-5 px-2'>
         <p className='text-blue-500'><Link to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> - <Link to={`/search?specialized=${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
         {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
-        <h2 className='text-[28px] font-bold max-w-[900px] text-justify'>{data?.title}</h2>
-        <div className='flex justify-between mt-3'>
+        <h2 className='text-[28px] font-bold max-w-[900px]'>{data?.title}</h2>
+        <div className='flex justify-between mt-3 md:flex-row flex-col'>
           <div>
             <p>Tác giả: <span className='text-blue-500'>{data?.author.username}</span></p>
             <p>Ngày đăng: {data?.upload_date}</p>
@@ -93,9 +93,8 @@ const Detail = () => {
           <div className='flex flex-col gap-5'>
             <button
               onClick={() => onButtonClick()}
-              className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Tải tài liệu ({data?.document_size} MB)</button>
+              className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 mt-2'>Tải tài liệu ({data?.document_size} MB)</button>
             <div className='flex gap-5'>
-
               <p>Lượt xem: {data?.views}</p>
               <p>Lượt tải về: {data?.download}</p>
             </div>
@@ -103,19 +102,15 @@ const Detail = () => {
         </div>
       </div>
       <div className='mt-10'>
-          {
-            data &&
-            <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
-          }
+        {/* File pdf render */}
       </div>
-      <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
+        <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
         <Document file={file} onLoadSuccess={onDocumentLoadSuccess} className={'flex flex-col items-center'}>
           {Array.apply(null, Array(numPages))
             .map((x, i) => {
               if (i <= pageNumber) {
                 return (
-                  <div className='lg:w-full w-[80%]'>
-
+                  <div className='lg:w-full w-fit'>
                     <Page
                       key={i}
                       pageNumber={i + 1}
@@ -135,6 +130,8 @@ const Detail = () => {
           <button onClick={() => setPageNumber(pageNumber + 10)} className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm</button>
         </div>
       </div>
+      {/* </DocumentViewer> */}
+      
     </div>
   );
 }
