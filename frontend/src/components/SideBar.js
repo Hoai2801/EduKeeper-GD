@@ -44,7 +44,7 @@ const SideBar = () => {
 
     const filter = () => {
         const redirect = "http://localhost:3000/search?filter&order=" + sort
-            + (department  ? `&department=${department}` : '')
+            + (department ? `&department=${department}` : '')
             + (specialized ? `&specialized=${specialized}` : '')
 
         window.location.href = redirect
@@ -52,22 +52,22 @@ const SideBar = () => {
 
     useEffect(() => {
         const listener = event => {
-          if (event.code === "Enter" || event.code === "NumpadEnter") {
-            filter();
-            event.preventDefault();
-            // callMyFunction();
-          }
+            if (event.code === "Enter" || event.code === "NumpadEnter") {
+                filter();
+                event.preventDefault();
+                // callMyFunction();
+            }
         };
         document.addEventListener("keydown", listener);
         return () => {
-          document.removeEventListener("keydown", listener);
+            document.removeEventListener("keydown", listener);
         };
-      }, []);
+    }, []);
 
     return (
         <div className='flex justify-between w-full gap-5 p-5'>
-            <div className='flex justify-between w-full gap-5 h-fit px-10'>
-                <div className='w-[25%] h-full rounded-lg shadow-lg bg-white flex items-center flex-col gap-5 px-5'>
+            <div className='flex justify-center w-full gap-5 h-fit px-10 '>
+                <div className='w-[25%] h-full rounded-lg shadow-lg bg-white md:flex items-center flex-col gap-5 px-5 hidden'>
                     <p className='text-2xl font-bold mt-2'>Lọc</p>
                     <form className="w-full mx-auto">
                         <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
@@ -145,7 +145,11 @@ const SideBar = () => {
                     </div>
                     <button onClick={filter} className='bg-blue-500 rounded-3xl w-[100px] h-[40px] text-center text-white text-x mb-10'>Lọc</button>
                 </div>
-                <div className='flex justify-center w-full bg-white rounded-lg'>
+                {/* filter bubble
+                <div className='w-fit fixed bottom-[100px] left-10 z-50 bg-white rounded-full p-5 shadow-lg'>
+                    Lọc
+                </div> */}
+                <div className='flex justify-center w-screen rounded-lg'>
                     <Outlet />
                 </div>
             </div>

@@ -12,10 +12,10 @@ const Navbar = () => {
     jwt = jwtDecode(token);
   }
 
-  const [isShowProfile, setIsShownProfile] = useState(false);
+  // const [isShowProfile, setIsShownProfile] = useState(false);
   const [isShowSpecialized, setIsShownSpecialized] = useState(false);
   const [isShowCategory, setIsShownCategory] = useState(false);
-  const [isSubMenShow, setIsSubMenuShown] = useState(false);
+  // const [isSubMenShow, setIsSubMenuShown] = useState(false);
 
   const [searchTerm, setSearch] = useState("");
 
@@ -45,8 +45,8 @@ const Navbar = () => {
   const out = () => {
     setIsShownSpecialized(false);
     setIsShownCategory(false);
-    setIsSubMenuShown(false);
-    setIsShownProfile(false);
+    // setIsSubMenuShown(false);
+    // setIsShownProfile(false);
   }
 
   const logout = () => {
@@ -176,7 +176,7 @@ const Navbar = () => {
                   </button>
                   <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                     {specialized && specialized.map((item, index) => (
-                      <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
+                      <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`} onClick={() => setIsMobileMenuOpen(false)}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
                     ))}
                   </div>
                 </div>
@@ -186,13 +186,14 @@ const Navbar = () => {
                   </button>
                   <div className={`w-[90%] flex flex-col items-center bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
                     {category && category?.map((item, index) => (
-                      <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index} className={`py-3 px-2 w-full hover:bg-[#C5D6F8] rounded-xl`}>{item.categoryName}</Link>
+                    <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index} className={`py-3 px-2 w-full hover:bg-[#C5D6F8] rounded-xl`} onClick={() => setIsMobileMenuOpen(false)}>{item.categoryName}</Link>
                     ))}
                   </div>
                 </div>
                 {jwt?.role === "ADMIN" ? (
                   <Link
                     to="/upload"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Upload tài liệu
                   </Link>
@@ -203,27 +204,12 @@ const Navbar = () => {
                         <Link to={"/profile"}>Profile</Link>
                         <button onClick={() => logout()} className="text-left">Đăng xuất</button>
                       </div>
-                    {/* <div className="lg:hidden flex w-full justify-end">
-                      <div className="w-10 min-w-10" onClick={() => setIsSubMenuShown(true)}>
-                        <img
-                          src="https://www.svgrepo.com/show/509382/menu.svg"
-                          alt=""
-                        />
-                        <div
-                          className={` ${isSubMenShow ? "flex" : "hidden"
-                            } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
-                          onMouseLeave={() => setIsSubMenuShown(false)}
-                        >
-                          <Link to={"/profile"}>Profile</Link>
-                          <button onClick={() => logout()} className="text-left">Đăng xuất</button>
-                        </div>
-                      </div>
-                    </div> */}
                   </>
                 ) : (
                   <Link
                     to={"/login"}
                     className="bg-blue-600 px-5 py-3 mt-5 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Đăng nhập
                   </Link>

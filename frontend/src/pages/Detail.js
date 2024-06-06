@@ -80,11 +80,11 @@ const Detail = () => {
 
   return (
     <div>
-      <div className='pt-[50px]'>
+      <div className='pt-[50px] md:px-5 px-2'>
         <p className='text-blue-500'><Link to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> - <Link to={`/search?specialized=${data?.specialized.specializedSlug}`}>{data?.specialized.specializedName}</Link></p>
         {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
-        <h2 className='text-[28px] font-bold max-w-[900px] text-justify'>{data?.title}</h2>
-        <div className='flex justify-between mt-3'>
+        <h2 className='text-[28px] font-bold max-w-[900px]'>{data?.title}</h2>
+        <div className='flex justify-between mt-3 md:flex-row flex-col'>
           <div>
             <p>Tác giả: <span className='text-blue-500'>{data?.author.username}</span></p>
             <p>Ngày đăng: {data?.upload_date}</p>
@@ -93,9 +93,8 @@ const Detail = () => {
           <div className='flex flex-col gap-5'>
             <button
               onClick={() => onButtonClick()}
-              className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Tải tài liệu ({data?.document_size} MB)</button>
+              className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 mt-2'>Tải tài liệu ({data?.document_size} MB)</button>
             <div className='flex gap-5'>
-
               <p>Lượt xem: {data?.views}</p>
               <p>Lượt tải về: {data?.download}</p>
             </div>
@@ -103,10 +102,7 @@ const Detail = () => {
         </div>
       </div>
       <div className='mt-10'>
-        {
-          // data &&
-          // <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
-        }
+        {/* File pdf render */}
       </div>
         <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
         <Document file={file} onLoadSuccess={onDocumentLoadSuccess} className={'flex flex-col items-center'}>
@@ -114,8 +110,7 @@ const Detail = () => {
             .map((x, i) => {
               if (i <= pageNumber) {
                 return (
-                  <div className='lg:w-full w-[80%]'>
-
+                  <div className='lg:w-full w-fit'>
                     <Page
                       key={i}
                       pageNumber={i + 1}
