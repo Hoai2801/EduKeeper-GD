@@ -4,9 +4,7 @@ import './Detail.css'
 import { Link } from 'react-router-dom';
 import 'react-pdf/dist/esm/Page/TextLayer.css'
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
-import { DocumentViewer } from 'react-documents';
-import DocViewer, { DocViewerRenderers, PDFRenderer } from "react-doc-viewer";
-import { logDOM } from '@testing-library/react';
+
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url,
@@ -44,6 +42,7 @@ const Detail = () => {
     fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
       .then((res) => res.blob())
       .then((blob) => {
+        console.log(blob)
         setFile(blob)
       });
 
@@ -78,12 +77,7 @@ const Detail = () => {
       method: "PUT",
     })
   };
-  console.log("file://" + data?.path)
-  let pathOfFile = data ? "file://" + data?.path : "file:///home/talos/Desktop/Learn/git/beginning-git-github-management-2nd.pdf";
-  const docs = [
-    // { uri: "http://localhost:8080/api/v1/documents/agjjfk-1717514917467/file", fileType: "docx" }
-    { uri: require(pathOfFile ?? ""), fileType: "docx" }, // Local File
-  ];
+
   return (
     <div>
       <div className='pt-[50px]'>
@@ -114,22 +108,6 @@ const Detail = () => {
           // <Recommend search={data?.title} author={data?.author.username} category={data?.category.id} specialized={data?.specialized.id} />
         }
       </div>
-      {data?.document_type !== "application/pdf" ? (
-        <div>
-
-      <DocumentViewer
-        // url={"http://localhost:8080/api/v1/documents/" + slug + "/file"}
-        url="https://www2.hu-berlin.de/stadtlabor/wp-content/uploads/2021/12/sample3.docx"
-        viewer="office"
-        >
-      </DocumentViewer>
-
-      <DocViewer
-  pluginRenderers={DocViewerRenderers}
-  documents={docs}
-/>
-  </div>
-      ) : (
         <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
         <Document file={file} onLoadSuccess={onDocumentLoadSuccess} className={'flex flex-col items-center'}>
           {Array.apply(null, Array(numPages))
@@ -157,7 +135,6 @@ const Detail = () => {
           <button onClick={() => setPageNumber(pageNumber + 10)} className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm</button>
         </div>
       </div>
-      )}
       {/* </DocumentViewer> */}
       
     </div>

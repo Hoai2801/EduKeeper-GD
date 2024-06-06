@@ -61,6 +61,9 @@ const Navbar = () => {
     }
   }
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+
   return (
     <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
       <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
@@ -134,8 +137,8 @@ const Navbar = () => {
         <form className="max-w-md mx-auto w-full md:block hidden min-w-[400px] mt-[-7px]" onKeyDown={(event) => {
           // press enter make page reload before search
           if (event.keyCode === 13) {
-           search();
-           event.preventDefault();
+            search();
+            event.preventDefault();
           }
         }}>
           <div className="relative">
@@ -149,61 +152,86 @@ const Navbar = () => {
           </div>
         </form>
 
-        {jwt ? (
-          <>
-            <div
-              className="pt-1 relative group mr-0 w-[500px] justify-end lg:flex hidden"
-              onMouseEnter={() => setIsShownProfile(true)}
-            >
-              <p className="mt-1 mr-3">Chào {jwt?.user_name}</p>
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"
-                alt=""
-                className="w-10 min-w-10 mt-[-5px] h-10"
-              />
-              <div
-                className={` ${isShowProfile ? "flex" : "hidden"
-                  } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
-                onMouseLeave={() => setIsShownProfile(false)}
-              >
-                <Link to={"/profile"}>Profile</Link>
-                <button onClick={() => logout()} className="text-left">Đăng xuất</button>
-              </div>
+
+        <>
+          <div className="flex gap-5 justify-end w-[500px]">
+
+            {/* mobile menu button */}
+            <div className="lg:hidden w-[50px]">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="w-[50px] pr-5 mt-3">
+                <img src={menuIcon} alt="" className="w-full" />
+              </button>
             </div>
-            <div className="lg:hidden flex w-full justify-end">
-              <div className="w-10 min-w-10" onClick={() => setIsSubMenuShown(true)}>
-                <img
-                  src="https://www.svgrepo.com/show/509382/menu.svg"
-                  alt=""
-                />
-                <div
-                  className={` ${isSubMenShow ? "flex" : "hidden"
-                    } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
-                  onMouseLeave={() => setIsSubMenuShown(false)}
+            <div className={`w-full absolute top-[80px] right-0 h-[90vh] bg-slate-200 ${isMobileMenuOpen ? "flex" : "hidden"}`}>
+              <div className="flex flex-col items-center w-full mt-3 gap-3">
+                <Link
+                  to={"/"}
+                  onMouseEnter={() => setIsShownSpecialized(false)}
                 >
-                  <Link to={"/profile"}>Profile</Link>
-                  <button onClick={() => logout()} className="text-left">Đăng xuất</button>
+                  Trang chủ
+                </Link>
+                <div className="flex flex-col gap-3 items-center">
+                  <button onClick={() => setIsShownSpecialized(!isShowSpecialized)} className="group-hover/department:text-blue-700">
+                    Ngành
+                  </button>
+                  <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
+                    {specialized && specialized.map((item, index) => (
+                      <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
+                    ))}
+                  </div>
                 </div>
+                <div className="flex flex-col gap-3 w-full items-center" >
+                  <button onClick={() => setIsShownCategory(!isShowCategory)} className="group-hover/department:text-blue-700">
+                    Thể loại
+                  </button>
+                  <div className={`w-[90%] flex flex-col items-center bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`} onMouseLeave={() => setIsShownCategory(false)}>
+                    {category && category?.map((item, index) => (
+                      <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index} className={`py-3 px-2 w-full hover:bg-[#C5D6F8] rounded-xl`}>{item.categoryName}</Link>
+                    ))}
+                  </div>
+                </div>
+                {jwt?.role === "ADMIN" ? (
+                  <Link
+                    to="/upload"
+                  >
+                    Upload tài liệu
+                  </Link>
+                ) : " "}
+                {jwt ? (
+                  <>
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <Link to={"/profile"}>Profile</Link>
+                        <button onClick={() => logout()} className="text-left">Đăng xuất</button>
+                      </div>
+                    {/* <div className="lg:hidden flex w-full justify-end">
+                      <div className="w-10 min-w-10" onClick={() => setIsSubMenuShown(true)}>
+                        <img
+                          src="https://www.svgrepo.com/show/509382/menu.svg"
+                          alt=""
+                        />
+                        <div
+                          className={` ${isSubMenShow ? "flex" : "hidden"
+                            } absolute bg-white border rounded-lg p-5 shadow-lg w-[370px] flex-col h-20 top-[65px] right-0`}
+                          onMouseLeave={() => setIsSubMenuShown(false)}
+                        >
+                          <Link to={"/profile"}>Profile</Link>
+                          <button onClick={() => logout()} className="text-left">Đăng xuất</button>
+                        </div>
+                      </div>
+                    </div> */}
+                  </>
+                ) : (
+                  <Link
+                    to={"/login"}
+                    className="bg-blue-600 px-5 py-3 mt-5 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
+                  >
+                    Đăng nhập
+                  </Link>
+                )}
               </div>
             </div>
-          </>
-        ) : (
-          <>
-            <div className="flex gap-5 justify-end w-[500px]">
-              <Link
-                to={"/login"}
-                className="bg-blue-600 px-5 py-3 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
-              >
-                Đăng nhập
-              </Link>
-              <div className="lg:hidden w-[50px]">
-                <button onClick={null} className="w-[50px] pr-5">
-                  <img src={menuIcon} alt="" className="h-10" />
-                </button>
-              </div>
-            </div>
-          </>
-        )}
+          </div>
+        </>
       </div>
     </div>
   );
