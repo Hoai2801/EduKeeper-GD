@@ -10,6 +10,8 @@ const SideBar = () => {
     const [departmentList, setDepartmentList] = useState([]);
     const [specialiesList, setSpecialiesList] = useState([]);
 
+    const [isFilterShow, setIsFilterShow] = useState(false);
+
     const handleSearch = (event) => {
         localStorage.setItem('search', event.target.value);
     }
@@ -66,9 +68,10 @@ const SideBar = () => {
 
     return (
         <div className='flex justify-between w-full gap-5 p-5'>
-            <div className='flex justify-center w-full gap-5 h-fit px-10 '>
-                <div className='w-[25%] h-full rounded-lg shadow-lg bg-white md:flex items-center flex-col gap-5 px-5 hidden'>
-                    <p className='text-2xl font-bold mt-2'>Lọc</p>
+            <div className={`flex md:flex-row flex-col justify-center w-full gap-5 h-fit md:px-10`}>
+                <button onClick={() => setIsFilterShow(!isFilterShow)} className={`bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded ${isFilterShow ? 'md:flex' : 'md:flex'}`}>Lọc tài liệu</button>
+                <div className={`md:w-[25%] w-full h-full rounded-lg shadow-lg bg-white items-center flex-col gap-5 px-5 ${isFilterShow ? 'md:flex' : 'md:flex hidden'}`}>
+                    <p className='text-2xl font-bold my-2'>Lọc</p>
                     <form className="w-full mx-auto">
                         <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
                         <div className="relative">
@@ -94,7 +97,7 @@ const SideBar = () => {
                         </div>
                     </div>
                     <form className="max-w-sm mx-auto">
-                        <label htmlFor="specialies" className="block mb-2 text-xl text-gray-900 font-semibold">Chuyên khoa</label>
+                        <label htmlFor="specialies" className="block mb-2 text-xl text-gray-900 font-semibold">Khoa</label>
                         <select id="specialies" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full"
                             onChange={(event) => {
                                 const selectedDepartment = JSON.parse(event.target.value);
@@ -143,7 +146,10 @@ const SideBar = () => {
                             <input type="text" id="range" className='border border-black rounded-lg w-[60px] h-[40px] p-2' />
                         </div>
                     </div>
+                    <div className='w-full pt-5 flex justify-center'>
+                        
                     <button onClick={filter} className='bg-blue-500 rounded-3xl w-[100px] h-[40px] text-center text-white text-x mb-10'>Lọc</button>
+                    </div>
                 </div>
                 {/* filter bubble
                 <div className='w-fit fixed bottom-[100px] left-10 z-50 bg-white rounded-full p-5 shadow-lg'>
