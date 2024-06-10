@@ -11,11 +11,12 @@ const Navbar = () => {
   if (token !== "undefined" && token !== null) {
     jwt = jwtDecode(token);
   }
+  console.log(jwt)
 
   // const [isShowProfile, setIsShownProfile] = useState(false);
   const [isShowSpecialized, setIsShownSpecialized] = useState(false);
   const [isShowCategory, setIsShownCategory] = useState(false);
-  // const [isSubMenShow, setIsSubMenuShown] = useState(false);
+  const [isSubMenuShow, setIsSubMenuShown] = useState(false);
 
   const [searchTerm, setSearch] = useState("");
 
@@ -155,7 +156,31 @@ const Navbar = () => {
 
         <>
           <div className="flex gap-5 justify-end w-[500px]">
+            <div className="flex text-center">
+                {jwt ? (
+                  <div>
 
+                  <button
+                    onClick={() => {
+                      setIsSubMenuShown(!isSubMenuShow);
+                    }}
+                    className="mt-3"
+                    >
+                    Chào {jwt.user_name}
+                  </button>
+                  <div className={`bg-white absolute w-[300px] h-[300px] top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`}>
+                      hello
+                  </div>
+                    </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2"
+                  >
+                    Đăng nhập
+                  </Link>
+                )}
+            </div>
             {/* mobile menu button */}
             <div className="lg:hidden w-[50px]">
               <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="w-[50px] pr-5 mt-3">

@@ -52,7 +52,7 @@ const Search = () => {
       });
   }, [url, order, slugSpecialized, slugSubject, publishYear, category])
 
-  const [limit, setLimit] = useState(30)
+  const [limit, setLimit] = useState(20)
 
   return (
     <div className='w-full pr-10'>
@@ -68,7 +68,7 @@ const Search = () => {
         )}
       </div>
       <div className='flex justify-center my-10'>
-        <button onClick={() => setLimit(limit + 30)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
+        <button onClick={() => setLimit(limit + 30)} className={`text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 ${documents.length <= limit ? 'hidden' : ''}`}>Xem thêm</button>
       </div>
     </div>
   )

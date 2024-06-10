@@ -69,7 +69,7 @@ const SideBar = () => {
     return (
         <div className='flex justify-between w-full gap-5 p-5'>
             <div className={`flex md:flex-row flex-col justify-center w-full gap-5 h-fit md:px-10`}>
-                <button onClick={() => setIsFilterShow(!isFilterShow)} className={`bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded ${isFilterShow ? 'md:flex' : 'md:flex'}`}>Lọc tài liệu</button>
+                <button onClick={() => setIsFilterShow(!isFilterShow)} className={`bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded ${isFilterShow ? 'md:hidden' : 'md:hidden'}`}>Lọc tài liệu</button>
                 <div className={`md:w-[25%] w-full h-full rounded-lg shadow-lg bg-white items-center flex-col gap-5 px-5 ${isFilterShow ? 'md:flex' : 'md:flex hidden'}`}>
                     <p className='text-2xl font-bold my-2'>Lọc</p>
                     <form className="w-full mx-auto">
