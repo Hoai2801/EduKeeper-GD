@@ -47,15 +47,17 @@ const Login = () => {
 
     const forgotPassword = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
-        fetch('http://localhost:8080/api/v1/auth/forgot-password/' + staffCode, {
-            method: 'POST',
-        })
-        .then((data) => {
-            if (data.status === 200) {
-                alert("Email xác nhận đã được gửi đến email của bạn")
-            }
-        })
-        // alert("Email xác nhận đã được gửi đến email của bạn")
+        if (window.confirm("Bạn muốn gửi email xác nhận đặt lại mật khẩu?") == true) {
+            // User clicked OK
+            fetch('http://localhost:8080/api/v1/auth/forgot-password/' + staffCode, {
+                method: 'POST',
+            })
+            .then((data) => {
+                if (data.status === 200) {
+                    alert("Email xác nhận đã được gửi đến email của bạn")
+                }
+            })
+        }
     }
 
     return (

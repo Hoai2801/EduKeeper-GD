@@ -164,12 +164,15 @@ const Navbar = () => {
                     onClick={() => {
                       setIsSubMenuShown(!isSubMenuShow);
                     }}
-                    className="mt-3"
+                    className="mt-2 text-xl flex gap-3"
                     >
                     Chào {jwt.user_name}
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="" className="w-8 h-8 rounded-full" />
                   </button>
-                  <div className={`bg-white absolute w-[300px] h-[300px] top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`}>
-                      hello
+                  <div className={`bg-white absolute flex flex-col max-w-[300px] w-[300px] overflow-hidden h-[300px] top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`} onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}>
+                      <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Trang cá nhân</Link>
+                      <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>
+                      <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Đăng xuất</Link>
                   </div>
                     </div>
                 ) : (

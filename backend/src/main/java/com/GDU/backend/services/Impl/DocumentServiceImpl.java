@@ -60,7 +60,6 @@ public class DocumentServiceImpl implements DocumentService {
 
         // author is the user who uploads by default
         User author = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
-        log.info("inside upload document");
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
         File destFile = new File(UPLOAD_DIR + fileName);
@@ -98,6 +97,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .path(destFile.getAbsolutePath())
                 .document_type(uploadRequestDTO.getDocument().getContentType())
                 .document_size(uploadRequestDTO.getDocument().getSize() / 1_000_000)
+                .description(uploadRequestDTO.getDescription())
                 .subject(subject)
                 .pages(numberOfPages)
                 .category(category)
@@ -395,6 +395,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .path(document.getPath())
                 .thumbnail(document.getThumbnail())
                 .pages(document.getPages())
+                .description(document.getDescription())
                 .document_type(document.getDocument_type())
                 .document_size(document.getDocument_size())
                 .build();

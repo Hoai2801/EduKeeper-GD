@@ -13,6 +13,10 @@ import User from './pages/User';
 import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import Department from './pages/Department';
+import Profile from './pages/Profile';
+import UserUpload from './pages/UserUpload';
+import UserHome from './components/UserHome';
+import UserInfor from './pages/UserInfor';
 
 function App() {
   return (
@@ -20,6 +24,11 @@ function App() {
       <Route element={<Layout />} >
         <Route path='/' element={<Home />} />
         <Route path='/upload' element={<Upload />} />
+        <Route path='/profile' element={<Profile />} >
+          <Route path='' element={<UserHome />} />
+          <Route path='upload' element={<UserUpload />} />
+          <Route path='information' element={<UserInfor />} />
+        </Route>
         <Route path='/document/:slug' element={<Detail />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<SignUp />} />

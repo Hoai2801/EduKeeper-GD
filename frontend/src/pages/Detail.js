@@ -101,6 +101,12 @@ const Detail = () => {
           </div>
         </div>
       </div>
+      <div>
+          <h3 className='text-[28px] font-bold text-blue-400'>Mô tả</h3>
+          <div>
+            <div dangerouslySetInnerHTML={{ __html: data?.description }}></div>
+          </div>
+      </div>
       <div className='mt-10'>
         {/* File pdf render */}
       </div>

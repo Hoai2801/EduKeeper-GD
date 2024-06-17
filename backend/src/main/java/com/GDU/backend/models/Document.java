@@ -32,6 +32,8 @@ public class Document {
     private String thumbnail;
 
     private String path;
+    
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "author", nullable = false)

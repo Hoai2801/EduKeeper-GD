@@ -32,6 +32,8 @@ public class DocumentResponseDTO {
 
     private String path;
     
+    private String description;
+    
     private UserResponse author;
 
     private Specialized specialized;
