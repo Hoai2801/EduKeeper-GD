@@ -51,4 +51,9 @@ public class SpecializedServiceImpl implements SpecializedService {
 
         return specializedWithCounts;
     }
+
+    @Override
+    public Specialized getSpecializedById(Long s) {
+        return specializedRepository.findById(s).orElse(null);
+    }
 }

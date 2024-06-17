@@ -164,7 +164,7 @@ const Navbar = () => {
                     onClick={() => {
                       setIsSubMenuShown(!isSubMenuShow);
                     }}
-                    className="mt-2 text-xl flex gap-3"
+                    className="lg:mt-2 mt-3 lg:text-xl md:flex gap-3 hidden"
                     >
                     Chào {jwt.user_name}
                     <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="" className="w-8 h-8 rounded-full" />

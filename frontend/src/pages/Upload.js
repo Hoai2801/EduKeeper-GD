@@ -19,6 +19,7 @@ export const Upload = () => {
 
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [listSpecialized, setListSpecialized] = useState(null);
+  const [listSubject, setListSubject] = useState(null);
 
   const token = localStorage.getItem("token");
   let jwt = null;
@@ -29,6 +30,16 @@ export const Upload = () => {
   if (!jwt) {
     window.location.href = "/";
   }
+
+  useEffect(() => {
+    console.log(specialized)
+    fetch('http://localhost:8080/api/v1/subjects/specialized/' + specialized).then(response => response.json())
+      .then(data => {
+        console.log(data)
+        setListSubject(data)
+      })
+      .catch(error => console.error(error));
+  }, [specialized])
 
   const handleFiles = (updatedFile) => {
     setFile(updatedFile[0]);
@@ -58,11 +69,9 @@ export const Upload = () => {
     formData.append('document', selectedFile);
     formData.append('title', title);
     // formData.append('department', selectedDepartment);
-    // category is long type
-    console.log(category)
     formData.append('category', category);
     formData.append('description', description);
-    formData.append('subject', 1);
+    formData.append('subject', subject);
     formData.append('specialized', specialized);
     formData.append('author', jwt.staff_code);
 
@@ -159,13 +168,16 @@ export const Upload = () => {
               }
             </select>
           </div>
-          <div className="mb-4">
-            <label htmlFor="subject" className="block text-gray-700 text-sm font-bold mb-2">Môn học</label>
-            <input type="text" id="subject" name="subject" placeholder="" required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-              onChange={event => setSubject(event.target.value)}
-              value={subject}
-            />
+          <div className="max-w-sm mx-auto mb-3">
+            <label htmlFor="department" className="block mb-2 text-sm font-semibold text-gray-900">Môn</label>
+            <select id="department" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" onChange={e => setSubject(e.target.value)}>
+              <option>Chọn môn</option>
+              {
+                Array.isArray(listSubject) && listSubject.map(subject => (
+                  <option value={subject.id} key={subject.id}>{subject.name}</option>
+                ))
+              }
+            </select>
           </div>
           <div className="mb-4">
             <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Giáo viên</label>

@@ -56,7 +56,7 @@ const Search = () => {
 
   return (
     <div className='w-full pr-10'>
-      <h2 className='text-[28px] font-bold text-center mt-10 mb-5'>Tài liệu ({documents && documents.length})</h2>
+      <h2 className='text-[28px] font-bold text-center mt- mb-5'>Tài liệu ({documents && documents.length})</h2>
       <div className='my-5 flex gap-5 h-fit flex-wrap justify-center'>
         {documents && documents.map((item, index) => {
           if (index < limit) {

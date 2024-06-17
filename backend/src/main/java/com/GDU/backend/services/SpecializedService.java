@@ -9,4 +9,6 @@ public interface SpecializedService {
     List<Specialized> getSpecializes();
 
     List<SpecializesWithCount> getSpecializedWithCount();
+
+    Specialized getSpecializedById(Long s);
 }

@@ -24,7 +24,7 @@ public class Subject {
     @Column(name = "subject_slug", nullable = false, length = 50)
     private String slug;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "specialized_id")
     private Specialized specialized;
 }

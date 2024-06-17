@@ -4,14 +4,14 @@ import change from '../assets/change.png'
 import logout from '../assets/log-out.png'
 const ProfileSideBar = () => {
   return (
-    <div className='w-fit h-fit p-10 bg-white rounded-lg shadow-lg flex flex-col gap-5 items-center align-middle mx-5'>
+    <div className='w-fit h-fit p-10 bg-white rounded-lg shadow-lg flex flex-col gap-5 items-center align-middle lg:mx-5'>
       <div className='justify-center flex gap-5 w-full mt-5'>
         <div className='relative'>
-          <div className='w-[150px] h-[150px] rounded-full overflow-hidden'>
+          <div className='lg:w-[150px] lg:h-[150px] w-[100px] h-[100px] rounded-full overflow-hidden'>
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" alt="" className='w-full h-full' />
           </div>
           <div className=''>
-            <label htmlFor="avatar" className='absolute bottom-0 right-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
+            <label htmlFor="avatar" className='absolute lg:bottom-0 lg:right-0 right-0 bottom-10 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
               <img src={change} alt="" className='w-5 h-5' />
             </label>
             <input id="avatar" type="file" className='hidden' />
@@ -34,7 +34,7 @@ const ProfileSideBar = () => {
           </div> */}
         </div>
       </div>
-      <div className='flex flex-col text-lg w-full'>
+      <div className='lg:flex flex-col text-lg w-full hidden'>
         <Link className='hover:rounded-xl hover:bg-[#C5D6F8] p-5' to={"/profile"}>
           Tổng quan
         </Link>

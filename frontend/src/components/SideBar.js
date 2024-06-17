@@ -137,7 +137,7 @@ const SideBar = () => {
                             </select>
                         </div>
                     </div>
-                    <div className='w-full'>
+                    {/* <div className='w-full'>
                         <label htmlFor="range" className='block mb-2 text-xl text-gray-900 font-semibold'>Số trang từ</label>
                         <div className='flex gap-2'>
 
@@ -145,7 +145,7 @@ const SideBar = () => {
                             <p className='text-2xl text-[50px]'>-</p>
                             <input type="text" id="range" className='border border-black rounded-lg w-[60px] h-[40px] p-2' />
                         </div>
-                    </div>
+                    </div> */}
                     <div className='w-full pt-5 flex justify-center'>
                         
                     <button onClick={filter} className='bg-blue-500 rounded-3xl w-[100px] h-[40px] text-center text-white text-x mb-10'>Lọc</button>

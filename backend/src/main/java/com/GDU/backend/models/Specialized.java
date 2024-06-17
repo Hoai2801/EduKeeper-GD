@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,4 +31,5 @@ public class Specialized {
 
     @Column(name = "specialized_slug", nullable = false, length = 200)
     private String specializedSlug;
+    
 }

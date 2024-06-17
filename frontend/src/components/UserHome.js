@@ -8,7 +8,7 @@ import DocumentCard from '../components/DocumentCard';
 const UserHome = () => {
   return (
     <div>
-      <div className='flex gap-5 justify-center'>
+      <div className='flex gap-5 justify-center flex-col lg:flex-row items-center'>
         <div className='bg-transparent text-center text-white font-bold bg-gradient-to-r from-orange-500 to-orange-300 w-[300px] h-[150px] rounded-lg p-3'>
           <h3 className='text-xl'>
             Tổng lượt tải về
