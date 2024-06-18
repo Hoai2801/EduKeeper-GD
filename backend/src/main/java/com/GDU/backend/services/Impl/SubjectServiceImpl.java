@@ -3,15 +3,16 @@ package com.GDU.backend.services.Impl;
 import com.GDU.backend.dtos.requests.SubjectDTO;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.models.Subject;
+import com.GDU.backend.models.SubjectSpecialized;
 import com.GDU.backend.repositories.SubjectRepository;
+import com.GDU.backend.repositories.SubjectSpecializedRepository;
 import com.GDU.backend.services.SpecializedService;
 import com.GDU.backend.services.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 public class SubjectServiceImpl implements SubjectService {
     private final SpecializedService specializedService;
     private final SubjectRepository subjectRepository;
+    private final SubjectSpecializedRepository subjectSpecializedRepository;
     
     @Override
     public List<Subject> getAllSubjects() {
@@ -36,21 +38,26 @@ public class SubjectServiceImpl implements SubjectService {
                 continue;
             }
             Subject newSubject = new Subject();
-            newSubject.setName(name);
-            newSubject.setSpecialized(specialized);
+            newSubject.setSubjectName(name);
             String normalized = Normalizer.normalize(subject.getName(), Normalizer.Form.NFD);
             Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
             String slug = pattern.matcher(normalized)
                     .replaceAll("")
                     .toLowerCase()
                     .replace(" ", "-");
-            newSubject.setSlug(slug);
+            newSubject.setSubjectSlug(slug);
             subjectRepository.save(newSubject);
         }
     }
 
     @Override
-    public List<Subject> getSubjectsBySpecialized(Long s) {
-        return subjectRepository.findAllBySpecializedId(s);
+    public List<Subject> getSubjectsBySpecializedId(Long specializedId) {
+        List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectsBySpecializedId(specializedId);
+        List<Subject> subjects = new ArrayList<>();
+        for (SubjectSpecialized subjectSpecialized : subjectSpecializeds) {
+            subjects.add(subjectSpecialized.getSubject());
+        }
+        return subjects;
     }
+
 }

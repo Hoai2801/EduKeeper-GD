@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -24,36 +25,38 @@ public class SpecializedServiceImpl implements SpecializedService {
     }
 
     @Override
-    public List<SpecializesWithCount> getSpecializedWithCount() {
-        List<Specialized> specializes = getSpecializes();
-        List<SpecializesWithCount> specializedWithCounts = new ArrayList<>();
-
-        for (Specialized specialized : specializes) {
-            try {
-                int documentsCount = documentService.countAllDocumentsBySpecialized(specialized.getId());
-                specializedWithCounts.add(SpecializesWithCount.builder()
-                        .specialized(specialized)
-                        .documentsCount(documentsCount)
-                        .build());
-            } catch (NonUniqueResultException e) {
-                // Handle the situation where multiple documents are associated with the same specialized entity
-                // Log the error or handle it in another way, such as skipping this specialized entity
-                // You can also modify the logic to aggregate the count from multiple documents
-                // For example, summing up the counts from all associated documents
-                System.err.println("Error: Multiple documents associated with specialized ID " + specialized.getId());
-                // Alternatively, you can skip this specialized entity
-                // continue;
-            } catch (Exception e) {
-                // Handle other exceptions
-                e.printStackTrace();
-            }
-        }
-
-        return specializedWithCounts;
+    public Specialized getSpecializedById(Long s) {
+        return specializedRepository.findById(s).orElse(null);
     }
 
     @Override
-    public Specialized getSpecializedById(Long s) {
-        return specializedRepository.findById(s).orElse(null);
+    public List<SpecializesWithCount> getSpecializedWithCount() {
+        try {
+            List<SpecializesWithCount> result = new ArrayList<>();
+            List<Specialized> specializedList = specializedRepository.findAll();
+            if (specializedList.isEmpty()) {
+                System.out.println("specializedList is empty");
+                return result;
+            }
+            specializedList.sort(Comparator.comparing(Specialized::getId));
+            for (Specialized specialized : specializedList) {
+                SpecializesWithCount specializesWithCount = new SpecializesWithCount();
+                specializesWithCount.setSpecialized(specialized);
+                System.out.println(specialized.getId());
+                int count = documentService.getDocumentsCountBySpecialized(specialized.getId());
+                System.out.println("count: " + count);
+//                specializesWithCount.setDocumentsCount(documentService.getDocumentsCountBySpecialized(specialized.getId()));
+                specializesWithCount.setDocumentsCount(count);
+                result.add(specializesWithCount);
+            }
+            return result;
+        } catch (NonUniqueResultException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Specialized> getSpecializedByDepartmentId(Long id) {
+        return specializedRepository.getSpecializedsByDepartmentId(id);
     }
 }

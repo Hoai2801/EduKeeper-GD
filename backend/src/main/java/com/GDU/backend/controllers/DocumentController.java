@@ -90,6 +90,15 @@ public class DocumentController {
             }
         });
     }
+    
+    @GetMapping("/author/{id}")
+    public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.getDocumentsByAuthor(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDocumentById(@PathVariable("id") Long id) {
@@ -158,14 +167,14 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/author/{authorName}")
-    public ResponseEntity<?> getDocumentsByAuthorName(@PathVariable("authorName") String authorName) {
-        try {
-            return ResponseEntity.ok(documentService.getDocumentsByAuthorName(authorName));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
+//    @GetMapping("/author/{authorName}")
+//    public ResponseEntity<?> getDocumentsByAuthorName(@PathVariable("authorName") String authorName) {
+//        try {
+//            return ResponseEntity.ok(documentService.getDocumentsByAuthorName(authorName));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+//        }
+//    }
 
     @PostMapping("/recommend")
     public ResponseEntity<?> getRecommendedDocuments(

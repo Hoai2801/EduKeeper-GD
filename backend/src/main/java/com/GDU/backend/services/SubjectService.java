@@ -9,5 +9,6 @@ public interface SubjectService {
     
     List<Subject> getAllSubjects();
     void createSubject(SubjectDTO subject);
-    List<Subject> getSubjectsBySpecialized(Long s);
+
+    List<Subject> getSubjectsBySpecializedId(Long specializedId);
 }

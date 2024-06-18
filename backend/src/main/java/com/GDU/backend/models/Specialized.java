@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -21,15 +22,14 @@ public class Specialized {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "specialized_name", nullable = false, length = 200)
+    @Column(name = "specialized_name", nullable = false, length = 50)
     private String specializedName;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    @JsonIgnore
-    private Department departmentID;
-
-    @Column(name = "specialized_slug", nullable = false, length = 200)
+    @Column(name = "specialized_slug", nullable = false, length = 100)
     private String specializedSlug;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
     
 }

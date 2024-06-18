@@ -202,11 +202,11 @@ const Navbar = () => {
                   <button onClick={() => setIsShownSpecialized(!isShowSpecialized)} className="group-hover/department:text-blue-700">
                     Ngành
                   </button>
-                  <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
+                  {/* <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                     {specialized && specialized.map((item, index) => (
                       <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`} onClick={() => setIsMobileMenuOpen(false)}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
                 <div className="flex flex-col gap-3 w-full items-center" >
                   <button onClick={() => setIsShownCategory(!isShowCategory)} className="group-hover/department:text-blue-700">

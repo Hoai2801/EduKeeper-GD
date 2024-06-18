@@ -1,5 +1,6 @@
 package com.GDU.backend.repositories;
 
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.models.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,12 +14,12 @@ import java.util.Optional;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     Document getDocumentBySlug(String slug);
 
-    @Query("SELECT d FROM Document d WHERE MONTH(d.upload_date) = MONTH(CURRENT_DATE())\n" +
-            "AND YEAR(d.upload_date) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")
+    @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
+            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")
     List<Document> getMostViewedDocuments(int limit);
 
-    @Query("SELECT d FROM Document d WHERE MONTH(d.upload_date) = MONTH(CURRENT_DATE())\n" +
-            "AND YEAR(d.upload_date) = YEAR(CURRENT_DATE()) ORDER BY d.download DESC LIMIT :limit")
+    @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
+            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.download DESC LIMIT :limit")
     List<Document> getMostDownloadedDocuments(int limit);
 
     @Query("SELECT d FROM Document d ORDER BY d.id DESC LIMIT :limit")
@@ -91,7 +92,21 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.slug = :slug")
     Optional<Document> findBySlug(String slug);
 
-    @Query("select count(d) from Document d where d.specialized.id = :id")
-    int countDocumentsBySpecializedId(@Param("id") Long id);
+//    @Query("SELECT d FROM Document d JOIN SubjectDocument sd JOIN SubjectSpecialized ss WHERE d.id = sd.document.id AND sd.subject.id = ss.subject.id AND ss.specialized.id = :id")
+//    int countDocumentsBySpecializedId(@Param("id") Long id);
 
+    @Query("select d from Document d where d.author.id = :id")
+    List<Document> findAllByAuthorId(Long id);
+
+    @Query(value = "SELECT\n" +
+            "    COUNT(d.id) AS document_count\n" +
+            "FROM\n" +
+            "    specialized s\n" +
+            "    LEFT JOIN subject_specialized ss ON s.id = ss.specialized_id\n" +
+            "    LEFT JOIN subject sj ON ss.subject_id = sj.id\n" +
+            "    LEFT JOIN subject_document sd ON sj.id = sd.subject_id\n" +
+            "    LEFT JOIN document d ON sd.document_id = d.id\n" +
+            "GROUP BY\n" +
+            "    s.specialized_name", nativeQuery = true)
+    int findAllBySpecializedId(Long id);
 }

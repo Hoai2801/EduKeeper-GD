@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import change from '../assets/change.png'
 import logout from '../assets/log-out.png'
 const ProfileSideBar = () => {
+  const [documentMenuShow, setDocumentMenuShow] = useState(false);
   return (
     <div className='w-fit h-fit p-10 bg-white rounded-lg shadow-lg flex flex-col gap-5 items-center align-middle lg:mx-5'>
       <div className='justify-center flex gap-5 w-full mt-5'>
@@ -38,9 +39,13 @@ const ProfileSideBar = () => {
         <Link className='hover:rounded-xl hover:bg-[#C5D6F8] p-5' to={"/profile"}>
           Tổng quan
         </Link>
-        <Link className='hover:rounded-xl hover:bg-[#C5D6F8] p-5' to={"upload"}>
-          Tài liệu đã đăng
-        </Link>
+        <button onClick={() => setDocumentMenuShow(!documentMenuShow)} className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 text-left'>
+        Quản lý tài liệu
+        </button>
+            <div className={`${documentMenuShow ? "block" : "hidden"} flex flex-col`}>
+                <Link className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>Tài liệu đã đăng</Link>
+                <Link className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>Tài liệu ưu thích</Link>
+            </div>
         <Link to={"information"} className='hover:rounded-xl hover:bg-[#C5D6F8] p-5'>
           Thông tin tài khoản
         </Link>

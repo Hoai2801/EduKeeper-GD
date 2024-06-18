@@ -61,14 +61,32 @@ export const Upload = () => {
       .catch(error => console.error(error));
   }, [])
 
-  console.log(selectedFile)
+  useEffect(() => {
+    console.log(selectedDepartment)
+    fetch('http://localhost:8080/api/v1/specializes/department/' + selectedDepartment?.id).then(response => response.json())
+      .then(data => {
+        console.log(data)
+        setListSpecialized(data)
+      })
+      .catch(error => console.error(error));
+  }, [selectedDepartment])
+
+  useEffect(() => {
+    console.log(specialized)
+    fetch('http://localhost:8080/api/v1/subjects/' + specialized).then(response => response.json())
+      .then(data => {
+        console.log(data)
+        setListSubject(data)
+      })
+      .catch(error => console.error(error));
+  }, [specialized])
 
   const uploadDocument = (event) => {
     event.preventDefault();
     const formData = new FormData();
     formData.append('document', selectedFile);
     formData.append('title', title);
-    // formData.append('department', selectedDepartment);
+    formData.append('department', selectedDepartment);
     formData.append('category', category);
     formData.append('description', description);
     formData.append('subject', subject);
@@ -174,7 +192,7 @@ export const Upload = () => {
               <option>Chọn môn</option>
               {
                 Array.isArray(listSubject) && listSubject.map(subject => (
-                  <option value={subject.id} key={subject.id}>{subject.name}</option>
+                  <option value={subject.id} key={subject.id}>{subject.subjectName}</option>
                 ))
               }
             </select>

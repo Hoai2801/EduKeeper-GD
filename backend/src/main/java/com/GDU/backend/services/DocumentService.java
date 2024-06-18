@@ -28,8 +28,6 @@ public interface DocumentService {
 
     List<DocumentResponseDTO> getLatestDocuments(int limit);
 
-    List<DocumentResponseDTO> getDocumentsByAuthorName(String authorName);
-
     List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO);
 
     List<DocumentResponseDTO> filterDocuments(FilterRequestDTO filterRequestDTO);
@@ -40,5 +38,7 @@ public interface DocumentService {
 
     int countAllDocuments();
 
-    int countAllDocumentsBySpecialized(Long id);
+    List<DocumentResponseDTO> getDocumentsByAuthor(Long id);
+
+    int getDocumentsCountBySpecialized(Long id);
 }

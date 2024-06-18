@@ -24,13 +24,23 @@ public class UploadRequestDTO {
 
     @NotEmpty
     @NotBlank
+    private int department;
+
+    @NotEmpty
+    @NotBlank
     private int specialized;
 
     @NotEmpty
     @NotBlank
     private int category;
 
+    @NotEmpty
+    @NotBlank
     private int subject;
+
+    @NotEmpty
+    @NotBlank
+    private Long userUpload;
 
     private String author;
 

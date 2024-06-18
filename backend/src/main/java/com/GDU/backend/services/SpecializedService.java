@@ -8,7 +8,9 @@ import java.util.List;
 public interface SpecializedService {
     List<Specialized> getSpecializes();
 
+    Specialized getSpecializedById(Long s);
+
     List<SpecializesWithCount> getSpecializedWithCount();
 
-    Specialized getSpecializedById(Long s);
+    List<Specialized> getSpecializedByDepartmentId(Long id);
 }

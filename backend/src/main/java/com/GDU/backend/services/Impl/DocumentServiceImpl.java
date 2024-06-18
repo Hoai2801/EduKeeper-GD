@@ -95,15 +95,14 @@ public class DocumentServiceImpl implements DocumentService {
                 .author(author)
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .path(destFile.getAbsolutePath())
-                .document_type(uploadRequestDTO.getDocument().getContentType())
-                .document_size(uploadRequestDTO.getDocument().getSize() / 1_000_000)
+                .documentType(uploadRequestDTO.getDocument().getContentType())
+                .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
                 .description(uploadRequestDTO.getDescription())
-                .subject(subject)
                 .pages(numberOfPages)
                 .category(category)
                 .thumbnail(thumbnail)
-                .specialized(specialized)
-                .upload_date(LocalDate.now())
+//                .specialized(specialized)
+                .uploadDate(LocalDate.now())
                 .build();
 
         documentRepository.save(newDocument);
@@ -170,7 +169,7 @@ public class DocumentServiceImpl implements DocumentService {
                                 .toLowerCase() + "-" + new Date().getTime() :
                         existDocument.getSlug()
         );
-        existDocument.setSpecialized(existDocument.getSpecialized());
+//        existDocument.setSpecialized(existDocument.getSpecialized());
 
         // I think we don't need update a document file 
         // any more because we should upload a new one instead
@@ -290,12 +289,6 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponseDTO> getDocumentsByAuthorName(String authorName) {
-        return documentRepository.getDocumentsByAuthorName(authorName)
-                .stream().map(this::convertToDocumentResponse).toList();
-    }
-
-    @Override
     public List<DocumentResponseDTO> filterDocuments(FilterRequestDTO filterRequestDTO) {
         List<Document> documents = documentRepository.getDocumentsByFilter(
                 filterRequestDTO.getDepartmentSlug(),
@@ -370,8 +363,14 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public int countAllDocumentsBySpecialized(Long id) {
-        return documentRepository.countDocumentsBySpecializedId(id);
+    public List<DocumentResponseDTO> getDocumentsByAuthor(Long id) {
+        List<Document> documents = documentRepository.findAllByAuthorId(id);
+        return documents.stream().map(this::convertToDocumentResponse).toList();
+    }
+
+    @Override
+    public int getDocumentsCountBySpecialized(Long id) {
+        return documentRepository.findAllBySpecializedId(id);
     }
 
     public DocumentResponseDTO convertToDocumentResponse(Document document) {
@@ -388,16 +387,15 @@ public class DocumentServiceImpl implements DocumentService {
                 .views(document.getViews())
                 .download(document.getDownload())
                 .author(author)
-                .specialized(document.getSpecialized())
+//                .specialized(document.getSpecialized())
                 .category(document.getCategory())
-                .subject(document.getSubject())
-                .upload_date(document.getUpload_date())
+                .upload_date(document.getUploadDate())
                 .path(document.getPath())
                 .thumbnail(document.getThumbnail())
                 .pages(document.getPages())
                 .description(document.getDescription())
-                .document_type(document.getDocument_type())
-                .document_size(document.getDocument_size())
+                .document_type(document.getDocumentType())
+                .document_size(document.getDocumentSize())
                 .build();
     }
 

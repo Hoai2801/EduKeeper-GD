@@ -65,7 +65,7 @@ public class AuthenticationService {
                 .staffCode(registerRequest.getStaffCode())
                 .roles(role)
                 .accountLocked(false)
-                .enabled(false)
+                .enable(false)
                 .build();
 
         userRepository.save(user);
@@ -131,7 +131,7 @@ public class AuthenticationService {
         if (user.isEnabled()) {
             throw new RuntimeException("User already activated");
         }
-        user.setEnabled(true);
+        user.setEnable(true);
         userRepository.save(user);
 //        tokenRepository.delete(dbToken);
         return "activated";
