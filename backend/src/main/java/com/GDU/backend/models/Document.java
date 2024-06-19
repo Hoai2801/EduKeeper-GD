@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -19,39 +21,50 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 200)
     private String title;
 
+    @Column(nullable = false, length = 300)
     private String slug;
 
-    private String document_type;
+    @Column(nullable = false, length = 30)
+    private String documentType;
 
-    private Long document_size;
+    @Column(nullable = false)
+    private Long documentSize;
 
-    private LocalDate upload_date;
+    @Column(nullable = false)
+    private Integer pages;
     
-    private String thumbnail;
+    @Column
+    private String description;
 
+    @Column(nullable = false)
+    private LocalDate uploadDate;
+
+    @Column(nullable = false, length = 500)
     private String path;
 
-    @ManyToOne
-    @JoinColumn(name = "author", nullable = false)
-    private User author;
-
-    @ManyToOne
-    @JoinColumn(name = "specialized_id")
-    private Specialized specialized;
-
-    @ManyToOne
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
+    @Column(nullable = false, length = 500)
+    private String thumbnail;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    private int views;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_upload", nullable = false)
+    private User userUpload;
+    
+    private String author;
 
+    @Column(nullable = false)
     private int download;
 
-    private int pages;
+    @Column(nullable = false)
+    private int views;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 }

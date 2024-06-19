@@ -1,5 +1,6 @@
 package com.GDU.backend.repositories;
 
+import com.GDU.backend.dtos.responses.SpecializesWithCount;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Specialized;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,18 +14,13 @@ public interface SpecializedRepository extends JpaRepository<Specialized, Long> 
     @Query("SELECT s FROM Specialized s WHERE s.id > :id")
     List<Specialized> findAllFromId(Long id);
 
-    @Query("SELECT s FROM Specialized s WHERE s.departmentID.id = :departmentID")
+    @Query("SELECT s FROM Specialized s WHERE s.department.id = :departmentID")
     List<Specialized> findAllFromDepartment(Long departmentID);
 
-    @Query("SELECT d FROM Document d WHERE d.specialized.specializedSlug = :specializedSlug ORDER BY d.id DESC")
-    List<Document> getLastestDocumentsBySpecializedSlug(String specializedSlug);
-
-    @Query("SELECT d FROM Document d WHERE d.specialized.id = :specializedId ORDER BY d.id DESC")
-    List<Document> getLastestDocumentsBySpecialized(Long specializedId);
-
-    @Query("SELECT s FROM Specialized s WHERE s.departmentID.id = :id")
+    @Query("SELECT s FROM Specialized s WHERE s.department.id = :id")
     List<Specialized> getSpecializedsByDepartmentId(Long id);
 
-    @Query("SELECT s FROM Specialized s WHERE s.departmentID.departmentSlug = :slug")
+    @Query("SELECT s FROM Specialized s WHERE s.department.departmentSlug = :slug")
     List<Specialized> getSpecializedsByDepartmentSlug(String slug);
+
 }

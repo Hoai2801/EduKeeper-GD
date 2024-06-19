@@ -83,12 +83,22 @@ public class DocumentController {
     ) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                System.out.println(uploadRequestDTO.toString());
                 return ResponseEntity.ok(documentService.uploadDocument(uploadRequestDTO));
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Error uploading document: " + e.getMessage());
             }
         });
+    }
+    
+    @GetMapping("/author/{id}")
+    public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.getDocumentsByAuthor(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -158,14 +168,6 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/author/{authorName}")
-    public ResponseEntity<?> getDocumentsByAuthorName(@PathVariable("authorName") String authorName) {
-        try {
-            return ResponseEntity.ok(documentService.getDocumentsByAuthorName(authorName));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
 
     @PostMapping("/recommend")
     public ResponseEntity<?> getRecommendedDocuments(

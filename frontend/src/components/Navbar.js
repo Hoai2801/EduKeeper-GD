@@ -11,11 +11,12 @@ const Navbar = () => {
   if (token !== "undefined" && token !== null) {
     jwt = jwtDecode(token);
   }
+  console.log(jwt)
 
   // const [isShowProfile, setIsShownProfile] = useState(false);
   const [isShowSpecialized, setIsShownSpecialized] = useState(false);
   const [isShowCategory, setIsShownCategory] = useState(false);
-  // const [isSubMenShow, setIsSubMenuShown] = useState(false);
+  const [isSubMenuShow, setIsSubMenuShown] = useState(false);
 
   const [searchTerm, setSearch] = useState("");
 
@@ -155,7 +156,34 @@ const Navbar = () => {
 
         <>
           <div className="flex gap-5 justify-end w-[500px]">
+            <div className="flex text-center">
+                {jwt ? (
+                  <div>
 
+                  <button
+                    onClick={() => {
+                      setIsSubMenuShown(!isSubMenuShow);
+                    }}
+                    className="lg:mt-2 mt-3 lg:text-xl md:flex gap-3 hidden"
+                    >
+                    Chào {jwt.user_name}
+                    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="" className="w-8 h-8 rounded-full" />
+                  </button>
+                  <div className={`bg-white absolute flex flex-col max-w-[300px] w-[300px] overflow-hidden h-[300px] top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`} onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}>
+                      <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Trang cá nhân</Link>
+                      <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>
+                      <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Đăng xuất</Link>
+                  </div>
+                    </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2"
+                  >
+                    Đăng nhập
+                  </Link>
+                )}
+            </div>
             {/* mobile menu button */}
             <div className="lg:hidden w-[50px]">
               <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="w-[50px] pr-5 mt-3">
@@ -174,11 +202,11 @@ const Navbar = () => {
                   <button onClick={() => setIsShownSpecialized(!isShowSpecialized)} className="group-hover/department:text-blue-700">
                     Ngành
                   </button>
-                  <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
+                  {/* <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                     {specialized && specialized.map((item, index) => (
                       <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`} onClick={() => setIsMobileMenuOpen(false)}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
                 <div className="flex flex-col gap-3 w-full items-center" >
                   <button onClick={() => setIsShownCategory(!isShowCategory)} className="group-hover/department:text-blue-700">

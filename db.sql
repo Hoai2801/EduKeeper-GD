@@ -8,8 +8,7 @@ CREATE TABLE `department` (
                               `id` smallint NOT NULL AUTO_INCREMENT,
                               `department_name` varchar(100) NOT NULL,
                               `department_slug` varchar(100) not null,
-                              PRIMARY KEY (`id`),
-                              KEY `idx_department_name` (`department_name`)
+                              PRIMARY KEY (`id`)
 );
 
 INSERT INTO `department` (`department_name`, `department_slug`)
@@ -30,14 +29,15 @@ VALUES
     ('Ngôn ngữ anh', 'ngon-ngu-anh'),
     ('Đông phương học', 'dong-phuong-hoc'),
     ('Truyền thông đa phương tiện', 'truyen-thong-da-phuong-tien'),
-    ('Quan hệ công chúng', 'quan-he-cong-chung');
+    ('Quan hệ công chúng', 'quan-he-cong-chung'),
+    ('Tất cả', 'tat-ca');
 
 
 DROP TABLE IF EXISTS `specialized`;
 
 -- Chuyên ngành
 CREATE TABLE `specialized` (
-                               id smallint not null auto_increment,
+                               id int not null auto_increment,
                                `specialized_name` varchar(50) not null,
                                `specialized_slug` varchar(100) not null,
                                `department_id` smallint not null,
@@ -94,28 +94,34 @@ DROP TABLE IF EXISTS `subject`;
 CREATE TABLE subject(
 	`id` int primary key not null auto_increment,
     `subject_name` varchar(50) not null,
-    `subject_slug` varchar(80) not null,
-    `specialized_id` smallint not null,
-    CONSTRAINT `specialized_fk`
-	FOREIGN KEY (`specialized_id`)
-	REFERENCES `specialized` (`id`)
+    `subject_slug` varchar(80) not null
 );
 
-insert into	`subject` values(1, 'toán cao cấp', 'toan-cao-cap', 18);
+CREATE TABLE `subject_specialized` (
+	`id` int primary key not null auto_increment,
+    `subject_id` int not null,
+    `specialized_id` int not null,
+                         CONSTRAINT `subject_fk_sjsc` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
+                         CONSTRAINT `specialized_fk_sjsc` FOREIGN KEY (`specialized_id`) REFERENCES `specialized` (`id`)
+);
+
+create table `role` (
+	`id` tinyint not null auto_increment primary key,
+    `name` varchar(100) not null
+);
 
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
                          `id` int NOT NULL AUTO_INCREMENT,
                          `user_name` varchar(200) NOT NULL,
---                          `department_id` smallint NOT NULL,
                          `password` varchar(200) NOT NULL,
                          `role_id` tinyint NOT NULL,
                          `account_locked` boolean not null default false,
                          `enable` boolean not null default false,
                          `email` varchar(50) not null,
-                         `created_date` datetime not null,
-                         `last_modified_date` datetime not null,
+                         `created_date` datetime,
+                         `last_modified_date` datetime,
 						`staff_code` varchar(20) not null,
                          PRIMARY KEY (`id`),
                          KEY `role_id` (`role_id`),
@@ -128,19 +134,19 @@ DROP TABLE IF EXISTS `category`;
 
 -- dùng để phân loại tài liệu như là tiểu luận, sách, bài báo nghiên cứu khoa học, tài liệu tham khảo, giáo trình...
 CREATE TABLE `category` (
-                            `id` tinyint NOT NULL AUTO_INCREMENT,
+                            `id` int NOT NULL AUTO_INCREMENT,
                             `category_name` varchar(50) NOT NULL,
                             `category_slug` varchar(100) not null,
                             PRIMARY KEY (`id`),
                             KEY `idx_category_name` (`category_name`)
 );
 
-INSERT INTO `category` (`category_name`)
+INSERT INTO `category` (`category_name`, `category_slug`)
 VALUES
-    ('Sách'),
-    ('Tiểu luận'),
-    ('Nghiên cứu khoa học'),
-    ('Giáo trình');
+    ('Sách', 'sach'),
+    ('Tiểu luận', 'tieu-luan'),
+    ('Nghiên cứu khoa học', 'nghien-cuu-khoa-hoc'),
+    ('Giáo trình', 'giao-trinh');
 
 DROP TABLE IF EXISTS `document`;
 
@@ -155,22 +161,31 @@ CREATE TABLE `document` (
                             `upload_date` date NOT NULL,
 							-- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
-                            `specialized_id` smallint DEFAULT NULL,
-                            `subject_id` int not null,
-                            `category_id` tinyint DEFAULT NULL,
+                            `description` varchar(2000) NOT NULL,
+                            `category_id` int DEFAULT NULL,
                             `thumbnail` varchar(200),
-                            `author` int NOT NULL,
+                            `author` varchar(100) NOT NULL,
+                            `user_upload` int not null,
                             `download` int not null,
                             `views` int not null,
                             PRIMARY KEY (`id`),
-                            KEY `document_ibfk_1` (`specialized_id`),
                             KEY `document_ibfk_2` (`category_id`),
-                            KEY `document_ibfk_3` (`subject_id`),
                             KEY `document_ibfk_4` (`author`),
-                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`specialized_id`) REFERENCES `specialized` (`id`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
-                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`author`) REFERENCES `users` (`id`)
+                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`)
+);
+
+CREATE TABLE subject_document(
+	`id` int primary key not null auto_increment,
+    `subject_id` int not null,
+    `document_id` int not null,
+    CONSTRAINT `subject_dcm_fk`
+	FOREIGN KEY (`subject_id`)
+    references `subject`(`id`),
+    constraint `document_fk_dcm`
+    foreign key (`document_id`)
+    references`document`(`id`)
+    
 );
 
 DROP TABLE IF EXISTS `favorite`;
@@ -206,5 +221,5 @@ create index idx_views on document (views);
 create index idx_upload_date on document (upload_date);
 create index idx_department_slug on department (department_slug);
 create index idx_specialized_slug on specialized (specialized_slug);
-create index idx_category_name on category (category_name);
+-- create index idx_category_name on category (category_name);
 ALTER TABLE `document` ADD FULLTEXT INDEX `title_index` (`title`);

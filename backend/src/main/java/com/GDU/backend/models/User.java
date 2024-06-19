@@ -47,7 +47,7 @@ public class User implements UserDetails, Principal {
     @Column(name = "account_locked")
     private boolean accountLocked;
 
-    private boolean enabled;
+    private boolean enable;
 
     @CreatedDate
     @Column(name = "created_date", updatable = false, nullable = false)
@@ -94,6 +94,6 @@ public class User implements UserDetails, Principal {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enable;
     }
 }

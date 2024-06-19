@@ -5,26 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
-
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "subject")
-public class Subject {
-
+public class SubjectDocument {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "subject_name", nullable = false, length = 50)
-    private String subjectName;
+    @ManyToOne
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
 
-    @Column(name = "subject_slug", nullable = false, length = 80)
-    private String subjectSlug;
-
+    @ManyToOne
+    @JoinColumn(name = "document_id", nullable = false)
+    private Document document;
 }

@@ -24,4 +24,9 @@ public class SpecializedController {
     public List<SpecializesWithCount> getDocumentsCountBySpecialized() {
         return specializedService.getSpecializedWithCount();
     }
+    
+    @GetMapping("/department/{id}")
+    public List<Specialized> getSpecializedByDepartmentId(@PathVariable("id") Long id) {
+        return specializedService.getSpecializedByDepartmentId(id);
+    }
 }

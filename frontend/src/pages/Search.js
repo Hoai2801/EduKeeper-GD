@@ -52,23 +52,23 @@ const Search = () => {
       });
   }, [url, order, slugSpecialized, slugSubject, publishYear, category])
 
-  const [limit, setLimit] = useState(30)
+  const [limit, setLimit] = useState(20)
 
   return (
     <div className='w-full pr-10'>
-      <h2 className='text-[28px] font-bold text-center mt-10 mb-5'>Tài liệu ({documents && documents.length})</h2>
+      <h2 className='text-[28px] font-bold text-center mt- mb-5'>Tài liệu ({documents && documents.length})</h2>
       <div className='my-5 flex gap-5 h-fit flex-wrap justify-center'>
         {documents && documents.map((item, index) => {
           if (index < limit) {
             return (
-              <DocumentCard key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug} />
+              <DocumentCard key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} subject={item.subject} />
             )
           }
         }
         )}
       </div>
       <div className='flex justify-center my-10'>
-        <button onClick={() => setLimit(limit + 30)} className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</button>
+        <button onClick={() => setLimit(limit + 30)} className={`text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 ${documents.length <= limit ? 'hidden' : ''}`}>Xem thêm</button>
       </div>
     </div>
   )

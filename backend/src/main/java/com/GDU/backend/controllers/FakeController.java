@@ -67,7 +67,7 @@ public class FakeController {
                 // todo: fix author
                 .author("22140044")
                 .specialized(faker.number().numberBetween(1, 39))
-                .subject(1)
+                .subject(1L)
                 .category(faker.number().numberBetween(1, 5))
                 .description(faker.chuckNorris().fact())
                 .document(result)
