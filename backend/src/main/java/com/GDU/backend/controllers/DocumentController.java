@@ -168,14 +168,6 @@ public class DocumentController {
         }
     }
 
-//    @GetMapping("/author/{authorName}")
-//    public ResponseEntity<?> getDocumentsByAuthorName(@PathVariable("authorName") String authorName) {
-//        try {
-//            return ResponseEntity.ok(documentService.getDocumentsByAuthorName(authorName));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-//        }
-//    }
 
     @PostMapping("/recommend")
     public ResponseEntity<?> getRecommendedDocuments(

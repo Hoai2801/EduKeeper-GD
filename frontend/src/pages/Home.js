@@ -39,6 +39,8 @@ const Home = () => {
         <div className='ml-5 flex flex-col gap-5 items-center'>
           {mostDownloaded?.map((item, index) => (
             <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} 
+            subject={item.subject}
+            
             // specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug}
              />
           ))}
@@ -50,6 +52,8 @@ const Home = () => {
         <div className='ml-5 flex flex-col gap-5 mt-5 items-center'>
           {mostViewed?.map((item, index) => (
             <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} 
+            subject={item.subject}
+            
             // specialized={item.specialized.specializedName} specializedSlug={item.specialized.specializedSlug} 
             />
           ))}

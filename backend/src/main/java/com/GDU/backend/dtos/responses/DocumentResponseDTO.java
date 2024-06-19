@@ -34,10 +34,10 @@ public class DocumentResponseDTO {
     
     private String description;
     
-    private UserResponse author;
-
-    private Specialized specialized;
+    private UserResponse user_upload;
     
+    private String author;
+
     private Subject subject;
     
     private Category category;

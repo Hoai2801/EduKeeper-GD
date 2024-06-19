@@ -51,24 +51,22 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> getDocumentsBySlugSpecialized(@Param("slug") String slug);
 
     @Query(value = "SELECT d.* FROM document d " +
-            "JOIN specialized s ON s.id = d.specialized_id " +
+            "JOIN subject_specialized ss ON ss.subject_id = d.subject_id " +
+            "JOIN specialized s ON s.id = ss.specialized_id " +
             "JOIN category c ON c.id = d.category_id " +
             "JOIN subject sj ON sj.id = d.subject_id " +
             "JOIN department dm ON dm.id = s.department_id " +
-            "WHERE (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
-            +
-            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))"
-            +
-            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))"
-            +
-            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))"
-            +
+            "WHERE (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))" +
+            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))" +
+            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))" +
+            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))" +
             "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) ", nativeQuery = true)
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,
                                         @Param("subjectName") String subjectName,
                                         @Param("specializedSlug") String specializedSlug,
                                         @Param("categoryName") String categoryName);
+
 
     // Get total number of documents this year
     @Query(value = "SELECT count(*) FROM document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01'))", nativeQuery = true)

@@ -42,7 +42,6 @@ const Detail = () => {
     fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
       .then((res) => res.blob())
       .then((blob) => {
-        console.log(blob)
         setFile(blob)
       });
 
@@ -81,12 +80,15 @@ const Detail = () => {
   return (
     <div>
       <div className='pt-[50px] md:px-5 px-2'>
-        <p className='text-blue-500'><Link to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> - <Link to={`/search?specialized=${data?.subject?.specialized.specializedSlug}`}>{data?.subject?.specialized.specializedName}</Link></p>
+        <p className='text-blue-500'><Link to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> - 
+        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}>{data?.subject?.subjectName}</Link>
+        </p>
         {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
         <h2 className='text-[28px] font-bold max-w-[900px]'>{data?.title}</h2>
         <div className='flex justify-between mt-3 md:flex-row flex-col'>
           <div>
-            <p>Tác giả: <span className='text-blue-500'>{data?.author.username}</span></p>
+            <p>Người đăng: <span className='text-blue-500'>{data?.user_upload.username}</span></p>
+            <p>Tác giả: <span className=''>{data?.author}</span></p>
             <p>Ngày đăng: {data?.upload_date}</p>
             <p>Trang: {data?.pages}</p>
           </div>

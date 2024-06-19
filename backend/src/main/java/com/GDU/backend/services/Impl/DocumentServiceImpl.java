@@ -373,7 +373,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     public DocumentResponseDTO convertToDocumentResponse(Document document) {
         // only need show name of user
-        UserResponse author = UserResponse.builder()
+        UserResponse userUpload = UserResponse.builder()
                 .id(document.getUserUpload().getId())
                 .username(document.getUserUpload().getName())
                 .staffCode(document.getUserUpload().getStaffCode())
@@ -384,8 +384,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .slug(document.getSlug())
                 .views(document.getViews())
                 .download(document.getDownload())
-                .author(author)
-//                .specialized(document.getSpecialized())
+                .user_upload(userUpload)
+                .author(document.getAuthor())
                 .category(document.getCategory())
                 .upload_date(document.getUploadDate())
                 .subject(document.getSubject())
