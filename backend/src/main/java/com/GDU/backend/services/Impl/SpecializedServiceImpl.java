@@ -42,9 +42,7 @@ public class SpecializedServiceImpl implements SpecializedService {
             for (Specialized specialized : specializedList) {
                 SpecializesWithCount specializesWithCount = new SpecializesWithCount();
                 specializesWithCount.setSpecialized(specialized);
-                System.out.println(specialized.getId());
                 int count = documentService.getDocumentsCountBySpecialized(specialized.getId());
-                System.out.println("count: " + count);
 //                specializesWithCount.setDocumentsCount(documentService.getDocumentsCountBySpecialized(specialized.getId()));
                 specializesWithCount.setDocumentsCount(count);
                 result.add(specializesWithCount);

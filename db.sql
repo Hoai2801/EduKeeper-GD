@@ -164,14 +164,15 @@ CREATE TABLE `document` (
                             `description` varchar(2000) NOT NULL,
                             `category_id` int DEFAULT NULL,
                             `thumbnail` varchar(200),
-                            `author` int NOT NULL,
+                            `author` varchar(100) NOT NULL,
+                            `user_upload` int not null,
                             `download` int not null,
                             `views` int not null,
                             PRIMARY KEY (`id`),
                             KEY `document_ibfk_2` (`category_id`),
                             KEY `document_ibfk_4` (`author`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`author`) REFERENCES `users` (`id`)
+                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`)
 );
 
 CREATE TABLE subject_document(

@@ -53,8 +53,10 @@ public class Document {
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author", nullable = false)
-    private User author;
+    @JoinColumn(name = "user_upload", nullable = false)
+    private User userUpload;
+    
+    private String author;
 
     @Column(nullable = false)
     private int download;
@@ -62,6 +64,7 @@ public class Document {
     @Column(nullable = false)
     private int views;
 
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<SubjectDocument> subjectDocuments;
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 }

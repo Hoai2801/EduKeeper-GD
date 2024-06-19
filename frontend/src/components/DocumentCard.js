@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const DocumentCard = ({ title, author, upload_date, slug, thumbnail, specialized, specializedSlug }) => {
+const DocumentCard = ({ title, author, upload_date, slug, thumbnail, subject }) => {
   return (
     <div className='p-3 rounded-lg bg-white flex flex-col border h-[580px] lg:w-[350px] min-w-[350px] gap-5 shadow-sm w-[95%]'>
       <Link to={`/document/${slug}`}>
@@ -9,7 +9,7 @@ const DocumentCard = ({ title, author, upload_date, slug, thumbnail, specialized
           {thumbnail ? <img src={"http://localhost:8080/api/v1/images/" + thumbnail} alt="" className='w-full h-full' /> : <img src="https://via.placeholder.com/150" alt="" />}
         </div>
         <div className='h-[50px] w-full pt-2'>
-          <Link to={`/search?specialized=${specializedSlug}`} className='text-purple-600 text-[16px] font-semibold'>{specialized}</Link>
+          <Link to={`/search?subject=${subject.subjectSlug}`} className='text-purple-600 text-[16px] font-semibold'>{subject.subjectName}</Link>
         </div>
         <div className='w-full flex flex-col gap-2'>
           <div className='min-h-[45px] h-fit'>

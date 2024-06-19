@@ -20,6 +20,7 @@ export const Upload = () => {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [listSpecialized, setListSpecialized] = useState(null);
   const [listSubject, setListSubject] = useState(null);
+  const [author, setAuthor] = useState(null);
 
   const token = localStorage.getItem("token");
   let jwt = null;
@@ -86,12 +87,13 @@ export const Upload = () => {
     const formData = new FormData();
     formData.append('document', selectedFile);
     formData.append('title', title);
-    formData.append('department', selectedDepartment);
+    formData.append('department', selectedDepartment.id);
     formData.append('category', category);
     formData.append('description', description);
     formData.append('subject', subject);
     formData.append('specialized', specialized);
-    formData.append('author', jwt.staff_code);
+    formData.append('userUpload', jwt.staff_code);
+    formData.append('author', author);
 
     console.log(formData)
     fetch('http://localhost:8080/api/v1/documents/upload', {
@@ -110,6 +112,7 @@ export const Upload = () => {
           setListSpecialized(null)
           setSubject('')
           setTitle('')
+          setAuthor(null)
         }
       })
       .catch(error => console.error(error));
@@ -201,6 +204,12 @@ export const Upload = () => {
             <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Giáo viên</label>
             <input type="text" id="teacher" name="teacher" placeholder="" required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500" disabled value={jwt.user_name} />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Tác giả</label>
+            <input type="text" id="teacher" name="teacher" placeholder="" required
+              onChange={e => setAuthor(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500" />
           </div>
           <div className="mb-6">
             <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Mô tả</label>

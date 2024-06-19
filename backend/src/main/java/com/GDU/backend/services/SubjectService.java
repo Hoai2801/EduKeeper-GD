@@ -11,4 +11,6 @@ public interface SubjectService {
     void createSubject(SubjectDTO subject);
 
     List<Subject> getSubjectsBySpecializedId(Long specializedId);
+
+    Subject getSubjectById(Long id);
 }

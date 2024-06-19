@@ -26,7 +26,8 @@ const Home = () => {
         <div className='lg:ml-5 flex lg:justify-between gap-5 overflow-auto flex-wrap justify-center'>
           {lastedDocuments && lastedDocuments?.map((item, index) => (
             <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} 
-            specialized={item.subject.specialized.specializedName} specializedSlug={item.subject.specialized.specializedSlug} 
+            subject={item.subject}
+            // specialized={item.subject.specialized.specializedName} specializedSlug={item.subject.specialized.specializedSlug} 
             />
           ))}
         </div>

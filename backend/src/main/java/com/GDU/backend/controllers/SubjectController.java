@@ -27,7 +27,6 @@ public class SubjectController {
     
     @PostMapping
     ResponseEntity<?> createSubject(@RequestBody SubjectDTO subject) {
-        System.out.println(subject.getName());
         subjectService.createSubject(subject);
         return ResponseEntity.ok().body("Subject created successfully");
     }

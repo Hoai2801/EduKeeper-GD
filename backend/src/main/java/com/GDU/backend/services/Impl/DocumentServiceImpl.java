@@ -8,10 +8,9 @@ import com.GDU.backend.dtos.responses.TotalResponse;
 import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
-import com.GDU.backend.repositories.CategoryRepository;
-import com.GDU.backend.repositories.DocumentRepository;
-import com.GDU.backend.repositories.SpecializedRepository;
+import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.DocumentService;
+import com.GDU.backend.services.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -45,21 +44,21 @@ public class DocumentServiceImpl implements DocumentService {
     private final CategoryRepository categoryRepository;
     private final SpecializedRepository specializedRepository;
     private final UserServiceImpl userService;
+    private final SubjectRepository subjectRepository;
+    private final SubjectDocumentRepository subjectDocumentRepository;
 
     @Override
     public String uploadDocument(UploadRequestDTO uploadRequestDTO) throws IOException {
-        Category category = categoryRepository.findById((long) uploadRequestDTO.getCategory())
+        // TODO: convert to service
+        Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        Specialized specialized = specializedRepository.findById((long) uploadRequestDTO.getSpecialized())
+        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
                 .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
-
-        // todo: add subject model
-        Subject subject = Subject.builder()
-                .id((long) uploadRequestDTO.getSubject())
-                .build();
-
-        // author is the user who uploads by default
-        User author = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
+        
+        Subject subject = subjectRepository.findById(uploadRequestDTO.getSubject())
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
+        
+        User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
         File destFile = new File(UPLOAD_DIR + fileName);
@@ -77,7 +76,6 @@ public class DocumentServiceImpl implements DocumentService {
         if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".pdf")) {
             numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
             thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
-
         } else if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".docx") || uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".doc")) {
             try {
                 File file = new File(destFile.getAbsolutePath());
@@ -92,7 +90,8 @@ public class DocumentServiceImpl implements DocumentService {
 
         Document newDocument = Document.builder()
                 .title(uploadRequestDTO.getTitle())
-                .author(author)
+                .author(uploadRequestDTO.getAuthor())
+                .userUpload(userUpload)
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .path(destFile.getAbsolutePath())
                 .documentType(uploadRequestDTO.getDocument().getContentType())
@@ -101,12 +100,11 @@ public class DocumentServiceImpl implements DocumentService {
                 .pages(numberOfPages)
                 .category(category)
                 .thumbnail(thumbnail)
+                .subject(subject)
 //                .specialized(specialized)
                 .uploadDate(LocalDate.now())
                 .build();
-
         documentRepository.save(newDocument);
-
         return "Document uploaded successfully";
     }
 
@@ -152,7 +150,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (newAuthor == null) {
             return "Author not existing";
         }
-        existDocument.setAuthor(newAuthor);
+        existDocument.setUserUpload(newAuthor);
 
         Category category = categoryRepository.findById((long) uploadRequestDTO.getCategory()).orElse(null);
         // Update document
@@ -376,9 +374,9 @@ public class DocumentServiceImpl implements DocumentService {
     public DocumentResponseDTO convertToDocumentResponse(Document document) {
         // only need show name of user
         UserResponse author = UserResponse.builder()
-                .id(document.getAuthor().getId())
-                .username(document.getAuthor().getName())
-                .staffCode(document.getAuthor().getStaffCode())
+                .id(document.getUserUpload().getId())
+                .username(document.getUserUpload().getName())
+                .staffCode(document.getUserUpload().getStaffCode())
                 .build();
         return DocumentResponseDTO.builder()
                 .id(document.getId())
@@ -390,6 +388,7 @@ public class DocumentServiceImpl implements DocumentService {
 //                .specialized(document.getSpecialized())
                 .category(document.getCategory())
                 .upload_date(document.getUploadDate())
+                .subject(document.getSubject())
                 .path(document.getPath())
                 .thumbnail(document.getThumbnail())
                 .pages(document.getPages())

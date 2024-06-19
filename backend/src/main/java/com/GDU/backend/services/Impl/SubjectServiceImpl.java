@@ -60,4 +60,9 @@ public class SubjectServiceImpl implements SubjectService {
         return subjects;
     }
 
+    @Override
+    public Subject getSubjectById(Long id) {
+        return subjectRepository.findById(id).orElse(null);
+    }
+
 }

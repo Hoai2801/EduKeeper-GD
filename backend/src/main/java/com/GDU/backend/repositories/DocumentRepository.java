@@ -95,18 +95,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 //    @Query("SELECT d FROM Document d JOIN SubjectDocument sd JOIN SubjectSpecialized ss WHERE d.id = sd.document.id AND sd.subject.id = ss.subject.id AND ss.specialized.id = :id")
 //    int countDocumentsBySpecializedId(@Param("id") Long id);
 
-    @Query("select d from Document d where d.author.id = :id")
+    @Query("select d from Document d where d.userUpload.id = :id")
     List<Document> findAllByAuthorId(Long id);
 
-    @Query(value = "SELECT\n" +
-            "    COUNT(d.id) AS document_count\n" +
-            "FROM\n" +
-            "    specialized s\n" +
-            "    LEFT JOIN subject_specialized ss ON s.id = ss.specialized_id\n" +
-            "    LEFT JOIN subject sj ON ss.subject_id = sj.id\n" +
-            "    LEFT JOIN subject_document sd ON sj.id = sd.subject_id\n" +
-            "    LEFT JOIN document d ON sd.document_id = d.id\n" +
-            "GROUP BY\n" +
-            "    s.specialized_name", nativeQuery = true)
+    @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id")
     int findAllBySpecializedId(Long id);
 }
