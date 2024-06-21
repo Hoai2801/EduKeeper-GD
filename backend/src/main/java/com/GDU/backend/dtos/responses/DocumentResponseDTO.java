@@ -1,7 +1,6 @@
 package com.GDU.backend.dtos.responses;
 
 import com.GDU.backend.models.Category;
-import com.GDU.backend.models.Specialized;
 import com.GDU.backend.models.Subject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ import java.time.LocalDate;
 public class DocumentResponseDTO {
 
     private Long id;
-    
+
     private String title;
 
     private String slug;
@@ -29,17 +28,17 @@ public class DocumentResponseDTO {
     private LocalDate upload_date;
 
     private String thumbnail;
-
+    private String status;
     private String path;
-    
+
     private String description;
-    
+
     private UserResponse user_upload;
-    
+
     private String author;
 
     private Subject subject;
-    
+
     private Category category;
 
     private int views;

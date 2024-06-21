@@ -1,10 +1,14 @@
 package com.GDU.backend.controllers;
 
+import com.GDU.backend.dtos.requests.DownloadDTO;
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.services.DocumentService;
+
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -79,8 +83,7 @@ public class DocumentController {
     @Async
     @PostMapping("/upload")
     public CompletableFuture<ResponseEntity<String>> uploadDocument(
-            @ModelAttribute UploadRequestDTO uploadRequestDTO
-    ) {
+            @ModelAttribute UploadRequestDTO uploadRequestDTO) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 System.out.println(uploadRequestDTO.toString());
@@ -91,7 +94,7 @@ public class DocumentController {
             }
         });
     }
-    
+
     @GetMapping("/author/{id}")
     public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
         try {
@@ -113,9 +116,8 @@ public class DocumentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(
-            @PathVariable("id") Long id, 
-            @ModelAttribute UploadRequestDTO uploadRequestDTO
-    ) {
+            @PathVariable("id") Long id,
+            @ModelAttribute UploadRequestDTO uploadRequestDTO) {
         try {
             return ResponseEntity.ok(documentService.updateDocumentById(id, uploadRequestDTO));
         } catch (Exception e) {
@@ -123,10 +125,11 @@ public class DocumentController {
         }
     }
 
-    @PutMapping("/download/{id}")
-    public ResponseEntity<?> updateDownloadCount(@PathVariable("id") Long id) {
+    @PutMapping("/download")
+    public ResponseEntity<?> updateDownloadCount(@ModelAttribute DownloadDTO downloadDTO) {
         try {
-            return ResponseEntity.ok(documentService.updateDownloadCount(id));
+            System.out.println("Ctrl " + downloadDTO);
+            return ResponseEntity.ok(documentService.updateDownloadCount(downloadDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -168,11 +171,9 @@ public class DocumentController {
         }
     }
 
-
     @PostMapping("/recommend")
     public ResponseEntity<?> getRecommendedDocuments(
-            @ModelAttribute RecommendationRequestDTO recommendationRequestDTO
-    ) {
+            @ModelAttribute RecommendationRequestDTO recommendationRequestDTO) {
         try {
             return ResponseEntity.ok(documentService.getRecommendedDocuments(recommendationRequestDTO));
         } catch (Exception e) {
@@ -189,4 +190,98 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @GetMapping("/draft")
+    public ResponseEntity<?> getDraftDocuments() {
+        try {
+            return ResponseEntity.ok(documentService.getDraftDocument());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-draft")
+    public ResponseEntity<?> getTotalDraftDocument() {
+        try {
+            return ResponseEntity.ok(documentService.countDraftDocuments());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<?> getPubledDocuments() {
+        try {
+            return ResponseEntity.ok(documentService.getPublishedDocument());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-published")
+    public ResponseEntity<?> getTotalPublishedDocument() {
+        try {
+            return ResponseEntity.ok(documentService.countPublishedDocuments());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<?> countDocumentMonthLy() {
+        try {
+            return ResponseEntity.ok(documentService.countDocumentsMonthly());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<?> getCountDocumentByType() {
+        try {
+            return ResponseEntity.ok(documentService.countDocumentsByType());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/accept/{id}")
+    public ResponseEntity<?> acceptDocumentById(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.AcceptDocument(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/accept")
+    public ResponseEntity<?> acceptListDocumentById(@RequestBody List<Long> id) {
+        try {
+            if (id.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("List id is empty");
+            }
+            return ResponseEntity.ok(documentService.AcceptListDocument(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/top3")
+    public ResponseEntity<?> getTop3Documents() {
+        try {
+            return ResponseEntity.ok(documentService.getTop3Documents());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/page/{page}")
+    public ResponseEntity<?> getPaginationDocs(@PathVariable("page") int page) {
+        try {
+            return ResponseEntity.ok(documentService.getPaginationDocs(page));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }

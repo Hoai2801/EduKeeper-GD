@@ -1,5 +1,7 @@
 package com.GDU.backend.services.Impl;
 
+import com.GDU.backend.dtos.responses.UserRakingRes;
+import com.GDU.backend.dtos.responses.UserRakingResI;
 import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.models.Token;
 import com.GDU.backend.models.User;
@@ -19,7 +21,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
-    private final PasswordEncoder passwordEncoder;
+    // private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
 
@@ -51,22 +53,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void changePassword(User user, String newPassword) {
-        user.setPassword(passwordEncoder.encode(newPassword));
+        // user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 
     @Override
     public User getUserByStaffCode(String staffCode) {
         return userRepository.findByStaffCode(staffCode).orElseThrow(
-                () -> new UsernameNotFoundException("User not found")
-        );
+                () -> new UsernameNotFoundException("User not found"));
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         return userRepository.findByEmail(userEmail).orElseThrow(
-                () -> new UsernameNotFoundException("User not found")
-        );
+                () -> new UsernameNotFoundException("User not found"));
+    }
+
+    @Override
+    public List<UserRakingResI> getTop10UserWithMostDownloads() {
+        try {
+            return userRepository.getRakingUser();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException(
+                    "Unimplemented method get top 10 user with most downloads: " + e.getMessage());
+        }
     }
 }

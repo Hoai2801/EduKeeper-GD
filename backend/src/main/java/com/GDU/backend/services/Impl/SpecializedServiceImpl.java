@@ -43,7 +43,7 @@ public class SpecializedServiceImpl implements SpecializedService {
                 SpecializesWithCount specializesWithCount = new SpecializesWithCount();
                 specializesWithCount.setSpecialized(specialized);
                 int count = documentService.getDocumentsCountBySpecialized(specialized.getId());
-//                specializesWithCount.setDocumentsCount(documentService.getDocumentsCountBySpecialized(specialized.getId()));
+                // specializesWithCount.setDocumentsCount(documentService.getDocumentsCountBySpecialized(specialized.getId()));
                 specializesWithCount.setDocumentsCount(count);
                 result.add(specializesWithCount);
             }

@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -28,14 +26,16 @@ public class Document {
     private String slug;
 
     @Column(nullable = false, length = 30)
+    private String status;
+    @Column(name = "document_type", nullable = false, length = 30)
     private String documentType;
 
-    @Column(nullable = false)
+    @Column(name = "document_size", nullable = false)
     private Long documentSize;
 
     @Column(nullable = false)
     private Integer pages;
-    
+
     @Column
     private String description;
 
@@ -55,7 +55,7 @@ public class Document {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_upload", nullable = false)
     private User userUpload;
-    
+
     private String author;
 
     @Column(nullable = false)

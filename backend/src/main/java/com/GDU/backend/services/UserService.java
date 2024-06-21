@@ -1,5 +1,6 @@
 package com.GDU.backend.services;
 
+import com.GDU.backend.dtos.responses.UserRakingResI;
 import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.models.User;
 import org.springframework.stereotype.Service;
@@ -15,4 +16,6 @@ public interface UserService {
     void changePassword(User user, String newPassword);
 
     User getUserByStaffCode(String staffCode);
+
+    List<UserRakingResI> getTop10UserWithMostDownloads();
 }
