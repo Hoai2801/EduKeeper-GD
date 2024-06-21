@@ -14,6 +14,8 @@ public class UserResponse {
     private String staffCode;
 
     private String username;
+    
+    private String avatar;
 
     private String email;
 

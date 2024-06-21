@@ -110,6 +110,8 @@ create table `role` (
     `name` varchar(100) not null
 );
 
+INSERT INTO `role`(`id`,`name`) values(1, "ADMIN"),(2, "USER");
+
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
@@ -163,29 +165,16 @@ CREATE TABLE `document` (
                             `path` varchar(500) NOT NULL,
                             `description` varchar(2000) NOT NULL,
                             `category_id` int DEFAULT NULL,
+                            `subject_id` int not null,
                             `thumbnail` varchar(200),
                             `author` varchar(100) NOT NULL,
                             `user_upload` int not null,
                             `download` int not null,
                             `views` int not null,
                             PRIMARY KEY (`id`),
-                            KEY `document_ibfk_2` (`category_id`),
-                            KEY `document_ibfk_4` (`author`),
+                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
                             CONSTRAINT `document_ibfk_4` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`)
-);
-
-CREATE TABLE subject_document(
-	`id` int primary key not null auto_increment,
-    `subject_id` int not null,
-    `document_id` int not null,
-    CONSTRAINT `subject_dcm_fk`
-	FOREIGN KEY (`subject_id`)
-    references `subject`(`id`),
-    constraint `document_fk_dcm`
-    foreign key (`document_id`)
-    references`document`(`id`)
-    
 );
 
 DROP TABLE IF EXISTS `favorite`;

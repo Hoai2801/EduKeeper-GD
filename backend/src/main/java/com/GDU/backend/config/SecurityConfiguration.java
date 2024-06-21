@@ -60,6 +60,7 @@ public class SecurityConfiguration {
                 ))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout.logoutUrl("/api/v1/auth/logout"))
                 .build();
     }
 }

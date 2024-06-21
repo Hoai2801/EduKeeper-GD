@@ -11,7 +11,6 @@ const Navbar = () => {
   if (token !== "undefined" && token !== null) {
     jwt = jwtDecode(token);
   }
-  console.log(jwt)
 
   // const [isShowProfile, setIsShownProfile] = useState(false);
   const [isShowSpecialized, setIsShownSpecialized] = useState(false);
@@ -52,7 +51,10 @@ const Navbar = () => {
 
   const logout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/";
+    fetch("http://localhost:80800/api/v1/auth/logout", {
+      method: "POST",
+    }).then((res) =>     window.location.href = "/"
+  );
   }
 
   const search = () => {
@@ -166,19 +168,19 @@ const Navbar = () => {
                     }}
                     className="lg:mt-2 mt-3 lg:text-xl md:flex gap-3 hidden"
                     >
-                    Chào {jwt.user_name}
+                    Chào {jwt.userName}
                     <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="" className="w-8 h-8 rounded-full" />
                   </button>
                   <div className={`bg-white absolute flex flex-col max-w-[300px] w-[300px] overflow-hidden h-[300px] top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`} onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}>
                       <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Trang cá nhân</Link>
                       <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>
-                      <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Đăng xuất</Link>
+                      <Link to="http://localhost:8080/api/v1/auth/logout" className="hover:bg-blue-300 w-full h-[50px]">Đăng xuất</Link>
                   </div>
                     </div>
                 ) : (
                   <Link
                     to="/login"
-                    className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2"
+                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-1 md:py-3"
                   >
                     Đăng nhập
                   </Link>
@@ -202,11 +204,11 @@ const Navbar = () => {
                   <button onClick={() => setIsShownSpecialized(!isShowSpecialized)} className="group-hover/department:text-blue-700">
                     Ngành
                   </button>
-                  {/* <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
+                  {<div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
                     {specialized && specialized.map((item, index) => (
                       <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`} onClick={() => setIsMobileMenuOpen(false)}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
                     ))}
-                  </div> */}
+                  </div> }
                 </div>
                 <div className="flex flex-col gap-3 w-full items-center" >
                   <button onClick={() => setIsShownCategory(!isShowCategory)} className="group-hover/department:text-blue-700">
@@ -229,7 +231,7 @@ const Navbar = () => {
                 {jwt ? (
                   <>
                       <div className="flex flex-col items-center w-full gap-3">
-                        <Link to={"/profile"}>Profile</Link>
+                        <Link>Profile</Link>
                         <button onClick={() => logout()} className="text-left">Đăng xuất</button>
                       </div>
                   </>

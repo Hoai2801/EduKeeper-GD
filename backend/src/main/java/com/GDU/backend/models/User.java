@@ -48,6 +48,8 @@ public class User implements UserDetails, Principal {
     private boolean accountLocked;
 
     private boolean enable;
+    
+    private String avatar;
 
     @CreatedDate
     @Column(name = "created_date", updatable = false, nullable = false)

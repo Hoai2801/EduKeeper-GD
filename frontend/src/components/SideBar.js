@@ -11,8 +11,6 @@ const SideBar = () => {
     const [subjectList, setSubjectList] = useState([]);
     const [isFilterShow, setIsFilterShow] = useState(false);
 
-    const [isFilterShow, setIsFilterShow] = useState(false);
-
     const handleSearch = (event) => {
         localStorage.setItem('search', event.target.value);
     };

@@ -263,6 +263,11 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public Document getDocumentById(Long id) {
+        return documentRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public String updateViewCount(Long id) {
         Document existsDocument = documentRepository.findById(id).orElse(null);
         if (existsDocument == null) {
@@ -361,14 +366,47 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponseDTO> getDocumentsByAuthor(Long id) {
-        List<Document> documents = documentRepository.findAllByAuthorId(id);
+    public List<DocumentResponseDTO> getDocumentsByAuthor(String staffCode) {
+        User user = userService.getUserByStaffCode(staffCode);
+        List<Document> documents = documentRepository.findAllByAuthorId(user.getId());
         return documents.stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
     public int getDocumentsCountBySpecialized(Long id) {
         return documentRepository.findAllBySpecializedId(id);
+    }
+
+    @Override
+    public int countDownload(Long id) {
+        // get total document download of user
+        User user = userService.getUserByStaffCode(id.toString());
+        List<Document> documents = documentRepository.findAllByUserId(user.getId());
+        if (documents != null) {
+            return documents.stream().mapToInt(Document::getDownload).sum();
+        }
+        return 0;
+    }
+
+    @Override
+    public int countView(Long id) {
+        // get total document view of user
+        User user = userService.getUserByStaffCode(id.toString());
+        List<Document> documents = documentRepository.findAllByUserId(user.getId());
+        if (documents != null) {
+            return documents.stream().mapToInt(Document::getViews).sum();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getDocumentPublicCountByUser(Long id) {
+        User user = userService.getUserByStaffCode(id.toString());
+        List<Document> documents = documentRepository.findAllByUserId(user.getId());
+        if (documents != null) {
+            return documents.size();
+        }
+        return 0;
     }
 
     public DocumentResponseDTO convertToDocumentResponse(Document document) {

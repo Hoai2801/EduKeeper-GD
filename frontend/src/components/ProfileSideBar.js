@@ -1,8 +1,15 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import change from '../assets/change.png'
-import logout from '../assets/log-out.png'
+import {jwtDecode} from "jwt-decode";
+
 const ProfileSideBar = () => {
+  const token = localStorage.getItem("token");
+  let jwt = null;
+  if (token !== "undefined" && token !== null) {
+    jwt = jwtDecode(token);
+  }
+  console.log(jwt)
   const [documentMenuShow, setDocumentMenuShow] = useState(false);
   return (
     <div className='w-fit h-fit p-10 bg-white rounded-lg shadow-lg flex flex-col gap-5 items-center align-middle lg:mx-5'>
@@ -21,12 +28,12 @@ const ProfileSideBar = () => {
         <div className='flex flex-col items-center mt-5'>
           <div className='flex flex-col gap-2'>
             <p className='text-3xl font-semibold'>
-              Tang Gia Hoai
+              {jwt?.userName}
             </p>
             <p className='text-gray-500 text-xl'>
-              hoai@gmail.com
+              {jwt?.email}
             </p>
-            <p className='text-gray-500'>MSSV: 22140044</p>
+            <p className='text-gray-500'>MSSV: {jwt?.staffCode}</p>
           </div>
           {/* <div className='flex items-end h-full gap-2 p-2'>
             <button onClick={null} className='hover:rounded-lg hover:bg-[#C5D6F8] p-2'>
@@ -43,8 +50,8 @@ const ProfileSideBar = () => {
         Quản lý tài liệu
         </button>
             <div className={`${documentMenuShow ? "block" : "hidden"} flex flex-col`}>
-                <Link className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>Tài liệu đã đăng</Link>
-                <Link className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>Tài liệu ưu thích</Link>
+                <Link to={'document/upload'} className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10 ${jwt?.role !== "student" ? "" : "hidden"}`}>Tài liệu đã đăng</Link>
+                <Link to="document/favorite" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>Tài liệu ưu thích</Link>
             </div>
         <Link to={"information"} className='hover:rounded-xl hover:bg-[#C5D6F8] p-5'>
           Thông tin tài khoản
@@ -55,7 +62,7 @@ const ProfileSideBar = () => {
         <Link to="notification" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5' >
           Cài đặt
         </Link>
-        <Link to="notification" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5' >
+        <Link to="http://localhost:80800/api/v1/auth/logout" to="notification" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5' >
           Đăng xuất
         </Link>
       </div>

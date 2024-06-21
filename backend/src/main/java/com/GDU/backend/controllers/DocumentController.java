@@ -93,9 +93,9 @@ public class DocumentController {
     }
     
     @GetMapping("/author/{id}")
-    public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
+    public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") String staffCode) {
         try {
-            return ResponseEntity.ok(documentService.getDocumentsByAuthor(id));
+            return ResponseEntity.ok(documentService.getDocumentsByAuthor(staffCode));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -189,4 +189,32 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    
+    @GetMapping("/count-total-download/{user-id}")
+    public ResponseEntity<?> countDownload(@PathVariable("user-id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.countDownload(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    @GetMapping("/count-total-view/{user-id}")
+    public ResponseEntity<?> countView(@PathVariable("user-id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.countView(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    @GetMapping("/total-documents/{user-id}")
+    public ResponseEntity<?> getDocumentsCount(@PathVariable("user-id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.getDocumentPublicCountByUser(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }
