@@ -11,7 +11,6 @@ const Navbar = () => {
   if (token !== "undefined" && token !== null) {
     jwt = jwtDecode(token);
   }
-  console.log(jwt)
 
   // const [isShowProfile, setIsShownProfile] = useState(false);
   const [isShowSpecialized, setIsShownSpecialized] = useState(false);

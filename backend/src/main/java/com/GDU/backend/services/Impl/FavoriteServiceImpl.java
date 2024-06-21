@@ -1,21 +1,27 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.FavoriteDTO;
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
+import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Favorite;
 import com.GDU.backend.models.User;
+import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.repositories.FavoriteRepository;
+import com.GDU.backend.repositories.UserRepository;
 import com.GDU.backend.services.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Deprecated
 public class FavoriteServiceImpl implements FavoriteService {
     private final FavoriteRepository favoriteRepository;
+    private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
 
     @Override
     public String createFavorite(FavoriteDTO favoriteDTO) {
@@ -31,29 +37,17 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    public List<Favorite> getAllFavorite() {
+    public List<DocumentResponseDTO> getDocumentsFavoritesByUserId(Long userId) {
         try {
-            return favoriteRepository.findAll();
-        } catch (Exception e) {
-            return null;
-        }
-    }
+            User existUser = userRepository.findByStaffCode(userId.toString()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            List<Favorite> favorites = favoriteRepository.findAllByUserID(existUser.getId());
 
-    @Override
-    public List<Favorite> getFavoritesByUserId(Long userId) {
-        try {
-            return favoriteRepository.findAllByUserId(userId);
+            return favorites.stream().map(favorite -> {
+                Document document = documentRepository.findById(favorite.getDocumentID().getId()).get();
+                return DocumentResponseDTO.from(document);
+            }).collect(Collectors.toList());
         } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Override
-    public List<Favorite> getFavoritesByDocsId(Long docsId) {
-        try {
-            return favoriteRepository.findAllByDocumentId(docsId);
-        } catch (Exception e) {
-            return null;
+            return List.of();
         }
     }
 
@@ -65,5 +59,24 @@ public class FavoriteServiceImpl implements FavoriteService {
         } catch (Exception e) {
             return "Delete failes" + e;
         }
+    }
+
+    @Override
+    public boolean isFavorite(Long userId, Long documentId) {
+        Favorite isExist = favoriteRepository.existsByUserIDAndDocumentID(userId, documentId);
+        if (isExist != null) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int getTotalFavoritesCountByAuthor(Long authorId) {
+        User user = userRepository.findByStaffCode(authorId.toString()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        List<Favorite> favorites = favoriteRepository.findAllByUserID(user.getId());
+        if (favorites != null) {
+            return favorites.size();
+        }
+        return 0;
     }
 }

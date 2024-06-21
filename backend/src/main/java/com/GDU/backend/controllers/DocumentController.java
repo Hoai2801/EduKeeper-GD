@@ -95,7 +95,7 @@ public class DocumentController {
     @GetMapping("/author/{id}")
     public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
         try {
-            return ResponseEntity.ok(documentService.getDocumentsByAuthor(id));
+            return ResponseEntity.ok(documentService.getDocumentsByUserUploadId(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -185,6 +185,33 @@ public class DocumentController {
             @RequestBody FilterRequestDTO filterRequestDTO) {
         try {
             return ResponseEntity.ok(documentService.filterDocuments(filterRequestDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    @GetMapping("/total-views/{authorId}")
+    public ResponseEntity<?> getTotalViewsByAuthor(@PathVariable("authorId") Long authorId) {
+        try {
+            return ResponseEntity.ok(documentService.getTotalViewsByAuthor(authorId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    @GetMapping("/total-downloads/{authorId}")
+    public ResponseEntity<?> getTotalDownloadsByAuthor(@PathVariable("authorId") Long authorId) {
+        try {
+            return ResponseEntity.ok(documentService.getTotalDownloadsByAuthor(authorId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/total-documents/{authorId}")
+    public ResponseEntity<?> getDocumentsCountByAuthor(@PathVariable("authorId") Long authorId) {
+        try {
+            return ResponseEntity.ok(documentService.getDocumentsCountByAuthor(authorId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

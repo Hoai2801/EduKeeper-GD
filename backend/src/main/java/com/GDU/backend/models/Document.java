@@ -56,6 +56,10 @@ public class Document {
     @JoinColumn(name = "user_upload", nullable = false)
     private User userUpload;
     
+    private String status;
+    
+    private String scope;
+    
     private String author;
 
     @Column(nullable = false)

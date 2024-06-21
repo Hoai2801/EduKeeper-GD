@@ -23,12 +23,10 @@ const Home = () => {
     <div>
       <div className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col p-10'>
         <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
-        <div className='lg:ml-5 flex lg:justify-between gap-5 overflow-auto flex-wrap justify-center'>
+        <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
           {lastedDocuments && lastedDocuments?.map((item, index) => (
-            <Post key={index} title={item.title} author={item.author} upload_date={item.upload_date} slug={item.slug} thumbnail={item.thumbnail} 
-            subject={item.subject}
+            <Post key={index} document={item} />
             // specialized={item.subject.specialized.specializedName} specializedSlug={item.subject.specialized.specializedSlug} 
-            />
           ))}
         </div>
           {/* button "see more" */}

@@ -12,7 +12,8 @@ import java.util.Optional;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
-    Document getDocumentBySlug(String slug);
+    @Query("SELECT d FROM Document d WHERE d.id = :id")
+    Document getDocumentById(Long id);
 
     @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
             "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")
@@ -94,7 +95,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 //    int countDocumentsBySpecializedId(@Param("id") Long id);
 
     @Query("select d from Document d where d.userUpload.id = :id")
-    List<Document> findAllByAuthorId(Long id);
+    List<Document> findAllByUserUploadId(Long id);
 
     @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id")
     int findAllBySpecializedId(Long id);
