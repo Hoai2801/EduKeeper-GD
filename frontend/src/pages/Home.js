@@ -36,7 +36,7 @@ const Home = () => {
         <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
         <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
           {lastedDocuments && lastedDocuments?.map((item, index) => (
-              <div className={`${item.scope === "private" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
+              <div className={`${item.scope === "private" || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
 
             <Post key={index} document={item} />
               </div>

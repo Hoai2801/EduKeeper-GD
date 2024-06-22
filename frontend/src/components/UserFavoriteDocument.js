@@ -22,9 +22,12 @@ const MyComponent = () => {
     }, [])
     return (
         <div>
-            {documentList?.map((item, index) => (
-                <DocumentCard key={index} document={item} />
-            ))}
+            <h2 className={`text-3xl font-semibold text-center mb-5`}>Tài liệu ưu thích của bạn</h2>
+            <div>
+                {documentList?.map((item, index) => (
+                    <DocumentCard key={index} document={item}/>
+                ))}
+            </div>
         </div>
     );
 };

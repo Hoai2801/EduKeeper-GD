@@ -29,6 +29,7 @@ function App() {
             <Route element={<Layout/>}>
                 <Route path='/' element={<Home/>}/>
                 <Route path='/upload' element={<Upload/>}/>
+                <Route path='/edit/:slug' element={<Upload/>}/>
                 <Route path='/profile' element={<Profile/>}>
                     <Route path='' element={<UserHome/>}/>
                     <Route path='document/upload' element={<UserUploadDocument/>}/>

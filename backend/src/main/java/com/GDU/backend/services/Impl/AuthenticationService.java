@@ -115,6 +115,7 @@ public class AuthenticationService {
         claims.put("staff_code", user.getUsername());
         claims.put("user_name", user.getName());
         claims.put("role", user.getRoles().getName());
+        claims.put("email", user.getEmail());
         var jwt = jwtService.generateToken(claims, user);
         return AuthenticationResponse.builder()
                 .token(jwt)

@@ -50,6 +50,7 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
             .then((res) => res.blob())
             .then((blob) => {
+                console.log(blob)
                 setFile(blob)
             });
 
@@ -161,9 +162,9 @@ const Detail = () => {
 
     return (
         <div>
-            <h2 className={`text-[28px] mt-10 font-bold ${data?.scope === "public" ? "hidden" : "block"}`}>
+            <h2 className={`text-[28px] mt-10 font-bold ${data?.scope === "public" || data?.user_upload.staffCode === staffCode ? "hidden" : "block"}`}>
                 Bạn không thể xem tài liệu này vì đây là tài liệu riêng tư</h2>
-            <div className={`${data?.scope === "public" ? "" : "hidden"}`}>
+            <div className={`${data?.scope === "public" || data?.user_upload.staffCode === staffCode ? "" : "hidden"}`}>
                 <div className={`pt-[50px] md:px-5 px-2 `}>
                     <p className='text-blue-500'><Link
                         to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> -

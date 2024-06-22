@@ -35,7 +35,6 @@ public class UserController {
     @GetMapping("/top-downloads")
     public ResponseEntity<?> getTop10UserWithMostDownloads() {
         try {
-
             return ResponseEntity.ok(userService.getTop10UserWithMostDownloads());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

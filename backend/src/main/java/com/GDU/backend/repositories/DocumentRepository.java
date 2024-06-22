@@ -54,10 +54,15 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "JOIN category c ON c.id = d.category_id " +
             "JOIN subject sj ON sj.id = d.subject_id " +
             "JOIN department dm ON dm.id = s.department_id " +
-            "WHERE (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))" +
-            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))" +
-            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))" +
-            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))" +
+            "WHERE d.status = 'published' "
+            + " AND (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
+            +
+            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))"
+            +
+            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))"
+            +
+            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))"
+            +
             "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) ", nativeQuery = true)
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,

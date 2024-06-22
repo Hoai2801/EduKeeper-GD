@@ -8,7 +8,6 @@ import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.DocumentService;
-import com.GDU.backend.services.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -50,12 +49,12 @@ public class DocumentServiceImpl implements DocumentService {
         // TODO: convert to service
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
-                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
-        
+//        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
+//                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
+
         Subject subject = subjectRepository.findById(uploadRequestDTO.getSubject())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
-        
+
         User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
@@ -66,7 +65,7 @@ public class DocumentServiceImpl implements DocumentService {
         Path uploadDir = Paths.get(UPLOAD_DIR);
         Files.createDirectories(uploadDir);
         Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        
+
         int numberOfPages = 0;
         String thumbnail = "";
 
@@ -93,6 +92,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .path(destFile.getAbsolutePath())
                 .documentType(uploadRequestDTO.getDocument().getContentType())
+                .status("Draft")
+                .scope(uploadRequestDTO.getScope())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
                 .description(uploadRequestDTO.getDescription())
                 .pages(numberOfPages)
@@ -144,56 +145,20 @@ public class DocumentServiceImpl implements DocumentService {
             return "Document not existing";
         }
 
-        User newAuthor = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
-        if (newAuthor == null) {
-            return "Author not existing";
+        User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
+        if (userUpload == null) {
+            return "User not existing";
         }
-        existDocument.setUserUpload(newAuthor);
+        existDocument.setUserUpload(userUpload);
 
-        Category category = categoryRepository.findById((long) uploadRequestDTO.getCategory()).orElse(null);
-        // Update document
+        Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
         existDocument.setCategory(category);
-        existDocument.setTitle(
-                uploadRequestDTO.getTitle() != null ?
-                        uploadRequestDTO.getTitle() :
-                        existDocument.getTitle()
-        );
-        existDocument.setSlug(
-                uploadRequestDTO.getTitle() != null ?
-                        uploadRequestDTO.getTitle()
-                                .replace(" ", "-")
-                                .toLowerCase() + "-" + new Date().getTime() :
-                        existDocument.getSlug()
-        );
-//        existDocument.setSpecialized(existDocument.getSpecialized());
-
-        // I think we don't need update a document file 
-        // any more because we should upload a new one instead
-
-        // Handle Path
-//        if (uploadRequestDTO.getDocument() != null) {
-//            existDocument.setDocument_type(uploadRequestDTO.getDocument().getContentType());
-//            existDocument.setDocument_size(uploadRequestDTO.getDocument().getSize() / 1_000_000);
-//
-//            String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
-//            File destFile = new File(UPLOAD_DIR + fileName);
-//
-//            // Save the uploaded document to the file system
-//            MultipartFile multipartFile = uploadRequestDTO.getDocument();
-//            Path uploadDir = Paths.get(UPLOAD_DIR);
-//            try {
-//                Files.createDirectories(uploadDir);
-//            } catch (IOException e) {
-//                log.error("Error creating directories: {}", e.getMessage());
-//            }
-//            try {
-//                Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-//            } catch (IOException e) {
-//                log.error("Error copying file: {}", e.getMessage());
-//            }
-//
-//            existDocument.setPath(destFile.getAbsolutePath());
-//        }
+        existDocument.setAuthor(uploadRequestDTO.getAuthor());
+        existDocument.setDescription(uploadRequestDTO.getDescription());
+        existDocument.setScope(uploadRequestDTO.getScope());
+        existDocument.setTitle(uploadRequestDTO.getTitle());
+        existDocument.setSlug(createSlug(uploadRequestDTO.getTitle()));
+        existDocument.setStatus("Draft");
         documentRepository.save(existDocument);
         return "Update document successfully";
     }

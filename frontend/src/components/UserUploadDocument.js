@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {jwtDecode} from "jwt-decode";
 import DocumentCard from "./DocumentCard";
+import edit from '../assets/edit-246.png';
+import {Link} from "react-router-dom";
 
 const MyComponent = () => {
     const token = localStorage.getItem("token");
@@ -25,15 +27,22 @@ const MyComponent = () => {
         <div className={`flex gap-5 justify-center flex-wrap`}>
             {documentList?.map((item, index) => (
                 <div className={`relative`}>
-                    <div className={`absolute top-0 right-0 rounded-lg p-2 m-4 text-white ${item.status === "Draft" ? "hidden" : "bg-red-500"}`}>
+                    <div
+                        className={`absolute top-0 right-0 rounded-lg p-2 m-4 text-white ${item.status !== "Draft" ? "hidden" : "bg-red-500"}`}>
                         Chưa duyệt
                     </div>
-                <DocumentCard key={index} document={item} />
-                    <div className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white ${item.scope !== "public" ? 
-                                                                                                    item.scope === "private" ? "bg-gray-500" :  
-                                                                                                        // only for student
-                                                                                                        "bg-amber-200" 
-                                                                                                : "bg-green-500"}`}>
+                    <DocumentCard key={index} document={item}/>
+                    <div
+                        className={`absolute bottom-[20%] right-0 rounded-lg p-2 m-4 text-white w-10 h-10 overflow-hidden cursor-pointer`}>
+                        <Link to={`/edit/${item.slug}`}>
+                            <img src={edit} alt="" className={`w-full h-full`}/>
+                        </Link>
+                    </div>
+                    <div className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white ${item.scope !== "public" ?
+                        item.scope === "private" ? "bg-gray-500" :
+                            // only for student
+                            "bg-amber-200"
+                        : "bg-green-500"}`}>
                         {item.scope}
                     </div>
                 </div>
