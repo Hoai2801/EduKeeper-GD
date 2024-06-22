@@ -60,6 +60,20 @@ public class User implements UserDetails, Principal {
 
     @Column(name = "account_locked")
     private boolean accountLocked;
+    
+    @ManyToOne
+    @JoinColumn(name = "department")
+    private Department department;
+    
+    @ManyToOne
+    @JoinColumn(name = "specialized")
+    private Specialized specialized;
+    
+    @Column(name = "class")
+    private String klass;
+    
+    @Column(name = "date_of_birth")
+    private LocalDateTime birthDay;
 
     private boolean enable;
 

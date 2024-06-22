@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS `department`;
 
 -- dùng để lưu thông tin khoa của tài liệu (ví dụ: khoa công nghệ thông tin, khoa kinh tế, khoa marketing...)
 CREATE TABLE `department` (
-                              `id` smallint NOT NULL AUTO_INCREMENT,
+                              `id` int NOT NULL AUTO_INCREMENT,
                               `department_name` varchar(100) NOT NULL,
                               `department_slug` varchar(100) not null,
                               PRIMARY KEY (`id`)
@@ -40,7 +40,7 @@ CREATE TABLE `specialized` (
                                id int not null auto_increment,
                                `specialized_name` varchar(50) not null,
                                `specialized_slug` varchar(100) not null,
-                               `department_id` smallint not null,
+                               `department_id` int not null,
                                PRIMARY KEY (`id`),
                                KEY `department_id` (`department_id`),
                                CONSTRAINT `specialized_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
@@ -120,12 +120,19 @@ CREATE TABLE `users` (
                          `account_locked` boolean not null default false,
                          `enable` boolean not null default false,
                          `email` varchar(50) not null,
+                         `department` int,
+                         `specialized` int,
+                         `date_of_birth` datetime,
+                         `class` varchar(20),
                          `created_date` datetime,
                          `last_modified_date` datetime,
 						`staff_code` varchar(20) not null,
                          PRIMARY KEY (`id`),
                          KEY `role_id` (`role_id`),
-                         CONSTRAINT `role_fk` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
+                         CONSTRAINT `role_fk` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`),
+                         CONSTRAINT `dpm_fk` FOREIGN KEY (`department`) REFERENCES `department` (`id`),
+                         CONSTRAINT `spec_fk` FOREIGN KEY (`specialized`) REFERENCES `specialized` (`id`)
+                         
 );
 
 -- INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN'); 

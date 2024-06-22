@@ -1,5 +1,7 @@
 package com.GDU.backend.controllers;
 
+import com.GDU.backend.dtos.requests.UserDetailDTO;
+import com.GDU.backend.dtos.responses.UserDetailResponse;
 import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +22,19 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
+
+    @GetMapping("/{staffCode}")
+    public ResponseEntity<UserDetailResponse> getUserResponseById(@PathVariable("staffCode") String staffCode) {
+        return ResponseEntity.ok(
+                userService.getUserResponseByStaffCode(staffCode)
+        );
+    }
     
-//    @PostMapping("/update")
-//    public ResponseEntity<?> updateUser(@RequestBody User user) {
-//        
-//    }
+    @PutMapping
+    public ResponseEntity<String> updateUser(@RequestBody UserDetailDTO userDetailDTO) {
+        return ResponseEntity.ok(userService.updateUser(userDetailDTO));
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {

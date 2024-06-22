@@ -1,10 +1,15 @@
 package com.GDU.backend.services.Impl;
 
-import com.GDU.backend.dtos.responses.UserRakingRes;
+import com.GDU.backend.dtos.requests.UserDetailDTO;
+import com.GDU.backend.dtos.responses.UserDetailResponse;
 import com.GDU.backend.dtos.responses.UserRakingResI;
 import com.GDU.backend.dtos.responses.UserResponse;
+import com.GDU.backend.models.Department;
+import com.GDU.backend.models.Specialized;
 import com.GDU.backend.models.Token;
 import com.GDU.backend.models.User;
+import com.GDU.backend.repositories.DepartmentRepository;
+import com.GDU.backend.repositories.SpecializedRepository;
 import com.GDU.backend.repositories.TokenRepository;
 import com.GDU.backend.repositories.UserRepository;
 import com.GDU.backend.services.UserService;
@@ -13,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +28,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     // private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final SpecializedRepository specializedRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -78,5 +84,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new UnsupportedOperationException(
                     "Unimplemented method get top 10 user with most downloads: " + e.getMessage());
         }
+    }
+
+    @Override
+    public UserDetailResponse getUserResponseByStaffCode(String staffCode) {
+        User user = getUserByStaffCode(staffCode);
+        if (user != null) {
+            return UserDetailResponse.builder()
+                    .email(user.getEmail())
+                    .staffCode(user.getStaffCode())
+                    .username(user.getName())
+                    .birthDay(user.getBirthDay())
+                    .department(user.getDepartment())
+                    .klass(user.getKlass())
+                    .specialized(user.getSpecialized())
+                    .roles(user.getRoles())
+                    .id(user.getId())
+                    .build();
+        }
+        return null;
+    }
+
+    @Override
+    public String updateUser(UserDetailDTO userDetailDTO) {
+        User user = getUserByStaffCode(userDetailDTO.getStaffCode());
+        if (user == null) {
+            return "user not found";
+        }
+        Department department = departmentRepository.findById(userDetailDTO.getDepartment()).orElse(null);
+        if (department == null) {
+            return "department not found";
+        }
+        Specialized specialized = specializedRepository.findById(userDetailDTO.getSpecialized()).orElse(null);
+        if (specialized == null) {
+            return "specialized not found";
+        }
+        user.setUsername(userDetailDTO.getUsername());
+        user.setDepartment(department);
+        user.setKlass(userDetailDTO.getKlass());
+        user.setSpecialized(specialized);
+        user.setBirthDay(userDetailDTO.getBirthDay());
+        userRepository.save(user);
+        return "updated";
     }
 }
