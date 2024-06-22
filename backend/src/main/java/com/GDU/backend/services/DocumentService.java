@@ -5,7 +5,8 @@ import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.dtos.responses.TotalResponse;
-
+import com.GDU.backend.dtos.responses.DocumentMonthly;
+import com.GDU.backend.dtos.responses.TypeDocumentRes;
 import java.io.IOException;
 import java.util.List;
 
@@ -47,4 +48,26 @@ public interface DocumentService {
     int getTotalDownloadsByAuthor(Long authorId);
 
     int getDocumentsCountByAuthor(Long authorId);
+    
+    int countDocumentsToday();
+
+    int countPublishedDocuments();
+
+    int countDraftDocuments();
+
+    List<DocumentResponseDTO> getDraftDocument();
+
+    List<DocumentResponseDTO> getPublishedDocument();
+
+    String AcceptDocument(Long id) throws IOException;
+
+    String AcceptListDocument(List<Long> ids) throws IOException;
+
+    List<DocumentMonthly> countDocumentsMonthly();
+
+    List<TypeDocumentRes> countDocumentsByType();
+
+    List<DocumentResponseDTO> getTop3Documents();
+
+    List<DocumentResponseDTO> getPaginationDocs(int page);
 }

@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 //@CrossOrigin
@@ -212,6 +213,99 @@ public class DocumentController {
     public ResponseEntity<?> getDocumentsCountByAuthor(@PathVariable("authorId") Long authorId) {
         try {
             return ResponseEntity.ok(documentService.getDocumentsCountByAuthor(authorId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/draft")
+    public ResponseEntity<?> getDraftDocuments() {
+        try {
+            return ResponseEntity.ok(documentService.getDraftDocument());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-draft")
+    public ResponseEntity<?> getTotalDraftDocument() {
+        try {
+            return ResponseEntity.ok(documentService.countDraftDocuments());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<?> getPubledDocuments() {
+        try {
+            return ResponseEntity.ok(documentService.getPublishedDocument());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-published")
+    public ResponseEntity<?> getTotalPublishedDocument() {
+        try {
+            return ResponseEntity.ok(documentService.countPublishedDocuments());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<?> countDocumentMonthLy() {
+        try {
+            return ResponseEntity.ok(documentService.countDocumentsMonthly());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<?> getCountDocumentByType() {
+        try {
+            return ResponseEntity.ok(documentService.countDocumentsByType());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/accept/{id}")
+    public ResponseEntity<?> acceptDocumentById(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.AcceptDocument(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/accept")
+    public ResponseEntity<?> acceptListDocumentById(@RequestBody List<Long> id) {
+        try {
+            if (id.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("List id is empty");
+            }
+            return ResponseEntity.ok(documentService.AcceptListDocument(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/top3")
+    public ResponseEntity<?> getTop3Documents() {
+        try {
+            return ResponseEntity.ok(documentService.getTop3Documents());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/page/{page}")
+    public ResponseEntity<?> getPaginationDocs(@PathVariable("page") int page) {
+        try {
+            return ResponseEntity.ok(documentService.getPaginationDocs(page));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

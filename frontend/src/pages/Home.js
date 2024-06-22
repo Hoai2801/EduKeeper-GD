@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Post from '../components/DocumentCard'
 import { Link } from 'react-router-dom'
+import {jwtDecode} from "jwt-decode";
 
 const Home = () => {
   const [mostViewed, setMostViewed] = useState([])
@@ -8,6 +9,8 @@ const Home = () => {
   const [mostDownloaded, setMostDownloaded] = useState([])
 
   const [lastedDocuments, setLastedDocuments] = useState([])
+
+  const [staffCode, setStaffCode] = useState(null)
 
   useEffect(() => {
     fetch('http://localhost:8080/api/v1/documents/most-viewed?limit=10').then(res => res?.json()).then(data => setMostViewed(data))
@@ -18,6 +21,14 @@ const Home = () => {
     })
   }, [])
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token !== "undefined" && token !== null) {
+      const jwt = jwtDecode(token);
+      setStaffCode(jwt?.staff_code);
+    }
+  }, []);
+
 
   return (
     <div>
@@ -25,8 +36,10 @@ const Home = () => {
         <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
         <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
           {lastedDocuments && lastedDocuments?.map((item, index) => (
+              <div className={`${item.scope === "private" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
+
             <Post key={index} document={item} />
-            // specialized={item.subject.specialized.specializedName} specializedSlug={item.subject.specialized.specializedSlug} 
+              </div>
           ))}
         </div>
           {/* button "see more" */}

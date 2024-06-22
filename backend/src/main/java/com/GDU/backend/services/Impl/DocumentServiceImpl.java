@@ -3,9 +3,7 @@ package com.GDU.backend.services.Impl;
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
-import com.GDU.backend.dtos.responses.DocumentResponseDTO;
-import com.GDU.backend.dtos.responses.TotalResponse;
-import com.GDU.backend.dtos.responses.UserResponse;
+import com.GDU.backend.dtos.responses.*;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.*;
@@ -428,4 +426,117 @@ public class DocumentServiceImpl implements DocumentService {
                 .build();
     }
 
+    @Override
+    public List<DocumentResponseDTO> getDraftDocument() {
+        return documentRepository.findDraftDocuments().stream().map(this::convertToDocumentResponse).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> getPublishedDocument() {
+        return documentRepository.findPublishedDocuments().stream().map(this::convertToDocumentResponse).toList();
+    }
+
+    @Override
+    public String AcceptDocument(Long id) throws IOException {
+        try {
+            Document document = documentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+            if (document.getStatus().equalsIgnoreCase("published")) {
+                throw new ResourceNotFoundException("Document has published");
+            }
+            document.setStatus("published");
+            documentRepository.save(document);
+            return "Accept Document with id: " + id + " success";
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method Accept Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String AcceptListDocument(List<Long> ids) throws IOException {
+        try {
+            for (Long id : ids) {
+                Document document = documentRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + id));
+                if (document.getStatus().equalsIgnoreCase("published")) {
+                    throw new ResourceNotFoundException("Document has published");
+                }
+                document.setStatus("published");
+                documentRepository.save(document);
+
+            }
+            return "Accept Document with id: " + ids + " success";
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method Accept Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentMonthly> countDocumentsMonthly() {
+        try {
+            return documentRepository.countDocumentsMonthly();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public int countDocumentsToday() {
+        try {
+            return documentRepository.countDocumentsToday();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public int countPublishedDocuments() {
+        try {
+            return documentRepository.countPublishedDocuments();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public int countDraftDocuments() {
+        try {
+            return documentRepository.countDraftDocuments();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<TypeDocumentRes> countDocumentsByType() {
+        try {
+            return documentRepository.countDocumentsByType();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentResponseDTO> getTop3Documents() {
+        try {
+
+            return documentRepository.getTop3Docs().stream().map(this::convertToDocumentResponse).toList();
+
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentResponseDTO> getPaginationDocs(int page) {
+        try {
+            int pageSize = 10;
+            int offset = (page - 1) * pageSize;
+            return documentRepository.getPaginationDocuments(offset).stream().map(this::convertToDocumentResponse)
+                    .toList();
+
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method pagination Docs: " + e.getMessage());
+        }
+    }
 }
