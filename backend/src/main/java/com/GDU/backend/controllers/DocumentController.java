@@ -95,7 +95,7 @@ public class DocumentController {
     @GetMapping("/author/{id}")
     public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
         try {
-            return ResponseEntity.ok(documentService.getDocumentsByUserUploadId(id));
+            return ResponseEntity.ok(documentService.getDocumentsByAuthor(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -207,7 +207,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
+    
     @GetMapping("/total-documents/{authorId}")
     public ResponseEntity<?> getDocumentsCountByAuthor(@PathVariable("authorId") Long authorId) {
         try {
@@ -216,4 +216,5 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    
 }

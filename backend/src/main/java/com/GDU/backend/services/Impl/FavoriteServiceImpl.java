@@ -26,8 +26,12 @@ public class FavoriteServiceImpl implements FavoriteService {
     @Override
     public String createFavorite(FavoriteDTO favoriteDTO) {
         try {
-            User user = User.builder().id(favoriteDTO.getUserId()).build();
-            Document document = Document.builder().id(favoriteDTO.getDocumentId()).build();
+            User user = userRepository.findByStaffCode(favoriteDTO.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            Document document = documentRepository.findById(Long.parseLong(favoriteDTO.getDocumentId())).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+            Favorite existsed = favoriteRepository.existsByUserIDAndDocumentID(user.getId(), document.getId());
+            if (existsed != null) {
+                return "Already favorite";
+            }
             Favorite newFavorite = Favorite.builder().userID(user).documentID(document).build();
             favoriteRepository.save(newFavorite);
             return "Create favorite success";
@@ -52,9 +56,15 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    public String deleteFavoriteById(Long id) {
+    public String deleteFavoriteById(FavoriteDTO favoriteDTO) {
         try {
-            favoriteRepository.deleteById(id);
+            User user = userRepository.findByStaffCode(favoriteDTO.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            Document document = documentRepository.findById(Long.parseLong(favoriteDTO.getDocumentId())).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+            Favorite isExist = favoriteRepository.existsByUserIDAndDocumentID(user.getId(), document.getId());
+
+            if (isExist != null) {
+                favoriteRepository.delete(isExist);
+            }
             return "Delete favorite success";
         } catch (Exception e) {
             return "Delete failes" + e;
@@ -62,12 +72,11 @@ public class FavoriteServiceImpl implements FavoriteService {
     }
 
     @Override
-    public boolean isFavorite(Long userId, Long documentId) {
-        Favorite isExist = favoriteRepository.existsByUserIDAndDocumentID(userId, documentId);
-        if (isExist != null) {
-            return true;
-        }
-        return false;
+    public boolean isFavorite(FavoriteDTO favoriteDTO) {
+        User user = userRepository.findByStaffCode(favoriteDTO.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Document document = documentRepository.findById(Long.parseLong(favoriteDTO.getDocumentId())).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+        Favorite isExist = favoriteRepository.existsByUserIDAndDocumentID(user.getId(), document.getId());
+        return isExist != null;
     }
 
     @Override

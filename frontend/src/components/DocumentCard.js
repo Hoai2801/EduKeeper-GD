@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const DocumentCard = ({ document }) => {
   return (
-    <div className='p-3 rounded-lg bg-white flex flex-col border h-[580px] lg:w-[350px] min-w-[350px] gap-5 shadow-sm w-[95%]'>
+    <div className={`p-3 rounded-lg bg-white flex flex-col border h-[580px] lg:w-[350px] min-w-[350px] gap-5 shadow-sm w-[95%]`}>
       <Link to={`/document/${document?.slug}`}>
         <div className='w-full h-[380px] border rounded-xl overflow-hidden'>
           {document?.thumbnail ? <img src={"http://localhost:8080/api/v1/images/" + document?.thumbnail} alt="" className='w-full h-full' /> : <img src="https://via.placeholder.com/150" alt="" />}

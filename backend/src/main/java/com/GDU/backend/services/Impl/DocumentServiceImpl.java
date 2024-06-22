@@ -52,6 +52,8 @@ public class DocumentServiceImpl implements DocumentService {
         // TODO: convert to service
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
+                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
         
         Subject subject = subjectRepository.findById(uploadRequestDTO.getSubject())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
@@ -92,8 +94,6 @@ public class DocumentServiceImpl implements DocumentService {
                 .userUpload(userUpload)
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .path(destFile.getAbsolutePath())
-                .scope(uploadRequestDTO.getScope())
-                .status("Draft")
                 .documentType(uploadRequestDTO.getDocument().getContentType())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
                 .description(uploadRequestDTO.getDescription())
@@ -361,9 +361,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponseDTO> getDocumentsByUserUploadId(Long id) {
-        User user = userService.getUserByStaffCode(id.toString());
-        List<Document> documents = documentRepository.findAllByUserUploadId(user.getId());
+    public List<DocumentResponseDTO> getDocumentsByAuthor(Long id) {
+        User existingUser = userService.getUserByStaffCode(id.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
         return documents.stream().map(this::convertToDocumentResponse).toList();
     }
 
@@ -374,32 +374,29 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public int getTotalViewsByAuthor(Long authorId) {
-        User user = userService.getUserByStaffCode(authorId.toString());
-        List<Document> documents = documentRepository.findAllByUserUploadId(user.getId());
-        if (documents != null) {
-            return documents.stream().mapToInt(Document::getViews).sum();
+        User existingUser = userService.getUserByStaffCode(authorId.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
+        if (documents.isEmpty()) {
+            return 0;
         }
-        return 0;
+        return documents.stream().mapToInt(Document::getViews).sum();
     }
 
     @Override
     public int getTotalDownloadsByAuthor(Long authorId) {
-        User user = userService.getUserByStaffCode(authorId.toString());
-        List<Document> documents = documentRepository.findAllByUserUploadId(user.getId());
-        if (documents != null) {
-            return documents.stream().mapToInt(Document::getDownload).sum();
+        User existingUser = userService.getUserByStaffCode(authorId.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
+        if (documents.isEmpty()) {
+            return 0;
         }
-        return 0;
+        return documents.stream().mapToInt(Document::getDownload).sum();
     }
 
     @Override
     public int getDocumentsCountByAuthor(Long authorId) {
-        User user = userService.getUserByStaffCode(authorId.toString());
-        List<Document> documents = documentRepository.findAllByUserUploadId(user.getId());
-        if (documents != null) {
-            return documents.size();
-        }
-        return 0;
+        User existingUser = userService.getUserByStaffCode(authorId.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
+        return documents.size();
     }
 
     public DocumentResponseDTO convertToDocumentResponse(Document document) {

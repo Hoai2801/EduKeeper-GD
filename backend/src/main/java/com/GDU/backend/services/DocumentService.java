@@ -38,7 +38,7 @@ public interface DocumentService {
 
     int countAllDocuments();
 
-    List<DocumentResponseDTO> getDocumentsByUserUploadId(Long id);
+    List<DocumentResponseDTO> getDocumentsByAuthor(Long id);
 
     int getDocumentsCountBySpecialized(Long id);
 

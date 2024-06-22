@@ -16,4 +16,5 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     @Query("SELECT f FROM Favorite f WHERE f.userID.id = :userId AND f.documentID.id = :documentId")
     Favorite existsByUserIDAndDocumentID(Long userId, Long documentId);
+    
 }

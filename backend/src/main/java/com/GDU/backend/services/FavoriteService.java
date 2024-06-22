@@ -11,9 +11,9 @@ public interface FavoriteService {
 
     List<DocumentResponseDTO> getDocumentsFavoritesByUserId(Long userId);
 
-    String deleteFavoriteById(Long id);
+    String deleteFavoriteById(FavoriteDTO favoriteDTO);
 
-    boolean isFavorite(Long userId, Long documentId);
+    boolean isFavorite(FavoriteDTO favoriteDTO);
 
     int getTotalFavoritesCountByAuthor(Long authorId);
 }

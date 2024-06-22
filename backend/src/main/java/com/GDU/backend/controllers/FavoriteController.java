@@ -30,13 +30,13 @@ public class FavoriteController {
         return ResponseEntity.ok(favoriteService.getTotalFavoritesCountByAuthor(authorId));
     }
     
-    @GetMapping("/is-favorite/{userId}/{documentId}")
-    public ResponseEntity<Boolean> isFavorite(@PathVariable("userId") Long userId, @PathVariable("documentId") Long documentId) {
-        return ResponseEntity.ok(favoriteService.isFavorite(userId, documentId));
+    @PostMapping("/is-favorite")
+    public ResponseEntity<Boolean> isFavorite(@RequestBody FavoriteDTO favoriteDTO) {
+        return ResponseEntity.ok(favoriteService.isFavorite(favoriteDTO));
     }
     
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFavoriteById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(favoriteService.deleteFavoriteById(id));
+    @DeleteMapping
+    public ResponseEntity<String> deleteFavoriteById(@RequestBody FavoriteDTO favoriteDTO) {
+        return ResponseEntity.ok(favoriteService.deleteFavoriteById(favoriteDTO));
     }
 }

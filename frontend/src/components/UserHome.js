@@ -23,6 +23,7 @@ const UserHome = () => {
             fetch("http://localhost:8080/api/v1/favorites/author/" + jwt?.staff_code)
                 .then((res) => res.json())
                 .then((data) => {
+                    console.log(data)
                     setTotalFavorites(data);
                 });
 

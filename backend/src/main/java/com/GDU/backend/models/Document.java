@@ -56,10 +56,6 @@ public class Document {
     @JoinColumn(name = "user_upload", nullable = false)
     private User userUpload;
     
-    private String status;
-    
-    private String scope;
-    
     private String author;
 
     @Column(nullable = false)
@@ -67,6 +63,10 @@ public class Document {
 
     @Column(nullable = false)
     private int views;
+    
+    private String scope;
+    
+    private String status; 
 
     @ManyToOne
     @JoinColumn(name = "subject_id")

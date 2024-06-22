@@ -3,7 +3,7 @@ package com.GDU.backend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
+// import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,8 +22,8 @@ import java.util.List;
 @EnableMethodSecurity(securedEnabled = true)
 @CrossOrigin
 public class SecurityConfiguration {
-    private final JwtAuthenticationFilter JwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
+    // private final JwtAuthenticationFilter JwtAuthFilter;
+    // private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -58,8 +58,8 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS
                 ))
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                // .authenticationProvider(authenticationProvider)
+                // .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
