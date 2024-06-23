@@ -30,7 +30,7 @@ function App() {
                 <Route path='/' element={<Home/>}/>
                 <Route path='/upload' element={<Upload/>}/>
                 <Route path='/edit/:slug' element={<Upload/>}/>
-                <Route path='/profile' element={<Profile/>}>
+                <Route path='/profile/:staff_code' element={<Profile/>}>
                     <Route path='' element={<UserHome/>}/>
                     <Route path='document/upload' element={<UserUploadDocument/>}/>
                     <Route path='document/favorite' element={<UserFavoriteDocument/>}/>

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {jwtDecode} from "jwt-decode";
+import {useParams} from "react-router-dom";
 
 const UserInfor = () => {
     const [specializedList, setSpecializedList] = useState([]);
@@ -7,6 +8,8 @@ const UserInfor = () => {
 
     const [selectedSpecialized, setSelectedSpecialized] = useState(null);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
+
+    const location = useParams();
 
     // user info
     const [name, setName] = useState(null);
@@ -36,8 +39,12 @@ const UserInfor = () => {
     }, [])
 
 
+
+
+
     useEffect(() => {
-        console.log(jwt)
+        if (jwt) {
+
         fetch("http://localhost:8080/api/v1/users/" + jwt?.staff_code)
             .then((res) => res.json())
             .then((data) => {
@@ -50,9 +57,31 @@ const UserInfor = () => {
                 setSelectedSpecialized(data?.specialized?.id)
                 setUser(data)
             });
-    }, [jwt?.staff_code])
 
-    console.log(user)
+            if (jwt) {
+                if (location.valueOf("staff_code").staff_code !== jwt?.staff_code) {
+                    window.location.href = `/`;
+                }
+            } else {
+                window.location.href = `/`;
+            }
+
+            fetch("http://localhost:8080/api/v1/specializes/department/" + jwt?.staff_code)
+                .then((res) => res.json())
+                .then((data) => {
+                    setSpecializedList(data)
+                });
+        }
+
+    }, [jwt, location])
+
+    // if (jwt) {
+    //     if (location.valueOf("staff_code").staff_code !== jwt?.staff_code) {
+    //         window.location.href = `/`;
+    //     }
+    // } else {
+    //     window.location.href = `/`;
+    // }
 
     useEffect(() => {
         if (selectedDepartment) {
@@ -60,7 +89,6 @@ const UserInfor = () => {
             fetch("http://localhost:8080/api/v1/specializes/department/" + selectedDepartment?.id)
                 .then((res) => res.json())
                 .then((data) => {
-
                     setSpecializedList(data)
                 });
         }
@@ -150,7 +178,7 @@ const UserInfor = () => {
                     {
                         specializedList && specializedList?.map(specialized => (
                             <option value={specialized.id}
-                                    className={`${specialized.id == user?.specialized?.id ? 'bg-red-400' : ''}`}
+                                    className={`${specialized.id === user?.specialized?.id ? 'bg-red-400' : ''}`}
                                     defaultChecked={specialized.id === user?.specialized?.id}
                                     key={specialized.id}>{specialized.specializedName}</option>
                         ))

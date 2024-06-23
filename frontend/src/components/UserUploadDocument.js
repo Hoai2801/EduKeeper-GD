@@ -2,27 +2,34 @@ import React, {useEffect, useState} from 'react';
 import {jwtDecode} from "jwt-decode";
 import DocumentCard from "./DocumentCard";
 import edit from '../assets/edit-246.png';
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 
-const MyComponent = () => {
-    const token = localStorage.getItem("token");
-    let jwt = null;
-    if (token !== "undefined" && token !== null) {
-        jwt = jwtDecode(token);
-    }
+const UserUploadDocument = () => {
+    const [jwt, setJwt] = useState(null);
+    const location = useParams();
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token !== "undefined" && token !== null) {
+            setJwt(jwtDecode(token));
+        }
+    }, []);
 
     const [documentList, setDocumentList] = useState([]);
-
-    useEffect(() => {
-        if (jwt) {
-            fetch("http://localhost:8080/api/v1/documents/author/" + jwt?.staff_code)
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data)
-                    setDocumentList(data);
-                });
+    if (jwt) {
+        if (location.valueOf("staff_code").staff_code !== jwt?.staff_code) {
+            window.location.href = `/profile/${jwt?.staff_code}/document/upload`;
         }
-    }, [])
+    } else {
+        window.location.href = `/`;
+    }
+    useEffect(() => {
+        fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data)
+                setDocumentList(data);
+            });
+    }, [location])
     return (
         <div className={`flex gap-5 justify-center flex-wrap`}>
             {documentList?.map((item, index) => (
@@ -51,4 +58,4 @@ const MyComponent = () => {
     );
 };
 
-export default MyComponent;
+export default UserUploadDocument;
