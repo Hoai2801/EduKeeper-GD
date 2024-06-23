@@ -10,7 +10,7 @@ public interface SubjectService {
     List<Subject> getAllSubjects();
     void createSubject(SubjectDTO subject);
 
-    List<Subject> getSubjectsBySpecializedId(Long specializedId);
+    List<Subject> getSubjectsBySpecializedId(String specializedId);
 
     Subject getSubjectById(Long id);
 }

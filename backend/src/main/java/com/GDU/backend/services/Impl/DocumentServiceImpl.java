@@ -3,14 +3,11 @@ package com.GDU.backend.services.Impl;
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
-import com.GDU.backend.dtos.responses.DocumentResponseDTO;
-import com.GDU.backend.dtos.responses.TotalResponse;
-import com.GDU.backend.dtos.responses.UserResponse;
+import com.GDU.backend.dtos.responses.*;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.DocumentService;
-import com.GDU.backend.services.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -52,12 +49,12 @@ public class DocumentServiceImpl implements DocumentService {
         // TODO: convert to service
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
-                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
-        
+//        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
+//                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
+
         Subject subject = subjectRepository.findById(uploadRequestDTO.getSubject())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
-        
+
         User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
@@ -68,7 +65,7 @@ public class DocumentServiceImpl implements DocumentService {
         Path uploadDir = Paths.get(UPLOAD_DIR);
         Files.createDirectories(uploadDir);
         Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        
+
         int numberOfPages = 0;
         String thumbnail = "";
 
@@ -95,6 +92,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .path(destFile.getAbsolutePath())
                 .documentType(uploadRequestDTO.getDocument().getContentType())
+                .status("Draft")
+                .scope(uploadRequestDTO.getScope())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
                 .description(uploadRequestDTO.getDescription())
                 .pages(numberOfPages)
@@ -146,56 +145,20 @@ public class DocumentServiceImpl implements DocumentService {
             return "Document not existing";
         }
 
-        User newAuthor = userService.getUserByStaffCode(uploadRequestDTO.getAuthor());
-        if (newAuthor == null) {
-            return "Author not existing";
+        User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
+        if (userUpload == null) {
+            return "User not existing";
         }
-        existDocument.setUserUpload(newAuthor);
+        existDocument.setUserUpload(userUpload);
 
-        Category category = categoryRepository.findById((long) uploadRequestDTO.getCategory()).orElse(null);
-        // Update document
+        Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
         existDocument.setCategory(category);
-        existDocument.setTitle(
-                uploadRequestDTO.getTitle() != null ?
-                        uploadRequestDTO.getTitle() :
-                        existDocument.getTitle()
-        );
-        existDocument.setSlug(
-                uploadRequestDTO.getTitle() != null ?
-                        uploadRequestDTO.getTitle()
-                                .replace(" ", "-")
-                                .toLowerCase() + "-" + new Date().getTime() :
-                        existDocument.getSlug()
-        );
-//        existDocument.setSpecialized(existDocument.getSpecialized());
-
-        // I think we don't need update a document file 
-        // any more because we should upload a new one instead
-
-        // Handle Path
-//        if (uploadRequestDTO.getDocument() != null) {
-//            existDocument.setDocument_type(uploadRequestDTO.getDocument().getContentType());
-//            existDocument.setDocument_size(uploadRequestDTO.getDocument().getSize() / 1_000_000);
-//
-//            String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
-//            File destFile = new File(UPLOAD_DIR + fileName);
-//
-//            // Save the uploaded document to the file system
-//            MultipartFile multipartFile = uploadRequestDTO.getDocument();
-//            Path uploadDir = Paths.get(UPLOAD_DIR);
-//            try {
-//                Files.createDirectories(uploadDir);
-//            } catch (IOException e) {
-//                log.error("Error creating directories: {}", e.getMessage());
-//            }
-//            try {
-//                Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-//            } catch (IOException e) {
-//                log.error("Error copying file: {}", e.getMessage());
-//            }
-//
-//            existDocument.setPath(destFile.getAbsolutePath());
-//        }
+        existDocument.setAuthor(uploadRequestDTO.getAuthor());
+        existDocument.setDescription(uploadRequestDTO.getDescription());
+        existDocument.setScope(uploadRequestDTO.getScope());
+        existDocument.setTitle(uploadRequestDTO.getTitle());
+        existDocument.setSlug(createSlug(uploadRequestDTO.getTitle()));
+        existDocument.setStatus("Draft");
         documentRepository.save(existDocument);
         return "Update document successfully";
     }
@@ -362,13 +325,41 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponseDTO> getDocumentsByAuthor(Long id) {
-        List<Document> documents = documentRepository.findAllByAuthorId(id);
+        User existingUser = userService.getUserByStaffCode(id.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
         return documents.stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
     public int getDocumentsCountBySpecialized(Long id) {
         return documentRepository.findAllBySpecializedId(id);
+    }
+
+    @Override
+    public int getTotalViewsByAuthor(Long authorId) {
+        User existingUser = userService.getUserByStaffCode(authorId.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
+        if (documents.isEmpty()) {
+            return 0;
+        }
+        return documents.stream().mapToInt(Document::getViews).sum();
+    }
+
+    @Override
+    public int getTotalDownloadsByAuthor(Long authorId) {
+        User existingUser = userService.getUserByStaffCode(authorId.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
+        if (documents.isEmpty()) {
+            return 0;
+        }
+        return documents.stream().mapToInt(Document::getDownload).sum();
+    }
+
+    @Override
+    public int getDocumentsCountByAuthor(Long authorId) {
+        User existingUser = userService.getUserByStaffCode(authorId.toString());
+        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
+        return documents.size();
     }
 
     public DocumentResponseDTO convertToDocumentResponse(Document document) {
@@ -386,6 +377,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .download(document.getDownload())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
+                .status(document.getStatus())
+                .scope(document.getScope())
                 .category(document.getCategory())
                 .upload_date(document.getUploadDate())
                 .subject(document.getSubject())
@@ -398,4 +391,117 @@ public class DocumentServiceImpl implements DocumentService {
                 .build();
     }
 
+    @Override
+    public List<DocumentResponseDTO> getDraftDocument() {
+        return documentRepository.findDraftDocuments().stream().map(this::convertToDocumentResponse).toList();
+    }
+
+    @Override
+    public List<DocumentResponseDTO> getPublishedDocument() {
+        return documentRepository.findPublishedDocuments().stream().map(this::convertToDocumentResponse).toList();
+    }
+
+    @Override
+    public String AcceptDocument(Long id) throws IOException {
+        try {
+            Document document = documentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+            if (document.getStatus().equalsIgnoreCase("published")) {
+                throw new ResourceNotFoundException("Document has published");
+            }
+            document.setStatus("published");
+            documentRepository.save(document);
+            return "Accept Document with id: " + id + " success";
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method Accept Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String AcceptListDocument(List<Long> ids) throws IOException {
+        try {
+            for (Long id : ids) {
+                Document document = documentRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + id));
+                if (document.getStatus().equalsIgnoreCase("published")) {
+                    throw new ResourceNotFoundException("Document has published");
+                }
+                document.setStatus("published");
+                documentRepository.save(document);
+
+            }
+            return "Accept Document with id: " + ids + " success";
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method Accept Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentMonthly> countDocumentsMonthly() {
+        try {
+            return documentRepository.countDocumentsMonthly();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public int countDocumentsToday() {
+        try {
+            return documentRepository.countDocumentsToday();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public int countPublishedDocuments() {
+        try {
+            return documentRepository.countPublishedDocuments();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public int countDraftDocuments() {
+        try {
+            return documentRepository.countDraftDocuments();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<TypeDocumentRes> countDocumentsByType() {
+        try {
+            return documentRepository.countDocumentsByType();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentResponseDTO> getTop3Documents() {
+        try {
+
+            return documentRepository.getTop3Docs().stream().map(this::convertToDocumentResponse).toList();
+
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentResponseDTO> getPaginationDocs(int page) {
+        try {
+            int pageSize = 10;
+            int offset = (page - 1) * pageSize;
+            return documentRepository.getPaginationDocuments(offset).stream().map(this::convertToDocumentResponse)
+                    .toList();
+
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method pagination Docs: " + e.getMessage());
+        }
+    }
 }

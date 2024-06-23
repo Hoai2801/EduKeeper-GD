@@ -51,8 +51,8 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public List<Subject> getSubjectsBySpecializedId(Long specializedId) {
-        List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectsBySpecializedId(specializedId);
+    public List<Subject> getSubjectsBySpecializedId(String specializedId) {
+        List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectsBySpecializedId(Long.parseLong(specializedId));
         List<Subject> subjects = new ArrayList<>();
         for (SubjectSpecialized subjectSpecialized : subjectSpecializeds) {
             subjects.add(subjectSpecialized.getSubject());

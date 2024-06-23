@@ -1,6 +1,7 @@
 package com.GDU.backend.services;
 
 import com.GDU.backend.dtos.requests.FavoriteDTO;
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.models.Favorite;
 
 import java.util.List;
@@ -8,11 +9,11 @@ import java.util.List;
 public interface FavoriteService {
     String createFavorite(FavoriteDTO favoriteDTO);
 
-    List<Favorite> getAllFavorite();
+    List<DocumentResponseDTO> getDocumentsFavoritesByUserId(Long userId);
 
-    List<Favorite> getFavoritesByUserId(Long userId);
+    String deleteFavoriteById(FavoriteDTO favoriteDTO);
 
-    List<Favorite> getFavoritesByDocsId(Long docsId);
+    boolean isFavorite(FavoriteDTO favoriteDTO);
 
-    String deleteFavoriteById(Long id);
+    int getTotalFavoritesCountByAuthor(Long authorId);
 }
