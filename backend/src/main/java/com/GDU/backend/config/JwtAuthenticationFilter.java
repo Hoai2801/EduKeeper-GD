@@ -40,6 +40,7 @@
                  UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
 
                  if (jwtService.isTokenValid(jwt, userDetails)) {
+                     System.out.println(userDetails.getAuthorities().toString());
                      UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                              userDetails,
                              null,
