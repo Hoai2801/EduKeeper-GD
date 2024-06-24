@@ -49,14 +49,14 @@ public class DocumentController {
     }
 
     // get most views in 30 days
-    @GetMapping("/most-viewed")
-    public ResponseEntity<?> getMostViewedDocuments(@RequestParam("limit") int limit) {
-        try {
-            return ResponseEntity.ok(documentService.getMostViewedDocuments(limit));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+//    @GetMapping("/most-viewed")
+//    public ResponseEntity<?> getMostViewedDocuments(@RequestParam("limit") int limit) {
+//        try {
+//            return ResponseEntity.ok(documentService.getMostViewedDocuments(limit));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
 
     // get most downloaded in 30 days
     @GetMapping("/most-downloaded")
@@ -124,24 +124,6 @@ public class DocumentController {
         }
     }
 
-    @PutMapping("/download/{id}")
-    public ResponseEntity<?> updateDownloadCount(@PathVariable("id") Long id) {
-        try {
-            return ResponseEntity.ok(documentService.updateDownloadCount(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
-
-    @PutMapping("/views/{id}")
-    public ResponseEntity<?> updateViewCount(@PathVariable("id") Long id) {
-        try {
-            return ResponseEntity.ok(documentService.updateViewCount(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
-
     @GetMapping("/count")
     public ResponseEntity<?> countAllDocuments() {
         try {
@@ -191,14 +173,14 @@ public class DocumentController {
         }
     }
     
-    @GetMapping("/total-views/{authorId}")
-    public ResponseEntity<?> getTotalViewsByAuthor(@PathVariable("authorId") Long authorId) {
-        try {
-            return ResponseEntity.ok(documentService.getTotalViewsByAuthor(authorId));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+//    @GetMapping("/total-views/{authorId}")
+//    public ResponseEntity<?> getTotalViewsByAuthor(@PathVariable("authorId") Long authorId) {
+//        try {
+//            return ResponseEntity.ok(documentService.getTotalViewsByAuthor(authorId));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
     
     @GetMapping("/total-downloads/{authorId}")
     public ResponseEntity<?> getTotalDownloadsByAuthor(@PathVariable("authorId") Long authorId) {

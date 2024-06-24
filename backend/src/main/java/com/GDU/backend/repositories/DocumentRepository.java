@@ -14,12 +14,12 @@ import java.util.Optional;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     Document getDocumentBySlug(String slug);
 
-    @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
-            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")
-    List<Document> getMostViewedDocuments(int limit);
+//    @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
+//            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.views) DESC LIMIT :limit")
+//    List<Document> getMostViewedDocuments(int limit);
 
     @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
-            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.download DESC LIMIT :limit")
+            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.downloads) DESC LIMIT :limit")
     List<Document> getMostDownloadedDocuments(int limit);
 
     @Query("SELECT d FROM Document d ORDER BY d.id DESC LIMIT :limit")
@@ -99,7 +99,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("select d from Document d where d.userUpload.id = :id")
     List<Document> findAllByAuthorId(Long id);
 
-    @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id")
+    @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id and d.status = 'published'")
     int findAllBySpecializedId(Long id);
 
     @Query(value = "SELECT * FROM document d WHERE d.status = 'draft'", nativeQuery = true)

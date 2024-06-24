@@ -130,7 +130,7 @@ const Navbar = () => {
                             </div>
                         </div>
                     </Link>
-                    {jwt?.role === "ADMIN" ? (
+                    {jwt?.role === "ADMIN" || jwt?.role === "TEACHER" ? (
                         <Link
                             to="/upload"
                             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
@@ -185,7 +185,7 @@ const Navbar = () => {
                                              className="w-8 h-8 rounded-full"/>
                                     </button>
                                     <div
-                                        className={`bg-white absolute flex flex-col max-w-[300px] w-[300px] overflow-hidden h-[300px] top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`}
+                                        className={`bg-white absolute flex flex-col items-center leading-[50px] max-w-[300px] w-[300px] overflow-hidden h-fit top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`}
                                         onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}>
                                         <Link to={`/profile/${jwt?.staff_code}`} className="hover:bg-blue-300 w-full h-[50px]">Trang cá
                                             nhân</Link>

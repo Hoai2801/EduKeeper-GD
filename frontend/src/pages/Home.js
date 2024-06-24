@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import {jwtDecode} from "jwt-decode";
 
 const Home = () => {
+
   const [mostViewed, setMostViewed] = useState([])
 
   const [mostDownloaded, setMostDownloaded] = useState([])

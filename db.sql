@@ -175,8 +175,8 @@ CREATE TABLE `document` (
                             `thumbnail` varchar(200),
                             `author` varchar(100) NOT NULL,
                             `user_upload` int not null,
-                            `download` int not null,
-                            `views` int not null,
+--                             `download` int not null,
+--                             `views` int not null,
                             PRIMARY KEY (`id`),
                             KEY `document_ibfk_2` (`category_id`),
                             KEY `document_ibfk_4` (`author`),
@@ -207,6 +207,27 @@ CREATE TABLE token (
                        expires_date datetime not null,
                        validated_at datetime,
                        FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+create table view_history (
+	id int auto_increment primary key,
+	user_id int not null,
+	document_id int not null,
+    created_at datetime not null,
+    is_lastest boolean default true not null,
+	constraint `vh_fk_u` FOREIGN key (`user_id`) REFERENCES `users` (`id`),
+	CONSTRAINT `vh_fk_d` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
+);
+
+CREATE TABLE `downloads` (
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `user_id` int NOT NULL,
+                            `document_id` int NOT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `user_id` (`user_id`),
+                            KEY `document_id` (`document_id`),
+                            CONSTRAINT `dl_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+                            CONSTRAINT `dl_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
 );
 
 

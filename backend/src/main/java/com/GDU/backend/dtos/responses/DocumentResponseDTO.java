@@ -1,18 +1,15 @@
 package com.GDU.backend.dtos.responses;
 
-import com.GDU.backend.models.Category;
-import com.GDU.backend.models.Document;
-import com.GDU.backend.models.Specialized;
-import com.GDU.backend.models.Subject;
+import com.GDU.backend.models.*;
+import com.GDU.backend.services.ViewHistoryService;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 @Data
 @Builder
@@ -42,6 +39,7 @@ public class DocumentResponseDTO {
     
     private String scope;
     
+    @Column(name = "user_upload")
     private UserResponse user_upload;
     
     private String author;
@@ -66,8 +64,8 @@ public class DocumentResponseDTO {
                 .id(document.getId())
                 .title(document.getTitle())
                 .slug(document.getSlug())
-                .views(document.getViews())
-                .download(document.getDownload())
+//                .views(document.getViewsCount())
+                .download(document.getDownloadsCount())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
                 .category(document.getCategory())

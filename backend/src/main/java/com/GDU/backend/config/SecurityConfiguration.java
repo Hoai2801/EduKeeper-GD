@@ -51,14 +51,15 @@ public class SecurityConfiguration {
                                 "/webjars/**"
                         ).hasRole("ADMIN")
                         .requestMatchers(
-//                                "/api/v1/users/**",
                                 "/api/v1/role/**"
                         ).hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(
                                 "/api/v1/documents/upload"
                         ).hasAnyRole("TEACHER", "ADMIN", "SUB-ADMIN")
                         .requestMatchers(
-                                "/api/v1/auth/**"
+                                "/api/v1/auth/**",
+                                "/api/v1/documents/filter",
+                                "/api/v1/favorites/**"
                         ).permitAll()
                         .requestMatchers(GET).permitAll()
                 )

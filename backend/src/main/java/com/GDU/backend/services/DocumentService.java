@@ -7,15 +7,17 @@ import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.dtos.responses.TotalResponse;
 import com.GDU.backend.dtos.responses.DocumentMonthly;
 import com.GDU.backend.dtos.responses.TypeDocumentRes;
+import com.GDU.backend.models.Document;
+
 import java.io.IOException;
 import java.util.List;
 
 public interface DocumentService {
     String uploadDocument(UploadRequestDTO uploadRequestDto) throws IOException;
 
-    String updateDownloadCount(Long id);
+//    String updateDownloadCount(Long id);
 
-    String updateViewCount(Long id);
+//    String updateViewCount(Long id);
 
     String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO);
 
@@ -23,7 +25,7 @@ public interface DocumentService {
 
     String deleteDocument(Long id);
 
-    List<DocumentResponseDTO> getMostViewedDocuments(int limit);
+//    List<DocumentResponseDTO> getMostViewedDocuments(int limit);
 
     List<DocumentResponseDTO> getMostDownloadedDocuments(int limit);
 
@@ -43,7 +45,7 @@ public interface DocumentService {
 
     int getDocumentsCountBySpecialized(Long id);
 
-    int getTotalViewsByAuthor(Long authorId);
+//    int getTotalViewsByAuthor(Long authorId);
 
     int getTotalDownloadsByAuthor(Long authorId);
 
@@ -70,4 +72,6 @@ public interface DocumentService {
     List<DocumentResponseDTO> getTop3Documents();
 
     List<DocumentResponseDTO> getPaginationDocs(int page);
+
+    Document getDocumentById(Long documentId);
 }

@@ -5,6 +5,7 @@ import love from '../assets/love.png'
 import document from '../assets/document.jpg'
 import {jwtDecode} from "jwt-decode";
 import {useLocation, useParams} from "react-router-dom";
+import DocumentCard from "./DocumentCard";
 
 const UserHome = () => {
     const [totalViews, setTotalViews] = useState(0);
@@ -14,8 +15,9 @@ const UserHome = () => {
     const [jwt, setJwt] = useState(null);
     const [staffCode, setStaffCode] = useState(null);
 
+    const [favoriteDocuments, setFavoriteDocuments] = useState(null);
+
     const location = useParams();
-    console.log(location.valueOf("staff_code"))
 
 
     useEffect(() => {
@@ -23,6 +25,13 @@ const UserHome = () => {
         if (token !== "undefined" && token !== null) {
             setJwt(jwtDecode(token));
         }
+
+        fetch('http://localhost:8080/api/v1/view-history/' + location.valueOf("staff_code").staff_code + '/10')
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data)
+                setFavoriteDocuments(data);
+            })
     }, []);
 
     useEffect(() => {
@@ -91,7 +100,7 @@ const UserHome = () => {
                 <div
                     className='bg-transparent text-center text-white font-bold bg-gradient-to-r from-green-600 to-green-400 w-[300px] h-[150px] rounded-lg p-3'>
                     <h3 className='text-xl'>
-                        Tổng lượt xem
+                        Tổng lượt được xem
                     </h3>
                     <div className='w-[40px] h-[40px] rounded-full mx-auto my-3 overflow-hidden'>
                         <img src={view} alt="" className='w-full h-full'/>
@@ -101,7 +110,7 @@ const UserHome = () => {
                 <div
                     className='bg-transparent text-center text-white font-bold bg-gradient-to-r from-purple-600 to-purple-400 w-[300px] h-[150px] rounded-lg p-3'>
                     <h3 className='text-xl'>
-                        Tổng lượt yêu thích
+                        Tổng được yêu thích
                     </h3>
                     <div className='w-[40px] h-[40px] rounded-full mx-auto my-3 overflow-hidden'>
                         <img src={love} alt="" className='w-full h-full object-center'/>
@@ -111,7 +120,7 @@ const UserHome = () => {
                 <div
                     className='bg-transparent text-center text-white font-bold bg-gradient-to-r from-blue-600 to-blue-400 w-[300px] h-[150px] rounded-lg p-3'>
                     <h3 className='text-xl'>
-                        Tổng lượt tài liệu
+                        Tổng tài liệu
                     </h3>
                     <div className='w-[40px] h-[40px] rounded-full mx-auto my-3 overflow-hidden'>
                         <img src={document} alt="" className='w-full h-full object-center'/>
@@ -123,7 +132,11 @@ const UserHome = () => {
             <div className='lg:w-[1262px] mx-auto'>
                 <h2 className='text-3xl font-semibold mt-5 mb-3 text-start'>Lịch sử xem</h2>
                 <div className='flex gap-5 w-full py-5 overflow-auto'>
-
+                    {
+                        favoriteDocuments?.map((document) => (
+                            <DocumentCard document={document} key={document.id}/>
+                        ))
+                    }
                     {/*<DocumentCard title="Tiêu đề" author={{ username: "Tang Gia Hoai", avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" }} upload_date="01/01/2022" slug="abc" />*/}
                     {/*<DocumentCard title="Tiêu đề" author={{ username: "Tang Gia Hoai", avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" }} upload_date="01/01/2022" slug="abc" />*/}
                     {/*<DocumentCard title="Tiêu đề" author={{ username: "Tang Gia Hoai", avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" }} upload_date="01/01/2022" slug="abc" />*/}
