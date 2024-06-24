@@ -25,7 +25,6 @@ function App() {
     window.scrollTo(0, 0);
     return (
         <Routes>
-
             <Route element={<Layout/>}>
                 <Route path='/' element={<Home/>}/>
                 <Route path='/upload' element={<Upload/>}/>

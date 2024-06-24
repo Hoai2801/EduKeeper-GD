@@ -170,14 +170,14 @@ public class DocumentServiceImpl implements DocumentService {
         return convertToDocumentResponse(document);
     }
 
-    @Override
-    public List<DocumentResponseDTO> getMostViewedDocuments(int limit) {
-        return documentRepository.getMostViewedDocuments(limit)
-                .stream()
-                .filter(document -> document.getViews() > 0)
-                .map(this::convertToDocumentResponse)
-                .toList();
-    }
+//    @Override
+//    public List<DocumentResponseDTO> getMostViewedDocuments(int limit) {
+//        return documentRepository.getMostViewedDocuments(limit)
+//                .stream()
+//                .filter(document -> !document.getViews().isEmpty())
+//                .map(this::convertToDocumentResponse)
+//                .toList();
+//    }
 
     @Override
     public String deleteDocument(Long id) {
@@ -203,38 +203,39 @@ public class DocumentServiceImpl implements DocumentService {
     public List<DocumentResponseDTO> getMostDownloadedDocuments(int limit) {
         // only get document has download more than 0
         return documentRepository.getMostDownloadedDocuments(limit).stream()
-                .filter(document -> document.getDownload() > 0)
+                .filter(document -> !document.getDownloads().isEmpty())
                 .map(this::convertToDocumentResponse)
                 .toList();
     }
 
     @Override
     public List<DocumentResponseDTO> getLatestDocuments(int limit) {
-        return documentRepository.getLastedDocuments(limit)
+               List<Document> documents = documentRepository.getLastedDocuments(limit);
+        return documents
                 .stream().map(this::convertToDocumentResponse).toList();
     }
 
-    public String updateDownloadCount(Long id) {
-        Document existsDocument = documentRepository.findById(id).orElse(null);
-        if (existsDocument == null) {
-            return "Document is not existing";
-        }
+//    public String updateDownloadCount(Long id) {
+//        Document existsDocument = documentRepository.findById(id).orElse(null);
+//        if (existsDocument == null) {
+//            return "Document is not existing";
+//        }
+//
+//        existsDocument.setDownload(existsDocument.getDownload() + 1);
+//        documentRepository.save(existsDocument);
+//        return "Update downloads success";
+//    }
 
-        existsDocument.setDownload(existsDocument.getDownload() + 1);
-        documentRepository.save(existsDocument);
-        return "Update downloads success";
-    }
-
-    @Override
-    public String updateViewCount(Long id) {
-        Document existsDocument = documentRepository.findById(id).orElse(null);
-        if (existsDocument == null) {
-            return "Document is not existing";
-        }
-        existsDocument.setViews(existsDocument.getViews() + 1);
-        documentRepository.save(existsDocument);
-        return "Update views success";
-    }
+//    @Override
+//    public String updateViewCount(Long id) {
+//        Document existsDocument = documentRepository.findById(id).orElse(null);
+//        if (existsDocument == null) {
+//            return "Document is not existing";
+//        }
+//        existsDocument.setViews(existsDocument.getViews() + 1);
+//        documentRepository.save(existsDocument);
+//        return "Update views success";
+//    }
 
     @Override
     public List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO) {
@@ -261,22 +262,27 @@ public class DocumentServiceImpl implements DocumentService {
 
         // Sort documents
         if (filterRequestDTO.getOrder() != null) {
-            if (filterRequestDTO.getOrder().equalsIgnoreCase("most-viewed")) {
-                documents.sort(Comparator.comparing(Document::getViews).reversed());
-            }
-            if (filterRequestDTO.getOrder().equalsIgnoreCase("most-downloaded")) {
-                // Filter documents with download > 0 first
-                // Update documents with filtered and sorted list
-                documents = documents.stream()
-                        .filter(document -> document.getDownload() > 0)
-                        .sorted(Comparator.comparing(Document::getDownload)
-                                .reversed()).collect(Collectors.toList());
-            }
-            if (filterRequestDTO.getOrder().equalsIgnoreCase("latest")) {
-                documents.sort(Comparator.comparing(Document::getId).reversed());
-            }
+            documents = switch (filterRequestDTO.getOrder().toLowerCase()) {
+//                case "most-viewed" -> documents.stream()
+//                        .filter(document -> document.getViewsCount() > 0 && document.getScope().equals("public"))
+//                        .sorted(Comparator.comparing(Document::getViewsCount).reversed())
+//                        .collect(Collectors.toList());
+                case "most-downloaded" -> documents.stream()
+                        .filter(document -> document.getDownloadsCount() > 0 && document.getScope().equals("public"))
+                        .sorted(Comparator.comparing(Document::getDownloadsCount).reversed())
+                        .collect(Collectors.toList());
+                default -> documents
+                        .stream()
+                        .filter(document -> document.getScope().equals("public"))
+                        .sorted(Comparator.comparing(Document::getId).reversed())
+                        .collect(Collectors.toList());
+            };
         } else {
-            documents.sort(Comparator.comparing(Document::getId).reversed());
+            documents = documents
+                    .stream()
+                    .filter(document -> document.getScope().equals("public"))
+                    .sorted(Comparator.comparing(Document::getId).reversed())
+                    .collect(Collectors.toList());
         }
         return documents.stream().map(this::convertToDocumentResponse).toList();
     }
@@ -335,15 +341,15 @@ public class DocumentServiceImpl implements DocumentService {
         return documentRepository.findAllBySpecializedId(id);
     }
 
-    @Override
-    public int getTotalViewsByAuthor(Long authorId) {
-        User existingUser = userService.getUserByStaffCode(authorId.toString());
-        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
-        if (documents.isEmpty()) {
-            return 0;
-        }
-        return documents.stream().mapToInt(Document::getViews).sum();
-    }
+//    @Override
+//    public int getTotalViewsByAuthor(Long authorId) {
+//        User existingUser = userService.getUserByStaffCode(authorId.toString());
+//        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
+//        if (documents.isEmpty()) {
+//            return 0;
+//        }
+//        return documents.stream().mapToInt(Document::getViewsCount).sum();
+//    }
 
     @Override
     public int getTotalDownloadsByAuthor(Long authorId) {
@@ -352,7 +358,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (documents.isEmpty()) {
             return 0;
         }
-        return documents.stream().mapToInt(Document::getDownload).sum();
+        return documents.stream().mapToInt(Document::getDownloadsCount).sum();
     }
 
     @Override
@@ -373,8 +379,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .id(document.getId())
                 .title(document.getTitle())
                 .slug(document.getSlug())
-                .views(document.getViews())
-                .download(document.getDownload())
+//                .views(document.getViewsCount())
+                .download(document.getDownloadsCount())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
                 .status(document.getStatus())
@@ -484,9 +490,9 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentResponseDTO> getTop3Documents() {
         try {
-
-            return documentRepository.getTop3Docs().stream().map(this::convertToDocumentResponse).toList();
-
+            return documentRepository.getTop3Docs()
+                    .stream()
+                    .map(this::convertToDocumentResponse).toList();
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
         }
@@ -503,5 +509,15 @@ public class DocumentServiceImpl implements DocumentService {
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method pagination Docs: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Document getDocumentById(Long documentId) {
+        return documentRepository.findById(documentId).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+    }
+
+    @Override
+    public List<Document> findDocumentsWithMostDownloads(int limit) {
+        return documentRepository.findDocumentsWithMostDownloads(limit);
     }
 }

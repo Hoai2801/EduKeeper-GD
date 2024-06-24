@@ -50,21 +50,30 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
             .then((res) => res.blob())
             .then((blob) => {
-                console.log(blob)
                 setFile(blob)
             });
 
+        // make view history
         const increaseView = setTimeout(() => {
-            fetch("http://localhost:8080/api/v1/documents/views/" + data?.id, {
-                method: "PUT",
-            })
+            if (staffCode) {
+                fetch("http://localhost:8080/api/v1/view-history", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        document_id: data?.id,
+                        staff_code: staffCode
+                    }),
+                })
+            }
         }, 30000);
 
         return () => clearTimeout(increaseView);
 
     }, [slug, data?.id])
 
-    const width = window.innerWidth > 800 ? 800 : window.innerWidth - 80;
+    const width = window.innerWidth > 800 ? 800 : window.innerWidth - 30;
 
     const onButtonClick = () => {
 
@@ -165,25 +174,26 @@ const Detail = () => {
             <h2 className={`text-[28px] mt-10 font-bold ${data?.scope === "public" || data?.user_upload.staffCode === staffCode ? "hidden" : "block"}`}>
                 Bạn không thể xem tài liệu này vì đây là tài liệu riêng tư</h2>
             <div className={`${data?.scope === "public" || data?.user_upload.staffCode === staffCode ? "" : "hidden"}`}>
-                <div className={`pt-[50px] md:px-5 px-2 `}>
-                    <p className='text-blue-500'><Link
+                <div className={`pt-[50px] md:px-5 md:px-2 px-5`}>
+                    <p className='text-blue-500 text-lg'><Link
                         to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> -
-                        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}>{data?.subject?.subjectName}</Link>
+                        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName} tư tưởng Hồ Chí Minh</Link>
                     </p>
                     {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
-                    <h2 className='text-[28px] font-bold max-w-[900px]'>{data?.title}</h2>
+                    <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title} xin cho ngườii dùng moi ngh</h2>
                     <div className='flex justify-between mt-3 md:flex-row flex-col'>
-                        <div>
-                            <p>Người đăng: <span className='text-blue-500'>{data?.user_upload.username}</span></p>
+                        <div className="flex flex-wrap gap-5 md:flex-col md:gap-1 md:mt-5 text-xl">
+                            <p>Giáo viên: <Link to={`/profile/${data?.user_upload.staffCode}`} className='text-blue-500'>{data?.user_upload.username}</Link></p>
                             <p>Tác giả: <span className=''>{data?.author}</span></p>
                             <p>Ngày đăng: {data?.upload_date}</p>
                             <p>Trang: {data?.pages}</p>
                         </div>
-                        <div className='flex flex-col gap-5'>
+                        <div className='flex flex-col gap-5 md:gap-2'>
                             <button
-                                className={`hover:shadow-lg rounded-md w-10 h-10 overflow-hidden bg-white ${isFavorite ? "p-1" : ""}`}
+                                className={`hover:shadow-lg rounded-md md:w-10 mt-5 md:h-10 w-full h-10 overflow-hidden bg-white ${isFavorite ? "p-1" : ""}`}
                                 onClick={() => favorite()}>
-                                <img src={isFavorite ? love : unlove} className={`w-full h-full`}/>
+                                <img src={isFavorite ? love : unlove} className={`w-full h-full md:block hidden`}/>
+                                <p className="md:hidden font-bold text-xl">Lưu vào yêu thích</p>
                             </button>
                             <button
                                 onClick={() => onButtonClick()}
@@ -197,15 +207,15 @@ const Detail = () => {
                         </div>
                     </div>
                 </div>
-                <div>
+                <div className={`md:px-0 px-5`}>
                     <h3 className='text-[28px] font-bold text-blue-400'>Mô tả</h3>
-                    <div>
+                    <div className={`text-xl`}>
                         <div dangerouslySetInnerHTML={{__html: data?.description}}></div>
                     </div>
                 </div>
-                <div className='mt-10'>
-                    {/* File pdf render */}
-                </div>
+                {/*<div className='mt-10'>*/}
+                {/*    /!* File pdf render *!/*/}
+                {/*</div>*/}
                 <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
                     <Document file={file} onLoadSuccess={onDocumentLoadSuccess}
                               className={'flex flex-col items-center'}>

@@ -1,9 +1,10 @@
 package com.GDU.backend.config;
 
+import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,7 +15,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.lang.reflect.Method;
 import java.util.List;
+
+import static org.springframework.http.HttpMethod.GET;
 
 @Configuration
 @EnableWebSecurity
@@ -22,8 +26,8 @@ import java.util.List;
 @EnableMethodSecurity(securedEnabled = true)
 @CrossOrigin
 public class SecurityConfiguration {
-    // private final JwtAuthenticationFilter JwtAuthFilter;
-    // private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationFilter JwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,13 +41,6 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/api/v1/users/**",
-                                "/api/v1/documents/**",
-                                "/api/v1/specialized/**",
-                                "/api/v1/department/**",
-                                "/api/v1/categories/**",
-                                "/api/v1/role/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs",
                                 "/configuration/ui",
@@ -52,14 +49,25 @@ public class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/api/v1/admin/**",
                                 "/webjars/**"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/v1/role/**"
+                        ).hasAnyRole("ADMIN", "SUB-ADMIN")
+                        .requestMatchers(
+                                "/api/v1/documents/upload"
+                        ).hasAnyRole("TEACHER", "ADMIN", "SUB-ADMIN")
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/api/v1/documents/filter",
+                                "/api/v1/favorites/**"
                         ).permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers(GET).permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS
                 ))
-                // .authenticationProvider(authenticationProvider)
-                // .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

@@ -20,7 +20,7 @@ const UserUploadDocument = () => {
             window.location.href = `/profile/${jwt?.staff_code}/document/upload`;
         }
     } else {
-        window.location.href = `/`;
+       
     }
     useEffect(() => {
         fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
