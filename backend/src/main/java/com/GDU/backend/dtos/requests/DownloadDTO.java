@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class DownloadDTO {
-    private Long userId;
+    private String staffCode;
     private Long documentId;
 
 }

@@ -15,10 +15,6 @@ import java.util.List;
 public interface DocumentService {
     String uploadDocument(UploadRequestDTO uploadRequestDto) throws IOException;
 
-//    String updateDownloadCount(Long id);
-
-//    String updateViewCount(Long id);
-
     String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO);
 
     DocumentResponseDTO getDocumentBySlug(String slug);
@@ -74,4 +70,6 @@ public interface DocumentService {
     List<DocumentResponseDTO> getPaginationDocs(int page);
 
     Document getDocumentById(Long documentId);
+
+    List<Document> findDocumentsWithMostDownloads(int limit);
 }

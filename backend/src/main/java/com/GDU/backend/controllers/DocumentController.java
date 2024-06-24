@@ -275,14 +275,14 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/top3")
-    public ResponseEntity<?> getTop3Documents() {
-        try {
-            return ResponseEntity.ok(documentService.getTop3Documents());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
+//    @GetMapping("/top3")
+//    public ResponseEntity<?> getTop3Documents() {
+//        try {
+//            return ResponseEntity.ok(documentService.getTop3Documents());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
 
     @GetMapping("/page/{page}")
     public ResponseEntity<?> getPaginationDocs(@PathVariable("page") int page) {

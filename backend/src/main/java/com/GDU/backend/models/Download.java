@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "downloads")
-public class Downloads {
+public class Download {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

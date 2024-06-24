@@ -57,4 +57,16 @@ public class ViewHistoryServiceImpl implements ViewHistoryService {
         }
         return List.of();
     }
+
+    @Override
+    public List<DocumentResponseDTO> getTopDocuments(Integer limit) {
+        List<ViewHistory> viewHistories = viewHistoryRepository.findTopDocuments(limit);
+        if (!viewHistories.isEmpty()) {
+            return viewHistories.stream()
+                    .map(ViewHistory::getDocument)
+                    .map(DocumentResponseDTO::from)
+                    .collect(Collectors.toList());
+        }
+        return List.of();
+    }
 }

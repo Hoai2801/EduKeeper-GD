@@ -145,4 +145,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     @Query(value = "SELECT * FROM document d ORDER BY d.upload_date ASC LIMIT 10  OFFSET :offset ", nativeQuery = true)
     List<Document> getPaginationDocuments(@Param("offset") int offset);
+
+    @Query(value = "SELECT d.* FROM document d LEFT JOIN downloads dl ON d.id = dl.document_id GROUP BY d.id ORDER BY COUNT(dl.id) DESC LIMIT :limit", nativeQuery = true)
+    List<Document> findDocumentsWithMostDownloads(@Param("limit") int limit);
+
 }

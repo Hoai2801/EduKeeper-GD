@@ -490,9 +490,9 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentResponseDTO> getTop3Documents() {
         try {
-
-            return documentRepository.getTop3Docs().stream().map(this::convertToDocumentResponse).toList();
-
+            return documentRepository.getTop3Docs()
+                    .stream()
+                    .map(this::convertToDocumentResponse).toList();
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
         }
@@ -514,5 +514,10 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public Document getDocumentById(Long documentId) {
         return documentRepository.findById(documentId).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+    }
+
+    @Override
+    public List<Document> findDocumentsWithMostDownloads(int limit) {
+        return documentRepository.findDocumentsWithMostDownloads(limit);
     }
 }

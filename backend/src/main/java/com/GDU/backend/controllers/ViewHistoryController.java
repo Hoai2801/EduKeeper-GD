@@ -23,4 +23,9 @@ public class ViewHistoryController {
     List<DocumentResponseDTO> getUserViewHistory(@PathVariable("staffCode") String staffCode, @PathVariable("limit") Integer limit) {
         return viewHistoryService.getUserViewHistory(staffCode, limit);
     }
+    
+    @GetMapping("/top-documents/{limit}")
+    List<DocumentResponseDTO> getTopDocuments(@PathVariable("limit") Integer limit) {
+        return viewHistoryService.getTopDocuments(limit);
+    }
 }

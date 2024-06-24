@@ -20,4 +20,7 @@ public interface ViewHistoryRepository extends JpaRepository<ViewHistory, Long> 
 
     @Query("SELECT v FROM ViewHistory v WHERE v.document.id = :id")
     List<ViewHistory> findByDocumentId(Long id);
+
+    @Query("SELECT v FROM ViewHistory v left join Document d on v.document.id = d.id GROUP BY v.id ORDER BY COUNT(d.id) DESC LIMIT :limit")
+    List<ViewHistory> findTopDocuments(Integer limit);
 }

@@ -8,9 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -61,11 +59,11 @@ public class Document {
     private String author;
 
     @OneToMany(mappedBy = "document")
-    private List<Downloads> downloads;
+    private List<Download> downloads;
 
-//    @ManyToMany(mappedBy = "document", fetch = FetchType.LAZY)
-//    @JsonManagedReference
-//    private List<ViewHistory> views;
+    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ViewHistory> views;
     
     private String scope;
     
@@ -76,9 +74,9 @@ public class Document {
     private Subject subject;
 
     // Methods to get the counts of views and downloads
-//    public int getViewsCount() {
-//        return views != null ? views.size() : 0;
-//    }
+    public int getViewsCount() {
+        return views != null ? views.size() : 0;
+    }
 
     public int getDownloadsCount() {
         return downloads != null ? downloads.size() : 0;

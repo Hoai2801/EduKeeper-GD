@@ -11,4 +11,6 @@ public interface ViewHistoryService {
     void createViewHistory(ViewHistoryDTO viewHistoryDTO);
 
     List<DocumentResponseDTO> getUserViewHistory(String staffCode, Integer limit);
+
+    List<DocumentResponseDTO> getTopDocuments(Integer limit);
 }

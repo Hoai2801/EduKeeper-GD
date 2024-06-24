@@ -11,9 +11,10 @@ const DashboardTest = () => {
   const [top10User, setTop10User] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/documents/top3")
+    fetch("http://localhost:8080/api/v1/downloads/top-documents/3")
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setTop3Docs(data);
       });
 

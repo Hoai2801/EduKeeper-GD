@@ -64,7 +64,7 @@ public class DocumentResponseDTO {
                 .id(document.getId())
                 .title(document.getTitle())
                 .slug(document.getSlug())
-//                .views(document.getViewsCount())
+                .views(document.getViewsCount())
                 .download(document.getDownloadsCount())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
