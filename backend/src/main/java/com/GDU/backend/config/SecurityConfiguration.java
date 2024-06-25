@@ -1,6 +1,7 @@
 package com.GDU.backend.config;
 
 import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpMethod;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,13 +60,23 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/documents/filter",
-                                "/api/v1/favorites/**"
+                                "/api/v1/favorites/**",
+                                "/api/v1/downloads/**",
+                                "/api/v1/notifications/**"
                         ).permitAll()
                         .requestMatchers(GET).permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS
                 ))
+                .logout(logout -> logout
+                        .logoutUrl("/api/v1/auth/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        })
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

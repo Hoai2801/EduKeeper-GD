@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import {Link} from "react-router-dom";
 
 const Login = () => {
     const [staffCode, setStaffCode] = useState('');
@@ -22,26 +23,24 @@ const Login = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                
-                
+
                 if (data.token !== undefined) {
-                    console.log(data.token)
-                    
+
                     localStorage.setItem('token', data.token);
                     if (rememberMe) {
                         localStorage.setItem('staffCode', staffCode);
                         localStorage.setItem('password', password);
                     }
 
-                    window.location.href = "/"; 
-                } 
-                if (data.status !== 200) {
-                    setError('Sai mật khẩu');
+                    window.location.href = "/";
+                }
+                if (data.status === 200) {
+                    setError('');
                     return
                 } else {
-                    setError('');
+                    setError('Sai mật khẩu');
                 }
-                
+
             })
     };
 
@@ -52,11 +51,11 @@ const Login = () => {
             fetch('http://localhost:8080/api/v1/auth/forgot-password/' + staffCode, {
                 method: 'POST',
             })
-            .then((data) => {
-                if (data.status === 200) {
-                    alert("Email xác nhận đã được gửi đến email của bạn")
-                }
-            })
+                .then((data) => {
+                    if (data.status === 200) {
+                        alert("Email xác nhận đã được gửi đến email của bạn")
+                    }
+                })
         }
     }
 
@@ -70,22 +69,22 @@ const Login = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form className="space-y-6">
+                    <form className="space-y-5">
                         <div>
                             <label htmlFor="staffCode" className="block text-sm font-medium text-gray-700">
-                            Mã giáo viên
+                                Mã giáo viên
                             </label>
                             <div className="mt-1">
-                                <input 
-                                    id="staffCode" 
-                                    name="staffCode" 
-                                    type="text" 
-                                    autoComplete="staffCode" 
+                                <input
+                                    id="staffCode"
+                                    name="staffCode"
+                                    type="text"
+                                    autoComplete="staffCode"
                                     required
                                     value={staffCode}
                                     onChange={(e) => setStaffCode(e.target.value)}
                                     className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                    placeholder="Nhập mã giáo viên" 
+                                    placeholder="Nhập mã giáo viên"
                                 />
                             </div>
                         </div>
@@ -95,45 +94,50 @@ const Login = () => {
                                 Mật khẩu
                             </label>
                             <div className="mt-1">
-                                <input 
-                                    id="password" 
-                                    name="password" 
-                                    type="password" 
-                                    autoComplete="current-password" 
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="current-password"
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                    placeholder="Nhập mật khẩu" 
+                                    placeholder="Nhập mật khẩu"
                                 />
                             </div>
                         </div>
 
-                                {error ? <p className='text-red-500'>{error}</p> : null}
+                        {error ? <p className='text-red-500'>{error}</p> : null}
                         <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center">
-                                <input 
-                                    id="remember_me" 
-                                    name="remember_me" 
+                                <input
+                                    id="remember_me"
+                                    name="remember_me"
                                     type="checkbox"
                                     checked={rememberMe}
                                     onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" 
+                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                 />
                                 <label htmlFor="remember_me" className="ml-2 block text-sm text-gray-900">
                                     Ghi nhớ đăng nhập
                                 </label>
                             </div>
                             <div className="text-sm">
-                                <button onClick={forgotPassword} className="font-medium text-blue-600 hover:text-blue-500">
+                                <button onClick={forgotPassword}
+                                        className="font-medium text-blue-600 hover:text-blue-500">
                                     Quên mật khẩu?
                                 </button>
                             </div>
                         </div>
+                        <div className={`w-full flex gap-2 justify-center`}>
+                            <p>Chưa có tài khoản? </p>
+                            <Link to={`/register`} className={`text-blue-500`}>Đăng ký</Link>
+                        </div>
 
                         <div>
-                            <button 
-                            type='button'
+                            <button
+                                type='button'
                                 onClick={(e) => handleSubmit(e)}
                                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 Đăng nhập

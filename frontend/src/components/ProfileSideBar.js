@@ -9,6 +9,15 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
     const [user, setUser] = useState(null);
 
     const out = () => {
+        fetch('http://localhost:8080/api/v1/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+        }).then((data) => {
+            if (data.status === 200) {
+                localStorage.removeItem("token");
+                window.location.href = "/";
+            }
+        })
         localStorage.removeItem("token");
         window.location.href = "/";
     }
@@ -78,10 +87,10 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 <Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
                     Thông báo
                 </Link>
-                <Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
-                    Cài đặt
-                </Link>
-                <Link onClick={() => out()} to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
+                {/*<Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>*/}
+                {/*    Cài đặt*/}
+                {/*</Link>*/}
+                <Link onClick={() => out()} className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
                     Đăng xuất
                 </Link>
             </div>

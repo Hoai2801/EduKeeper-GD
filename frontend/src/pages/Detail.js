@@ -75,23 +75,35 @@ const Detail = () => {
 
     const width = window.innerWidth > 800 ? 800 : window.innerWidth - 30;
 
-    const onButtonClick = () => {
+    const onDonwloadClick = () => {
 
         // Creating new object of PDF file
-        const fileURL =
-            window.URL.createObjectURL(new Blob([file], {type: data?.document_type}));
-
-        // Setting various property values
-        let alink = document.createElement("a");
-        alink.href = fileURL;
-        alink.download = data?.title;
-        alink.click();
-
-        console.log("id: " + data?.id);
+        const fileURL = window.URL.createObjectURL(new Blob([file], {
+            type: data?.document_type,
+            name: data?.title
+        }));
 
         // increase download value of document
-        fetch("http://localhost:8080/api/v1/documents/download/" + data?.id, {
-            method: "PUT",
+        fetch("http://localhost:8080/api/v1/downloads", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                documentId: data?.id,
+                staffCode: staffCode
+            }),
+        }).then((data) => {
+            if (data.status === 200) {
+
+                // Setting various property values
+                let alink = document.createElement("a");
+                alink.href = fileURL;
+                alink.download = data?.title;
+                alink.click();
+            }
+        }).catch((error) => {
+            console.error('Error fetching favorite status:', error);
         })
     };
 
@@ -117,7 +129,6 @@ const Detail = () => {
             })
                 .then((res) => res.json())
                 .then((data) => {
-                    console.log(data);
                     setIsFavorite(data);
                 })
                 .catch((error) => {
@@ -177,29 +188,37 @@ const Detail = () => {
                 <div className={`pt-[50px] md:px-5 md:px-2 px-5`}>
                     <p className='text-blue-500 text-lg'><Link
                         to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> -
-                        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName} tư tưởng Hồ Chí Minh</Link>
+                        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName} tư
+                            tưởng Hồ Chí Minh</Link>
                     </p>
                     {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
-                    <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title} xin cho ngườii dùng moi ngh</h2>
+                    <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title} xin
+                        cho ngườii dùng moi ngh</h2>
                     <div className='flex justify-between mt-3 md:flex-row flex-col'>
                         <div className="flex flex-wrap gap-5 md:flex-col md:gap-1 md:mt-5 text-xl">
-                            <p>Giáo viên: <Link to={`/profile/${data?.user_upload.staffCode}`} className='text-blue-500'>{data?.user_upload.username}</Link></p>
+                            <p>Giáo viên: <Link to={`/profile/${data?.user_upload.staffCode}`}
+                                                className='text-blue-500'>{data?.user_upload.username}</Link></p>
                             <p>Tác giả: <span className=''>{data?.author}</span></p>
                             <p>Ngày đăng: {data?.upload_date}</p>
                             <p>Trang: {data?.pages}</p>
                         </div>
                         <div className='flex flex-col gap-5 md:gap-2'>
-                            <button
-                                className={`hover:shadow-lg rounded-md md:w-10 mt-5 md:h-10 w-full h-10 overflow-hidden bg-white ${isFavorite ? "p-1" : ""}`}
-                                onClick={() => favorite()}>
-                                <img src={isFavorite ? love : unlove} className={`w-full h-full md:block hidden`}/>
-                                <p className="md:hidden font-bold text-xl">Lưu vào yêu thích</p>
+                            <button className={`w-full hover:shadow-lg rounded-md bg-white p-4`}
+                                    onClick={() => favorite()}>
+                                <div className={`w-full min-w-[220px] flex items-center gap-2 h-10 justify-center`}>
+                                    <p className="font-bold text-lg">{isFavorite ? "Đã lưu" : "Lưu vào yêu thích"}</p>
+                                    <div
+                                        className={`hover:shadow-lg rounded-md w-5 mt-1 h-5 overflow-hidden bg-white ${isFavorite ? "p-1" : ""}`}>
+                                        <img src={isFavorite ? love : unlove} className={`w-full h-full`}/>
+                                    </div>
+                                </div>
                             </button>
-                            <button
-                                onClick={() => onButtonClick()}
-                                className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 mt-2'>Tải tài liệu
+                            <buttonN
+                                onClick={() => onDonwloadClick()}
+                                className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 mt-2 text-center cursor-pointer'>Tải
+                                tài liệu
                                 ({data?.document_size} MB)
-                            </button>
+                            </buttonN>
                             <div className='flex gap-5'>
                                 <p>Lượt xem: {data?.views}</p>
                                 <p>Lượt tải về: {data?.download}</p>
@@ -248,7 +267,8 @@ const Detail = () => {
                 {/* </DocumentViewer> */}
             </div>
         </div>
-    );
+    )
+        ;
 }
 
 

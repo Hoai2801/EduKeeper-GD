@@ -6,5 +6,4 @@ import lombok.Data;
 public class DownloadDTO {
     private String staffCode;
     private Long documentId;
-
 }
