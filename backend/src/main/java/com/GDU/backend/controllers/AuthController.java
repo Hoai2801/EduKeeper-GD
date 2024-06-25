@@ -7,9 +7,13 @@ import com.GDU.backend.dtos.responses.AuthenticationResponse;
 import com.GDU.backend.services.Impl.AuthenticationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,16 +25,33 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(
-            @RequestBody RegisterRequest registerRequest
-    ) throws MessagingException {
+            @Valid @RequestBody RegisterRequest registerRequest
+    ) {
+        try {
         return ResponseEntity.ok().body(authenticationService.register(registerRequest));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody AuthenticationRequest loginRequest
     ) {
-        return ResponseEntity.ok().body(authenticationService.login(loginRequest));
+        try {
+            return ResponseEntity.ok().body(authenticationService.login(loginRequest));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        if (authentication != null) {
+            System.out.println("logout: " + authentication.getName());
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     @PostMapping("/activate/{token}")

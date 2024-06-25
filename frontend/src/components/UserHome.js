@@ -86,16 +86,16 @@ const UserHome = () => {
     }, [staffCode]);
     return (
         <div>
-            <div className='flex gap-5 justify-center flex-col lg:flex-row items-center'>
+            <div className='flex gap-5 lg:justify-center flex-wrap flex-row w-full'>
                 <div
                     className='bg-transparent text-center text-white font-bold bg-gradient-to-r from-orange-500 to-orange-300 w-[300px] h-[150px] rounded-lg p-3'>
                     <h3 className='text-xl'>
                         Tổng lượt tải về
                     </h3>
                     <div className='w-[40px] h-[40px] rounded-full overflow-hidden mx-auto my-3'>
-                        <img src={download || 0} alt="" className='w-full h-full object-center'/>
+                        <img src={download} alt="" className='w-full h-full object-center'/>
                     </div>
-                    <p className='text-3xl'>{totalDownloads}</p>
+                    <p className='text-3xl'>{totalDownloads || 0}</p>
                 </div>
                 <div
                     className='bg-transparent text-center text-white font-bold bg-gradient-to-r from-green-600 to-green-400 w-[300px] h-[150px] rounded-lg p-3'>

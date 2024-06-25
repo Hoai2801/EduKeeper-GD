@@ -37,7 +37,7 @@ function App() {
                 </Route>
                 <Route path="/document/:slug" element={<Detail/>}/>
                 <Route path="/login" element={<Login/>}/>
-                <Route path="/signup" element={<SignUp/>}/>
+                <Route path="/register" element={<SignUp/>}/>
                 <Route path="/account/:action/:token" element={<AccoutAction/>}/>
                 <Route element={<SideBar/>}>
                     <Route path="/search" element={<Search/>}/>

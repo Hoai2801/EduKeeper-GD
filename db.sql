@@ -172,6 +172,7 @@ CREATE TABLE `document` (
                             `path` varchar(500) NOT NULL,
                             `description` varchar(2000) NOT NULL,
                             `category_id` int DEFAULT NULL,
+                            `subject_id` int DEFAULT NULL,
                             `thumbnail` varchar(200),
                             `author` varchar(100) NOT NULL,
                             `user_upload` int not null,
@@ -181,7 +182,8 @@ CREATE TABLE `document` (
                             KEY `document_ibfk_2` (`category_id`),
                             KEY `document_ibfk_4` (`author`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`)
+                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`),
+                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
 );
 
 DROP TABLE IF EXISTS `favorite`;

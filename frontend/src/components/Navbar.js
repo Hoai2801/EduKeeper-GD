@@ -49,8 +49,16 @@ const Navbar = () => {
     }
 
     const logout = () => {
-        localStorage.removeItem("token");
-        window.location.href = "/";
+        fetch('http://localhost:8080/api/v1/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+        })
+            .then((data) => {
+                if (data.status === 200) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/";
+                }
+            });
     }
 
     const search = () => {
@@ -187,11 +195,14 @@ const Navbar = () => {
                                     <div
                                         className={`bg-white absolute flex flex-col items-center leading-[50px] max-w-[300px] w-[300px] overflow-hidden h-fit top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`}
                                         onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}>
-                                        <Link to={`/profile/${jwt?.staff_code}`} className="hover:bg-blue-300 w-full h-[50px]">Trang cá
-                                            nhân</Link>
-                                        <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>
-                                        <Link to="/profile" className="hover:bg-blue-300 w-full h-[50px]">Đăng
-                                            xuất</Link>
+                                        <Link to={`/profile/${jwt?.staff_code}`}
+                                              className="hover:bg-blue-300 w-full h-[50px]">
+                                            Trang cá nhân
+                                        </Link>
+                                        <Link to={`/profile/${jwt?.staff_code}/setting`} className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>
+                                        <Link onClick={() => logout()} className="hover:bg-blue-300 w-full h-[50px]">
+                                            Đăng xuất
+                                        </Link>
                                     </div>
                                 </div>
                             ) : (
@@ -210,11 +221,29 @@ const Navbar = () => {
                                 <img src={menuIcon} alt="" className="w-full"/>
                             </button>
                         </div>
-                        <div
-                            className={`w-full absolute top-[80px] right-0 h-[90vh] bg-slate-200 ${isMobileMenuOpen ? "flex" : "hidden"}`}>
-                            <div className="flex flex-col items-center w-full mt-3 gap-3">
+                        <div className={`w-full absolute top-[80px] right-0 h-[90vh] bg-slate-200 ${isMobileMenuOpen ? "flex" : "hidden"}`}>
+                            <div className="flex flex-col items-center w-full mt-3 gap-3 px-4">
+                                <div className="relative w-full">
+                                    <div
+                                        className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                        <svg className="w-4 h-4 text-gray-500 " aria-hidden="true"
+                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+                                                  strokeWidth="2"
+                                                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                                        </svg>
+                                    </div>
+                                    <input type="search" id="default-search"
+                                           className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                                           placeholder="Tìm sách theo tên, chủ đề..." required value={searchTerm}
+                                           onChange={(e) => setSearch(e.target.value)}/>
+                                    <button type="reset" onClick={search}
+                                            className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Tìm
+                                    </button>
+                                </div>
                                 <Link
                                     to={"/"}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                     onMouseEnter={() => setIsShownSpecialized(false)}
                                 >
                                     Trang chủ
@@ -224,11 +253,18 @@ const Navbar = () => {
                                             className="group-hover/department:text-blue-700">
                                         Ngành
                                     </button>
-                                    {/* <div className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`} onMouseLeave={() => setIsShownSpecialized(false)}>
-                    {specialized && specialized.map((item, index) => (
-                      <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`} key={index} className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`} onClick={() => setIsMobileMenuOpen(false)}>{item.specialized.specializedName} <p className="text-[10px]">({item.documentsCount})</p></Link>
-                    ))}
-                  </div> */}
+                                    <div
+                                        className={`w-[90%] h-[300px] overflow-scroll bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`}
+                                        onMouseLeave={() => setIsShownSpecialized(false)}>
+                                        {specialized && specialized.map((item, index) => (
+                                            <Link
+                                                to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`}
+                                                key={index}
+                                                className={`py-3 px-5 hover:bg-[#C5D6F8] h-[40px] flex justify-between`}
+                                                onClick={() => setIsMobileMenuOpen(false)}>{item.specialized.specializedName}
+                                                <p className="text-[10px]">({item.documentsCount})</p></Link>
+                                        ))}
+                                    </div>
                                 </div>
                                 <div className="flex flex-col gap-3 w-full items-center">
                                     <button onClick={() => setIsShownCategory(!isShowCategory)}
@@ -256,8 +292,14 @@ const Navbar = () => {
                                 {jwt ? (
                                     <>
                                         <div className="flex flex-col items-center w-full gap-3">
-                                            <Link to={"/profile"}>Profile</Link>
-                                            <button onClick={() => logout()} className="text-left">Đăng xuất</button>
+                                            <Link to={`/profile/${jwt?.staff_code}`}
+                                                  onClick={() => setIsMobileMenuOpen(false)}
+                                            >Trang cá nhân</Link>
+                                            <button onClick={() => {
+                                                logout()
+                                                setIsMobileMenuOpen(false)
+                                            }} className="text-left">Đăng xuất
+                                            </button>
                                         </div>
                                     </>
                                 ) : (

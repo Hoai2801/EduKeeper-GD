@@ -32,6 +32,7 @@ public class DownloadServiceImpl implements DownloadService {
             download.setUser(user);
             download.setDocument(document);
             downloadRepository.save(download);
+            return "download successfully";
         }
         return "user downloaded this document before";
     }
