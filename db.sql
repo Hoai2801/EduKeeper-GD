@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS `department`;
 
 -- dùng để lưu thông tin khoa của tài liệu (ví dụ: khoa công nghệ thông tin, khoa kinh tế, khoa marketing...)
 CREATE TABLE `department` (
-                              `id` smallint NOT NULL AUTO_INCREMENT,
+                              `id` int NOT NULL AUTO_INCREMENT,
                               `department_name` varchar(100) NOT NULL,
                               `department_slug` varchar(100) not null,
                               PRIMARY KEY (`id`)
@@ -40,7 +40,7 @@ CREATE TABLE `specialized` (
                                id int not null auto_increment,
                                `specialized_name` varchar(50) not null,
                                `specialized_slug` varchar(100) not null,
-                               `department_id` smallint not null,
+                               `department_id` int not null,
                                PRIMARY KEY (`id`),
                                KEY `department_id` (`department_id`),
                                CONSTRAINT `specialized_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
@@ -110,8 +110,6 @@ create table `role` (
     `name` varchar(100) not null
 );
 
-INSERT INTO `role`(`id`,`name`) values(1, "ADMIN"),(2, "USER");
-
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
@@ -122,12 +120,19 @@ CREATE TABLE `users` (
                          `account_locked` boolean not null default false,
                          `enable` boolean not null default false,
                          `email` varchar(50) not null,
+                         `department` int,
+                         `specialized` int,
+                         `date_of_birth` datetime,
+                         `class` varchar(20),
                          `created_date` datetime,
                          `last_modified_date` datetime,
 						`staff_code` varchar(20) not null,
                          PRIMARY KEY (`id`),
                          KEY `role_id` (`role_id`),
-                         CONSTRAINT `role_fk` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
+                         CONSTRAINT `role_fk` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`),
+                         CONSTRAINT `dpm_fk` FOREIGN KEY (`department`) REFERENCES `department` (`id`),
+                         CONSTRAINT `spec_fk` FOREIGN KEY (`specialized`) REFERENCES `specialized` (`id`)
+                         
 );
 
 -- INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN'); 
@@ -161,35 +166,39 @@ CREATE TABLE `document` (
                             `document_size` smallint NOT NULL,
                             `pages` smallint not null,
                             `upload_date` date NOT NULL,
-							-- chứa đường dẫn đến nơi lưu file
+                            `status` ENUM('draft', 'published') not null DEFAULT 'draft',
+                            `scope` ENUM('public', 'student-only', 'private') not null DEFAULT 'public',
+			    -- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
                             `description` varchar(2000) NOT NULL,
                             `category_id` int DEFAULT NULL,
-                            `subject_id` int not null,
+                            `subject_id` int DEFAULT NULL,
                             `thumbnail` varchar(200),
                             `author` varchar(100) NOT NULL,
                             `user_upload` int not null,
-                            `download` int not null,
-                            `views` int not null,
+--                             `download` int not null,
+--                             `views` int not null,
                             PRIMARY KEY (`id`),
-                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
+                            KEY `document_ibfk_2` (`category_id`),
+                            KEY `document_ibfk_4` (`author`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_4` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`)
+                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`),
+                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
 );
 
 DROP TABLE IF EXISTS `favorite`;
 
 -- dùng để lưu thông tin các tài liệu mà người dùng ưu thích, muốn đọc lại, tham khảo nhiều lần
--- CREATE TABLE `favorite` (
---                             `id` int NOT NULL AUTO_INCREMENT,
---                             `user_id` int NOT NULL,
---                             `document_id` int NOT NULL,
---                             PRIMARY KEY (`id`),
---                             KEY `user_id` (`user_id`),
---                             KEY `document_id` (`document_id`),
---                             CONSTRAINT `access_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
---                             CONSTRAINT `access_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
--- );
+CREATE TABLE `favorite` (
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `user_id` int NOT NULL,
+                            `document_id` int NOT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `user_id` (`user_id`),
+                            KEY `document_id` (`document_id`),
+                            CONSTRAINT `access_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+                            CONSTRAINT `access_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
+);
 
 
 CREATE TABLE token (
@@ -200,6 +209,27 @@ CREATE TABLE token (
                        expires_date datetime not null,
                        validated_at datetime,
                        FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+create table view_history (
+	id int auto_increment primary key,
+	user_id int not null,
+	document_id int not null,
+    created_at datetime not null,
+    is_lastest boolean default true not null,
+	constraint `vh_fk_u` FOREIGN key (`user_id`) REFERENCES `users` (`id`),
+	CONSTRAINT `vh_fk_d` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
+);
+
+CREATE TABLE `downloads` (
+                            `id` int NOT NULL AUTO_INCREMENT,
+                            `user_id` int NOT NULL,
+                            `document_id` int NOT NULL,
+                            PRIMARY KEY (`id`),
+                            KEY `user_id` (`user_id`),
+                            KEY `document_id` (`document_id`),
+                            CONSTRAINT `dl_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+                            CONSTRAINT `dl_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
 );
 
 

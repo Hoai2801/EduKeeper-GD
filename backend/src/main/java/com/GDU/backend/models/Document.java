@@ -1,5 +1,6 @@
 package com.GDU.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,8 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -58,13 +58,27 @@ public class Document {
     
     private String author;
 
-    @Column(nullable = false)
-    private int download;
+    @OneToMany(mappedBy = "document")
+    private List<Download> downloads;
 
-    @Column(nullable = false)
-    private int views;
+    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ViewHistory> views;
+    
+    private String scope;
+    
+    private String status; 
 
     @ManyToOne
     @JoinColumn(name = "subject_id")
     private Subject subject;
+
+    // Methods to get the counts of views and downloads
+    public int getViewsCount() {
+        return views != null ? views.size() : 0;
+    }
+
+    public int getDownloadsCount() {
+        return downloads != null ? downloads.size() : 0;
+    }
 }

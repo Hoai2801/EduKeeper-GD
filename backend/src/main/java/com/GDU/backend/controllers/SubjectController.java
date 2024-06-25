@@ -21,7 +21,7 @@ public class SubjectController {
     }
     
     @GetMapping("/{specializedId}")
-    ResponseEntity<?> getSubjectsBySpecializedId(@PathVariable("specializedId") Long specializedId) {
+    ResponseEntity<?> getSubjectsBySpecializedId(@PathVariable("specializedId") String specializedId) {
         return ResponseEntity.ok(subjectService.getSubjectsBySpecializedId(specializedId));
     }
     

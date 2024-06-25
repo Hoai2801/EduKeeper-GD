@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 //@CrossOrigin
@@ -48,14 +49,14 @@ public class DocumentController {
     }
 
     // get most views in 30 days
-    @GetMapping("/most-viewed")
-    public ResponseEntity<?> getMostViewedDocuments(@RequestParam("limit") int limit) {
-        try {
-            return ResponseEntity.ok(documentService.getMostViewedDocuments(limit));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+//    @GetMapping("/most-viewed")
+//    public ResponseEntity<?> getMostViewedDocuments(@RequestParam("limit") int limit) {
+//        try {
+//            return ResponseEntity.ok(documentService.getMostViewedDocuments(limit));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
 
     // get most downloaded in 30 days
     @GetMapping("/most-downloaded")
@@ -93,9 +94,9 @@ public class DocumentController {
     }
     
     @GetMapping("/author/{id}")
-    public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") String staffCode) {
+    public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
         try {
-            return ResponseEntity.ok(documentService.getDocumentsByAuthor(staffCode));
+            return ResponseEntity.ok(documentService.getDocumentsByAuthor(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -118,24 +119,6 @@ public class DocumentController {
     ) {
         try {
             return ResponseEntity.ok(documentService.updateDocumentById(id, uploadRequestDTO));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
-
-    @PutMapping("/download/{id}")
-    public ResponseEntity<?> updateDownloadCount(@PathVariable("id") Long id) {
-        try {
-            return ResponseEntity.ok(documentService.updateDownloadCount(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-        }
-    }
-
-    @PutMapping("/views/{id}")
-    public ResponseEntity<?> updateViewCount(@PathVariable("id") Long id) {
-        try {
-            return ResponseEntity.ok(documentService.updateViewCount(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -190,31 +173,124 @@ public class DocumentController {
         }
     }
     
-    @GetMapping("/count-total-download/{user-id}")
-    public ResponseEntity<?> countDownload(@PathVariable("user-id") Long id) {
+//    @GetMapping("/total-views/{authorId}")
+//    public ResponseEntity<?> getTotalViewsByAuthor(@PathVariable("authorId") Long authorId) {
+//        try {
+//            return ResponseEntity.ok(documentService.getTotalViewsByAuthor(authorId));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
+    
+    @GetMapping("/total-downloads/{authorId}")
+    public ResponseEntity<?> getTotalDownloadsByAuthor(@PathVariable("authorId") Long authorId) {
         try {
-            return ResponseEntity.ok(documentService.countDownload(id));
+            return ResponseEntity.ok(documentService.getTotalDownloadsByAuthor(authorId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
     
-    @GetMapping("/count-total-view/{user-id}")
-    public ResponseEntity<?> countView(@PathVariable("user-id") Long id) {
+    @GetMapping("/total-documents/{authorId}")
+    public ResponseEntity<?> getDocumentsCountByAuthor(@PathVariable("authorId") Long authorId) {
         try {
-            return ResponseEntity.ok(documentService.countView(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-    
-    @GetMapping("/total-documents/{user-id}")
-    public ResponseEntity<?> getDocumentsCount(@PathVariable("user-id") Long id) {
-        try {
-            return ResponseEntity.ok(documentService.getDocumentPublicCountByUser(id));
+            return ResponseEntity.ok(documentService.getDocumentsCountByAuthor(authorId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
+    @GetMapping("/draft")
+    public ResponseEntity<?> getDraftDocuments() {
+        try {
+            return ResponseEntity.ok(documentService.getDraftDocument());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-draft")
+    public ResponseEntity<?> getTotalDraftDocument() {
+        try {
+            return ResponseEntity.ok(documentService.countDraftDocuments());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<?> getPubledDocuments() {
+        try {
+            return ResponseEntity.ok(documentService.getPublishedDocument());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/count-published")
+    public ResponseEntity<?> getTotalPublishedDocument() {
+        try {
+            return ResponseEntity.ok(documentService.countPublishedDocuments());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<?> countDocumentMonthLy() {
+        try {
+            return ResponseEntity.ok(documentService.countDocumentsMonthly());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<?> getCountDocumentByType() {
+        try {
+            return ResponseEntity.ok(documentService.countDocumentsByType());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/accept/{id}")
+    public ResponseEntity<?> acceptDocumentById(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(documentService.AcceptDocument(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/accept")
+    public ResponseEntity<?> acceptListDocumentById(@RequestBody List<Long> id) {
+        try {
+            if (id.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("List id is empty");
+            }
+            return ResponseEntity.ok(documentService.AcceptListDocument(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+//    @GetMapping("/top3")
+//    public ResponseEntity<?> getTop3Documents() {
+//        try {
+//            return ResponseEntity.ok(documentService.getTop3Documents());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+//        }
+//    }
+
+    @GetMapping("/page/{page}")
+    public ResponseEntity<?> getPaginationDocs(@PathVariable("page") int page) {
+        try {
+            return ResponseEntity.ok(documentService.getPaginationDocs(page));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
 }

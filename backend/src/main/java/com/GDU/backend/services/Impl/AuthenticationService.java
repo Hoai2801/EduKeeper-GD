@@ -10,9 +10,7 @@ import com.GDU.backend.exceptions.TokenExpiredException;
 import com.GDU.backend.exceptions.UserNotFoundException;
 import com.GDU.backend.models.Token;
 import com.GDU.backend.models.User;
-import com.GDU.backend.repositories.RoleRepository;
-import com.GDU.backend.repositories.TokenRepository;
-import com.GDU.backend.repositories.UserRepository;
+import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.Impl.enums.EmailTemplateName;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +32,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final DepartmentRepository departmentRepository;
+    private final SpecializedRepository specializedRepository;
     private final EmailService emailService;
     private final UserServiceImpl userService;
     private final JwtService jwtService;
@@ -47,22 +47,31 @@ public class AuthenticationService {
         var role = roleRepository.findByName(registerRequest.getRoles()).orElseThrow(
                 () -> new RuntimeException("Role not found"));
         
+        var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
+                () -> new RuntimeException("Department not found")
+        );
+        
+        var specialized = specializedRepository.findById(Long.parseLong(registerRequest.getSpecialized())).orElseThrow(
+                () -> new RuntimeException("Specialized not found")
+        );
         // check if user exists
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            return "Email already exists";
+            throw new RuntimeException("Email đã được sử dụng bởi tài khoản khác"); 
         }
 
         // check if staffCode exists
         if (userRepository.existsByStaffCode(registerRequest.getStaffCode())) {
-            return "StaffCode already exists";
+            throw new RuntimeException("Mã sinh viên đã được sử dụng");
         }
-        System.out.println("before user");
         // save user
         var user = User.builder()
                 .username(registerRequest.getUsername())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .staffCode(registerRequest.getStaffCode())
+                .specialized(specialized)
+                .department(department)
+                .klass(registerRequest.getClassroom())
                 .roles(role)
                 .accountLocked(false)
                 .enable(false)
@@ -110,10 +119,17 @@ public class AuthenticationService {
                         // use staff code to log in
                         loginRequest.getStaffCode(),
                         loginRequest.getPassword()));
+
+        if (auth == null) {
+            throw new RuntimeException("Sai mật khẩu");
+        }
         var claims = new HashMap<String, Object>();
         var user = (User) auth.getPrincipal();
-        claims.put("staffCode", user.getUsername());
-        claims.put("userName", user.getName());
+        if (!user.isEnabled()) {
+            throw new RuntimeException("User not activated");
+        }
+        claims.put("staff_code", user.getUsername());
+        claims.put("user_name", user.getName());
         claims.put("role", user.getRoles().getName());
         claims.put("email", user.getEmail());
         var jwt = jwtService.generateToken(claims, user);

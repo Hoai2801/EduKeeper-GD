@@ -1,12 +1,12 @@
 package com.GDU.backend.repositories;
 
-import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.models.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+import com.GDU.backend.dtos.responses.DocumentMonthly;
+import com.GDU.backend.dtos.responses.TypeDocumentRes;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,12 +14,12 @@ import java.util.Optional;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     Document getDocumentBySlug(String slug);
 
-    @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
-            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")
-    List<Document> getMostViewedDocuments(int limit);
+//    @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
+//            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.views) DESC LIMIT :limit")
+//    List<Document> getMostViewedDocuments(int limit);
 
     @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
-            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.download DESC LIMIT :limit")
+            "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.downloads) DESC LIMIT :limit")
     List<Document> getMostDownloadedDocuments(int limit);
 
     @Query("SELECT d FROM Document d ORDER BY d.id DESC LIMIT :limit")
@@ -31,8 +31,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL '30' DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
     List<Document> getPopularDocumentThisMonth();
 
-    @Query(value = "SELECT d.* FROM Document d JOIN Users u ON u.id = d.user_id WHERE u.role = 'teacher' AND MATCH(d.author) AGAINST (:authorName IN BOOLEAN MODE)", nativeQuery = true)
-    List<Document> getDocumentsByAuthorName(@Param("authorName") String authorName);
 
     @Query(value = "SELECT d.* FROM document d " +
             "INNER JOIN users u ON d.author = u.id " +
@@ -56,10 +54,15 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "JOIN category c ON c.id = d.category_id " +
             "JOIN subject sj ON sj.id = d.subject_id " +
             "JOIN department dm ON dm.id = s.department_id " +
-            "WHERE (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))" +
-            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))" +
-            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))" +
-            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))" +
+            "WHERE d.status = 'published' "
+            + " AND (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
+            +
+            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))"
+            +
+            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))"
+            +
+            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))"
+            +
             "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) ", nativeQuery = true)
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,
@@ -96,9 +99,54 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("select d from Document d where d.userUpload.id = :id")
     List<Document> findAllByAuthorId(Long id);
 
-    @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id")
+    @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id and d.status = 'published'")
     int findAllBySpecializedId(Long id);
 
-    @Query("SELECT d FROM Document d WHERE d.userUpload.id = :id")
-    List<Document> findAllByUserId(Long id);
+    @Query(value = "SELECT * FROM document d WHERE d.status = 'draft'", nativeQuery = true)
+    List<Document> findDraftDocuments();
+
+    @Query(value = "SELECT * FROM document d WHERE d.status = 'published'", nativeQuery = true)
+    List<Document> findPublishedDocuments();
+
+    // @Query(value = "SELECT COUNT(d.id) AS total, MONTH(d.upload_date) AS month
+    // FROM Document d GROUP BY MONTH(d.upload_date)")
+    @Query(value = "SELECT COALESCE(SUM(d.total), 0) AS total, m.month " +
+            "FROM ( " +
+            "   SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
+            "   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 " +
+            "   UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 " +
+            "   UNION ALL SELECT 11 UNION ALL SELECT 12 " +
+            ") AS m " +
+            "LEFT JOIN ( " +
+            "   SELECT COUNT(id) AS total, MONTH(upload_date) AS month " +
+            "   FROM document " +
+            "   GROUP BY MONTH(upload_date) " +
+            ") AS d ON m.month = d.month " +
+            "GROUP BY m.month " +
+            "ORDER BY m.month ASC", nativeQuery = true)
+    List<DocumentMonthly> countDocumentsMonthly();
+
+    @Query(value = "SELECT COUNT(d.id) " +
+            "FROM document d " +
+            "WHERE d.upload_date >= CURRENT_DATE() AND d.upload_date < CURRENT_DATE() + INTERVAL 1 DAY", nativeQuery = true)
+    int countDocumentsToday();
+
+    @Query(value = "SELECT COUNT(d.id) as total, d.documentType as type FROM Document d GROUP BY d.documentType")
+    List<TypeDocumentRes> countDocumentsByType();
+
+    @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'published'")
+    int countPublishedDocuments();
+
+    @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'draft'")
+    int countDraftDocuments();
+
+    @Query(value = "SELECT * FROM document d ORDER BY d.download DESC LIMIT 3", nativeQuery = true)
+    List<Document> getTop3Docs();
+
+    @Query(value = "SELECT * FROM document d ORDER BY d.upload_date ASC LIMIT 10  OFFSET :offset ", nativeQuery = true)
+    List<Document> getPaginationDocuments(@Param("offset") int offset);
+
+    @Query(value = "SELECT d.* FROM document d LEFT JOIN downloads dl ON d.id = dl.document_id GROUP BY d.id ORDER BY COUNT(dl.id) DESC LIMIT :limit", nativeQuery = true)
+    List<Document> findDocumentsWithMostDownloads(@Param("limit") int limit);
+
 }

@@ -1,10 +1,13 @@
 package com.GDU.backend.controllers;
 
 import com.GDU.backend.dtos.requests.FavoriteDTO;
+import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.services.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/favorites")
@@ -13,49 +16,27 @@ public class FavoriteController {
     private final FavoriteService favoriteService;
     
     @PostMapping
-    public ResponseEntity<?> addFavorite(@RequestBody FavoriteDTO favoriteDTO) {
-        try {
-            return ResponseEntity.ok(favoriteService.createFavorite(favoriteDTO));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
+    public ResponseEntity<String> createFavorite(@RequestBody FavoriteDTO favoriteDTO) {
+        return ResponseEntity.ok(favoriteService.createFavorite(favoriteDTO));
+    }
+    
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<DocumentResponseDTO>> getDocumentsFavoritesByUserId(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(favoriteService.getDocumentsFavoritesByUserId(userId));
+    }
+    
+    @GetMapping("/author/{authorId}")
+    public ResponseEntity<Integer> getTotalFavoritesCountByAuthor(@PathVariable("authorId") Long authorId) {
+        return ResponseEntity.ok(favoriteService.getTotalFavoritesCountByAuthor(authorId));
     }
     
     @PostMapping("/is-favorite")
-    public ResponseEntity<?> checkIsFavorite(@RequestBody FavoriteDTO favoriteDTO) {
-        try {
-            return ResponseEntity.ok(favoriteService.checkIsFavorite(favoriteDTO));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
+    public ResponseEntity<Boolean> isFavorite(@RequestBody FavoriteDTO favoriteDTO) {
+        return ResponseEntity.ok(favoriteService.isFavorite(favoriteDTO));
     }
     
     @DeleteMapping
-    public ResponseEntity<?> deleteFavoriteById(@RequestBody FavoriteDTO favoriteDTO) {
-        try {
-            System.out.println("favoriteDTO = " + favoriteDTO);
-            return ResponseEntity.ok(favoriteService.deleteFavoriteById(favoriteDTO));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
+    public ResponseEntity<String> deleteFavoriteById(@RequestBody FavoriteDTO favoriteDTO) {
+        return ResponseEntity.ok(favoriteService.deleteFavoriteById(favoriteDTO));
     }
-    
-    @GetMapping("/{staffCode}")
-    public ResponseEntity<?> getFavoritesByUserId(@PathVariable("staffCode") String staffCode) {
-        try {
-            return ResponseEntity.ok(favoriteService.getFavoritesByUserId(staffCode));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-    
-    @GetMapping("/count-total/{userId}")
-    public ResponseEntity<?> getFavoritesTotalOfDocsOfUser(@PathVariable("userId") Long userId) {
-        try {
-            return ResponseEntity.ok(favoriteService.getTotalOfDocsOfUser(userId));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-    
 }

@@ -21,14 +21,14 @@ public class UploadRequestDTO {
     @NotEmpty
     @NotBlank
     private String description;
+//
+//    @NotEmpty
+//    @NotBlank
+//    private long department;
 
-    @NotEmpty
-    @NotBlank
-    private long department;
-
-    @NotEmpty
-    @NotBlank
-    private long specialized;
+//    @NotEmpty
+//    @NotBlank
+//    private long specialized;
 
     @NotEmpty
     @NotBlank
@@ -37,6 +37,8 @@ public class UploadRequestDTO {
     @NotEmpty
     @NotBlank
     private long subject;
+    
+    private String scope; 
 
     @NotEmpty
     @NotBlank

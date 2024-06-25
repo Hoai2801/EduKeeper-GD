@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FavoriteDTO {
     @NotBlank(message = "userId not null")
-    private Long userId;
+    private String userId;
 
     @NotBlank(message = "documentId not null")
-    private Long documentId;
+    private String documentId;
 }
