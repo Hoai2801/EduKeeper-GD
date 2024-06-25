@@ -33,6 +33,12 @@ public class RegisterRequest {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
+    private String department;
+
+    private String specialized;
+    
+    private String classroom;
+
     @NotEmpty
     @NotBlank
     @NotNull

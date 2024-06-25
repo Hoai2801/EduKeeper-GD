@@ -43,7 +43,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                     </div>
                     <div className={`${!isTrueLegit && 'hidden'}`}>
                         <label htmlFor="avatar"
-                               className='absolute lg:bottom-0 lg:right-0 right-[80px] bottom-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
+                               className='absolute lg:bottom-0 lg:right-0 right-[90px] bottom-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
                             <img src={change} alt="" className='w-5 h-5'/>
                         </label>
                         <input id="avatar" type="file" className='hidden'/>
@@ -51,10 +51,10 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 </div>
                 <div className='flex flex-col items-center mt-5'>
                     <div className='flex flex-col gap-2 w-full text-center md:text-left'>
-                        <p className='text-3xl font-semibold items-center'>
+                        <p className='sm:text-3xl font-semibold items-center text-xl'>
                             {user?.username}
                         </p>
-                        <p className='text-gray-500 text-xl'>
+                        <p className='text-gray-500 sm:text-xl'>
                             {user?.email}
                         </p>
                         <p className='text-gray-500'>Mã số: {user?.staffCode}</p>

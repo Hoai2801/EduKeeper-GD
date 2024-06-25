@@ -25,16 +25,24 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(
-            @RequestBody RegisterRequest registerRequest
-    ) throws MessagingException {
+            @Valid @RequestBody RegisterRequest registerRequest
+    ) {
+        try {
         return ResponseEntity.ok().body(authenticationService.register(registerRequest));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody AuthenticationRequest loginRequest
     ) {
-        return ResponseEntity.ok().body(authenticationService.login(loginRequest));
+        try {
+            return ResponseEntity.ok().body(authenticationService.login(loginRequest));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/logout")

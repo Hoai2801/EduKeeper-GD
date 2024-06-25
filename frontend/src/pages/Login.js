@@ -21,27 +21,25 @@ const Login = () => {
                 password,
             }),
         })
-            .then((response) => response.json())
-            .then((data) => {
-
-                if (data.token !== undefined) {
-
-                    localStorage.setItem('token', data.token);
-                    if (rememberMe) {
-                        localStorage.setItem('staffCode', staffCode);
-                        localStorage.setItem('password', password);
-                    }
-
-                    window.location.href = "/";
-                }
-                if (data.status === 200) {
-                    setError('');
-                    return
+            .then(response => {
+                if (!response.ok) {
+                    response.text().then(r => {
+                        if (r) setError("Sai mật khẩu")
+                    })
                 } else {
-                    setError('Sai mật khẩu');
+                    response.json()
+                        .then(data => {
+                        if (data.token !== undefined) {
+                            localStorage.setItem("token", data.token);
+                            window.location.href = "/";
+                        }
+                    });
                 }
-
             })
+            .catch(error => {
+                console.error('Error:', error.message);
+            });
+
     };
 
     const forgotPassword = (event) => {
