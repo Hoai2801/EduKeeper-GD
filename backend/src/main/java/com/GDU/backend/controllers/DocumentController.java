@@ -11,12 +11,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 //@CrossOrigin
 @RestController
@@ -77,22 +75,19 @@ public class DocumentController {
         }
     }
 
-    @Async
     @PostMapping("/upload")
-    public CompletableFuture<ResponseEntity<String>> uploadDocument(
+    public ResponseEntity<String> uploadDocument(
             @ModelAttribute UploadRequestDTO uploadRequestDTO
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                System.out.println(uploadRequestDTO.toString());
-                return ResponseEntity.ok(documentService.uploadDocument(uploadRequestDTO));
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Error uploading document: " + e.getMessage());
-            }
-        });
+        try {
+            System.out.println(uploadRequestDTO.toString());
+            return ResponseEntity.ok(documentService.uploadDocument(uploadRequestDTO));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error uploading document: " + e.getMessage());
+        }
     }
-    
+
     @GetMapping("/author/{id}")
     public ResponseEntity<?> getDocumentsByAuthor(@PathVariable("id") Long id) {
         try {
@@ -114,7 +109,7 @@ public class DocumentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(
-            @PathVariable("id") Long id, 
+            @PathVariable("id") Long id,
             @ModelAttribute UploadRequestDTO uploadRequestDTO
     ) {
         try {
@@ -172,7 +167,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    
+
 //    @GetMapping("/total-views/{authorId}")
 //    public ResponseEntity<?> getTotalViewsByAuthor(@PathVariable("authorId") Long authorId) {
 //        try {
@@ -181,7 +176,7 @@ public class DocumentController {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 //        }
 //    }
-    
+
     @GetMapping("/total-downloads/{authorId}")
     public ResponseEntity<?> getTotalDownloadsByAuthor(@PathVariable("authorId") Long authorId) {
         try {
@@ -190,7 +185,7 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    
+
     @GetMapping("/total-documents/{authorId}")
     public ResponseEntity<?> getDocumentsCountByAuthor(@PathVariable("authorId") Long authorId) {
         try {
@@ -292,5 +287,5 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    
+
 }

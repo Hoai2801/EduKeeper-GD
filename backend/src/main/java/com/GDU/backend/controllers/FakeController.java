@@ -64,10 +64,11 @@ public class FakeController {
 
         UploadRequestDTO uploadRequestDTO = UploadRequestDTO.builder()
                 .title(faker.book().title())
-                // todo: fix author
-                .author("22140044")
-//                .specialized(faker.number().numberBetween(1, 39))
+                .author("Adam hoai")
+                .userUpload("22140044")
                 .subject(1L)
+                .scope("public")
+                
                 .category(faker.number().numberBetween(1, 5))
                 .description(faker.chuckNorris().fact())
                 .document(result)

@@ -1,6 +1,7 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.FilterRequestDTO;
+import com.GDU.backend.dtos.requests.NotificationDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.*;
@@ -8,6 +9,7 @@ import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.DocumentService;
+import com.GDU.backend.services.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -39,10 +41,9 @@ public class DocumentServiceImpl implements DocumentService {
     private static final Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
     private final DocumentRepository documentRepository;
     private final CategoryRepository categoryRepository;
-    private final SpecializedRepository specializedRepository;
     private final UserServiceImpl userService;
     private final SubjectRepository subjectRepository;
-    private final SubjectDocumentRepository subjectDocumentRepository;
+    private final NotificationService notificationService;
 
     @Override
     public String uploadDocument(UploadRequestDTO uploadRequestDTO) throws IOException {
@@ -82,7 +83,6 @@ public class DocumentServiceImpl implements DocumentService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            log.info("number of pages: " + numberOfPages);
         }
 
         Document newDocument = Document.builder()
@@ -104,6 +104,13 @@ public class DocumentServiceImpl implements DocumentService {
                 .uploadDate(LocalDate.now())
                 .build();
         documentRepository.save(newDocument);
+        NotificationDTO notificationDTO = NotificationDTO.builder()
+                .sender(userUpload.getStaffCode())
+                .receiver("22140044")
+                .content("New document uploaded by " + userUpload.getStaffCode())
+                .title("New document uploaded")
+                .build();
+        notificationService.send(notificationDTO);
         return "Document uploaded successfully";
     }
 
