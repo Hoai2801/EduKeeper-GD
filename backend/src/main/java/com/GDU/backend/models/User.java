@@ -27,7 +27,7 @@ import java.util.List;
         "u.user_name AS username, u.staff_code AS staffCode, u.email AS email " +
         "FROM Downloads dl " +
         "JOIN Users u ON u.id = dl.user_id " +
-        "WHERE u.staff_code LIKE 'user' " +
+        "WHERE u.role_id = 3 " +
         "GROUP BY dl.user_id " +
         "ORDER BY total DESC LIMIT 10", resultSetMapping = "UserRankingMapping")
 @SqlResultSetMapping(name = "UserRankingMapping", classes = @ConstructorResult(targetClass = com.GDU.backend.dtos.responses.UserRakingResI.class, columns = {

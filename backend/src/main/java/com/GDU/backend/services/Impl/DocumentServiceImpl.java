@@ -5,11 +5,10 @@ import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.DocumentResponseDTO;
+import com.GDU.backend.dtos.responses.Monthly;
 import com.GDU.backend.dtos.responses.TotalResponse;
 import com.GDU.backend.dtos.responses.UserResponse;
-import com.GDU.backend.dtos.responses.DocumentMonthly;
-import com.GDU.backend.dtos.responses.TypeDocumentRes;
-import com.GDU.backend.dtos.responses.UserResponse;
+import com.GDU.backend.dtos.responses.TypeRes;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.*;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import javax.swing.text.html.parser.DocumentParser;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -36,10 +34,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,10 +57,9 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public String uploadDocument(UploadRequestDTO uploadRequestDTO) throws IOException {
         // TODO: convert to service
+        System.out.println(uploadRequestDTO);
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
-                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
 
         Subject subject = subjectRepository.findById(uploadRequestDTO.getSubject())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
@@ -164,15 +161,18 @@ public class DocumentServiceImpl implements DocumentService {
         existDocument.setUserUpload(newAuthor);
 
         Category category = categoryRepository.findById((long) uploadRequestDTO.getCategory()).orElse(null);
+        Subject subject = subjectRepository.findById((long) uploadRequestDTO.getSubject()).orElse(null);
         // Update document
         existDocument.setCategory(category);
         existDocument.setTitle(
                 uploadRequestDTO.getTitle() != null ? uploadRequestDTO.getTitle() : existDocument.getTitle());
+        existDocument.setAuthor(
+                uploadRequestDTO.getAuthor() != null ? uploadRequestDTO.getAuthor() : existDocument.getAuthor());
         existDocument.setSlug(
                 uploadRequestDTO.getTitle() != null ? uploadRequestDTO.getTitle()
                         .replace(" ", "-")
                         .toLowerCase() + "-" + new Date().getTime() : existDocument.getSlug());
-        // existDocument.setSpecialized(existDocument.getSpecialized());
+        existDocument.setSubject(subject);
 
         // I think we don't need update a document file
         // any more because we should upload a new one instead
@@ -225,23 +225,32 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public String deleteDocument(Long id) {
-        Document document = documentRepository.findById(id).orElse(null);
-        if (document == null) {
-            return "Document not existing";
+    public boolean deleteDocumentById(Long id) {
+        try {
+            Document document = documentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+
+            String path = document.getPath();
+            File file = new File(path);
+
+            if (file.isFile() && document.isDelete() == false) {
+                // boolean deleted = file.delete();
+                // if (!deleted) {
+                // return "Delete file failed";
+                // } else {
+                // }
+                document.setDeleteDate(LocalDateTime.now());
+                document.setDelete(true);
+                documentRepository.save(document);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method delete document " + e.getMessage());
+
         }
 
-        String path = document.getPath();
-        File file = new File(path);
-        if (file.exists()) {
-            boolean deleted = file.delete();
-            if (!deleted) {
-                return "Delete file failed";
-            } else {
-                documentRepository.delete(document);
-            }
-        }
-        return "Document deleted successfully";
     }
 
     @Override
@@ -414,6 +423,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .author(document.getAuthor())
                 .category(document.getCategory())
                 .upload_date(document.getUploadDate())
+                .deleted_at(document.getDeleteDate())
                 .subject(document.getSubject())
                 .path(document.getPath())
                 .status(document.getStatus())
@@ -427,12 +437,12 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponseDTO> getDraftDocument() {
-        return documentRepository.findDraftDocuments().stream().map(this::convertToDocumentResponse).toList();
+        return documentRepository.getDraftDocuments().stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
     public List<DocumentResponseDTO> getPublishedDocument() {
-        return documentRepository.findPublishedDocuments().stream().map(this::convertToDocumentResponse).toList();
+        return documentRepository.getPublishedDocuments().stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
@@ -471,9 +481,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentMonthly> countDocumentsMonthly() {
+    public List<Monthly> countDocumentsMonthly(int year) {
         try {
-            return documentRepository.countDocumentsMonthly();
+            return documentRepository.countDocumentsMonthly(year);
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
         }
@@ -507,9 +517,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<TypeDocumentRes> countDocumentsByType() {
+    public List<TypeRes> countDocumentsByType(int year) {
         try {
-            return documentRepository.countDocumentsByType();
+            return documentRepository.countDocumentsByType(year);
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
         }
@@ -536,6 +546,38 @@ public class DocumentServiceImpl implements DocumentService {
 
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method pagination Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentResponseDTO> getDeletedDocument() {
+        try {
+
+            return documentRepository.getDeleteDocuments().stream().map(this::convertToDocumentResponse)
+                    .toList();
+
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method pagination Docs: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String recoveryDocument(List<Long> ids) throws IOException {
+        try {
+            for (Long id : ids) {
+                Document document = documentRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + id));
+                if (document.isDelete() == false) {
+                    throw new ResourceNotFoundException("Document has recovered");
+                }
+                document.setDelete(false);
+                ;
+                documentRepository.save(document);
+
+            }
+            return "Recovered Document successfully";
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method Recovered Docs: " + e.getMessage());
         }
     }
 

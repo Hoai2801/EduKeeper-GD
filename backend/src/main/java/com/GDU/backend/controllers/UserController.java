@@ -20,11 +20,11 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
-    
-//    @PostMapping("/update")
-//    public ResponseEntity<?> updateUser(@RequestBody User user) {
-//        
-//    }
+
+    // @PostMapping("/update")
+    // public ResponseEntity<?> updateUser(@RequestBody User user) {
+    //
+    // }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
@@ -37,6 +37,26 @@ public class UserController {
         try {
 
             return ResponseEntity.ok(userService.getTop10UserWithMostDownloads());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/monthly/{year}")
+    public ResponseEntity<?> countUsersMonthly(@PathVariable("year") int year) {
+        try {
+
+            return ResponseEntity.ok(userService.countUsersMonthly(year));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/type/{year}")
+    public ResponseEntity<?> countUsersByRoles(@PathVariable("year") int year) {
+        try {
+
+            return ResponseEntity.ok(userService.countUsersByRoles(year));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

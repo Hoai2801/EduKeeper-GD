@@ -4,25 +4,38 @@ import DragDropFile from "./DragDropFile";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { Document, Page } from "react-pdf";
+import toast from "react-hot-toast";
 
 export default function EditDocs({ onClose }) {
   const [selectedFile, setFile] = useState(null);
 
-  const [department, setDepartment] = useState(null);
+  const [author, setAuthor] = useState(null);
   const [listCategory, setListCategory] = useState(null);
   const [category, setCategory] = useState(null);
   const [description, setDescription] = useState(null);
   const [specialized, setSpecialized] = useState(null);
   const [subject, setSubject] = useState(null);
   const [title, setTitle] = useState(null);
-
   const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [department, setDepartment] = useState(null);
   const [listSpecialized, setListSpecialized] = useState(null);
 
   const handleFiles = (updatedFile) => {
     setFile(updatedFile[0]);
   };
-
+  useEffect(() => {
+    console.log(selectedDepartment);
+    fetch(
+      "http://localhost:8080/api/v1/specializes/department/" +
+        selectedDepartment?.id
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setListSpecialized(data);
+      })
+      .catch((error) => console.error(error));
+  }, [selectedDepartment]);
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/departments")
       .then((response) => response.json())
@@ -46,23 +59,20 @@ export default function EditDocs({ onClose }) {
     const formData = new FormData();
     formData.append("document", selectedFile);
     formData.append("title", title);
-    // formData.append('department', selectedDepartment);
-    // category is long type
     formData.append("category", category);
     formData.append("description", description);
     formData.append("subject", 1);
-    formData.append("specialized", specialized);
-    formData.append("author", "admin");
+    formData.append("userUpload", "admin");
+    formData.append("author", author);
     fetch("http://localhost:8080/api/v1/documents/upload", {
       method: "POST",
       body: formData,
     })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
-          alert("Đăng tài liệu thành công");
+          toast.success("Đăng bài thành công");
         } else {
-          alert("Dang bai that bai");
+          toast.error("Đăng bài thất bái");
         }
         setFile(null);
         setCategory("");
@@ -135,29 +145,23 @@ export default function EditDocs({ onClose }) {
                 />
               </div>
               <div className="flex mb-3 gap-4">
-                <div className="w-1/2 ">
+                <div className="w-1/2">
                   <label
                     htmlFor="department"
                     className="block mb-2 text-sm font-semibold text-gray-900"
                   >
-                    Khoa
+                    Thể loại
                   </label>
                   <select
                     id="department"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    onChange={(event) => {
-                      const selectedDepartment = JSON.parse(event.target.value);
-                      console.log(selectedDepartment);
-                      setSelectedDepartment(selectedDepartment);
-                      setListSpecialized(selectedDepartment.specializeds);
-                    }}
-                    value={JSON.stringify(selectedDepartment)}
+                    onChange={(e) => setCategory(e.target.value)}
                   >
-                    <option>Chọn khoa</option>
-                    {department &&
-                      department.map((dep) => (
-                        <option value={JSON.stringify(dep)} key={dep.id}>
-                          {dep.departmentName}
+                    <option>Chọn thể loại</option>
+                    {Array.isArray(listCategory) &&
+                      listCategory.map((category) => (
+                        <option value={category.id} key={category.id}>
+                          {category.categoryName}
                         </option>
                       ))}
                   </select>
@@ -187,27 +191,6 @@ export default function EditDocs({ onClose }) {
               <div className="flex mb-3 gap-4">
                 <div className="w-1/2">
                   <label
-                    htmlFor="department"
-                    className="block mb-2 text-sm font-semibold text-gray-900"
-                  >
-                    Thể loại
-                  </label>
-                  <select
-                    id="department"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    <option>Chọn thể loại</option>
-                    {Array.isArray(listCategory) &&
-                      listCategory.map((category) => (
-                        <option value={category.id} key={category.id}>
-                          {category.categoryName}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div className="w-1/2">
-                  <label
                     htmlFor="subject"
                     className="block text-gray-700 text-sm font-bold mb-2"
                   >
@@ -223,8 +206,52 @@ export default function EditDocs({ onClose }) {
                     value={subject}
                   />
                 </div>
+                <div className="w-1/2">
+                  <label
+                    htmlFor="department"
+                    className="block mb-2 text-sm font-semibold text-gray-900"
+                  >
+                    Khoa
+                  </label>
+                  <select
+                    id="department"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    onChange={(event) => {
+                      const selectedDepartment = JSON.parse(event.target.value);
+                      console.log(selectedDepartment);
+                      setSelectedDepartment(selectedDepartment);
+                      setListSpecialized(selectedDepartment.specializeds);
+                    }}
+                    value={JSON.stringify(selectedDepartment)}
+                  >
+                    <option>Chọn khoa</option>
+                    {department &&
+                      department.map((dep) => (
+                        <option value={JSON.stringify(dep)} key={dep.id}>
+                          {dep.departmentName}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </div>
               <div className="mb-4">
+                <div className="w-1/2">
+                  <label
+                    htmlFor="subject"
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                  >
+                    Tác giả
+                  </label>
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    placeholder=""
+                    required
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+                    onChange={(event) => setAuthor(event.target.value)}
+                  />
+                </div>
                 <label
                   htmlFor="teacher"
                   className="block text-gray-700 text-sm font-bold mb-2"

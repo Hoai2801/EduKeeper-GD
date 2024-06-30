@@ -1,9 +1,9 @@
 package com.GDU.backend.repositories;
 
-import com.GDU.backend.dtos.responses.DocumentResponseDTO;
-import com.GDU.backend.dtos.responses.DocumentMonthly;
-import com.GDU.backend.dtos.responses.TypeDocumentRes;
+import com.GDU.backend.dtos.responses.Monthly;
+import com.GDU.backend.dtos.responses.TypeRes;
 import com.GDU.backend.models.Document;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,20 +17,20 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         Document getDocumentBySlug(String slug);
 
         @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
-                        "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")
+                        "AND d.isDelete = false  AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.views DESC LIMIT :limit")
         List<Document> getMostViewedDocuments(int limit);
 
         @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
-                        "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.download DESC LIMIT :limit")
+                        "AND d.isDelete = false AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY d.download DESC LIMIT :limit")
         List<Document> getMostDownloadedDocuments(int limit);
 
-        @Query("SELECT d FROM Document d ORDER BY d.id DESC LIMIT :limit")
-        List<Document> getLastedDocuments(int limit);
+        @Query("SELECT d FROM Document d WHERE d.isDelete = false ORDER BY d.id DESC LIMIT :limit")
+        List<Document> getLastedDocuments(@Param("limit") int limit);
 
-        @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
+        @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND d.is_delete = 0  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
         List<Document> getPopularDocumentThisWeek();
 
-        @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL '30' DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
+        @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL '30' DAY) AND d.is_delete = 0  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
         List<Document> getPopularDocumentThisMonth();
 
         @Query(value = "SELECT d.* FROM Document d JOIN Users u ON u.id = d.user_id WHERE u.role = 'teacher' AND MATCH(d.author) AGAINST (:authorName IN BOOLEAN MODE)", nativeQuery = true)
@@ -58,7 +58,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                         "JOIN category c ON c.id = d.category_id " +
                         "JOIN subject sj ON sj.id = d.subject_id " +
                         "JOIN department dm ON dm.id = s.department_id " +
-                        "WHERE (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
+                        "WHERE d.status = 'published' "
+                        + " AND (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
                         +
                         "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))"
                         +
@@ -89,11 +90,11 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         @Query(value = "SELECT count(*) FROM document d WHERE d.upload_date >= DATE_FORMAT(NOW(),CONCAT( YEAR(NOW()) ,'-01-01')) AND d.upload_date < DATE_FORMAT(NOW() + INTERVAL 1 YEAR, CONCAT( YEAR(NOW()) + 1 ,'-01-01'))  AND MONTH(d.upload_date) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH)) ", nativeQuery = true)
         Integer getNumberOfDocumentPreviousMonth();
 
-        @Query(value = "SELECT count(*) FROM document", nativeQuery = true)
+        @Query(value = "SELECT count(*) FROM document d WHERE d.is_delete = 0", nativeQuery = true)
         int countAllDocuments();
 
-        @Query("SELECT d FROM Document d WHERE d.slug = :slug")
-        Optional<Document> findBySlug(String slug);
+        @Query(value = "SELECT d FROM Document d WHERE d.slug = :slug AND d.isDelete = false")
+        Optional<Document> findBySlug(@Param("slug") String slug);
 
         @Query("SELECT d FROM Document d JOIN SubjectDocument sd JOIN " +
                         " SubjectSpecialized ss WHERE d.id= sd.document.id AND sd.subject.id= ss.subject.id AND ss.specialized.id=:id")
@@ -101,11 +102,14 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         // @Query("select count(d) from Document d where d.specialized.id = :id")
         // int countDocumentsBySpecializedId(@Param("id") Long id);
 
-        @Query(value = "SELECT * FROM Document d WHERE d.status = 'draft'", nativeQuery = true)
-        List<Document> findDraftDocuments();
+        @Query(value = "SELECT * FROM Document d WHERE d.status = 'draft' AND d.is_delete = 0", nativeQuery = true)
+        List<Document> getDraftDocuments();
 
-        @Query(value = "SELECT * FROM Document d WHERE d.status = 'published'", nativeQuery = true)
-        List<Document> findPublishedDocuments();
+        @Query(value = "SELECT * FROM Document d WHERE d.status = 'published' AND d.is_delete = 0 ", nativeQuery = true)
+        List<Document> getPublishedDocuments();
+
+        @Query(value = "SELECT * FROM Document d WHERE d.is_delete = 1 ", nativeQuery = true)
+        List<Document> getDeleteDocuments();
 
         // @Query(value = "SELECT COUNT(d.id) AS total, MONTH(d.upload_date) AS month
         // FROM Document d GROUP BY MONTH(d.upload_date)")
@@ -118,36 +122,36 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                         ") AS m " +
                         "LEFT JOIN ( " +
                         "   SELECT COUNT(id) AS total, MONTH(upload_date) AS month " +
-                        "   FROM Document " +
+                        "   FROM Document WHERE YEAR(upload_date) = :year AND is_delete = 0" +
                         "   GROUP BY MONTH(upload_date) " +
-                        ") AS d ON m.month = d.month " +
+                        ") AS d ON m.month = d.month  " +
                         "GROUP BY m.month " +
                         "ORDER BY m.month ASC", nativeQuery = true)
-        List<DocumentMonthly> countDocumentsMonthly();
+        List<Monthly> countDocumentsMonthly(@Param("year") int year);
 
         @Query(value = "SELECT COUNT(d.id) " +
                         "FROM Document d " +
-                        "WHERE d.upload_date >= CURRENT_DATE() AND d.upload_date < CURRENT_DATE() + INTERVAL 1 DAY", nativeQuery = true)
+                        "WHERE  d.is_delete = 0 AND d.upload_date >= CURRENT_DATE() AND d.upload_date < CURRENT_DATE() + INTERVAL 1 DAY", nativeQuery = true)
         int countDocumentsToday();
 
-        @Query(value = "SELECT COUNT(d.id) as total, d.documentType as type FROM Document d GROUP BY d.documentType")
-        List<TypeDocumentRes> countDocumentsByType();
+        @Query(value = "SELECT COUNT(d.id) as total, d.documentType as type FROM Document d WHERE d.isDelete = false AND YEAR(d.uploadDate) = :year GROUP BY d.documentType")
+        List<TypeRes> countDocumentsByType(@Param("year") int year);
 
-        @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'published'", nativeQuery = true)
+        @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'published' AND d.is_delete = 0", nativeQuery = true)
         int countPublishedDocuments();
 
-        @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'draft'", nativeQuery = true)
+        @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'draft' AND d.is_delete = 0", nativeQuery = true)
         int countDraftDocuments();
 
-        @Query(value = "SELECT * FROM Document d ORDER BY d.download DESC LIMIT 3", nativeQuery = true)
+        @Query(value = "SELECT * FROM Document d WHERE d.is_delete = 0 ORDER BY d.download DESC LIMIT 3 ", nativeQuery = true)
         List<Document> getTop3Docs();
 
-        @Query(value = "SELECT * FROM Document d ORDER BY d.upload_date ASC LIMIT 10  OFFSET :offset ", nativeQuery = true)
+        @Query(value = "SELECT * FROM Document d WHERE d.is_delete = 0 ORDER BY d.upload_date ASC LIMIT 10  OFFSET :offset ", nativeQuery = true)
         List<Document> getPaginationDocuments(@Param("offset") int offset);
 
-        @Query("select d from Document d where d.userUpload.id = :id")
+        @Query("select d from Document d where d.userUpload.id = :id AND d.isDelete = false")
         List<Document> findAllByAuthorId(Long id);
 
-        @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id")
+        @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id AND d.isDelete = false")
         int findAllBySpecializedId(Long id);
 }

@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
 import SideBarAdmin from "../components/SideBarAdmin";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams, useLocation } from "react-router-dom";
 
 const Admin = () => {
   // const token = localStorage.getItem("token");
@@ -15,6 +15,9 @@ const Admin = () => {
   // if (jwt !== null && jwt.exp < Date.now() / 1000 && jwt.role !== "ADMIN") {
   //   window.location.href = "/";
   // }
+
+  const location = useLocation();
+  const currentPath = location.pathname.split("/")[2];
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -37,13 +40,13 @@ const Admin = () => {
                   </li>
                   <li className="flex items-center text-blue-900 antialiased font-sans text-sm font-normal leading-normal cursor-pointer transition-colors duration-300 hover:text-blue-500">
                     <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                      user
+                      {currentPath}
                     </p>
                   </li>
                 </ol>
               </nav>
               <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-gray-900">
-                user
+                {currentPath}
               </h6>
             </div>
             <div className="flex items-center">

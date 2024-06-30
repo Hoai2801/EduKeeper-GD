@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -25,6 +27,10 @@ public class Document {
     @Column(nullable = false, length = 300)
     private String slug;
 
+    @Column(name = "is_delete", nullable = false)
+    @Getter
+    private boolean isDelete;
+
     @Column(nullable = false, length = 30)
     private String status;
     @Column(name = "document_type", nullable = false, length = 30)
@@ -39,8 +45,11 @@ public class Document {
     @Column
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "upload_date")
     private LocalDate uploadDate;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deleteDate;
 
     @Column(nullable = false, length = 500)
     private String path;

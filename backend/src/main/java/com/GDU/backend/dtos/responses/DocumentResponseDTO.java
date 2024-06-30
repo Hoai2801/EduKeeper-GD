@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -26,6 +27,8 @@ public class DocumentResponseDTO {
     private Long document_size;
 
     private LocalDate upload_date;
+
+    private LocalDateTime deleted_at;
 
     private String thumbnail;
     private String status;

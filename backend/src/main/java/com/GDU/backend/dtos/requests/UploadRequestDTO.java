@@ -24,14 +24,6 @@ public class UploadRequestDTO {
 
     @NotEmpty
     @NotBlank
-    private long department;
-
-    @NotEmpty
-    @NotBlank
-    private long specialized;
-
-    @NotEmpty
-    @NotBlank
     private long category;
 
     @NotEmpty

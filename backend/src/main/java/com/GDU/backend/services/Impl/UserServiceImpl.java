@@ -1,5 +1,7 @@
 package com.GDU.backend.services.Impl;
 
+import com.GDU.backend.dtos.responses.Monthly;
+import com.GDU.backend.dtos.responses.TypeRes;
 import com.GDU.backend.dtos.responses.UserRakingRes;
 import com.GDU.backend.dtos.responses.UserRakingResI;
 import com.GDU.backend.dtos.responses.UserResponse;
@@ -77,6 +79,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } catch (Exception e) {
             throw new UnsupportedOperationException(
                     "Unimplemented method get top 10 user with most downloads: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Monthly> countUsersMonthly(int year) {
+        try {
+            return userRepository.countUsersMonthly(year);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Users: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<TypeRes> countUsersByRoles(int year) {
+        try {
+            return userRepository.countUsersByRole(year);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Users: " + e.getMessage());
         }
     }
 }

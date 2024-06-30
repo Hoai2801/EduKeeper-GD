@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useHandleDetailDocs } from "../components/HandleEvent";
-import DocumentDeleter from "../hook/useDeleteDocs";
-export default function AcceptDocs(params) {
+
+export default function DeletedDocument(params) {
   const [documents, setDocuments] = useState([]);
   const [activePage, setActivePage] = useState(1);
+  const [isCheck, setIsCheck] = useState(true);
   const navigate = useNavigate();
   const handleDetailDocs = useHandleDetailDocs();
   const goBack = () => {
@@ -33,23 +34,67 @@ export default function AcceptDocs(params) {
     if (checkedDocuments.length === 0) {
       toast.error("Bạn phải chọn tài liệu để cập nhật");
     } else {
-      fetch("http://localhost:8080/api/v1/documents/accept", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(checkedDocuments),
-      })
-        .then((response) => {
-          console.log(response);
+      const res = async () => {
+        try {
+          const response = await fetch(
+            "http://localhost:8080/api/v1/documents/recovery",
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(checkedDocuments),
+            }
+          );
+
           if (response.status === 200) {
-            toast.success("Bạn vừa duyệt tài liệu " + checkedDocuments);
+            toast.success(
+              "Bạn vừa khôi phục tài liệu thành công " + checkedDocuments
+            ); // Success message
+            setCheckedDocuments([]); // Clear checked documents list
           } else {
-            toast.error("Lỗi vui lòng thử lại sau! ");
+            toast.error("Lỗi vui lòng thử lại sau! "); // Error message on API call failure
           }
-          setCheckedDocuments([]);
-        })
-        .catch((error) => console.error(error));
+        } catch (error) {
+          toast.error("Lỗi hệ thống, vui lòng thử lại sau! "); // Generic error message
+        }
+      };
+
+      const customToast = toast.custom(() => (
+        <div
+          className={` max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto flex  ring-1 ring-black ring-opacity-5`}
+        >
+          <div className="flex-1 w-0 p-4">
+            <div className="flex items-start">
+              <div className="ml-3 flex-1">
+                <p className="text-sm font-medium text-gray-900">
+                  Khôi phục tài liệu
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  Bạn có chắc muốn khôi phục các tài liệu đã chọn không
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex border-l border-gray-300">
+            <button
+              onClick={async () => {
+                toast.remove(customToast);
+                await res();
+              }}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-2 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Đồng ý
+            </button>
+          </div>
+          <div className="flex border-l border-gray-300">
+            <button
+              onClick={() => toast.remove(customToast)}
+              className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Hủy
+            </button>
+          </div>
+        </div>
+      ));
     }
   };
   const next = () => {
@@ -62,7 +107,7 @@ export default function AcceptDocs(params) {
   };
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/v1/documents/draft`)
+    fetch(`http://localhost:8080/api/v1/documents/deleted`)
       .then((res) => res.json())
       .then((data) => {
         setDocuments(data);
@@ -71,8 +116,14 @@ export default function AcceptDocs(params) {
 
   return (
     <div>
-      <div className="text-center text-gray-500 text-3xl font-bold">
-        Danh sách tài liệu cần duyệt
+      <div className="text-center ">
+        <h1 className="text-gray-500 text-3xl font-bold">
+          Danh sách tài liệu đã xóa
+        </h1>
+        <p className="text-gray-400 text-sm font-bold">
+          Lưu ý danh sách này chỉ gồm những tài liệu đã xóa trong khoảng 30 trở
+          lại đây. Các tài liệu đã xóa quá 30 không thể khôi phục lại
+        </p>
       </div>
       {documents && documents.length != 0 ? (
         <>
@@ -99,11 +150,9 @@ export default function AcceptDocs(params) {
                         Category
                       </th>
                       <th scope="col" class="px-6 py-3">
-                        CreateAt
+                        Ngày xóa{" "}
                       </th>
-                      <th scope="col" class="px-6 py-3">
-                        Action
-                      </th>
+                      <th scope="col" class="px-6 py-3"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -127,7 +176,7 @@ export default function AcceptDocs(params) {
                         </td>
                         <td class="px-6 py-4 min-w-32">
                           {" "}
-                          {document.upload_date}{" "}
+                          {document.deleted_at.replace("T", "-")}{" "}
                         </td>
                         <td class=" px-6 py-4 flex items-center  gap-3 ">
                           <input
@@ -136,18 +185,6 @@ export default function AcceptDocs(params) {
                             onChange={() => handleCheckboxChange(document.id)}
                             checked={checkedDocuments.includes(document.id)}
                           />
-                          <a
-                            onClick={() => handleDetailDocs(document.slug)}
-                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline hover:cursor-pointer"
-                          >
-                            Detail
-                          </a>
-                          <a
-                            onClick={() => DocumentDeleter(document.id)}
-                            class="font-medium text-red-600 dark:text-red-500 hover:underline hover:cursor-pointer"
-                          >
-                            Remove
-                          </a>
                         </td>
                       </tr>
                     ))}
@@ -163,7 +200,7 @@ export default function AcceptDocs(params) {
                   onClick={handleAccpet}
                   className="px-6 py-2  text-white bg-blue-400 rounded-lg hover:cursor-pointer"
                 >
-                  Duyệt
+                  Khôi phục
                 </button>
               </div>
             </div>
@@ -243,10 +280,10 @@ export default function AcceptDocs(params) {
             <div className="min-w-48 min-h-8 ">
               <div className="p-4">
                 <h4 className="text-xl font-semibold">
-                  Chào mừng bạn đến với phần duyệt tài liệu
+                  Chào mừng bạn đến với phần tài liệu đã xóa
                 </h4>
                 <p className="my-1 text-sm max-w-2xl text-gray-400 font-medium">
-                  Có vẻ như hiện tại tất cả tài liệu đã được duyệt, vui lòng
+                  Có vẻ như hiện tại tất cả tài liệu đã xóa không có, vui lòng
                   quay trở lại sau khi có tài liệu nào đó cần bạn duyêt!
                 </p>
               </div>

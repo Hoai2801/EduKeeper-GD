@@ -1,5 +1,7 @@
 package com.GDU.backend.services;
 
+import com.GDU.backend.dtos.responses.Monthly;
+import com.GDU.backend.dtos.responses.TypeRes;
 import com.GDU.backend.dtos.responses.UserRakingResI;
 import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.models.User;
@@ -18,4 +20,9 @@ public interface UserService {
     User getUserByStaffCode(String staffCode);
 
     List<UserRakingResI> getTop10UserWithMostDownloads();
+
+    List<Monthly> countUsersMonthly(int year);
+
+    List<TypeRes> countUsersByRoles(int year);
+
 }

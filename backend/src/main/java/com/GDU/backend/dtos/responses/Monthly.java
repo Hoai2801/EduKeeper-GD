@@ -1,7 +1,7 @@
 package com.GDU.backend.dtos.responses;
 
-public interface TypeDocumentRes {
-    String getType();
-
+public interface Monthly {
     int getTotal();
+
+    int getMonth();
 }

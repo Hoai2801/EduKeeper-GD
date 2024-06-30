@@ -5,9 +5,9 @@ import com.GDU.backend.dtos.requests.FilterRequestDTO;
 import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.DocumentResponseDTO;
+import com.GDU.backend.dtos.responses.Monthly;
 import com.GDU.backend.dtos.responses.TotalResponse;
-import com.GDU.backend.dtos.responses.DocumentMonthly;
-import com.GDU.backend.dtos.responses.TypeDocumentRes;
+import com.GDU.backend.dtos.responses.TypeRes;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,7 +23,7 @@ public interface DocumentService {
 
     DocumentResponseDTO getDocumentBySlug(String slug);
 
-    String deleteDocument(Long id);
+    // String deleteDocument(Long id);
 
     List<DocumentResponseDTO> getMostViewedDocuments(int limit);
 
@@ -57,15 +57,21 @@ public interface DocumentService {
 
     List<DocumentResponseDTO> getPublishedDocument();
 
+    List<DocumentResponseDTO> getDeletedDocument();
+
     String AcceptDocument(Long id) throws IOException;
 
     String AcceptListDocument(List<Long> ids) throws IOException;
 
-    List<DocumentMonthly> countDocumentsMonthly();
+    List<Monthly> countDocumentsMonthly(int year);
 
-    List<TypeDocumentRes> countDocumentsByType();
+    List<TypeRes> countDocumentsByType(int year);
 
     List<DocumentResponseDTO> getTop3Documents();
 
     List<DocumentResponseDTO> getPaginationDocs(int page);
+
+    boolean deleteDocumentById(Long id);
+
+    String recoveryDocument(List<Long> ids) throws IOException;
 }

@@ -16,6 +16,7 @@ import AcceptDocs from "./pages/AcceptDocs";
 import Department from "./pages/Department";
 import DashboardTest from "./pages/DashboardTest";
 import Document from "./pages/Document";
+import DeletedDocument from "./pages/ListDocsDeleted";
 import Profile from "./pages/Profile";
 import UserUpload from "./pages/UserUpload";
 import UserHome from "./components/UserHome";
@@ -45,6 +46,7 @@ function App() {
         <Route path="users" element={<User />} />
         <Route path="department" element={<Department />} />
         <Route path="document/:page" element={<Document />} />
+        <Route path="document/deleted" element={<DeletedDocument />} />
         <Route path="accept" element={<AcceptDocs />} />
       </Route>
     </Routes>

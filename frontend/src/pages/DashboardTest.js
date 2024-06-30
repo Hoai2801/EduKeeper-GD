@@ -1,15 +1,32 @@
 import React, { useEffect, useState } from "react";
 import ColumnChart from "../components/Chart";
-import { LineChart, DoughnutChart } from "../components/Chart";
+import {
+  LineChart,
+  DoughnutDocsChart,
+  DoughnutUserChart,
+} from "../components/Chart";
+import { useHandleDetailDocs } from "../components/HandleEvent";
 import Avatar from "../assets/avatar.webp";
 import AvatarGirl from "../assets/avatar-girl.webp";
 import AvatarBoy from "../assets/avatar-boy.webp";
 import DevBoy from "../assets/dev-boy.webp";
 import DefaultDocs from "../assets/docs.jpg";
+import { toast } from "react-hot-toast";
 const DashboardTest = () => {
+  const currentYear = new Date().getFullYear();
   const [top3Docs, setTop3Docs] = useState([]);
   const [top10User, setTop10User] = useState([]);
-
+  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [totalDraftDocuments, setTotalDraftDocuments] = useState(0);
+  const [totalPublishedDocuments, setTotalPublishedDocuments] = useState(0);
+  const [totalTodayDocuments, setTotalTodayDocuments] = useState(0);
+  const [yearColumnChart, setYearColumnChart] = useState(currentYear);
+  const [yearLineChart, setYearLineChart] = useState(currentYear);
+  const [yearDoughnutDocsChart, setYearDoughnutDocsChart] =
+    useState(currentYear);
+  const [yearDoughnutUserChart, setYearDoughnutUserChart] =
+    useState(currentYear);
+  const handleDetailDocs = useHandleDetailDocs();
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/documents/top3")
       .then((res) => res.json())
@@ -22,14 +39,43 @@ const DashboardTest = () => {
       .then((data) => {
         setTop10User(data);
       });
+
+    fetch("http://localhost:8080/api/v1/documents/count")
+      .then((res) => res.json())
+      .then((data) => {
+        setTotalDocuments(data);
+      });
+
+    fetch("http://localhost:8080/api/v1/documents/count-draft")
+      .then((res) => res.json())
+      .then((data) => {
+        setTotalDraftDocuments(data);
+      });
+
+    fetch("http://localhost:8080/api/v1/documents/count-published")
+      .then((res) => res.json())
+      .then((data) => {
+        setTotalPublishedDocuments(data);
+      });
+
+    fetch("http://localhost:8080/api/v1/documents/today")
+      .then((res) => res.json())
+      .then((data) => {
+        setTotalTodayDocuments(data);
+      });
   }, []);
+
+  const handleDetailUser = (id) => {
+    toast.error(
+      "Hiện tại bạn không thể xem thông tin của người dùng có id là " + id
+    );
+  };
 
   const hanldeContact = () => {
     window.location.href =
       "https://www.facebook.com/profile.php?id=100009283092043";
   };
 
-  const items = [1, 2, 3, 4, 5, 6, 7];
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
@@ -47,14 +93,14 @@ const DashboardTest = () => {
               Tổng số tài liệu
             </p>
             <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-              {100}
+              {totalDocuments}
             </h4>
           </div>
           <div className="border-t border-blue-gray-50 p-4">
-            <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
+            {/* <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
               <strong className="text-green-500">{9}%</strong>
               &nbsp;so với năm trước
-            </p>
+            </p> */}
           </div>
         </div>
         {/* Number of published documents */}
@@ -71,13 +117,15 @@ const DashboardTest = () => {
               Tài liệu chưa duyệt
             </p>
             <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-              {9}
+              {totalDraftDocuments}
             </h4>
           </div>
           <div className="border-t border-blue-gray-50 p-4">
             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-              <strong className="text-green-500">{10}%</strong>
-              &nbsp;so với tháng trước
+              <strong className="text-green-500">
+                {Math.round((totalDraftDocuments * 100) / totalDocuments)}%
+              </strong>
+              &nbsp;so với tổng tài liệu
             </p>
           </div>
         </div>
@@ -95,13 +143,15 @@ const DashboardTest = () => {
               Tài liệu đã công bố
             </p>
             <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-              {9}
+              {totalPublishedDocuments}
             </h4>
           </div>
           <div className="border-t border-blue-gray-50 p-4">
             <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
-              <strong className="text-green-500">{10}%</strong>
-              &nbsp;so với tháng trước
+              <strong className="text-green-500">
+                {Math.round((totalPublishedDocuments * 100) / totalDocuments)}%
+              </strong>
+              &nbsp;so với tổng tài liệu
             </p>
           </div>
         </div>
@@ -119,14 +169,14 @@ const DashboardTest = () => {
               Tài liệu hôm nay
             </p>
             <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-              {9}
+              {totalTodayDocuments}
             </h4>
           </div>
           <div className="border-t border-blue-gray-50 p-4">
-            <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
+            {/* <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
               <strong className="text-green-500">{10}%</strong>
               &nbsp;so với tháng trước
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
@@ -168,7 +218,10 @@ const DashboardTest = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="ml-auto mr-2 hover:cursor-pointer">
+                    <div
+                      onClick={() => handleDetailDocs(docs.slug)}
+                      className="ml-auto mr-2 hover:cursor-pointer"
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 320 512 "
@@ -327,54 +380,65 @@ const DashboardTest = () => {
           <div className="w-1/2 mr-6  bg-white bg-clip-border rounded-xl shadow-md">
             <div className="mb-4 flex justify-between items-center mx-4">
               <p className="text-sm font-medium text-gray-700">
-                Biểu đồ số lượng tài liệu trong từng tháng
+                Biểu đồ số lượng tài liệu trong từng tháng của năm
               </p>
               <input
                 className="w-[80px] text-sm text-gray-500 p-2 border-solid rounded-lg border-[1px] border-gray-300 font-semibold mt-2"
-                type="month"
+                type="number"
+                defaultValue={currentYear}
+                onChange={(e) => {
+                  setYearColumnChart(e.target.value);
+                }}
                 name=""
                 id=""
-                min=""
-                max=""
+                min="2023"
+                max={currentYear}
               />
             </div>
-            <ColumnChart />
+            <ColumnChart year={yearColumnChart} />
           </div>
           <div className="w-1/2  bg-white bg-clip-border rounded-xl shadow-md">
             <div className="mb-4 flex justify-between items-center mx-4">
               <p className="text-sm font-medium text-gray-700">
-                Biểu đồ số lượng tài liệu trong từng tháng
+                Biểu đồ số lượng tài liệu và người dùng trong từng tháng của năm
               </p>
               <input
                 className="w-[80px] text-sm text-gray-500 p-2 border-solid rounded-lg border-[1px] border-gray-300 font-semibold mt-2"
-                type="month"
+                type="number"
+                defaultValue={currentYear}
                 name=""
+                onChange={(e) => {
+                  setYearLineChart(e.target.value);
+                }}
                 id=""
-                min=""
-                max=""
+                min="2023"
+                max={currentYear}
               />
             </div>
-            <LineChart />
+            <LineChart year={yearLineChart} />
           </div>
         </div>
       </div>
       {/* Ranking */}
       <div className="mt-4">
         <h4 className="text-xl font-bold">RANKING</h4>
-        <div className="mt-6 flex gap-y-10  justify-center items-center md:flex-col xl:flex-row">
+        <div className="mt-6 flex gap-y-10   md:flex-col xl:flex-row">
           {/* Top 1-3 */}
           <div className="w-1/2 flex flex-row justify-start ">
             {/* Top 2 */}
-            <div className="mt-8  mr-4 flex flex-col  items-center">
+            <div
+              className="mt-8  mr-4 flex flex-col  items-center hover:cursor-pointer"
+              onClick={() => handleDetailUser(top10User[1]?.user.id)}
+            >
               <div className="relative ">
-                <div className="w-32 h-32 bg-blue-300 rounded-full flex flex-col items-center justify-center">
+                <div className="w-32 h-32 bg-blue-300 rounded-full flex flex-col items-center justify-center ">
                   <img
                     className="w-32 h-24 object-cover rounded-full"
                     src={Avatar}
                     alt="Top 1"
                   />
                 </div>
-                <div className="absolute top-24  left-1/2 transform -translate-x-1/2 min-w-max px-6 py-1 bg-violet-800 text-white rounded-lg">
+                <div className="absolute  top-24  left-1/2 transform -translate-x-1/2 min-w-max px-6 py-1 bg-violet-800 text-white rounded-lg">
                   <p className="text-base font-semibold italic">
                     {top10User[1]?.user.username}
                   </p>
@@ -399,7 +463,10 @@ const DashboardTest = () => {
               </div>
             </div>
             {/* Top 1 */}
-            <div className=" mx-4  flex flex-col  items-center">
+            <div
+              className=" mx-4  flex flex-col  items-center hover:cursor-pointer"
+              onClick={() => handleDetailUser(top10User[0]?.user.id)}
+            >
               <div className="relative ">
                 <div className="w-32 h-32 bg-blue-300 rounded-full flex flex-col items-center justify-center">
                   <div className="absolute top-[-34px]">
@@ -445,7 +512,10 @@ const DashboardTest = () => {
               </div>
             </div>{" "}
             {/* Top 3 */}
-            <div className="mt-16  mx-4  flex flex-col  items-center">
+            <div
+              className="mt-16  mx-4  flex flex-col  items-center hover:cursor-pointer"
+              onClick={() => handleDetailUser(top10User[2]?.user.id)}
+            >
               <div className="relative ">
                 <div className="w-32 h-32 bg-blue-300 rounded-full flex flex-col items-center justify-center">
                   <img
@@ -482,28 +552,28 @@ const DashboardTest = () => {
           </div>
           {/* Top 4-10 */}
           <div className="ml-4 w-1/2">
-            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-4">
-              <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    <th scope="col" class="px-4 py-2">
-                      Rank
-                    </th>
-                    <th scope="col" class="px-4 py-2">
-                      Avatar
-                    </th>
-                    <th scope="col" class="px-4 py-2">
-                      Name
-                    </th>
-                    <th scope="col" class="px-2 py-2">
-                      Downloads
-                    </th>
-                    <th scope="col" class="px-2 py-2"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {top10User &&
-                    top10User.slice(3).map((item, index) => (
+            <div class="relative overflow-x-auto justify-center items-center shadow-md sm:rounded-lg mb-4">
+              {top10User && top10User.length > 3 ? (
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                  <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                      <th scope="col" class="px-4 py-2">
+                        Rank
+                      </th>
+                      <th scope="col" class="px-4 py-2">
+                        Avatar
+                      </th>
+                      <th scope="col" class="px-4 py-2">
+                        Name
+                      </th>
+                      <th scope="col" class="px-2 py-2">
+                        Downloads
+                      </th>
+                      <th scope="col" class="px-2 py-2"></th>
+                    </tr>
+                  </thead>
+                  {top10User.slice(3).map((item, index) => (
+                    <tbody>
                       <tr
                         key={index + 4}
                         className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -527,16 +597,42 @@ const DashboardTest = () => {
                         <td className="px-4 py-3"> {item.total} </td>
                         <td className="px-4 py-3 text-right">
                           <a
-                            href="#"
-                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                            onClick={() => handleDetailUser(item.user.username)}
+                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline hover:cursor-pointer"
                           >
                             Detail
                           </a>
                         </td>
                       </tr>
-                    ))}
-                </tbody>
-              </table>
+                    </tbody>
+                  ))}
+                </table>
+              ) : (
+                <div className="">
+                  <div className="min-h-32 w-full bg-gray-200 bg-clip-border rounded-xl shadow-md flex items-center pb-4 ">
+                    <div className="min-w-48 min-h-8 ">
+                      <div className="p-4">
+                        <h4 className="text-xl font-semibold">
+                          Chào mừng bạn đến với phần sinh viên tiêu biểu
+                        </h4>
+                        <p className="my-1 text-sm max-w-2xl text-gray-400 font-medium">
+                          Có vẻ như hiện tại chưa có sinh viên nào tham gia, vui
+                          lòng quay trở lại sau khi có thông báo mới! Hãy khám
+                          phá những thứ thú vị khác đang đợi bạn.
+                        </p>
+                      </div>
+                      <div className="ml-4 mb-2">
+                        <button
+                          className="px-4 py-2 border-solid border-2 border-gray-400 rounded-lg 	  text-sm font-medium"
+                          type="submit"
+                        >
+                          <span>Khám phá ngay</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -548,39 +644,47 @@ const DashboardTest = () => {
           <div className="w-1/2 max-h-80 bg-white rounded-lg mr-2 ">
             <div className=" flex justify-between items-center mx-4">
               <p className="text-sm font-medium text-gray-700">
-                Biểu đồ số lượng tài liệu trong từng tháng
+                Biểu đồ số lượng tài liệu trong năm
               </p>
               <input
                 className="w-[80px] text-sm text-gray-500 p-2 border-solid rounded-lg border-[1px] border-gray-300 font-semibold mt-2"
-                type="month"
+                type="number"
+                defaultValue={currentYear}
+                onChange={(e) => {
+                  setYearDoughnutDocsChart(e.target.value);
+                }}
                 name=""
                 id=""
-                min=""
-                max=""
+                min="2023"
+                max={currentYear}
               />
             </div>
             <p className="mt-2 w-full h-[1px] bg-gray-300"> </p>
             <div className="flex justify-center items-center ">
-              <DoughnutChart />
+              <DoughnutDocsChart year={yearDoughnutDocsChart} />
             </div>
           </div>
           <div className="w-1/2 max-h-80 bg-white rounded-lg  ml-2">
             <div className=" flex justify-between items-center mx-4">
               <p className="text-sm font-medium text-gray-700">
-                Biểu đồ số lượng tài liệu trong từng tháng
+                Biểu đồ số lượng người tham gia trong năm
               </p>
               <input
                 className="w-[80px] text-sm text-gray-500 p-2 border-solid rounded-lg border-[1px] border-gray-300 font-semibold mt-2"
-                type="month"
+                type="number"
+                defaultValue={currentYear}
+                onChange={(e) => {
+                  setYearDoughnutUserChart(e.target.value);
+                }}
                 name=""
                 id=""
-                min=""
-                max=""
+                min="2023"
+                max={currentYear}
               />
             </div>
             <p className="mt-2 w-full h-[1px] bg-gray-300"> </p>
             <div className="flex justify-center items-center ">
-              <DoughnutChart />
+              <DoughnutUserChart year={yearDoughnutUserChart} />
             </div>
           </div>
         </div>
