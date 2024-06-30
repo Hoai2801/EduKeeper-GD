@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -48,6 +49,9 @@ public class Document {
     @Column(nullable = false, length = 500)
     private String thumbnail;
 
+    @Column(name = "is_delete", nullable = false)
+    private boolean isDelete;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
@@ -64,6 +68,9 @@ public class Document {
     @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<ViewHistory> views;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deleteDate;
     
     private String scope;
     

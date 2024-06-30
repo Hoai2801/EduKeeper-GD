@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,32 +28,23 @@ import java.util.concurrent.Executors;
 public class FakeController {
 
     private final DocumentService documentService;
-    
+
     @GetMapping("/{amount}")
-    public String fake(@PathVariable("amount") int amount) {
-        int numThreads = 4; // Adjust the number of threads as needed
-        try (ExecutorService executor = Executors.newFixedThreadPool(numThreads)) {
-            for (int i = 0; i < amount; i++) {
-                executor.execute(() -> {
-                    try {
-                        createFakeDocument();
-                    } catch (IOException e) {
-                        log.error("Error creating fake document: {}", e.getMessage());
-                    }
-                });
-            }
+    public String fake(@PathVariable("amount") int amount) throws IOException {
+        for (int i = 0; i < amount; i++) {
+            createFakeDocument();
         }
         return "faking";
     }
 
-    private void createFakeDocument() throws IOException{
+    private void createFakeDocument() throws IOException {
         Faker faker = new Faker();
 
         // create fake dto for testing
         String pathUrl = "src/main/resources/static/uploads/";
         String[] files = {"1713791537559_Packt.ASP.NET.8.Best.Practices.183763212X.pdf", "1713792927454_Algorithmic Thinking, 2nd Edition_ Unlock Your Programming Potential by Daniel Zingaro.pdf", "1715004861451_mongodb-the-definitive-guide-powerful-and-scalable-data-storage-3rd-edition-3nbsped-9781491954461_compress.pdf"};
-        Path path = Paths.get(pathUrl + files[(int)  Math.round(Math.random())]);
-        String name = faker.book().title();
+        Path path = Paths.get(pathUrl + files[(int) Math.round(Math.random())]);
+        String name = faker.book().title() + LocalDateTime.now();
         String originalFileName = "file.pdf";
         String contentType = "application/pdf";
         byte[] content = null;
@@ -68,7 +61,7 @@ public class FakeController {
                 .userUpload("22140044")
                 .subject(1L)
                 .scope("public")
-                
+
                 .category(faker.number().numberBetween(1, 5))
                 .description(faker.chuckNorris().fact())
                 .document(result)

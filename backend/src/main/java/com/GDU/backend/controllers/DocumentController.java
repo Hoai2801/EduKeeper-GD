@@ -100,7 +100,11 @@ public class DocumentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDocumentById(@PathVariable("id") Long id) {
         try {
-            return ResponseEntity.ok(documentService.deleteDocument(id));
+            boolean isDelete = documentService.deleteDocumentById(id);
+            if (!isDelete) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Delete document failed");
+            }
+            return ResponseEntity.ok("Delete document successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error deleting document: " + e.getMessage());
@@ -123,6 +127,15 @@ public class DocumentController {
     public ResponseEntity<?> countAllDocuments() {
         try {
             return ResponseEntity.ok(documentService.countAllDocuments());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+        }
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<?> countDocumentsToday() {
+        try {
+            return ResponseEntity.ok(documentService.countDocumentsToday());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
         }
@@ -231,19 +244,19 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/monthly")
-    public ResponseEntity<?> countDocumentMonthLy() {
+    @GetMapping("/monthly/{year}")
+    public ResponseEntity<?> countDocumentMonthLy(@PathVariable("year") int year) {
         try {
-            return ResponseEntity.ok(documentService.countDocumentsMonthly());
+            return ResponseEntity.ok(documentService.countDocumentsMonthly(year));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
-    @GetMapping("/type")
-    public ResponseEntity<?> getCountDocumentByType() {
+    @GetMapping("/type/{year}")
+    public ResponseEntity<?> getCountDocumentByType(@PathVariable("year") int year) {
         try {
-            return ResponseEntity.ok(documentService.countDocumentsByType());
+            return ResponseEntity.ok(documentService.countDocumentsByType(year));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
@@ -270,19 +283,40 @@ public class DocumentController {
         }
     }
 
-//    @GetMapping("/top3")
-//    public ResponseEntity<?> getTop3Documents() {
-//        try {
-//            return ResponseEntity.ok(documentService.getTop3Documents());
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//        }
-//    }
+    @GetMapping("/top3")
+    public ResponseEntity<?> getTop3Documents() {
+        try {
+            return ResponseEntity.ok(documentService.getTop3Documents());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
     @GetMapping("/page/{page}")
     public ResponseEntity<?> getPaginationDocs(@PathVariable("page") int page) {
         try {
             return ResponseEntity.ok(documentService.getPaginationDocs(page));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/deleted")
+    public ResponseEntity<?> getDeletedDocuments() {
+        try {
+            return ResponseEntity.ok(documentService.getDeletedDocument());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/recovery")
+    public ResponseEntity<?> recovertyDocumentById(@RequestBody List<Long> ids) {
+        try {
+            if (ids.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("List id is empty");
+            }
+            return ResponseEntity.ok(documentService.recoveryDocument(ids));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

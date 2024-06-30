@@ -49,7 +49,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .content(message.getContent())
                 .created_at(LocalDateTime.now())
                 .build();
-        log.info("Sending message: {}", message);
+        log.info("Sending message: {}", notification);
         notificationRepository.save(notification);
     }
 

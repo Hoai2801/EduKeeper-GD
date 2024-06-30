@@ -1,46 +1,126 @@
-import React, { useEffect, useState } from 'react'
-import removeIcon from '../assets/logo192.png'
-import editIcon from '../assets/edit-246.png'
+import React, { useEffect, useState } from "react";
+import removeIcon from "../assets/logo192.png";
+import editIcon from "../assets/edit-246.png";
+import DepartmentItems from "../components/DepartmentItems";
+import toast from "react-hot-toast";
+import "./Department.css";
 
 const Department = () => {
     const [department, setDepartment] = useState(null);
+    const [selectDepartment, setSelectDepartment] = useState(null);
+    const [specialized, setSpecialized] = useState(null);
+    const [isShowPostSpecialized, setIsShowPostSpecialized] = useState(false);
+    const [activeDocumentId, setActiveDocumentId] = useState(null);
+    const handleToggleDetails = (id) => {
+        setActiveDocumentId((prevId) => (prevId === id ? null : id));
+    };
+
+    const handleClickAddSpecialized = (dep) => {
+        setIsShowPostSpecialized(true);
+        setSelectDepartment(dep);
+    };
+
+    const hanldePostSpecialized = () => {
+        if (!specialized) {
+            toast.error("Bạn đang để trống tên chuyên ngành !");
+        } else {
+            // Call api
+            toast.success(
+                "Tạo chuyên ngành mới cho khoa " +
+                selectDepartment.departmentName +
+                " thành công."
+            );
+
+            setSpecialized("");
+        }
+    };
 
     useEffect(() => {
         fetch("http://localhost:8080/api/v1/departments")
-          .then((res) => res.json())
-          .then((data) => {
-            setDepartment(data);
-            console.log(data)
-          });
-      }, [])
-  return (
-    <div>
-        {department && department.map((dep) => (
-            <div key={dep.id}>
-                <div className='flex justify-between w-full border shadow-lg rounded-xl border-black p-4 mt-5'>
-                <h1 className='text-3xl'>{dep.departmentName}</h1>
-                    <div>
-                        <button onClick={null}>
-                            <img src={removeIcon} alt="" className='w-10 h-10'/>
-                        </button>
-                        <button onClick={null}>
-                            <img src={editIcon} alt="" className='w-10 h-10'/>
-                        </button>
-                    </div>
-                </div>
-                
-                {dep.specializeds && dep.specializeds.map((specialized) => (
-                    <div key={specialized.id} className='flex pl-10 gap-2'>
-                        <span className='text-3xl'>
-                            L
-                        </span>
-                        <h2 className='mt-3 text-xl'>{specialized.specializedName}</h2>
+            .then((res) => res.json())
+            .then((data) => {
+                setDepartment(data);
+            });
+    }, []);
+    return (
+        <div>
+            {department &&
+                department.map((dep) => (
+                    <div key={dep.id}>
+                        <div className="flex justify-between w-full border shadow-lg rounded-xl border-black p-4 mt-5">
+                            <h1 className="text-2xl">{dep.departmentName}</h1>
+                            <div className=" flex items-end">
+                                <a
+                                    onClick={() => handleClickAddSpecialized(dep)}
+                                    class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
+                                >
+                                    Thêm ngành mới
+                                </a>
+                                <a
+                                    onClick={() => handleToggleDetails(dep.id)}
+                                    class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
+                                >
+                                    Chi tiết
+                                </a>
+                            </div>
+                        </div>
+                        {activeDocumentId && (
+                            <DepartmentItems
+                                isActive={activeDocumentId == dep.id}
+                                id={activeDocumentId}
+                            />
+                        )}
                     </div>
                 ))}
-            </div>
-        ))}
-    </div>
-  )
-}
+            {isShowPostSpecialized && (
+                <div className="popup">
+                    <div className="popup-content ">
+                        <div className="max-w-lg p-8 bg-white rounded-md shadow-md">
+                            <h2 className="text-xl font-semibold">Thông tin chuyên ngành</h2>
+                            <p className="font-semibold text-sm text-red-600">
+                                Lưu ý bạn đang thêm chuyên ngành mới cho khoa{" "}
+                                {selectDepartment.departmentName}
+                            </p>
+                            <form className="mt-4">
+                                <div className="mb-4">
+                                    <label
+                                        htmlFor="name"
+                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                    >
+                                        Tên chuyên ngành
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        placeholder="Tên chuyên ngành ..."
+                                        required
+                                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+                                        value={specialized}
+                                        onChange={(e) => setSpecialized(e.target.value)}
+                                    />
+                                </div>
+                            </form>
+                            <div className="mt-6  flex justify-end ">
+                                <button
+                                    onClick={() => setIsShowPostSpecialized(false)}
+                                    className="font-medium text-slate-500 rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-white border border-1 border-slate-500"
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    onClick={hanldePostSpecialized}
+                                    className="ml-4 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-blue-500"
+                                >
+                                    Xác nhận
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
-export default Department
+export default Department;

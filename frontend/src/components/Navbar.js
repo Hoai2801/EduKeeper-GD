@@ -93,6 +93,13 @@ const Navbar = () => {
 
         }, []);
 
+        const checkNotification = () => {
+            setIsNotificationOpen(!isNotificationOpen);
+            if (jwt) {
+                fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwt.staff_code);
+            }
+        }
+
 
         async function fetchData() {
             if (jwt) {
@@ -220,7 +227,7 @@ const Navbar = () => {
                     </form>
                     <>
                         <div className="flex gap-5 justify-end w-[500px]">
-                            <button onClick={() => setIsNotificationOpen(!isNotificationOpen)} className={`relative`}>
+                            <button onClick={() => checkNotification()} className={`relative`}>
                                 <div className={`w-8 h-8 flex`}>
                                     <img src={bell} alt="" className={`w-full h-full`}/>
                                 </div>

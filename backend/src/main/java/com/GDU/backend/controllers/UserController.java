@@ -50,4 +50,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @GetMapping("/monthly/{year}")
+    public ResponseEntity<?> countUsersMonthly(@PathVariable("year") int year) {
+        try {
+
+            return ResponseEntity.ok(userService.countUsersMonthly(year));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/type/{year}")
+    public ResponseEntity<?> countUsersByRoles(@PathVariable("year") int year) {
+        try {
+
+            return ResponseEntity.ok(userService.countUsersByRoles(year));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

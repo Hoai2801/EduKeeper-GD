@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -177,35 +178,6 @@ public class DocumentServiceImpl implements DocumentService {
         return convertToDocumentResponse(document);
     }
 
-//    @Override
-//    public List<DocumentResponseDTO> getMostViewedDocuments(int limit) {
-//        return documentRepository.getMostViewedDocuments(limit)
-//                .stream()
-//                .filter(document -> !document.getViews().isEmpty())
-//                .map(this::convertToDocumentResponse)
-//                .toList();
-//    }
-
-    @Override
-    public String deleteDocument(Long id) {
-        Document document = documentRepository.findById(id).orElse(null);
-        if (document == null) {
-            return "Document not existing";
-        }
-
-        String path = document.getPath();
-        File file = new File(path);
-        if (file.exists()) {
-            boolean deleted = file.delete();
-            if (!deleted) {
-                return "Delete file failed";
-            } else {
-                documentRepository.delete(document);
-            }
-        }
-        return "Document deleted successfully";
-    }
-
     @Override
     public List<DocumentResponseDTO> getMostDownloadedDocuments(int limit) {
         // only get document has download more than 0
@@ -221,28 +193,6 @@ public class DocumentServiceImpl implements DocumentService {
         return documents
                 .stream().map(this::convertToDocumentResponse).toList();
     }
-
-//    public String updateDownloadCount(Long id) {
-//        Document existsDocument = documentRepository.findById(id).orElse(null);
-//        if (existsDocument == null) {
-//            return "Document is not existing";
-//        }
-//
-//        existsDocument.setDownload(existsDocument.getDownload() + 1);
-//        documentRepository.save(existsDocument);
-//        return "Update downloads success";
-//    }
-
-//    @Override
-//    public String updateViewCount(Long id) {
-//        Document existsDocument = documentRepository.findById(id).orElse(null);
-//        if (existsDocument == null) {
-//            return "Document is not existing";
-//        }
-//        existsDocument.setViews(existsDocument.getViews() + 1);
-//        documentRepository.save(existsDocument);
-//        return "Update views success";
-//    }
 
     @Override
     public List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO) {
@@ -450,9 +400,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentMonthly> countDocumentsMonthly() {
+    public List<Monthly> countDocumentsMonthly(int year) {
         try {
-            return documentRepository.countDocumentsMonthly();
+            return documentRepository.countDocumentsMonthly(year);
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
         }
@@ -486,9 +436,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<TypeDocumentRes> countDocumentsByType() {
+    public List<TypeRes> countDocumentsByType(int year) {
         try {
-            return documentRepository.countDocumentsByType();
+            return documentRepository.countDocumentsByType(year);
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
         }
@@ -526,5 +476,43 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<Document> findDocumentsWithMostDownloads(int limit) {
         return documentRepository.findDocumentsWithMostDownloads(limit);
+    }
+
+    @Override
+    public boolean deleteDocumentById(Long id) {
+        try {
+            Document document = documentRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+
+            String path = document.getPath();
+            File file = new File(path);
+
+            if (file.isFile() && !document.isDelete()) {
+                // boolean deleted = file.delete();
+                // if (!deleted) {
+                // return "Delete file failed";
+                // } else {
+                // }
+                document.setDeleteDate(LocalDateTime.now());
+                document.setDelete(true);
+                documentRepository.save(document);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method delete document " + e.getMessage());
+
+        }
+    }
+
+    @Override
+    public Object getDeletedDocument() {
+        return null;
+    }
+
+    @Override
+    public Object recoveryDocument(List<Long> ids) {
+        return null;
     }
 }

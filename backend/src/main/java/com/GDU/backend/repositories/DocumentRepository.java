@@ -1,5 +1,7 @@
 package com.GDU.backend.repositories;
 
+import com.GDU.backend.dtos.responses.Monthly;
+import com.GDU.backend.dtos.responses.TypeRes;
 import com.GDU.backend.models.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -108,8 +110,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT * FROM document d WHERE d.status = 'published'", nativeQuery = true)
     List<Document> findPublishedDocuments();
 
-    // @Query(value = "SELECT COUNT(d.id) AS total, MONTH(d.upload_date) AS month
-    // FROM Document d GROUP BY MONTH(d.upload_date)")
     @Query(value = "SELECT COALESCE(SUM(d.total), 0) AS total, m.month " +
             "FROM ( " +
             "   SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 " +
@@ -119,20 +119,20 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             ") AS m " +
             "LEFT JOIN ( " +
             "   SELECT COUNT(id) AS total, MONTH(upload_date) AS month " +
-            "   FROM document " +
+            "   FROM document WHERE YEAR(upload_date) = :year AND is_delete = 0" +
             "   GROUP BY MONTH(upload_date) " +
-            ") AS d ON m.month = d.month " +
+            ") AS d ON m.month = d.month  " +
             "GROUP BY m.month " +
             "ORDER BY m.month ASC", nativeQuery = true)
-    List<DocumentMonthly> countDocumentsMonthly();
+    List<Monthly> countDocumentsMonthly(@Param("year") int year);
 
     @Query(value = "SELECT COUNT(d.id) " +
             "FROM document d " +
             "WHERE d.upload_date >= CURRENT_DATE() AND d.upload_date < CURRENT_DATE() + INTERVAL 1 DAY", nativeQuery = true)
     int countDocumentsToday();
 
-    @Query(value = "SELECT COUNT(d.id) as total, d.documentType as type FROM Document d GROUP BY d.documentType")
-    List<TypeDocumentRes> countDocumentsByType();
+    @Query(value = "SELECT COUNT(d.id) as total, d.documentType as type FROM Document d WHERE d.isDelete = false AND YEAR(d.uploadDate) = :year GROUP BY d.documentType")
+    List<TypeRes> countDocumentsByType(@Param("year") int year);
 
     @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'published'")
     int countPublishedDocuments();

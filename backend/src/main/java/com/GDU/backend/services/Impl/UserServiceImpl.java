@@ -1,9 +1,7 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.UserDetailDTO;
-import com.GDU.backend.dtos.responses.UserDetailResponse;
-import com.GDU.backend.dtos.responses.UserRakingResI;
-import com.GDU.backend.dtos.responses.UserResponse;
+import com.GDU.backend.dtos.responses.*;
 import com.GDU.backend.models.Department;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.models.Token;
@@ -87,6 +85,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public List<Monthly> countUsersMonthly(int year) {
+        try {
+            return userRepository.countUsersMonthly(year);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Users: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<TypeRes> countUsersByRoles(int year) {
+        try {
+            return userRepository.countUsersByRole(year);
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method count Users: " + e.getMessage());
+        }
+    }
+
+    @Override
     public UserDetailResponse getUserResponseByStaffCode(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -127,4 +143,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(user);
         return "updated";
     }
+    
 }
