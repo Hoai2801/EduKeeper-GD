@@ -89,7 +89,8 @@ export default function EditDocs({ onClose }) {
       <div className="popup ">
         <div className="popup-content w-5/6 h-4/5  flex flex-col items-center overflow-auto">
           <h2 className="my-2 font-bold text-xl ">Tạo bài đăng mới</h2>
-          <div className="flex ">
+          <button onClick={() => onClose()}>X</button>
+          <div className="flex flex-col gap-5">
             <div className="mx-4">
               <DragDropFile handleFiles={handleFiles} />
               <div>

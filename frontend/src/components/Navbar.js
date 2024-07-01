@@ -265,6 +265,9 @@ const Navbar = () => {
                                             </Link>
                                             <Link to={`/profile/${jwt?.staff_code}/setting`}
                                                   className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>
+                                            <Link to={`/dashboard/home`}>
+                                                Admin
+                                            </Link>
                                             <Link onClick={() => logout()} className="hover:bg-blue-300 w-full h-[50px]">
                                                 Đăng xuất
                                             </Link>

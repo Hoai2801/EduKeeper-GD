@@ -110,6 +110,7 @@ export default function DeletedDocument(params) {
         fetch(`http://localhost:8080/api/v1/documents/deleted`)
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
                 setDocuments(data);
             });
     }, []);

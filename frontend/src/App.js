@@ -13,13 +13,14 @@ import User from "./pages/User";
 import Admin from "./pages/Admin";
 import AcceptDocs from "./pages/AcceptDocs";
 import Department from "./pages/Department";
-import DashboardTest from "./pages/DashboardTest";
+import Dashboard from "./pages/Dashboard";
 import Document from "./pages/Document";
 import Profile from "./pages/Profile";
 import UserHome from "./components/UserHome";
 import UserInfor from "./pages/UserInfor";
 import UserUploadDocument from "./components/UserUploadDocument";
 import UserFavoriteDocument from "./components/UserFavoriteDocument";
+import DeletedDocument from "./pages/ListDocsDeleted";
 
 function App() {
     window.scrollTo(0, 0);
@@ -44,10 +45,11 @@ function App() {
                 </Route>
             </Route>
             <Route path="/dashboard" element={<Admin/>}>
-                <Route index path="home" element={<DashboardTest/>}/>
+                <Route index path="home" element={<Dashboard/>}/>
                 <Route path="users" element={<User/>}/>
                 <Route path="department" element={<Department/>}/>
                 <Route path="document/:page" element={<Document/>}/>
+                <Route path="deleted" element={<DeletedDocument/>}/>
                 <Route path="accept" element={<AcceptDocs/>}/>
             </Route>
         </Routes>

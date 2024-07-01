@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -51,6 +52,10 @@ public class DocumentResponseDTO {
     private int views;
 
     private int download;
+    
+    private boolean is_delete;
+    
+    private LocalDateTime deleted_at;
 
     private int pages;
 
@@ -75,6 +80,8 @@ public class DocumentResponseDTO {
                 .subject(document.getSubject())
                 .path(document.getPath())
                 .thumbnail(document.getThumbnail())
+                .is_delete(document.isDelete())
+                .deleted_at(document.getDeleteDate())
                 .pages(document.getPages())
                 .description(document.getDescription())
                 .document_type(document.getDocumentType())

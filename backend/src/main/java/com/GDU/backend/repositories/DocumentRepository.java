@@ -24,7 +24,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.downloads) DESC LIMIT :limit")
     List<Document> getMostDownloadedDocuments(int limit);
 
-    @Query("SELECT d FROM Document d ORDER BY d.id DESC LIMIT :limit")
+    @Query("SELECT d FROM Document d WHERE d.isDelete = false and d.status = 'published' and (d.scope = 'student-only' or d.scope = 'public') ORDER BY d.id DESC LIMIT :limit")
     List<Document> getLastedDocuments(int limit);
 
     @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
@@ -32,6 +32,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL '30' DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
     List<Document> getPopularDocumentThisMonth();
+
+    @Query(value = "SELECT * FROM document d WHERE d.is_delete = 1 ", nativeQuery = true)
+    List<Document> getDeleteDocuments();
 
 
     @Query(value = "SELECT d.* FROM document d " +
@@ -104,10 +107,10 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id and d.status = 'published'")
     int findAllBySpecializedId(Long id);
 
-    @Query(value = "SELECT * FROM document d WHERE d.status = 'draft'", nativeQuery = true)
+    @Query(value = "SELECT * FROM document d WHERE d.status = 'draft' and is_delete = 0", nativeQuery = true)
     List<Document> findDraftDocuments();
 
-    @Query(value = "SELECT * FROM document d WHERE d.status = 'published'", nativeQuery = true)
+    @Query(value = "SELECT * FROM document d WHERE d.status = 'published' and is_delete = 0", nativeQuery = true)
     List<Document> findPublishedDocuments();
 
     @Query(value = "SELECT COALESCE(SUM(d.total), 0) AS total, m.month " +

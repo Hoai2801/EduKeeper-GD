@@ -73,9 +73,9 @@ const Detail = () => {
 
     }, [slug, data?.id])
 
-    const width = window.innerWidth > 800 ? 800 : window.innerWidth - 30;
+    const width = window.innerWidth > 1050 ? 1050 : window.innerWidth - 30;
 
-    const onDonwloadClick = () => {
+    const downloadClick = () => {
 
         // Creating new object of PDF file
         const fileURL = window.URL.createObjectURL(new Blob([file], {
@@ -188,8 +188,7 @@ const Detail = () => {
                 <div className={`pt-[50px] md:px-5 md:px-2 px-5`}>
                     <p className='text-blue-500 text-lg'><Link
                         to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> -
-                        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName} tư
-                            tưởng Hồ Chí Minh</Link>
+                        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName}</Link>
                     </p>
                     {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
                     <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title} xin
@@ -214,7 +213,7 @@ const Detail = () => {
                                 </div>
                             </button>
                             <buttonN
-                                onClick={() => onDonwloadClick()}
+                                onClick={() => downloadClick()}
                                 className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 mt-2 text-center cursor-pointer'>Tải
                                 tài liệu
                                 ({data?.document_size} MB)

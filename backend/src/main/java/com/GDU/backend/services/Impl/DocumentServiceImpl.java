@@ -344,6 +344,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .scope(document.getScope())
                 .category(document.getCategory())
                 .upload_date(document.getUploadDate())
+                .is_delete(document.isDelete())
+                .deleted_at(document.getDeleteDate())
                 .subject(document.getSubject())
                 .path(document.getPath())
                 .thumbnail(document.getThumbnail())
@@ -361,7 +363,11 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponseDTO> getPublishedDocument() {
-        return documentRepository.findPublishedDocuments().stream().map(this::convertToDocumentResponse).toList();
+        // filter the document is not deleted
+        return documentRepository.findPublishedDocuments()
+                .stream()
+                .map(this::convertToDocumentResponse)
+                .toList();
     }
 
     @Override
@@ -507,12 +513,34 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Object getDeletedDocument() {
-        return null;
+    public List<DocumentResponseDTO> getDeletedDocument() {
+        try {
+            return documentRepository.getDeleteDocuments()
+                    .stream()
+                    .map(this::convertToDocumentResponse)
+                    .toList();
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method pagination Docs: " + e.getMessage());
+        }
     }
 
     @Override
-    public Object recoveryDocument(List<Long> ids) {
-        return null;
+    public String recoveryDocument(List<Long> ids) throws IOException {
+        try {
+            for (Long id : ids) {
+                Document document = documentRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + id));
+                if (!document.isDelete()) {
+                    throw new ResourceNotFoundException("Document has recovered");
+                }
+                document.setDelete(false);
+                ;
+                documentRepository.save(document);
+
+            }
+            return "Recovered Document successfully";
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method Recovered Docs: " + e.getMessage());
+        }
     }
 }

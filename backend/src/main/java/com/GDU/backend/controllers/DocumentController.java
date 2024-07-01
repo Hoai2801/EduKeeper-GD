@@ -227,7 +227,7 @@ public class DocumentController {
     }
 
     @GetMapping("/public")
-    public ResponseEntity<?> getPubledDocuments() {
+    public ResponseEntity<?> getPublishedDocuments() {
         try {
             return ResponseEntity.ok(documentService.getPublishedDocument());
         } catch (Exception e) {
@@ -311,7 +311,7 @@ public class DocumentController {
     }
 
     @PutMapping("/recovery")
-    public ResponseEntity<?> recovertyDocumentById(@RequestBody List<Long> ids) {
+    public ResponseEntity<?> recoveryDocumentById(@RequestBody List<Long> ids) {
         try {
             if (ids.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("List id is empty");

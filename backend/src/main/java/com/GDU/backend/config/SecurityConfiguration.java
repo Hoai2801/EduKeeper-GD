@@ -62,7 +62,8 @@ public class SecurityConfiguration {
                                 "/api/v1/documents/filter",
                                 "/api/v1/favorites/**",
                                 "/api/v1/downloads/**",
-                                "/api/v1/notifications/**"
+                                "/api/v1/notifications/**",
+                                "api/v1/documents/**"
                         ).permitAll()
                         .requestMatchers(GET).permitAll()
                 )

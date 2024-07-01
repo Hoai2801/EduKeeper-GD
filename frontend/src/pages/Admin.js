@@ -4,17 +4,17 @@ import SideBarAdmin from "../components/SideBarAdmin";
 import { Outlet, useParams, useLocation } from "react-router-dom";
 
 const Admin = () => {
-  // const token = localStorage.getItem("token");
-  // let jwt = null;
-  // if (token !== "undefined" && token !== null) {
-  //   jwt = jwtDecode(token);
-  // } else {
-  //   window.location.href = "/";
-  // }
+  const token = localStorage.getItem("token");
+  let jwt = null;
+  if (token !== "undefined" && token !== null) {
+    jwt = jwtDecode(token);
+  } else {
+    window.location.href = "/";
+  }
 
-  // if (jwt !== null && jwt.exp < Date.now() / 1000 && jwt.role !== "ADMIN") {
-  //   window.location.href = "/";
-  // }
+  if (jwt !== null && jwt.exp < Date.now() / 1000 && jwt.role !== "ADMIN") {
+    window.location.href = "/";
+  }
 
   const location = useLocation();
   const currentPath = location.pathname.split("/")[2];

@@ -69,9 +69,10 @@ public interface DocumentService {
 
     List<Document> findDocumentsWithMostDownloads(int limit);
 
+
+    List<DocumentResponseDTO> getDeletedDocument();
+    
     boolean deleteDocumentById(Long id);
 
-    Object getDeletedDocument();
-
-    Object recoveryDocument(List<Long> ids);
+    String recoveryDocument(List<Long> ids) throws IOException;
 }
