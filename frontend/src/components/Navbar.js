@@ -94,7 +94,6 @@ const Navbar = () => {
         }, []);
 
         const checkNotification = () => {
-            setIsNotificationOpen(!isNotificationOpen);
             if (jwt) {
                 fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwt.staff_code);
             }
@@ -108,15 +107,23 @@ const Navbar = () => {
                     .then((data) => {
                         // console.log(data)
                         setNotification(data);
+                        let uncheckedCount = 0;
+
                         for (let i = 0; i < data.length; i++) {
-                            if (data[0]._check === true) {
-                                setIsHasNotification(i);
-                                break;
+                            if (data[i]._check === false) {
+                                uncheckedCount++;
                             }
-                            if (i === 9) {
+
+                            // Stop counting if unchecked notifications reach 10
+                            if (uncheckedCount >= 10) {
                                 setIsHasNotification("9+");
                                 break;
                             }
+                        }
+
+                        // If the loop completes and there are less than 10 unchecked notifications
+                        if (uncheckedCount < 10) {
+                            setIsHasNotification(uncheckedCount);
                         }
                     });
             }
@@ -125,13 +132,13 @@ const Navbar = () => {
         return (
             <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
                 <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
-                    <div className="flex gap-4 w-[250px] h-full">
+                    <div className="flex gap-4 lg:w-[250px] h-full w-fit items-center pl-2">
                         <Link to={"/"}>
-                            <div className="min-w-[135px]">
+                            <div className="lg:min-w-[135px] min-w-[90px]">
                                 <img
                                     src="https://giadinh.edu.vn/upload/photo/logofooter-8814.png"
                                     alt=""
-                                    className="h-[50px]"
+                                    className="md:h-[50px] h-[30px]"
                                 />
                             </div>
                         </Link>
@@ -172,8 +179,7 @@ const Navbar = () => {
                             onMouseEnter={() => {
                                 setIsShownCategory(true)
                                 setIsShownSpecialized(false)
-                            }
-                            }
+                            }}
                         >
                             <div className="">
                                 <p className="group-hover/department:text-blue-700">
@@ -227,16 +233,19 @@ const Navbar = () => {
                     </form>
                     <>
                         <div className="flex gap-5 justify-end w-[500px]">
-                            <button onClick={() => checkNotification()} className={`relative`}>
+                            <button onClick={() => setIsNotificationOpen(true)} className={`relative`}>
                                 <div className={`w-8 h-8 flex`}>
                                     <img src={bell} alt="" className={`w-full h-full`}/>
                                 </div>
                                 <div
-                                    className={`bg-red-500 rounded-full w-fit h-fit absolute text-white p-1 text-[10px] top-0 right-[-10px] ${isHasNotification ? "block" : "hidden"}`}>{isHasNotification}</div>
+                                    className={`bg-red-500 rounded-full w-fit h-5 absolute text-white p-1 text-[10px] top-0 right-[-10px] ${isHasNotification ? "block" : "hidden"}`}>{isHasNotification}</div>
                             </button>
                             <div
                                 className={`${isNotificationOpen ? "block" : "hidden"} flex flex-col gap-2 absolute top-[85px] sm:right-[100px] bg-white rounded-lg shadow-lg w-[400px] h-fit max-h-[300px] overflow-scroll`}
-                                onMouseLeave={() => setIsNotificationOpen(!isNotificationOpen)}
+                                onMouseLeave={() => {
+                                    setIsNotificationOpen(!isNotificationOpen)
+                                    checkNotification()
+                                }}
                                 onMouseEnter={() => setIsNotificationOpen(true)}
                             >
                                 {notification && notification?.map((item, index) => (
@@ -263,8 +272,8 @@ const Navbar = () => {
                                                   className="hover:bg-blue-300 w-full h-[50px]">
                                                 Trang cá nhân
                                             </Link>
-                                            <Link to={`/profile/${jwt?.staff_code}/setting`}
-                                                  className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>
+                                            {/*<Link to={`/profile/${jwt?.staff_code}/setting`}*/}
+                                            {/*      className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>*/}
                                             <Link to={`/dashboard/home`}>
                                                 Admin
                                             </Link>
@@ -276,7 +285,7 @@ const Navbar = () => {
                                 ) : (
                                     <Link
                                         to="/login"
-                                        className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2"
+                                        className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full md:text-sm text-xs w-[80px] md:w-[150px] md:px-4 px-0 md:py-2 py-1 text-center"
                                     >
                                         Đăng nhập
                                     </Link>
@@ -285,7 +294,7 @@ const Navbar = () => {
                             {/* mobile menu button */}
                             <div className="lg:hidden w-[50px]">
                                 <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                        className="w-[50px] pr-5 mt-3">
+                                        className="w-[50px] pr-5 md:mt-3 mt-2">
                                     <img src={menuIcon} alt="" className="w-full"/>
                                 </button>
                             </div>

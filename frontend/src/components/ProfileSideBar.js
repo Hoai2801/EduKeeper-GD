@@ -84,9 +84,9 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 <Link to={"information"} className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
                     Thông tin tài khoản
                 </Link>
-                <Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
-                    Thông báo
-                </Link>
+                {/*<Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>*/}
+                {/*    Thông báo*/}
+                {/*</Link>*/}
                 {/*<Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>*/}
                 {/*    Cài đặt*/}
                 {/*</Link>*/}

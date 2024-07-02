@@ -49,6 +49,7 @@ export default function DeletedDocument(params) {
                         toast.success(
                             "Bạn vừa khôi phục tài liệu thành công " + checkedDocuments
                         ); // Success message
+                        setDocuments(documents.filter((doc) => !checkedDocuments.includes(doc.id)))
                         setCheckedDocuments([]); // Clear checked documents list
                     } else {
                         toast.error("Lỗi vui lòng thử lại sau! "); // Error message on API call failure

@@ -19,10 +19,9 @@ const Notification = ({notification}) => {
     }
 
     return (
-        <div
-            className={`flex flex-col w-full border-b border-gray-300 p-3 ${notification._check ? "bg-gray-300" : "bg-white"}`}>
+        <div className={`flex flex-col w-full min-h-32 border-b border-gray-300 p-3 ${notification._check ? "bg-gray-200" : "bg-white"}`}>
             <div className={`flex justify-between`}>
-                <h3 className={`${!notification._check ? "font-semibold" : "text-gray-500"}`}>{notification.title}</h3>
+                <h3 className={`${!notification._check ? "font-semibold" : "text-gray-500 font-semibold"}`}>{notification.title}</h3>
                 <p>{(formatDate(notification.created_at))}</p>
             </div>
             <p className={`${!notification._check ? "" : "text-gray-500"}`}>{notification.content}</p>

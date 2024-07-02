@@ -191,8 +191,7 @@ const Detail = () => {
                         <Link to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName}</Link>
                     </p>
                     {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
-                    <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title} xin
-                        cho ngườii dùng moi ngh</h2>
+                    <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title}</h2>
                     <div className='flex justify-between mt-3 md:flex-row flex-col'>
                         <div className="flex flex-wrap gap-5 md:flex-col md:gap-1 md:mt-5 text-xl">
                             <p>Giáo viên: <Link to={`/profile/${data?.user_upload.staffCode}`}

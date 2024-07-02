@@ -50,7 +50,6 @@ function App() {
                 <Route path="department" element={<Department/>}/>
                 <Route path="document/:page" element={<Document/>}/>
                 <Route path="deleted" element={<DeletedDocument/>}/>
-                <Route path="accept" element={<AcceptDocs/>}/>
             </Route>
         </Routes>
     );
