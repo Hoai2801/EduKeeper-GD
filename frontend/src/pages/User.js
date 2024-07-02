@@ -25,9 +25,6 @@ const User = () => {
     roles: 'USER' // Default role is 'user'
   });
 
-  console.log(editUser)
-
-
   // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -167,7 +164,7 @@ const User = () => {
                 <th className="px-4 py-2">Mã nhân viên</th>
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Quyền</th>
-                <th className="px-4 py-2">Tình trạng</th>
+                <th className="px-4 py-2 w-[200px]">Tình trạng</th>
                 <th className="px-4 py-2">Ngày khởi tạo</th>
                 <th className="px-4 py-2"></th>
               </tr>
@@ -191,7 +188,7 @@ const User = () => {
                     </div>
                     <div className='w-full p-5'>
                         <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Tên người dùng</label>
-                        <input type="text" id="message" name="message" placeholder="" required value={editUser.username}/>
+                        <input type="text" id="message" name="message" placeholder="" required value={editUser.username} onChange={(e) => setEditUser({...editUser, username: e.target.value})}/>
                         <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Quyền người dùng</label>
                         <select name="message" id="message" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" >
                             <option>Quyền người dùng</option>

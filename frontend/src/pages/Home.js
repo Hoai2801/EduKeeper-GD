@@ -15,12 +15,10 @@ const Home = () => {
 
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/view-history/top-documents/10').then(res => res?.json()).then(data => {
-            console.log(data)
             setMostViewed(data)
         })
         fetch('http://localhost:8080/api/v1/documents/most-downloaded?limit=10').then(res => res?.json()).then(data => setMostDownloaded(data))
         fetch('http://localhost:8080/api/v1/documents/latest?limit=10').then(res => res?.json()).then(data => {
-            console.log(data)
             setLastedDocuments(data)
         })
     }, [])

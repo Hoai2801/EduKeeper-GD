@@ -48,7 +48,7 @@ function App() {
                 <Route index path="home" element={<Dashboard/>}/>
                 <Route path="users" element={<User/>}/>
                 <Route path="department" element={<Department/>}/>
-                <Route path="document/:page" element={<Document/>}/>
+                <Route path="document" element={<Document/>}/>
                 <Route path="deleted" element={<DeletedDocument/>}/>
             </Route>
         </Routes>

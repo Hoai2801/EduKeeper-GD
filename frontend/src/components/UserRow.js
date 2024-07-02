@@ -1,19 +1,22 @@
-import React from 'react'
+import React, {useState} from 'react'
 import removeIcon from '../assets/logo192.png'
 import editIcon from '../assets/edit-246.png'
 
 const UserRow = ({ user, setEditUser, setIsEditOpen }) => {
+    const [isShow, setIsShow] = useState(true)
   const removeUser = () => {
-    const response = fetch(`http://localhost:8080/api/v1/users/${user.id}`, {
+    fetch(`http://localhost:8080/api/v1/users/${user.id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
     })
-    console.log(response)
-    if (response) {
-      alert("Xóa người dùng thành công")
-    }
+        .then((res) => res.text())
+        .then((data) => {
+            setIsShow(false)
+            alert(data)
+        })
   }
 
   const handleUserEdit = () => {
@@ -25,8 +28,9 @@ const UserRow = ({ user, setEditUser, setIsEditOpen }) => {
     });
     setIsEditOpen(true);
   }
+
   return (
-    <tr key={user.id} className={`p-2 mt-5 ${user.enabled ? "bg-white" : "bg-gray-100"} w-full`}>
+    <tr key={user.id} className={`p-2 mt-5 ${user.enabled ? "bg-white" : "bg-gray-100"} w-full ${isShow ? "" : "hidden"}`}>
       <td className="px-4 py-2">{user.id}</td>
       <td className="px-4 py-2">{user.username}</td>
       <td className="px-4 py-2">{user.staffCode}</td>

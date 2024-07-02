@@ -2,14 +2,9 @@ package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.UserDetailDTO;
 import com.GDU.backend.dtos.responses.*;
-import com.GDU.backend.models.Department;
-import com.GDU.backend.models.Specialized;
-import com.GDU.backend.models.Token;
-import com.GDU.backend.models.User;
-import com.GDU.backend.repositories.DepartmentRepository;
-import com.GDU.backend.repositories.SpecializedRepository;
-import com.GDU.backend.repositories.TokenRepository;
-import com.GDU.backend.repositories.UserRepository;
+import com.GDU.backend.models.*;
+import com.GDU.backend.repositories.*;
+import com.GDU.backend.services.NotificationService;
 import com.GDU.backend.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +12,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
@@ -52,7 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         List<Token> tokens = tokenRepository.findTokensByUserId(id);
         tokenRepository.deleteAll(tokens);
         userRepository.deleteById(id);
-        return "deleted";
+        return "Xóa người dùng thành công!";
     }
 
     @Override
@@ -103,6 +104,30 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public String changeAvatar(String staffCode, MultipartFile avatar) {
+        User user = userRepository.findByStaffCode(staffCode).orElse(null);
+        if (user != null) {
+            // generate file name and path
+            String fileName = System.currentTimeMillis() + "_" + avatar.getOriginalFilename();
+            File destFile = new File("src/main/resources/static/avatar/" + fileName);
+
+            // save file
+            try {
+                Path uploadDir = Paths.get("src/main/resources/static/avatar/");
+                Files.createDirectories(uploadDir);
+                Files.copy(avatar.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            user.setAvatar(fileName);
+            userRepository.save(user);
+            return "Thay đổi avatar thành công!";
+        }
+        return "Hệ thống hiện tại không thể thực hiện thao tác này";
+    }
+
+    @Override
     public UserDetailResponse getUserResponseByStaffCode(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -113,6 +138,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     .birthDay(user.getBirthDay())
                     .department(user.getDepartment())
                     .klass(user.getKlass())
+                    .avatar(user.getAvatar())
                     .specialized(user.getSpecialized())
                     .roles(user.getRoles())
                     .id(user.getId())

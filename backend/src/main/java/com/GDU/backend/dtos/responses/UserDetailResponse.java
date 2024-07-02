@@ -28,6 +28,8 @@ public class UserDetailResponse {
     private String klass;
 
     private LocalDateTime birthDay;
+    
+    private String avatar;
 
     private boolean enable;
 }

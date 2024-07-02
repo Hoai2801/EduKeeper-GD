@@ -358,7 +358,10 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponseDTO> getDraftDocument() {
-        return documentRepository.findDraftDocuments().stream().map(this::convertToDocumentResponse).toList();
+        return documentRepository.findDraftDocuments()
+                .stream()
+                .map(this::convertToDocumentResponse)
+                .toList();
     }
 
     @Override

@@ -29,4 +29,18 @@ public class ImageController {
         // Return the image bytes with appropriate headers
         return ResponseEntity.ok().contentType(mediaType).body(imageBytes);
     }
+
+    @GetMapping("/avatar/{imageName}")
+    public ResponseEntity<byte[]> getAvatar(@PathVariable String imageName) throws IOException {
+        Path imagePath = Paths.get("src", "main", "resources", "static", "avatar", imageName);
+
+        // Read the image file into a byte array
+        byte[] imageBytes = Files.readAllBytes(imagePath);
+
+        // Set the appropriate content type for the image
+        MediaType mediaType = MediaType.IMAGE_PNG; // Assuming PNG format
+
+        // Return the image bytes with appropriate headers
+        return ResponseEntity.ok().contentType(mediaType).body(imageBytes);
+    }
 }

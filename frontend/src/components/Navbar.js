@@ -1,18 +1,14 @@
 import {jwtDecode} from "jwt-decode";
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-import useWebSocket, {ReadyState} from "react-use-websocket"
 // asset
 import menuIcon from "../assets/menu-hamburge.png";
 import bell from "../assets/free-bell-icon-860-thumb.png"
 import Notification from "./Notification";
 
 const Navbar = () => {
-        const token = localStorage.getItem("token");
-        let jwt = null;
-        if (token !== "undefined" && token !== null) {
-            jwt = jwtDecode(token);
-        }
+
+        const [jwt, setJwt] = useState(null);
 
         const [isShowSpecialized, setIsShownSpecialized] = useState(false);
         const [isShowCategory, setIsShownCategory] = useState(false);
@@ -28,6 +24,8 @@ const Navbar = () => {
         const [isHasNotification, setIsHasNotification] = useState(null);
         const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
+        const [user, setUser] = useState(null);
+
         useEffect(() => {
             fetch("http://localhost:8080/api/v1/specializes/count")
                 .then((res) => res.json())
@@ -41,18 +39,33 @@ const Navbar = () => {
                     setCategory(data);
                 });
 
-            if (jwt && jwt.exp < Date.now() / 1000) {
-                localStorage.removeItem("token");
-                window.location.href = "/";
+            const token = localStorage.getItem("token");
+            if (token !== "undefined" && token !== null) {
+                setJwt(jwtDecode(token));
             }
+
+
         }, [])
+
+        useEffect(() => {
+            if (jwt) {
+                fetch('http://localhost:8080/api/v1/users/' + jwt?.staff_code)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        setUser(data);
+                    });
+            }
+        }, [jwt]);
+
+        if (jwt && jwt.exp < Date.now() / 1000) {
+            localStorage.removeItem("token");
+            window.location.href = "/";
+        }
 
         const out = () => {
             setIsShownSpecialized(false);
             setIsShownCategory(false);
             setIsNotificationOpen(false);
-            // setIsSubMenuShown(false);
-            // setIsShownProfile(false);
         }
 
         const logout = () => {
@@ -77,32 +90,11 @@ const Navbar = () => {
 
         const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-        const POLLING_INTERVAL = 1000; // Poll every 5 seconds
-
-
+        const POLLING_INTERVAL = 1000;
         useEffect(() => {
-
+            if (user) {
             const intervalId = setInterval(() => {
-
-                fetchData();
-
-            }, POLLING_INTERVAL);
-
-
-            return () => clearInterval(intervalId); // Cleanup on component unmount
-
-        }, []);
-
-        const checkNotification = () => {
-            if (jwt) {
-                fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwt.staff_code);
-            }
-        }
-
-
-        async function fetchData() {
-            if (jwt) {
-                fetch('http://localhost:8080/api/v1/notifications/user/' + jwt.staff_code)
+                fetch('http://localhost:8080/api/v1/notifications/user/' + user.staffCode)
                     .then((res) => res.json())
                     .then((data) => {
                         // console.log(data)
@@ -126,6 +118,15 @@ const Navbar = () => {
                             setIsHasNotification(uncheckedCount);
                         }
                     });
+
+            }, POLLING_INTERVAL);
+            return () => clearInterval(intervalId); // Cleanup on component unmount
+            }
+        }, [user]);
+
+        const checkNotification = () => {
+            if (jwt) {
+                fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwt.staff_code);
             }
         }
 
@@ -233,7 +234,8 @@ const Navbar = () => {
                     </form>
                     <>
                         <div className="flex gap-5 justify-end w-[500px]">
-                            <button onClick={() => setIsNotificationOpen(true)} className={`relative`}>
+                            <button onClick={() => setIsNotificationOpen(true)}
+                                    className={`relative`}>
                                 <div className={`w-8 h-8 flex`}>
                                     <img src={bell} alt="" className={`w-full h-full`}/>
                                 </div>
@@ -242,15 +244,15 @@ const Navbar = () => {
                             </button>
                             <div
                                 className={`${isNotificationOpen ? "block" : "hidden"} flex flex-col gap-2 absolute top-[85px] sm:right-[100px] bg-white rounded-lg shadow-lg w-[400px] h-fit max-h-[300px] overflow-scroll`}
-                                onMouseLeave={() => {
-                                    setIsNotificationOpen(!isNotificationOpen)
-                                    checkNotification()
-                                }}
+                                // onMouseLeave={() => {
+                                //     // setIsNotificationOpen(!isNotificationOpen)
+                                //     // checkNotification()
+                                // }}
                                 onMouseEnter={() => setIsNotificationOpen(true)}
                             >
-                                {notification && notification?.map((item, index) => (
+                                {notification ? notification?.map((item, index) => (
                                     <Notification notification={item}/>
-                                ))}
+                                )) : <div className={`text-center h-[80px] text-xl`}>Không có thông báo nào!</div>}
                             </div>
                             <div className="flex text-center">
                                 {jwt ? (
@@ -262,8 +264,10 @@ const Navbar = () => {
                                             className="lg:mt-2 mt-3 lg:text-xl md:flex gap-3 hidden"
                                         >
                                             Chào {jwt.user_name}
-                                            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt=""
-                                                 className="w-8 h-8 rounded-full"/>
+                                            <img
+                                                src={user ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                                                alt=""
+                                                className="w-8 h-8 rounded-full"/>
                                         </button>
                                         <div
                                             className={`bg-white absolute flex flex-col items-center leading-[50px] max-w-[300px] w-[300px] overflow-hidden h-fit top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`}
@@ -274,7 +278,7 @@ const Navbar = () => {
                                             </Link>
                                             {/*<Link to={`/profile/${jwt?.staff_code}/setting`}*/}
                                             {/*      className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>*/}
-                                            <Link to={`/dashboard/home`}>
+                                            <Link to={`/dashboard/home`} className={`${jwt?.role === "ROLE_ADMIN" || jwt?.role === "ROLE_SUB-ADMIN" ? "block" : "hidden"} hover:bg-blue-300 w-full h-[50px]`}>
                                                 Admin
                                             </Link>
                                             <Link onClick={() => logout()} className="hover:bg-blue-300 w-full h-[50px]">
@@ -285,7 +289,7 @@ const Navbar = () => {
                                 ) : (
                                     <Link
                                         to="/login"
-                                        className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full md:text-sm text-xs w-[80px] md:w-[150px] md:px-4 px-0 md:py-2 py-1 text-center"
+                                        className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full md:text-sm text-xs w-[80px] md:w-[150px] md:px-4 px-0 md:py-3 py-1 text-center"
                                     >
                                         Đăng nhập
                                     </Link>

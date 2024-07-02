@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 
 @Configuration
@@ -54,6 +55,8 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/v1/role/**"
                         ).hasAnyRole("ADMIN", "SUB-ADMIN")
+                        .requestMatchers(DELETE, "api/v1/users/**")
+                        .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(
                                 "/api/v1/documents/upload"
                         ).hasAnyRole("TEACHER", "ADMIN", "SUB-ADMIN")
@@ -63,7 +66,8 @@ public class SecurityConfiguration {
                                 "/api/v1/favorites/**",
                                 "/api/v1/downloads/**",
                                 "/api/v1/notifications/**",
-                                "api/v1/documents/**"
+                                "/api/v1/documents/**",
+                                "/api/v1/users/avatar/**"
                         ).permitAll()
                         .requestMatchers(GET).permitAll()
                 )

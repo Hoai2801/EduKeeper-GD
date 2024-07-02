@@ -20,7 +20,7 @@ export default function Document(params) {
     const [activeButton, setActiveButton] = useState(0);
     const [activePage, setActivePage] = useState(1);
 
-
+const [draftCount, setDraftCount] = useState(0);
     // Set docs by status
     const [draftDocumentList, setDraftDocumentList] = useState([]);
     const [publicDocumentList, setPublicDocumentList] = useState([]);
@@ -84,7 +84,6 @@ export default function Document(params) {
 
     const hanldeDisplayDrafDocs = () => {
         setActiveButton(1);
-        setDocumentLength(draftDocumentList.length)
         setActivePage(1);
     };
 
@@ -137,34 +136,33 @@ export default function Document(params) {
         }
     };
 
-    // useEffect(() => {
-    //   fetch(`http://localhost:8080/api/v1/documents/public`)
-    //       .then((res) => res.json())
-    //       .then((data) => {
-    //         setDocuments(data);
-    //       });
-    //
-    //   navigation(`/dashboard/document/${activePage}`);
-    // }, [activePage]);
     useEffect(() => {
-        // fetch(`http://localhost:8080/api/v1/documents/count`)
-        //     .then((res) => res.json())
-        //     .then((data) => {
-        //       setCountDocuments(data);
-        //     });
-        console.log("first q")
-        fetch('http://localhost:8080/api/v1/documents/public')
+        fetch('http://localhost:8080/api/v1/documents/count-draft')
             .then((res) => res.json())
             .then((data) => {
-                setPublicDocumentList(data)
-                setDocs(data.slice(0, 10))
+                console.log(data)
+                setDraftCount(data)
             })
-        fetch('http://localhost:8080/api/v1/documents/draft')
-            .then((res) => res.json())
-            .then((data) => {
-                setDraftDocumentList(data)
-            })
-    }, [docs]);
+    }, []);
+
+    useEffect(() => {
+        if (activeButton === 1) {
+            fetch('http://localhost:8080/api/v1/documents/draft')
+                .then((res) => res.json())
+                .then((data) => {
+                    setDraftDocumentList(data)
+                    setDocs(data.slice(0, 10))
+                    setDocumentLength(data.length)
+                })
+        } else {
+            fetch('http://localhost:8080/api/v1/documents/public')
+                .then((res) => res.json())
+                .then((data) => {
+                    setPublicDocumentList(data)
+                    setDocs(data.slice(0, 10))
+                })
+        }
+    }, [activeButton]);
 
     function handleAccept() {
         if (checkedDocuments.length === 0) {
@@ -176,7 +174,7 @@ export default function Document(params) {
                         "http://localhost:8080/api/v1/documents/accept",
                         {
                             method: "PUT",
-                            headers: { "Content-Type": "application/json" },
+                            headers: {"Content-Type": "application/json"},
                             body: JSON.stringify(checkedDocuments),
                         }
                     );
@@ -254,7 +252,7 @@ export default function Document(params) {
                             type="button"
                         >
                           <span>
-                            Draft document ({draftDocumentList.length})
+                            Tài liệu đợi duyệt ({draftCount || 0})
                           </span>
                         </button>
                     </div>
@@ -266,13 +264,6 @@ export default function Document(params) {
                         >
                             <span>Thêm tài liệu</span>
                         </button>
-                        {/*<button*/}
-                        {/*    onClick={handleAccpetDocs}*/}
-                        {/*    className="px-4 py-2 rounded-lg border-solid	bg-blue-500 text-white text-sm font-medium"*/}
-                        {/*    type="submit"*/}
-                        {/*>*/}
-                        {/*  <span>Duyệt tài liệu</span>*/}
-                        {/*</button>*/}
                         <button
                             onClick={handleFillDocs}
                             className=" p-2 w-20 rounded-lg border-solid flex border border-gray-500 text-gray-500 text-sm"
@@ -348,7 +339,7 @@ export default function Document(params) {
                                             </td>
                                             <td class="px-6 py-4 capitalize">
                                                 {" "}
-                                                {document.status}{" "}
+                                                {document.scope}
                                             </td>
                                             <td class="px-6 py-4 ">
                                                 {" "}
@@ -356,26 +347,20 @@ export default function Document(params) {
                                             </td>
                                             <td class="px-6 py-4"> {document.upload_date} </td>
                                             {activeButton === 0 ? (
-                                                <td class=" px-6 py-4  ">
+                                                <td class=" px-6 py-4 flex gap-3 ">
                                                     <a
                                                         onClick={() => handleDetailDocs(document.slug)}
                                                         class="font-medium text-blue-600 dark:text-blue-500 hover:underline hover:cursor-pointer "
                                                     >
-                                                        Detail
+                                                        Chi tiết
                                                     </a>
                                                     <Link to={`/edit/${document.slug}`}
-                                                          class="font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
+                                                          class="font-medium text-blue-600 dark:text-blue-500 hover:underline hover:cursor-pointer"
                                                     >
-                                                        Edit
+                                                        Chỉnh sửa
                                                     </Link>
-                                                    <a
-                                                        onClick={() => {
-                                                            DocumentDeleter(document.id);
-                                                        }}
-                                                        class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3 hover:cursor-pointer"
-                                                    >
-                                                        Remove
-                                                    </a>
+                                                    <DocumentDeleter id={document.id} setDocs={setDocs}
+                                                                     docs={docs}/>
                                                 </td>
                                             ) : (
                                                 <td className=" px-6 py-4 flex items-center  gap-3 ">

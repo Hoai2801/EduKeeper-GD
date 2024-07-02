@@ -132,7 +132,6 @@ CREATE TABLE `users` (
                          CONSTRAINT `role_fk` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`),
                          CONSTRAINT `dpm_fk` FOREIGN KEY (`department`) REFERENCES `department` (`id`),
                          CONSTRAINT `spec_fk` FOREIGN KEY (`specialized`) REFERENCES `specialized` (`id`)
-                         
 );
 
 -- INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN'); 

@@ -107,7 +107,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id and d.status = 'published'")
     int findAllBySpecializedId(Long id);
 
-    @Query(value = "SELECT * FROM document d WHERE d.status = 'draft' and is_delete = 0", nativeQuery = true)
+    @Query(value = "SELECT * FROM document d WHERE d.status = 'Draft' and is_delete = 0", nativeQuery = true)
     List<Document> findDraftDocuments();
 
     @Query(value = "SELECT * FROM document d WHERE d.status = 'published' and is_delete = 0", nativeQuery = true)
@@ -140,7 +140,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'published'")
     int countPublishedDocuments();
 
-    @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status LIKE 'draft'")
+    @Query(value = "SELECT COUNT(d.id) FROM Document d WHERE d.status = 'Draft'")
     int countDraftDocuments();
 
     @Query(value = "SELECT * FROM document d ORDER BY d.download DESC LIMIT 3", nativeQuery = true)

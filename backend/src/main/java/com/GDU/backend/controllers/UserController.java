@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 
 @RestController
@@ -38,8 +40,15 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUserById(@PathVariable("id") Long id) {
-        System.out.println("deleting user " + id);
         return ResponseEntity.ok(userService.deleteUserById(id));
+    }
+    
+    @PostMapping("/avatar/{staffCode}")
+    public ResponseEntity<String> changeAvatar(
+            @PathVariable("staffCode") String staffCode,
+            @RequestBody MultipartFile avatar
+    ) {
+        return ResponseEntity.ok(userService.changeAvatar(staffCode, avatar));
     }
 
     @GetMapping("/top-downloads")

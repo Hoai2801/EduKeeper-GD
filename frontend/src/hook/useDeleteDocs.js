@@ -63,7 +63,7 @@ const DocumentDeleter = ({ id, setDocs, docs}) => {
     };
 
     return (
-        <button onClick={handleDelete} className="delete-button text-red-500">
+        <button onClick={handleDelete} className="delete-button text-red-500 hover:underline">
             Xóa
         </button>
     );
