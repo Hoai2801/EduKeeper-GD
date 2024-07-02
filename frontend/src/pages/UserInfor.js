@@ -193,7 +193,7 @@ const UserInfor = () => {
             </div>
             <div className='flex justify-center p-5'>
                 <button onClick={updateUser}
-                        className='hover:rounded-lg hover:bg-[#C5D6F8] p-2 bg-red-500 rounded-lg'>Update
+                        className='hover:rounded-lg hover:bg-[#C5D6F8] p-2 bg-blue-400 rounded-lg'>Update
                 </button>
             </div>
             </div>

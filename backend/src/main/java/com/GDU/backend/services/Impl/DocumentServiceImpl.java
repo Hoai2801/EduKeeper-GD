@@ -331,6 +331,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .id(document.getUserUpload().getId())
                 .username(document.getUserUpload().getName())
                 .staffCode(document.getUserUpload().getStaffCode())
+                .avatar(document.getUserUpload().getAvatar())
                 .build();
         return DocumentResponseDTO.builder()
                 .id(document.getId())

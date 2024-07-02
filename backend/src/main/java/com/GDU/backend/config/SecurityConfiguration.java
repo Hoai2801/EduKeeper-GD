@@ -67,7 +67,8 @@ public class SecurityConfiguration {
                                 "/api/v1/downloads/**",
                                 "/api/v1/notifications/**",
                                 "/api/v1/documents/**",
-                                "/api/v1/users/avatar/**"
+                                "/api/v1/users/avatar/**",
+                                "/api/v1/view-history"
                         ).permitAll()
                         .requestMatchers(GET).permitAll()
                 )

@@ -44,7 +44,6 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setData(data)
             });
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
@@ -56,18 +55,19 @@ const Detail = () => {
         // make view history
         const increaseView = setTimeout(() => {
             if (staffCode) {
+                console.log("viewed")
                 fetch("http://localhost:8080/api/v1/view-history", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        document_id: data?.id,
-                        staff_code: staffCode
+                        documentId: data?.id,
+                        staffCode: staffCode
                     }),
                 })
             }
-        }, 30000);
+        }, 1000);
 
         return () => clearTimeout(increaseView);
 
@@ -140,7 +140,6 @@ const Detail = () => {
     function favorite() {
         if (staffCode) {
             if (isFavorite) {
-                console.log("delete")
                 fetch("http://localhost:8080/api/v1/favorites", {
                     method: "DELETE",
                     headers: {

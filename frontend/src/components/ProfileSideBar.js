@@ -1,10 +1,31 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Link, useParams} from 'react-router-dom'
 import change from '../assets/change.png'
 
 const ProfileSideBar = ({isTrueLegit, jwt}) => {
     const [documentMenuShow, setDocumentMenuShow] = useState(false);
     const [user, setUser] = useState(null);
+
+    const [avatar, setAvatar] = useState(null);
+
+    useEffect(() => {
+        if (avatar) {
+            const formData = new FormData();
+            formData.append('avatar', avatar);
+        let isTrue = window.confirm("Bạn có muốn thay đổi ảnh đại diện?");
+        if (isTrue) {
+            fetch("http://localhost:8080/api/v1/users/avatar/" + user.staffCode, {
+                method: "POST",
+                body: formData
+            })
+                .then((res) => res.text())
+                .then((data) => {
+                    console.log(data)
+                    alert(data)
+                })
+        }
+        }
+    }, [avatar]);
 
     const out = () => {
         fetch('http://localhost:8080/api/v1/auth/logout', {
@@ -36,7 +57,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 <div className='relative flex flex-col items-center'>
                     <div className='lg:w-[150px] lg:h-[150px] w-[100px] h-[100px] rounded-full overflow-hidden'>
                         <img
-                            src={"http://localhost:8080/api/v1/images/avatar/" + user?.avatar || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
+                            src={user ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
                             alt="" className='w-full h-full object-cover'/>
                     </div>
                     <div className={`${!isTrueLegit && 'hidden'}`}>
@@ -44,7 +65,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                                className='absolute lg:bottom-0 lg:right-0 right-[90px] bottom-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
                             <img src={change} alt="" className='w-5 h-5'/>
                         </label>
-                        <input id="avatar" type="file" className='hidden'/>
+                        <input id="avatar" type="file" className='hidden' onChange={(e) => setAvatar(e.target.files[0])}/>
                     </div>
                 </div>
                 <div className='flex flex-col items-center mt-5'>
@@ -88,9 +109,9 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 {/*<Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>*/}
                 {/*    Cài đặt*/}
                 {/*</Link>*/}
-                <Link onClick={() => out()} className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
+                <button onClick={() => out()} className={`hover:rounded-xl hover:bg-[#C5D6F8] text-left p-5 ${!isTrueLegit ? "hidden" : ""}`}>
                     Đăng xuất
-                </Link>
+                </button>
             </div>
         </div>
     )

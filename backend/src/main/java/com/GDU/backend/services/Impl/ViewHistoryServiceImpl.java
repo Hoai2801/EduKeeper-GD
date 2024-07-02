@@ -41,6 +41,7 @@ public class ViewHistoryServiceImpl implements ViewHistoryService {
                 .user(existingUser)
                 .document(existingDocument)
                 .createdAt(LocalDate.now())
+                .isLastest(true)
                 .build();
         viewHistoryRepository.save(viewHistory);
     }

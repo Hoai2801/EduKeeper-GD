@@ -131,16 +131,16 @@ const UserHome = () => {
             </div>
             <div className='lg:w-[1262px] mx-auto'>
                 <h2 className='text-3xl font-semibold mt-5 mb-3 text-start'>Lịch sử xem</h2>
-                <div className='flex gap-5 w-full py-5 overflow-auto'>
+                <div className='flex gap-2 w-full py-5 overflow-scroll'>
                     {
-                        favoriteDocuments?.map((document) => (
-                            <DocumentCard document={document} key={document.id}/>
-                        ))
+                        favoriteDocuments?.map((document, index) => {
+                            if (index < 10) {
+                                return (
+                                    <DocumentCard document={document} key={document.id}/>
+                                )
+                            }
+                        })
                     }
-                    {/*<DocumentCard title="Tiêu đề" author={{ username: "Tang Gia Hoai", avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" }} upload_date="01/01/2022" slug="abc" />*/}
-                    {/*<DocumentCard title="Tiêu đề" author={{ username: "Tang Gia Hoai", avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" }} upload_date="01/01/2022" slug="abc" />*/}
-                    {/*<DocumentCard title="Tiêu đề" author={{ username: "Tang Gia Hoai", avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" }} upload_date="01/01/2022" slug="abc" />*/}
-                    {/*<DocumentCard title="Tiêu đề" author={{ username: "Tang Gia Hoai", avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s" }} upload_date="01/01/2022" slug="abc" />*/}
                 </div>
             </div>
         </div>
