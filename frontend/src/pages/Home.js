@@ -13,6 +13,19 @@ const Home = () => {
 
     const [staffCode, setStaffCode] = useState(null)
 
+    const [banner, setBanner] = useState([])
+
+    const [indexBanner, setIndexBanner] = useState(0)
+
+
+    const handleNextBanner = () => {
+        if (indexBanner < banner?.length - 1) {
+            setIndexBanner(indexBanner + 1)
+        } else {
+            setIndexBanner(0)
+        }
+    }
+
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/view-history/top-documents/9').then(res => res?.json()).then(data => {
             setMostViewed(data)
@@ -21,7 +34,22 @@ const Home = () => {
         fetch('http://localhost:8080/api/v1/documents/latest?limit=9').then(res => res?.json()).then(data => {
             setLastedDocuments(data)
         })
+        fetch('http://localhost:8080/api/v1/banner')
+            .then(res => res?.json())
+            .then(data => {
+                console.log(data)
+                setBanner(data)
+            })
     }, [])
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            handleNextBanner();
+        }, 5000);
+
+        // Cleanup the timeout on component unmount
+        return () => clearTimeout(timeout);
+    }, [indexBanner, banner]);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -31,11 +59,16 @@ const Home = () => {
         }
     }, []);
 
-
     return (
         <div>
-            <div
-                className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2'>
+                <div className={`w-full h-[300px] h-[600px]`}>
+                    {banner?.map((banner, index) => (
+                        <img src={`http://localhost:8080/api/v1/images/banner/${banner.path}`} alt=""
+                        className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
+                        />
+                    ))}
+                </div>
+            <div className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2'>
                 <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
                 <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
                     {lastedDocuments && lastedDocuments?.map((item, index) => (

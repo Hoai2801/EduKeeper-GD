@@ -242,6 +242,13 @@ CREATE TABLE notification(
     constraint `rcv_fk_us` foreign key(receiver) references users(id)
 );
 
+create table banner(
+	id int not null auto_increment primary key,
+    path varchar(200) not null,
+    idex int,
+    is_enable boolean default true
+);
+
 
 -- Performance
 -- create index idx_slug on document (slug);
