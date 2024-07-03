@@ -21,6 +21,7 @@ import UserInfor from "./pages/UserInfor";
 import UserUploadDocument from "./components/UserUploadDocument";
 import UserFavoriteDocument from "./components/UserFavoriteDocument";
 import DeletedDocument from "./pages/ListDocsDeleted";
+import BannerManager from "./pages/BannerManager";
 
 function App() {
     window.scrollTo(0, 0);
@@ -49,6 +50,7 @@ function App() {
                 <Route path="users" element={<User/>}/>
                 <Route path="department" element={<Department/>}/>
                 <Route path="document" element={<Document/>}/>
+                <Route path="banner" element={<BannerManager/>}/>
                 <Route path="deleted" element={<DeletedDocument/>}/>
             </Route>
         </Routes>

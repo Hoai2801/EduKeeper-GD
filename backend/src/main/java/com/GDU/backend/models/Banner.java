@@ -18,7 +18,9 @@ public class Banner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
    
-    private String path;
+    private String image;
+    
+    private String url;
     
     @Column(name = "is_enable")
     private boolean enable;

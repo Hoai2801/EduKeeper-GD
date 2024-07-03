@@ -69,7 +69,7 @@ public class SecurityConfiguration {
                                 "/api/v1/documents/**",
                                 "/api/v1/users/avatar/**",
                                 "/api/v1/view-history",
-                                "/api/v1/banner",
+                                "/api/v1/banners/**",
                                 "/api/v1/comments/**"
                         ).permitAll()
                         .requestMatchers(GET).permitAll()

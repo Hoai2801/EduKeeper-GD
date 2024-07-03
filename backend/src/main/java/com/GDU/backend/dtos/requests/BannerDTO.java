@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @Builder
 public class BannerDTO {
+    private String url;
+    private boolean enable;
     private MultipartFile banner;
     
 }

@@ -244,9 +244,10 @@ CREATE TABLE notification(
 
 create table banner(
 	id int not null auto_increment primary key,
-    path varchar(200) not null,
+    image varchar(200) not null,
     idex int,
-    is_enable boolean default true
+    is_enable boolean default true,
+    url varchar(500)
 );
 
 create table comment(

@@ -1,12 +1,20 @@
 package com.GDU.backend.services;
 
+import com.GDU.backend.dtos.requests.BannerDTO;
 import com.GDU.backend.models.Banner;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface BannerService {
-    String createBanner(MultipartFile banner);
+    String createBanner(BannerDTO banner);
 
-    List<Banner> getBanner();
+    List<Banner> getBanners();
+    
+    List<Banner> getAllBanners();
+
+    String activeBanner(Long id);
+
+    String deleteBanner(Long id);
+
+    String updateBanner(Long id, BannerDTO bannerDTO);
 }
