@@ -23,16 +23,15 @@ const BannerManager = () => {
         fetchBanner();
     }, []);
 
-    const handleDelete = (id) => () => {
+    const handleDelete = (id) => {
         fetch('http://localhost:8080/api/v1/banners/' + id, {
             method: "DELETE",
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
         })
-            .then((res) => res.json())
+            .then((res) => res.text())
             .then((data) => {
+                if (data === "success") {
                 setBannerList(bannerList.filter(banner => banner.id !== id));
+                }
             });
     }
     const handleEdit = () => {
@@ -67,13 +66,12 @@ const BannerManager = () => {
         })
             .then((res) => res.text())
             .then((data) => {
-                console.log(data)
                 if (data === "success") fetchBanner()
                 setIsEditShow(false)
             });
     }
 
-    console.log(file)
+    const fileURL = file ? URL.createObjectURL(file) : '';
 
     return (
         <div className={``}>
@@ -111,7 +109,6 @@ const BannerManager = () => {
                         <tbody>
                         {bannerList?.map((item, index) => {
                             return (
-
                                 <tr className="bg-white border-b hover:bg-gray-50">
                                     <th scope="row"
                                         className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -149,10 +146,14 @@ const BannerManager = () => {
                                             setIsEditShow(true)
                                             setBannerEdit(item)
                                         }}
-                                                className="font-medium text-blue-600 hover:underline">Edit
+                                                className="font-medium text-blue-600 hover:underline">Sửa
                                         </button>
-                                        <a href="#"
-                                           className="font-medium text-red-600 hover:underline">Edit</a>
+                                        <button onClick={() => {
+                                            if (window.confirm("Bạn có chắc chắn muốn xóa?")) {
+                                                handleDelete(item.id)
+                                            }
+                                        }}
+                                            className="font-medium text-red-600 hover:underline">Xóa</button>
                                     </td>
                                 </tr>
                             )
@@ -163,7 +164,7 @@ const BannerManager = () => {
                 <div className={`${isEditShow ? 'block' : 'hidden'}`}>
                     <div className={`bg-gray-500 opacity-65 absolute top-0 left-0 w-full h-full`}></div>
                     <div className={`w-full h-full absolute top-0 left-0 flex flex-col justify-center items-center`}>
-                        <div className={`w-[500px] h-[800px] bg-white rounded-lg p-2`}>
+                        <div className={`w-[500px] h-fit bg-white rounded-lg p-2`}>
                             <div className={`w-full h-[50px] flex justify-end items-end`}>
                                 <button className={`bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded`}
                                         onClick={() => setIsEditShow(false)}>
@@ -172,7 +173,9 @@ const BannerManager = () => {
                             </div>
                             <div className={`flex flex-col justify-center items-center pt-5`}>
                                 <DragDropFile handleFiles={setFile} fileSupport={"image"}/>
-                                <img src={file} alt=""/>
+                                <div className={`w-full px-5 mt-5 border-b-2`}>
+                                <img src={fileURL} alt="" className={`w-full`}/>
+                                </div>
                             </div>
                             <div className={`p-5 flex flex-col gap-3`}>
                                 <div>

@@ -7,7 +7,9 @@ import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.*;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
-import com.GDU.backend.repositories.*;
+import com.GDU.backend.repositories.CategoryRepository;
+import com.GDU.backend.repositories.DocumentRepository;
+import com.GDU.backend.repositories.SubjectRepository;
 import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,8 +52,6 @@ public class DocumentServiceImpl implements DocumentService {
         // TODO: convert to service
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-//        Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
-//                .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
 
         Subject subject = subjectRepository.findById(uploadRequestDTO.getSubject())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
@@ -101,7 +100,6 @@ public class DocumentServiceImpl implements DocumentService {
                 .category(category)
                 .thumbnail(thumbnail)
                 .subject(subject)
-//                .specialized(specialized)
                 .uploadDate(LocalDate.now())
                 .build();
         documentRepository.save(newDocument);
@@ -189,15 +187,14 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponseDTO> getLatestDocuments(int limit) {
-               List<Document> documents = documentRepository.getLastedDocuments(limit);
-        return documents
-                .stream().map(this::convertToDocumentResponse).toList();
+        List<Document> documents = documentRepository.getLastedDocuments(limit);
+        return documents.stream()
+                .map(this::convertToDocumentResponse)
+                .toList();
     }
 
     @Override
     public List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO) {
-        // return list document which have a same specialized and category, title or
-        // author
         return documentRepository.getDocumentsSuggested(
                         recommendationRequestDTO.getSpecialized(),
                         recommendationRequestDTO.getCategory(),
@@ -221,10 +218,6 @@ public class DocumentServiceImpl implements DocumentService {
         // Sort documents
         if (filterRequestDTO.getOrder() != null) {
             documents = switch (filterRequestDTO.getOrder().toLowerCase()) {
-//                case "most-viewed" -> documents.stream()
-//                        .filter(document -> document.getViewsCount() > 0 && document.getScope().equals("public"))
-//                        .sorted(Comparator.comparing(Document::getViewsCount).reversed())
-//                        .collect(Collectors.toList());
                 case "most-downloaded" -> documents.stream()
                         .filter(document -> document.getDownloadsCount() > 0 && document.getScope().equals("public"))
                         .sorted(Comparator.comparing(Document::getDownloadsCount).reversed())
@@ -298,16 +291,6 @@ public class DocumentServiceImpl implements DocumentService {
     public int getDocumentsCountBySpecialized(Long id) {
         return documentRepository.findAllBySpecializedId(id);
     }
-
-//    @Override
-//    public int getTotalViewsByAuthor(Long authorId) {
-//        User existingUser = userService.getUserByStaffCode(authorId.toString());
-//        List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
-//        if (documents.isEmpty()) {
-//            return 0;
-//        }
-//        return documents.stream().mapToInt(Document::getViewsCount).sum();
-//    }
 
     @Override
     public int getTotalDownloadsByAuthor(Long authorId) {
@@ -400,6 +383,14 @@ public class DocumentServiceImpl implements DocumentService {
                     throw new ResourceNotFoundException("Document has published");
                 }
                 document.setStatus("published");
+                NotificationDTO notification = NotificationDTO.builder()
+                        .receiver(document.getUserUpload().getStaffCode())
+                        .sender("22140044")
+                        .created_at(LocalDateTime.now())
+                        .title("Tài liệu của bạn đã được duyệt")
+                        .content("Tài liệu " + document.getTitle() + " đã được duyệt")
+                        .build();
+                notificationService.send(notification);
                 documentRepository.save(document);
 
             }
@@ -459,7 +450,8 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             return documentRepository.getTop3Docs()
                     .stream()
-                    .map(this::convertToDocumentResponse).toList();
+                    .map(this::convertToDocumentResponse)
+                    .toList();
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
         }
@@ -470,7 +462,9 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             int pageSize = 10;
             int offset = (page - 1) * pageSize;
-            return documentRepository.getPaginationDocuments(offset).stream().map(this::convertToDocumentResponse)
+            return documentRepository.getPaginationDocuments(offset)
+                    .stream()
+                    .map(this::convertToDocumentResponse)
                     .toList();
 
         } catch (Exception e) {
@@ -505,6 +499,14 @@ public class DocumentServiceImpl implements DocumentService {
                 // }
                 document.setDeleteDate(LocalDateTime.now());
                 document.setDelete(true);
+                NotificationDTO notification = NotificationDTO.builder()
+                        .receiver(document.getUserUpload().getStaffCode())
+                        .sender("22140044")
+                        .created_at(LocalDateTime.now())
+                        .title("Tài liệu của bạn đã bị gỡ bởi hệ thống")
+                        .content("Tài liệu " + document.getTitle() + " đã bị gỡ")
+                        .build();
+                notificationService.send(notification);
                 documentRepository.save(document);
                 return true;
             } else {
@@ -538,7 +540,7 @@ public class DocumentServiceImpl implements DocumentService {
                     throw new ResourceNotFoundException("Document has recovered");
                 }
                 document.setDelete(false);
-                ;
+                document.setDeleteDate(null);
                 documentRepository.save(document);
 
             }

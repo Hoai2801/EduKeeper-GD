@@ -5,7 +5,6 @@ import com.GDU.backend.models.Banner;
 import com.GDU.backend.services.BannerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

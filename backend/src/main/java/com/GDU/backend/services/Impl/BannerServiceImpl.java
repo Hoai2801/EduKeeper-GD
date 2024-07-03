@@ -66,6 +66,11 @@ public class BannerServiceImpl implements BannerService {
     public String deleteBanner(Long id) {
         Banner existBanner = bannerRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Banner not found"));
+        File oldFile = new File("src/main/resources/static/banner/" + existBanner.getImage());
+        if (oldFile.exists()) {
+            System.out.println("Delete file: " + oldFile.getName());
+            oldFile.delete();
+        }
         bannerRepository.delete(existBanner);
         return "success";
     }

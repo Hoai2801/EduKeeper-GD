@@ -41,6 +41,8 @@ const Detail = () => {
 
     const [commentContent, setCommentContent] = useState('');
 
+    const [limitComments, setLimitComments] = useState(5);
+
     function onDocumentLoadSuccess({numPages}) {
         setNumPages(numPages);
     }
@@ -333,11 +335,17 @@ const Detail = () => {
                             </button>
                         </div>
                         <div>
-                            {commentList.map((comment) => (
-                                <Comment
-                                    comment={comment}
-                                />
-                            ))}
+                            {commentList.map((comment, index) => {
+                                if (index < limitComments) {
+                                    return (
+                                        <Comment
+                                            comment={comment}
+                                        />
+                                    )
+                                }})}
+                        </div>
+                        <div className={`w-full flex justify-center ${commentList?.length > limitComments ? "" : "hidden"}`}>
+                            <button onClick={() => setLimitComments(limitComments + 5)}>Tải thêm bình luận</button>
                         </div>
                     </div>
                 </section>

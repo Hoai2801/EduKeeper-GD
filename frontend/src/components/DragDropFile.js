@@ -38,7 +38,7 @@ const DragDropFile = (props) => {
         e.target.files[0].type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           || props.fileSupport === "image"
       ) {
-        props.handleFiles(e.target.files);
+        props.handleFiles(e.target.files[0]);
         console.log(e.target.files)
       }
       else {

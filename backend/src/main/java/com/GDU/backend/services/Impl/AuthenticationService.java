@@ -183,8 +183,6 @@ public class AuthenticationService {
             throw new PasswordsDoNotMatchException("Passwords do not match");
         }
         User user = dbToken.getUser();
-        log.info("User: {}", user);
-        log.info("Password: {}", changePasswordRequest.getPassword());
         userService.changePassword(user, changePasswordRequest.getPassword());
         tokenRepository.delete(dbToken);
         return "reset";

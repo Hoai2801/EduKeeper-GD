@@ -244,10 +244,10 @@ const Navbar = () => {
                             </button>
                             <div
                                 className={`${isNotificationOpen ? "block" : "hidden"} flex flex-col gap-2 absolute top-[85px] sm:right-[100px] bg-white rounded-lg shadow-lg w-[400px] h-fit max-h-[300px] overflow-scroll`}
-                                // onMouseLeave={() => {
-                                //     // setIsNotificationOpen(!isNotificationOpen)
-                                //     // checkNotification()
-                                // }}
+                                onMouseLeave={() => {
+                                    setIsNotificationOpen(!isNotificationOpen)
+                                    checkNotification()
+                                }}
                                 onMouseEnter={() => setIsNotificationOpen(true)}
                             >
                                 {notification ? notification?.map((item, index) => (

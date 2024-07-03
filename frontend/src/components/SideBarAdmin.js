@@ -1,7 +1,18 @@
-import { React, useState } from "react";
+import {React, useEffect, useState} from "react";
 import { Link, NavLink } from "react-router-dom";
 
 const SideBarAdmin = () => {
+  const [documentsDraft, setDocumentsDraft] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/v1/documents/count-draft')
+        .then((res) => res.text())
+        .then((data) => {
+            setDocumentsDraft(data);
+        })
+  }, []);
+
+
   return (
       <aside className="bg-gradient-to-br from-gray-800 to-gray-900 -translate-x-80 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0">
         <div className="relative border-b border-white/20">
@@ -89,7 +100,7 @@ const SideBarAdmin = () => {
                   ></path>
                 </svg>
                 <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
-                  profile
+                  Tài khoản
                 </p>
               </NavLink>
             </li>
@@ -119,7 +130,7 @@ const SideBarAdmin = () => {
                   ></path>
                 </svg>
                 <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
-                  tables
+                  Khoa, Ngành
                 </p>
               </NavLink>
             </li>
@@ -175,7 +186,8 @@ const SideBarAdmin = () => {
                 </svg>
 
                 <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
-                  Document
+                  Tài liệu
+                  <p>{documentsDraft ? `(${documentsDraft} đang chờ duyệt)` : ''}</p>
                 </p>
               </NavLink>
               <NavLink
@@ -216,6 +228,33 @@ const SideBarAdmin = () => {
                               ? "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85] w-full flex items-center gap-4 px-4 capitalize"
                               : "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white hover:bg-white/10 active:bg-white/30 w-full flex items-center gap-4 px-4 capitalize"
                   }
+                  to="error"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0,0,256,256">
+                  <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
+                     stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
+                     font-family="none" font-weight="none" font-size="none" text-anchor="none"
+                     style={{ "mix-blend-mode": "normal" }}>
+                    <g transform="scale(9.84615,9.84615)">
+                      <path
+                          d="M11,-0.03125c-0.83594,0 -1.65625,0.16406 -2.25,0.75c-0.59375,0.58594 -0.78125,1.41797 -0.78125,2.28125h-3.96875c-0.55078,0 -1,0.44922 -1,1h-1v2h22v-2h-1c0,-0.55078 -0.44922,-1 -1,-1h-3.96875c0,-0.86328 -0.1875,-1.69531 -0.78125,-2.28125c-0.59375,-0.58594 -1.41406,-0.75 -2.25,-0.75zM11,2.03125h4c0.54688,0 0.71875,0.12891 0.78125,0.1875c0.0625,0.05859 0.1875,0.22266 0.1875,0.78125h-5.9375c0,-0.55859 0.125,-0.72266 0.1875,-0.78125c0.0625,-0.05859 0.23438,-0.1875 0.78125,-0.1875zM4,7v16c0,1.65234 1.34766,3 3,3h12c1.65234,0 3,-1.34766 3,-3v-16zM8,10h2v12h-2zM12,10h2v12h-2zM16,10h2v12h-2z"></path>
+                    </g>
+                  </g>
+                </svg>
+                <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                  Báo Lỗi
+                </p>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                  className={({ isActive, isPending }) =>
+                      isPending
+                          ? "pending"
+                          : isActive
+                              ? "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85] w-full flex items-center gap-4 px-4 capitalize"
+                              : "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white hover:bg-white/10 active:bg-white/30 w-full flex items-center gap-4 px-4 capitalize"
+                  }
                   to="deleted"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0,0,256,256">
@@ -230,7 +269,7 @@ const SideBarAdmin = () => {
                   </g>
                 </svg>
                 <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
-                  Trash
+                  Tài liệu đã xóa
                 </p>
               </NavLink>
             </li>

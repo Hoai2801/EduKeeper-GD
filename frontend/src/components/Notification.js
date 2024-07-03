@@ -4,15 +4,17 @@ const Notification = ({notification}) => {
     function formatDate(dateString) {
         const daysOfWeek = ["Chủ Nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
         const today = new Date();
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
-
         const date = new Date(dateString);
+
+        const diffInTime = today.getTime() - date.getTime();
+        const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
 
         if (date.toDateString() === today.toDateString()) {
             return "Hôm nay";
-        } else if (date.toDateString() === yesterday.toDateString()) {
+        } else if (diffInDays === 1) {
             return "Hôm qua";
+        } else if (diffInDays > 1 && diffInDays <= 7) {
+            return `${diffInDays} ngày trước`;
         } else {
             return daysOfWeek[date.getDay()];
         }
