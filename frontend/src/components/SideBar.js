@@ -18,6 +18,7 @@ const SideBar = () => {
   const [department, setDepartment] = useState(null);
   const [specialized, setSpecialized] = useState(null);
   const [subject, setSubject] = useState(null);
+  const [year, setYear] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/departments")
@@ -56,7 +57,7 @@ const SideBar = () => {
       `http://localhost:3000/search?filter&order=${sort}` +
       (department ? `&department=${department.departmentSlug}` : "") +
       (specialized ? `&specialized=${specialized.specializedSlug}` : "") +
-      (subject ? `&subject=${subject.subjectSlug}` : "");
+      (subject ? `&subject=${subject.subjectSlug}` : "" + (year ? `&publishYear=${year}` : ""));
 
     window.location.href = redirect;
   };
@@ -246,6 +247,9 @@ const SideBar = () => {
               </label>
               <select
                 id="publication-date"
+                onChange={(event) => {
+                  setYear(event.target.value);
+                }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full"
               >
                 <option value="">Năm xuất bản</option>

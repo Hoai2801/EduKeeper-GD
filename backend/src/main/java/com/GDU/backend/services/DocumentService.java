@@ -40,7 +40,7 @@ public interface DocumentService {
 
     int getTotalDownloadsByAuthor(Long authorId);
 
-    int getDocumentsCountByAuthor(Long authorId);
+    int getDocumentsCountByAuthor(String authorId);
     
     int countDocumentsToday();
 
@@ -75,4 +75,6 @@ public interface DocumentService {
     boolean deleteDocumentById(Long id);
 
     String recoveryDocument(List<Long> ids) throws IOException;
+
+    int getTotalViewsByAuthor(String staffCode);
 }

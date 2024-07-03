@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.GDU.backend.dtos.responses.DocumentMonthly;
 import com.GDU.backend.dtos.responses.TypeDocumentRes;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,12 +70,15 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             +
             "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))"
             +
+            "AND (:dateTime IS NULL OR d.upload_date LIKE CONCAT('%', COALESCE(:dateTime, ''), '%'))"
+            +
             "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) ", nativeQuery = true)
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,
                                         @Param("subjectName") String subjectName,
                                         @Param("specializedSlug") String specializedSlug,
-                                        @Param("categoryName") String categoryName);
+                                        @Param("categoryName") String categoryName,
+                                        @Param("dateTime") String dateTime);
 
 
     // Get total number of documents this year
@@ -152,4 +157,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT d.* FROM document d LEFT JOIN downloads dl ON d.id = dl.document_id GROUP BY d.id ORDER BY COUNT(dl.id) DESC LIMIT :limit", nativeQuery = true)
     List<Document> findDocumentsWithMostDownloads(@Param("limit") int limit);
 
+    @Query(value = "SELECT count(vh) FROM Document d left join ViewHistory vh on d.id = vh.document.id WHERE d.isDelete = false AND d.userUpload.staffCode = :staffCode")
+    int getTotalViewsByAuthor(String staffCode);
 }

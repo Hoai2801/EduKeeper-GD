@@ -79,6 +79,7 @@ const LineChart = ({ year }) => {
     fetch(`http://localhost:8080/api/v1/users/monthly/${year}`)
         .then((res) => res.json())
         .then((data) => {
+          console.log(data)
           setCountUsersMonthly(data);
         });
   }, [year]);

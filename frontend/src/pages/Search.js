@@ -19,13 +19,14 @@ const Search = () => {
   const search = localStorage.getItem('search') || '';
 
   useEffect(() => {
-
+console.log(publishYear)
     const dataSearch = {
       searchTerm: search || '',
       subjectName: slugSubject || '',
       categoryName: category || '',
       departmentSlug: slugDepartment || '',
       specializedSlug: slugSpecialized || '',
+      publishYear: publishYear || '',
       order: order
     };
 

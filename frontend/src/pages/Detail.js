@@ -7,6 +7,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 import {jwtDecode} from "jwt-decode";
 import unlove from '../assets/unlove.png';
 import love from '../assets/love.png';
+import Comment from "../components/Comment";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.min.js',
@@ -36,6 +37,10 @@ const Detail = () => {
     const [file, setFile] = useState(null);
     const [data, setData] = useState(null);
 
+    const [commentList, setCommentList] = useState([]);
+
+    const [commentContent, setCommentContent] = useState('');
+
     function onDocumentLoadSuccess({numPages}) {
         setNumPages(numPages);
     }
@@ -55,7 +60,6 @@ const Detail = () => {
         // make view history
         const increaseView = setTimeout(() => {
             if (staffCode) {
-                console.log("viewed")
                 fetch("http://localhost:8080/api/v1/view-history", {
                     method: "POST",
                     headers: {
@@ -72,6 +76,20 @@ const Detail = () => {
         return () => clearTimeout(increaseView);
 
     }, [slug, data?.id])
+
+    useEffect(() => {
+        fetchComment()
+    }, [data]);
+
+    const fetchComment = () => {
+        if (data) {
+            fetch('http://localhost:8080/api/v1/comments/' + data?.id)
+                .then(res => res.json())
+                .then(data => {
+                    setCommentList(data)
+                })
+        }
+    }
 
     const width = window.innerWidth > 1050 ? 1050 : window.innerWidth - 30;
 
@@ -137,6 +155,36 @@ const Detail = () => {
         }
     }, [staffCode, data?.id]);
 
+    const createComment = (event) => {
+        event.preventDefault();
+        if (staffCode === null) {
+            // redirect to login
+            window.location.href = "/login";
+        }
+
+        if (commentContent === "") {
+            return;
+        }
+        fetch("http://localhost:8080/api/v1/comments/" + data?.id, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "content": commentContent,
+                "documentId": data?.id,
+                "staffCode": staffCode
+            }),
+        })
+            .then((res) => res.text())
+            .then((data) => {
+                if (data === "success") {
+                    setCommentContent("");
+                    fetchComment()
+                }
+            })
+    };
+
     function favorite() {
         if (staffCode) {
             if (isFavorite) {
@@ -187,7 +235,8 @@ const Detail = () => {
                 <div className={`pt-[50px] md:px-5 md:px-2 px-5`}>
                     <p className='text-blue-500 text-lg'><Link
                         to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> -
-                        <Link to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName}</Link>
+                        <Link
+                            to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName}</Link>
                     </p>
                     {/* <Link to={`/department/${data?.specialized.departmentID.departmentSlug}`}>{data?.specialized.specializedName}</Link> - */}
                     <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title}</h2>
@@ -261,11 +310,41 @@ const Detail = () => {
                         </button>
                     </div>
                 </div>
+                <section className="bg-white py-8 lg:py-16 antialiased mt-3">
+                    <div className="max-w-2xl mx-auto px-4">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-lg lg:text-2xl font-bold text-gray-900">Bình luận
+                                ({commentList.length})</h2>
+                        </div>
+                        <div className="mb-6">
+                            <div
+                                className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200">
+                                <label htmlFor="comment" className="sr-only">Your comment</label>
+                                <textarea id="comment" rows="6"
+                                          value={commentContent}
+                                          onChange={(e) => setCommentContent(e.target.value)}
+                                          className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none"
+                                          placeholder="Write a comment..." required></textarea>
+                            </div>
+                            <button
+                                    onClick={createComment}
+                                    className="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 bg-blue-600">
+                                Đăng bình luận
+                            </button>
+                        </div>
+                        <div>
+                            {commentList.map((comment) => (
+                                <Comment
+                                    comment={comment}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </section>
                 {/* </DocumentViewer> */}
             </div>
         </div>
-    )
-        ;
+    );
 }
 
 

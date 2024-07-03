@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -15,5 +17,6 @@ public class FilterRequestDTO {
     private String subjectName;
     private String departmentSlug;
     private String specializedSlug;
+    private String publishYear;
     private String order;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ViewHistoryRepository extends JpaRepository<ViewHistory, Long> {
 
-    @Query("SELECT v FROM ViewHistory v WHERE v.user.id = :existingUser AND v.document.id = :existingDocument")
+    @Query("SELECT v FROM ViewHistory v WHERE v.user.id = :existingUser AND v.document.id = :existingDocument and v.isLastest = true")
     ViewHistory findByUserAndDocumentLatest(Long existingUser, Long existingDocument);
 
     @Query("SELECT v FROM ViewHistory v WHERE v.user.id = :id AND v.isLastest = true ORDER BY v.createdAt DESC LIMIT :limit")

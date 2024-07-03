@@ -214,7 +214,8 @@ public class DocumentServiceImpl implements DocumentService {
                 filterRequestDTO.getSearchTerm(),
                 filterRequestDTO.getSubjectName(),
                 filterRequestDTO.getSpecializedSlug(),
-                filterRequestDTO.getCategoryName()
+                filterRequestDTO.getCategoryName(),
+                filterRequestDTO.getPublishYear()
         );
 
         // Sort documents
@@ -319,8 +320,8 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public int getDocumentsCountByAuthor(Long authorId) {
-        User existingUser = userService.getUserByStaffCode(authorId.toString());
+    public int getDocumentsCountByAuthor(String staffCode) {
+        User existingUser = userService.getUserByStaffCode(staffCode);
         List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
         return documents.size();
     }
@@ -337,7 +338,6 @@ public class DocumentServiceImpl implements DocumentService {
                 .id(document.getId())
                 .title(document.getTitle())
                 .slug(document.getSlug())
-//                .views(document.getViewsCount())
                 .download(document.getDownloadsCount())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
@@ -546,5 +546,10 @@ public class DocumentServiceImpl implements DocumentService {
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method Recovered Docs: " + e.getMessage());
         }
+    }
+
+    @Override
+    public int getTotalViewsByAuthor(String staffCode) {
+        return documentRepository.getTotalViewsByAuthor(staffCode);
     }
 }

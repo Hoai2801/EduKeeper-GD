@@ -29,7 +29,6 @@ const UserHome = () => {
         fetch('http://localhost:8080/api/v1/view-history/' + location.valueOf("staff_code").staff_code + '/10')
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setFavoriteDocuments(data);
             })
     }, []);
@@ -45,6 +44,7 @@ const UserHome = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                if (staffCode) {
                 // Fetch total favorites
                 let response = await fetch(`http://localhost:8080/api/v1/favorites/author/${staffCode}`);
                 if (!response.ok) {
@@ -54,29 +54,27 @@ const UserHome = () => {
                 setTotalFavorites(data);
 
                 // Fetch total views
-                response = await fetch(`http://localhost:8080/api/v1/documents/total-views/${staffCode}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                data = await response.json();
-                setTotalViews(data);
+                await fetch(`http://localhost:8080/api/v1/documents/total-views/${staffCode}`)
+                    .then(res => res.json())
+                    .then(data => setTotalViews(data));
+
 
                 // Fetch total downloads
                 response = await fetch(`http://localhost:8080/api/v1/documents/total-downloads/${staffCode}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
                 data = await response.json();
                 setTotalDownloads(data);
 
                 // Fetch total documents
-                response = await fetch(`http://localhost:8080/api/v1/documents/total-documents/${staffCode}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                await fetch(`http://localhost:8080/api/v1/documents/total-documents/${staffCode}`)
+                    .then(res => res.text())
+                    .then(data => setTotalDocuments(data));
+                // if (!response.ok) {
+                //     throw new Error(`HTTP error! status: ${response.status}`);
+                // }
+                // data = await response.text();
+                // console.log(data)
+                // setTotalDocuments(data);
                 }
-                data = await response.json();
-                setTotalDocuments(data);
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }

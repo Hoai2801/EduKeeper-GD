@@ -249,6 +249,14 @@ create table banner(
     is_enable boolean default true
 );
 
+create table comment(
+	id int not null auto_increment primary key,
+    document_id int not null,
+    user_id int not null,
+    content varchar(1000) not null,
+    created_at datetime not null
+);
+
 
 -- Performance
 -- create index idx_slug on document (slug);

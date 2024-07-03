@@ -56,7 +56,7 @@ public class Document {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_upload", nullable = false)
     private User userUpload;
     
