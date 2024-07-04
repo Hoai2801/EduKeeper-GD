@@ -143,11 +143,12 @@ const User = () => {
                 }}
                 required
               >
-                <option value="USER">Người dùng</option>
-                <option value="ADMIN">Quản trị viên</option>
+                  <option value="USER">Người dùng</option>
+                  <option value="TEACHER">Giáo viên</option>
+                  <option value="SUB_ADMIN">Quản trị (Sub)</option>
               </select>
             </div>
-            <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center">
               <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
                 Đăng ký
               </button>
@@ -193,7 +194,8 @@ const User = () => {
                         <select name="message" id="message" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" >
                             <option>Quyền người dùng</option>
                             <option value="USER">Người dùng</option>
-                            <option value="ADMIN">Quản trị</option>
+                            <option value="TEACHER">Giáo viên</option>
+                            <option value="SUB_ADMIN">Quản trị (Sub)</option>
                         </select>
                     </div>
                 </div>

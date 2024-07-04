@@ -7,11 +7,13 @@ import {Document, Page} from 'react-pdf';
 import {useLocation, useParams} from "react-router-dom";
 
 export const Upload = () => {
-    const path = useParams();
+    const path = useLocation();
+    console.log(path)
+    let isEditPage = path.pathname !== '/upload';
+    console.log(isEditPage)
     // edit file
     const [documentEdit, setDocumentEdit] = useState(null);
-    // const [fileName, setFilename] = useState(null);
-    // const [fileSize, setFileSize] = useState(null);
+
     // file upload
     const [selectedFile, setFile] = useState(null);
 
@@ -46,11 +48,14 @@ export const Upload = () => {
 
 
     useEffect(() => {
+        if (specialized) {
+
         fetch('http://localhost:8080/api/v1/subjects/specialized/' + specialized).then(response => response.json())
             .then(data => {
                 setListSubject(data)
             })
             .catch(error => console.error(error));
+        }
     }, [specialized])
 
     const handleFiles = (updatedFile) => {
@@ -176,6 +181,7 @@ export const Upload = () => {
         formData.append('userUpload', jwt.staff_code);
         formData.append('scope', scope);
         formData.append('author', author);
+        console.log(formData)
         fetch('http://localhost:8080/api/v1/documents/' + documentEdit?.id, {
             method: 'PUT',
             body: formData,
@@ -197,12 +203,14 @@ export const Upload = () => {
         }
     }
 
+    console.log(selectedFile)
+
     return (
         <div>
-            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${path ? "block" : "hidden"}`}>Cập nhật tài liệu</h2>
-            <div className={`${path ? "hidden" : "block"}`}>
+            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${isEditPage ? "block" : "hidden"}`}>Cập nhật tài liệu</h2>
+            <div className={`${isEditPage ? "hidden" : "block"}`}>
                 <p className='text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0'>Đăng tài liệu</p>
-                <DragDropFile handleFiles={handleFiles}/>
+                <DragDropFile handleFiles={handleFiles} fileSupport={`application/pdf`}/>
             </div>
             <div>
                 {selectedFile && (
@@ -341,12 +349,12 @@ export const Upload = () => {
                     </div>
                     <button
                         onClick={createDocument}
-                        className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue ${path ? "hidden" : ""}`}>
+                        className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue ${isEditPage ? "hidden" : ""}`}>
                         Đăng
                     </button>
                     <button
                         onClick={updateDocument}
-                        className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue ${path ? "" : "hidden"}`}>
+                        className={`bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue ${isEditPage ? "" : "hidden"}`}>
                         Cập nhật
                     </button>
                 </form>

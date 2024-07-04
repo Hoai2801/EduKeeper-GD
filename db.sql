@@ -125,6 +125,7 @@ CREATE TABLE `users` (
                          `date_of_birth` datetime,
                          `class` varchar(20),
                          `created_date` datetime,
+                         `avatar` varchar(200),
                          `last_modified_date` datetime,
 						`staff_code` varchar(20) not null,
                          PRIMARY KEY (`id`),
@@ -175,6 +176,8 @@ CREATE TABLE `document` (
                             `thumbnail` varchar(200),
                             `author` varchar(100) NOT NULL,
                             `user_upload` int not null,
+                            `is_delete` boolean default false,
+                            `deleted_at` datetime,
 --                             `download` int not null,
 --                             `views` int not null,
                             PRIMARY KEY (`id`),
@@ -182,7 +185,7 @@ CREATE TABLE `document` (
                             KEY `document_ibfk_4` (`author`),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
                             CONSTRAINT `document_ibfk_1` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`),
-                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
+                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`)
 );
 
 DROP TABLE IF EXISTS `favorite`;
@@ -237,6 +240,7 @@ CREATE TABLE notification(
     receiver int not null,
     title varchar(50) not null,
     content varchar(100) not null,
+    is_check boolean default false,
     created_at datetime not null,
     constraint `sd_fk_us` foreign key(sender) references users(id),
     constraint `rcv_fk_us` foreign key(receiver) references users(id)
@@ -246,8 +250,8 @@ create table banner(
 	id int not null auto_increment primary key,
     image varchar(200) not null,
     idex int,
-    is_enable boolean default true,
-    url varchar(500)
+    url varchar(500),
+    is_enable boolean default true
 );
 
 create table comment(
@@ -255,7 +259,9 @@ create table comment(
     document_id int not null,
     user_id int not null,
     content varchar(1000) not null,
-    created_at datetime not null
+    created_at datetime not null,
+     constraint `cmt_fk_user` foreign key(user_id) references users(id),
+      constraint `cmt_fk_dcm` foreign key(document_id) references document(id)
 );
 
 

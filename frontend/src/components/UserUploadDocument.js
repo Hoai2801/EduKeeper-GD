@@ -20,7 +20,7 @@ const UserUploadDocument = () => {
             window.location.href = `/profile/${jwt?.staff_code}/document/upload`;
         }
     } else {
-       
+
     }
     useEffect(() => {
         fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
@@ -32,6 +32,9 @@ const UserUploadDocument = () => {
     }, [location])
     return (
         <div className={`flex gap-5 justify-center flex-wrap`}>
+            <h2 className={`text-3xl font-semibold`}>Tài liệu đã đăng</h2>
+            {documentList.length === 0 ? <div className={`w-full mt-10`}>
+                Không có tài liệu</div> : null}
             {documentList?.map((item, index) => (
                 <div className={`relative`}>
                     <div

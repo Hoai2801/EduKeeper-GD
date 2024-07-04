@@ -28,7 +28,7 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest registerRequest
     ) {
         try {
-        return ResponseEntity.ok().body(authenticationService.register(registerRequest));
+            return ResponseEntity.ok().body(authenticationService.register(registerRequest));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

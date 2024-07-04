@@ -43,42 +43,50 @@ public class AuthenticationService {
     private String activationUrl;
 
     public String register(RegisterRequest registerRequest) throws MessagingException {
+        User user = new User();
         // role is optional<Role>
         var role = roleRepository.findByName(registerRequest.getRoles()).orElseThrow(
                 () -> new RuntimeException("Role not found"));
-        
-        var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
-                () -> new RuntimeException("Department not found")
-        );
-        
-        var specialized = specializedRepository.findById(Long.parseLong(registerRequest.getSpecialized())).orElseThrow(
-                () -> new RuntimeException("Specialized not found")
-        );
+        if (role.getName().equals("USER")) {
+            var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
+                    () -> new RuntimeException("Department not found")
+            );
+
+            var specialized = specializedRepository.findById(Long.parseLong(registerRequest.getSpecialized())).orElseThrow(
+                    () -> new RuntimeException("Specialized not found")
+            );
+            user.setDepartment(department);
+            user.setSpecialized(specialized);
+            user.setKlass(registerRequest.getClassroom());
+            user.setEnable(false);
+        } else {
+            user.setDepartment(null);
+            user.setSpecialized(null);
+            user.setKlass(null);
+            user.setEnable(true);
+        }
         // check if user exists
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email đã được sử dụng bởi tài khoản khác"); 
+            throw new RuntimeException("Email đã được sử dụng bởi tài khoản khác");
         }
 
         // check if staffCode exists
         if (userRepository.existsByStaffCode(registerRequest.getStaffCode())) {
-            throw new RuntimeException("Mã sinh viên đã được sử dụng");
+            throw new RuntimeException("Mã đã được sử dụng");
         }
         // save user
-        var user = User.builder()
-                .username(registerRequest.getUsername())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .staffCode(registerRequest.getStaffCode())
-                .specialized(specialized)
-                .department(department)
-                .klass(registerRequest.getClassroom())
-                .roles(role)
-                .accountLocked(false)
-                .enable(false)
-                .build();
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setStaffCode(registerRequest.getStaffCode());
+        user.setRoles(role);
 
         userRepository.save(user);
-        sendValidationEmail(user);
+
+        // send email for student
+        if (role.getName().equals("USER")) {
+            sendValidationEmail(user);
+        }
         return "registered";
     }
 

@@ -57,7 +57,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 <div className='relative flex flex-col items-center'>
                     <div className='lg:w-[150px] lg:h-[150px] w-[100px] h-[100px] rounded-full overflow-hidden'>
                         <img
-                            src={user ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
+                            src={user && user?.avatar ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
                             alt="" className='w-full h-full object-cover'/>
                     </div>
                     <div className={`${!isTrueLegit && 'hidden'}`}>

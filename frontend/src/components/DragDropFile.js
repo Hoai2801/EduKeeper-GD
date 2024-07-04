@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 
-const DragDropFile = (props) => {
+const DragDropFile = ({handleFiles, fileSupport}) => {
   // drag state
   const [dragActive, setDragActive] = useState(false);
   // ref
@@ -24,7 +24,7 @@ const DragDropFile = (props) => {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      props.handleFiles(e.dataTransfer.files);
+      handleFiles(e.dataTransfer.files);
       // console.log(e.dataTransfer.files)
     }
   };
@@ -36,10 +36,9 @@ const DragDropFile = (props) => {
       if (e.target.files[0].type === "application/pdf" ||
         e.target.files[0].type === "application/msword" ||
         e.target.files[0].type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          || props.fileSupport === "image"
+          || fileSupport === "image"
       ) {
-        props.handleFiles(e.target.files[0]);
-        console.log(e.target.files)
+        handleFiles(e.target.files);
       }
       else {
         alert("File not supported")

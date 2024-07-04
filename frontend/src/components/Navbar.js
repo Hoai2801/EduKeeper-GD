@@ -20,7 +20,7 @@ const Navbar = () => {
 
         const [category, setCategory] = useState(null);
 
-        const [notification, setNotification] = useState(null);
+        const [notification, setNotification] = useState([]);
         const [isHasNotification, setIsHasNotification] = useState(null);
         const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
@@ -90,7 +90,7 @@ const Navbar = () => {
 
         const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-        const POLLING_INTERVAL = 1000;
+        const POLLING_INTERVAL = 30000; // 30 seconds
         useEffect(() => {
             if (user) {
             const intervalId = setInterval(() => {
@@ -129,6 +129,8 @@ const Navbar = () => {
                 fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwt.staff_code);
             }
         }
+
+        console.log(jwt)
 
         return (
             <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
@@ -196,7 +198,7 @@ const Navbar = () => {
                                 </div>
                             </div>
                         </Link>
-                        {jwt?.role === "ADMIN" || jwt?.role === "TEACHER" ? (
+                        {jwt?.role === "ADMIN" || jwt?.role === "TEACHER" || jwt?.role === "SUB-ADMIN" ? (
                             <Link
                                 to="/upload"
                                 className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
@@ -250,7 +252,7 @@ const Navbar = () => {
                                 }}
                                 onMouseEnter={() => setIsNotificationOpen(true)}
                             >
-                                {notification ? notification?.map((item, index) => (
+                                {notification && notification?.length ? notification?.map((item, index) => (
                                     <Notification notification={item}/>
                                 )) : <div className={`text-center h-[80px] text-xl`}>Không có thông báo nào!</div>}
                             </div>
@@ -265,7 +267,7 @@ const Navbar = () => {
                                         >
                                             Chào {jwt.user_name}
                                             <img
-                                                src={user ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                                                src={user && user?.avatar ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
                                                 alt=""
                                                 className="w-8 h-8 rounded-full"/>
                                         </button>
