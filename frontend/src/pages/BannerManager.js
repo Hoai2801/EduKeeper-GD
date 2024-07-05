@@ -71,8 +71,6 @@ const BannerManager = () => {
             });
     }
 
-    const fileURL = file ? URL.createObjectURL(file) : '';
-
     return (
         <div className={``}>
             <div className={`bg-white rounded-lg p-3`}>
@@ -174,7 +172,7 @@ const BannerManager = () => {
                             <div className={`flex flex-col justify-center items-center pt-5`}>
                                 <DragDropFile handleFiles={setFile} fileSupport={"image"}/>
                                 <div className={`w-full px-5 mt-5 border-b-2`}>
-                                <img src={fileURL} alt="" className={`w-full`}/>
+                                <img src={file ? URL.createObjectURL(file[0]) : `http://localhost:8080/api/v1/images/banner/${bannerEdit?.image}`} alt="" className={`w-full`}/>
                                 </div>
                             </div>
                             <div className={`p-5 flex flex-col gap-3`}>

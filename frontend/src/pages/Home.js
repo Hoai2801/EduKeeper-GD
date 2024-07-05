@@ -60,12 +60,12 @@ const Home = () => {
 
     return (
         <div>
-            <div className={`w-full h-[300px] h-[600px]`}>
+            <div className={`w-full h-[300px] fit md:h-[600px] ${banner?.length === 0 ? "hidden" : "block"}`}>
                 {banner?.map((banner, index) => (
                     <a href={banner?.url?.includes('http') ? banner?.url : banner.url !== null ? `https://${banner?.url}` : ''}
                        className={`${banner?.url === null ? "" : "disabled"}`}>
                         <img src={`http://localhost:8080/api/v1/images/banner/${banner.image}`} alt=""
-                             className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
+                             className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 md:rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
                         />
                     </a>
                 ))}

@@ -30,4 +30,10 @@ public interface UserService {
     List<TypeRes> countUsersByRoles(int year);
 
     String changeAvatar(String id, MultipartFile avatar);
+
+    String blockUser(String staffCode);
+
+    Boolean isUserBlocked(String staffCode);
+
+    String unblockUser(String staffCode);
 }

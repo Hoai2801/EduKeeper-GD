@@ -20,11 +20,12 @@ const UserRow = ({ user, setEditUser, setIsEditOpen }) => {
   }
 
   const handleUserEdit = () => {
+        console.log(user)
     setEditUser({
       staffCode: user.staffCode,
       username: user.username,
       email: user.email,
-      roles: user.roles
+      role: user.roles.name
     });
     setIsEditOpen(true);
   }

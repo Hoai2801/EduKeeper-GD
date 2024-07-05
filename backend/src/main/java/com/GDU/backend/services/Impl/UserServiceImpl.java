@@ -2,9 +2,11 @@ package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.UserDetailDTO;
 import com.GDU.backend.dtos.responses.*;
-import com.GDU.backend.models.*;
+import com.GDU.backend.models.Department;
+import com.GDU.backend.models.Specialized;
+import com.GDU.backend.models.Token;
+import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.*;
-import com.GDU.backend.services.NotificationService;
 import com.GDU.backend.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final TokenRepository tokenRepository;
     private final SpecializedRepository specializedRepository;
     private final DepartmentRepository departmentRepository;
+    private final RoleRepository roleRepository;
 
     @Override
     public List<UserResponse> getAllUsers() {
@@ -128,6 +131,37 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public String blockUser(String staffCode) {
+        User user = getUserByStaffCode(staffCode);
+        if (user != null) {
+            user.setAccountLocked(true);
+            userRepository.save(user);
+            return "Đã khoá người dùng!";
+        }
+        return "Lỗi hệ thống, hiện tại không thể thực hiện thao tác!";
+    }
+
+    @Override
+    public Boolean isUserBlocked(String staffCode) {
+        User user = getUserByStaffCode(staffCode);
+        if (user != null) {
+            return user.isAccountLocked();
+        }
+        return true;
+    }
+
+    @Override
+    public String unblockUser(String staffCode) {
+        User user = getUserByStaffCode(staffCode);
+        if (user != null) {
+            user.setAccountLocked(false);
+            userRepository.save(user);
+            return "Đã mở khoá người dùng!";
+        }
+        return "Lỗi hệ thống, hiện tại không thể thực hiện thao tác!";
+    }
+
+    @Override
     public UserDetailResponse getUserResponseByStaffCode(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -153,21 +187,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (user == null) {
             return "user not found";
         }
-        Department department = departmentRepository.findById(userDetailDTO.getDepartment()).orElse(null);
-        if (department == null) {
-            return "department not found";
+        if (userDetailDTO.getRole().equals("ROLE_STUDENT")) {
+            Department department = departmentRepository.findById(userDetailDTO.getDepartment()).orElse(null);
+            if (department == null) {
+                return "department not found";
+            }
+            Specialized specialized = specializedRepository.findById(userDetailDTO.getSpecialized()).orElse(null);
+            if (specialized == null) {
+                return "specialized not found";
+            }
+            user.setDepartment(department);
+            user.setSpecialized(specialized);
         }
-        Specialized specialized = specializedRepository.findById(userDetailDTO.getSpecialized()).orElse(null);
-        if (specialized == null) {
-            return "specialized not found";
-        }
+        var role = roleRepository.findByName(userDetailDTO.getRole()).orElseThrow(
+                () -> new UsernameNotFoundException("Role not found")
+        );
+        user.setRoles(role);
         user.setUsername(userDetailDTO.getUsername());
-        user.setDepartment(department);
         user.setKlass(userDetailDTO.getKlass());
-        user.setSpecialized(specialized);
         user.setBirthDay(userDetailDTO.getBirthDay());
         userRepository.save(user);
-        return "updated";
+        return "success";
     }
-    
+
 }

@@ -7,17 +7,18 @@ import {Document, Page} from 'react-pdf';
 import {useLocation, useParams} from "react-router-dom";
 
 export const Upload = () => {
-    const path = useLocation();
-    console.log(path)
-    let isEditPage = path.pathname !== '/upload';
-    console.log(isEditPage)
+    const location = useLocation();
+    let isEditPage = location.pathname !== '/upload';
+
+    const path = useParams()
+
     // edit file
     const [documentEdit, setDocumentEdit] = useState(null);
 
     // file upload
     const [selectedFile, setFile] = useState(null);
 
-    const [department, setDepartment] = useState(null);
+    const [departments, setDepartments] = useState([]);
     const [listCategory, setListCategory] = useState(null);
     const [category, setCategory] = useState(1);
     const [description, setDescription] = useState(null);
@@ -41,20 +42,22 @@ export const Upload = () => {
     const [title, setTitle] = useState(null);
 
     const [selectedDepartment, setSelectedDepartment] = useState(null);
-    const [listSpecialized, setListSpecialized] = useState(null);
+    const [listSpecialized, setListSpecialized] = useState([]);
     const [listSubject, setListSubject] = useState(null);
     const [author, setAuthor] = useState(null);
+
+    const [bearToken, setBearToken] = useState(null);
     const [jwt, setJwt] = useState(null);
 
 
     useEffect(() => {
         if (specialized) {
-
-        fetch('http://localhost:8080/api/v1/subjects/specialized/' + specialized).then(response => response.json())
-            .then(data => {
-                setListSubject(data)
-            })
-            .catch(error => console.error(error));
+            fetch('http://localhost:8080/api/v1/subjects/' + specialized?.id).then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    setListSubject(data)
+                })
+                .catch(error => console.error(error));
         }
     }, [specialized])
 
@@ -65,7 +68,7 @@ export const Upload = () => {
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/departments').then(response => response.json())
             .then(data => {
-                setDepartment(data)
+                setDepartments(data)
             })
             .catch(error => console.error(error));
 
@@ -75,6 +78,7 @@ export const Upload = () => {
             })
             .catch(error => console.error(error));
         const token = localStorage.getItem("token");
+        setBearToken(token)
         if (token !== "undefined" && token !== null) {
             setJwt(jwtDecode(token));
         } else window.location.href = "/";
@@ -86,9 +90,10 @@ export const Upload = () => {
                     setDescription(data.description)
                     setAuthor(data.author)
                     setScope(data.scope)
-                    // setSpecialized(data.specialized)
+                    setSpecialized(data.specialized)
+                    setSelectedDepartment(data.specialized.department)
                     setCategory(data.category.id)
-                    // setSubject(data.subject)
+                    setSubject(data.subject.id)
                     setDocumentEdit(data)
                 })
                 .catch(error => console.error(error));
@@ -115,16 +120,20 @@ export const Upload = () => {
     }, [])
 
     useEffect(() => {
+        if (selectedDepartment) {
         fetch('http://localhost:8080/api/v1/specializes/department/' + selectedDepartment?.id).then(data => data.json())
             .then(data => {
-                setListSpecialized(data)
+                console.log(data)
+                if (data.length > 0) {
+                    setListSpecialized(data)
+                }
             })
             .catch(error => console.error(error));
+        }
     }, [selectedDepartment])
 
     useEffect(() => {
-        console.log(specialized)
-        fetch('http://localhost:8080/api/v1/subjects/' + specialized).then(response => response.json())
+        fetch('http://localhost:8080/api/v1/subjects/' + specialized?.id).then(response => response.json())
             .then(data => {
                 setListSubject(data)
             })
@@ -149,6 +158,9 @@ export const Upload = () => {
         fetch('http://localhost:8080/api/v1/documents/upload', {
             method: 'POST',
             body: formData,
+            headers: {
+                'Authorization': 'Bearer ' + bearToken
+            }
         })
             .then(response => {
                 console.log(response)
@@ -182,9 +194,13 @@ export const Upload = () => {
         formData.append('scope', scope);
         formData.append('author', author);
         console.log(formData)
+        console.log(bearToken)
         fetch('http://localhost:8080/api/v1/documents/' + documentEdit?.id, {
             method: 'PUT',
             body: formData,
+            headers: {
+                'Authorization': `Bearer ${bearToken}`,
+            }
         })
             .then(response => {
                 console.log(response)
@@ -195,7 +211,6 @@ export const Upload = () => {
             .catch(error => console.error(error));
     }
 
-
     // check is true author or not
     if (jwt && documentEdit) {
         if (jwt?.staff_code !== documentEdit?.user_upload?.staffCode) {
@@ -203,11 +218,10 @@ export const Upload = () => {
         }
     }
 
-    console.log(selectedFile)
-
     return (
         <div>
-            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${isEditPage ? "block" : "hidden"}`}>Cập nhật tài liệu</h2>
+            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${isEditPage ? "block" : "hidden"}`}>Cập nhật
+                tài liệu</h2>
             <div className={`${isEditPage ? "hidden" : "block"}`}>
                 <p className='text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0'>Đăng tài liệu</p>
                 <DragDropFile handleFiles={handleFiles} fileSupport={`application/pdf`}/>
@@ -231,8 +245,9 @@ export const Upload = () => {
                 <h2 className="text-2xl font-semibold mb-6">Thông tin tài liệu</h2>
                 <form>
                     <div className="mb-4">
-                        <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">Tên tài
-                            liệu</label>
+                        <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+                            Tên tài liệu
+                        </label>
                         <input type="text" id="name" name="name" placeholder="Báo cáo môn học ..." required
                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
                                onChange={event => setTitle(event.target.value)}
@@ -253,11 +268,14 @@ export const Upload = () => {
                                 }}
                                 value={JSON.stringify(selectedDepartment)}
                         >
-                            <option>Chọn khoa</option>
+                            <option className={`${isEditPage ? "hidden" : "block"}`}>Chọn khoa</option>
                             {
-                                department && department.map(dep => (
-                                    <option value={JSON.stringify(dep)} key={dep.id}>{dep.departmentName}</option>
-                                ))
+                                departments && departments.map(dep => {
+                                    return (
+                                        <option value={JSON.stringify(dep)}
+                                                key={dep.id}>{dep.departmentName}</option>
+                                    )
+                                })
                             }
                         </select>
                     </div>
@@ -266,13 +284,16 @@ export const Upload = () => {
                                className="block mb-2 text-sm font-semibold text-gray-900">Ngành</label>
                         <select id="department"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                onChange={e => setSpecialized(e.target.value)}>
+                                onChange={e => setSpecialized(JSON.parse(e.target.value))}
+                                value={JSON.stringify(specialized)}
+                        >
                             <option>Chọn ngành</option>
                             {
-                                Array.isArray(listSpecialized) && listSpecialized.map(specialized => (
-                                    <option value={specialized.id}
+                                listSpecialized && listSpecialized?.map(specialized => {
+                                    return(
+                                    <option value={JSON.stringify(specialized)}
                                             key={specialized.id}>{specialized.specializedName}</option>
-                                ))
+                                )})
                             }
                         </select>
                     </div>
@@ -312,7 +333,7 @@ export const Upload = () => {
                         <select id="department"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 onChange={e => setScope(e.target.value)}
-                        value={scope}
+                                value={scope}
                         >
                             <option>Chọn quyền riêng tư</option>
                             {

@@ -22,7 +22,7 @@ const User = () => {
     username: '',
     email: '',
     password: '',
-    roles: 'USER' // Default role is 'user'
+    role: 'USER' // Default role is 'user'
   });
 
   // Handle form input change
@@ -53,16 +53,55 @@ const User = () => {
     }
   };
 
-
-  useEffect(() => {
-    fetch("http://localhost:8080/api/v1/users")
+  const fetchUsers = () => {
+    fetch('http://localhost:8080/api/v1/users', {
+    })
       .then((res) => res.json())
       .then((data) => {
         setUsers(data)
-      });
+      })
+  }
+
+  useEffect(() => {
+    fetchUsers()
   }, [])
 
-  return (
+
+
+    function saveEditUser() {
+        fetch(`http://localhost:8080/api/v1/users`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(editUser)
+        })
+            .then((res) => res.text())
+            .then((data) => {
+                if (data === "success") {
+                    setIsEditOpen(false)
+                    alert("Cập nhật người dùng thành công")
+                    fetchUsers()
+                }
+            })
+    }
+
+    function blockUser(staffCode) {
+        fetch(`http://localhost:8080/api/v1/users/block/${staffCode}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+            .then((res) => res.text())
+            .then((data) => {
+                alert(data)
+            })
+    }
+
+    return (
     <div className="container mx-auto">
       <h2 className="font-bold text-3xl mb-5 w-full text-center">Danh sách người dùng</h2>
       <div className="flex justify-center">
@@ -143,9 +182,9 @@ const User = () => {
                 }}
                 required
               >
-                  <option value="USER">Người dùng</option>
-                  <option value="TEACHER">Giáo viên</option>
-                  <option value="SUB_ADMIN">Quản trị (Sub)</option>
+                  <option value="ROLE_USER">Người dùng</option>
+                  <option value="ROLE_TEACHER">Giáo viên</option>
+                  <option value="ROLE_SUB-ADMIN">Quản trị (Sub)</option>
               </select>
             </div>
               <div className="flex items-center justify-center">
@@ -178,29 +217,81 @@ const User = () => {
           </table>
         </div>
         <div className={`absolute bottom-0 right-0 w-full h-full  justify-center items-center ${isEditOpen ? 'flex' : 'hidden'}`}>
-            <div className='bg-white w-[50%] h-[50%] rounded-2xl border'>
+            <div className='bg-white w-[50%] h-fit py-5 rounded-2xl border'>
                 <div className='w-full flex justify-end p-2'>
                     <button onClick={() => setIsEditOpen(false)} className='bg-red-500 text-white rounded-lg w-10 p-2'>X</button>
                 </div>
                 <div>
                     <div className='w-full flex justify-center gap-5'>
-                        <button onClick={null} className='bg-red-400 text-white rounded-lg w-fit p-2'>Disable user</button>
-                        <button onClick={null} className='bg-red-400 text-white rounded-lg w-fit p-2'>Xóa user</button>
+                        <button onClick={() => blockUser(editUser.staffCode)} className='bg-red-400 text-white rounded-lg w-fit p-2'>
+                            Khóa tài khoản
+                        </button>
                     </div>
-                    <div className='w-full p-5'>
-                        <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Tên người dùng</label>
-                        <input type="text" id="message" name="message" placeholder="" required value={editUser.username} onChange={(e) => setEditUser({...editUser, username: e.target.value})}/>
-                        <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2">Quyền người dùng</label>
-                        <select name="message" id="message" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" >
-                            <option>Quyền người dùng</option>
-                            <option value="USER">Người dùng</option>
-                            <option value="TEACHER">Giáo viên</option>
-                            <option value="SUB_ADMIN">Quản trị (Sub)</option>
-                        </select>
-                    </div>
+                    <form className="px-8 py-6">
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="staffCode">Mã nhân
+                                viên</label>
+                            <input
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="staffCode"
+                                type="text"
+                                placeholder="Mã nhân viên"
+                                name="staffCode"
+                                value={editUser.staffCode}
+                                onChange={(e) => setEditUser({ ...editUser, staffCode: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">Tên người
+                                dùng</label>
+                            <input
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="username"
+                                type="text"
+                                placeholder="Tên người dùng"
+                                name="username"
+                                value={editUser.username}
+                                onChange={(e) => setEditUser({ ...editUser, username: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">Email</label>
+                            <input
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="email"
+                                type="email"
+                                placeholder="Email"
+                                name="email"
+                                value={editUser.email}
+                                onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="roles">Vai
+                                trò</label>
+                            <select
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="roles"
+                                name="roles"
+                                onChange={(e) => {
+                                    editUser.role = e.target.value;
+                                }}
+                                required
+                            >
+                                <option value="ROLE_USER" selected={editUser.role === 'ROLE_USER'}>Người dùng</option>
+                                <option value="ROLE_TEACHER" selected={editUser.role === 'ROLE_TEACHER'}>Giáo viên</option>
+                                <option value="ROLE_SUB-ADMIN" selected={editUser.role === 'ROLE_SUB-ADMIN'}>Quản trị (Sub)</option>
+                            </select>
+                        </div>
+                    </form>
                 </div>
                 <div className='w-full flex justify-center p-2'>
-                  <button onClick={null} className='bg-blue-500 hover:bg-blue-700 text-white rounded-lg w-[50%] p-2'>Lưu</button>
+                    <button onClick={saveEditUser}
+                            className='bg-blue-500 hover:bg-blue-700 text-white rounded-lg w-[50%] p-2'>Lưu
+                    </button>
                 </div>
             </div>
         </div>

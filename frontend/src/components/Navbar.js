@@ -130,8 +130,6 @@ const Navbar = () => {
             }
         }
 
-        console.log(jwt)
-
         return (
             <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
                 <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
@@ -198,7 +196,7 @@ const Navbar = () => {
                                 </div>
                             </div>
                         </Link>
-                        {jwt?.role === "ADMIN" || jwt?.role === "TEACHER" || jwt?.role === "SUB-ADMIN" ? (
+                        {jwt?.role === "ROLE_ADMIN" || jwt?.role === "ROLE_TEACHER" || jwt?.role === "ROLE_SUB-ADMIN" ? (
                             <Link
                                 to="/upload"
                                 className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
@@ -236,7 +234,7 @@ const Navbar = () => {
                     </form>
                     <>
                         <div className="flex gap-5 justify-end w-[500px]">
-                            <button onClick={() => setIsNotificationOpen(true)}
+                            <button onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                                     className={`relative`}>
                                 <div className={`w-8 h-8 flex`}>
                                     <img src={bell} alt="" className={`w-full h-full`}/>
@@ -245,7 +243,7 @@ const Navbar = () => {
                                     className={`bg-red-500 rounded-full w-fit h-5 absolute text-white p-1 text-[10px] top-0 right-[-10px] ${isHasNotification ? "block" : "hidden"}`}>{isHasNotification}</div>
                             </button>
                             <div
-                                className={`${isNotificationOpen ? "block" : "hidden"} flex flex-col gap-2 absolute top-[85px] sm:right-[100px] bg-white rounded-lg shadow-lg w-[400px] h-fit max-h-[300px] overflow-scroll`}
+                                className={`${isNotificationOpen ? "block" : "hidden"} flex flex-col gap-2 absolute top-[85px] md:right-[80px] bg-white rounded-lg shadow-lg w-[400px] h-fit max-h-[300px] overflow-scroll`}
                                 onMouseLeave={() => {
                                     setIsNotificationOpen(!isNotificationOpen)
                                     checkNotification()
@@ -263,7 +261,7 @@ const Navbar = () => {
                                             onClick={() => {
                                                 setIsSubMenuShown(!isSubMenuShow);
                                             }}
-                                            className="lg:mt-2 mt-3 lg:text-xl md:flex gap-3 hidden"
+                                            className="lg:mt-2 mt-3 lg:text-xl xl:flex gap-3 hidden"
                                         >
                                             Chào {jwt.user_name}
                                             <img

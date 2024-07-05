@@ -46,16 +46,6 @@ public class DocumentController {
         }
     }
 
-    // get most views in 30 days
-//    @GetMapping("/most-viewed")
-//    public ResponseEntity<?> getMostViewedDocuments(@RequestParam("limit") int limit) {
-//        try {
-//            return ResponseEntity.ok(documentService.getMostViewedDocuments(limit));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//        }
-//    }
-
     // get most downloaded in 30 days
     @GetMapping("/most-downloaded")
     public ResponseEntity<?> getMostDownloadedDocuments(@RequestParam("limit") int limit) {

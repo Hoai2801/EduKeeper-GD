@@ -80,6 +80,10 @@ public class Document {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "specialized_id")
+    private Specialized specialized;
+
     // Methods to get the counts of views and downloads
     public int getViewsCount() {
         return views != null ? views.size() : 0;

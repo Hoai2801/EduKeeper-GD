@@ -22,14 +22,50 @@ import UserUploadDocument from "./components/UserUploadDocument";
 import UserFavoriteDocument from "./components/UserFavoriteDocument";
 import DeletedDocument from "./pages/ListDocsDeleted";
 import BannerManager from "./pages/BannerManager";
+import {useEffect, useState} from "react";
+import {jwtDecode} from "jwt-decode";
 
 function App() {
     window.scrollTo(0, 0);
+
+    const [jwt, setJwt] = useState(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token !== "undefined" && token !== null) {
+            const decodedJwt = jwtDecode(token);
+            setJwt(decodedJwt);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (jwt) {
+            const checkIfBlocked = () => {
+                fetch('http://localhost:8080/api/v1/users/is-blocked/' + jwt?.staff_code)
+                    .then(res => res.text())
+                    .then(data => {
+                        if (data === "true") {
+                            localStorage.removeItem("token");
+                            window.location.href = "/login";
+                        }
+                    });
+            };
+
+            // Run immediately when jwt is set
+            checkIfBlocked();
+
+            // Set interval to run every 30 seconds
+            const intervalId = setInterval(checkIfBlocked, 30000);
+
+            // Cleanup interval on component unmount
+            return () => clearInterval(intervalId);
+        }
+    }, [jwt]);
     return (
         <Routes>
             <Route element={<Layout/>}>
                 <Route path='/' element={<Home/>}/>
-                <Route path='/upload' element={<Upload/>}/>
+                <Route path='/upload' element={<Upload />}/>
                 <Route path='/edit/:slug' element={<Upload/>}/>
                 <Route path='/profile/:staff_code' element={<Profile/>}>
                     <Route path='' element={<UserHome/>}/>
@@ -42,7 +78,7 @@ function App() {
                 <Route path="/register" element={<SignUp/>}/>
                 <Route path="/account/:action/:token" element={<AccoutAction/>}/>
                 <Route element={<SideBar/>}>
-                    <Route path="/search" element={<Search/>}/>
+                    <Route path="/search" element={<Search jwt={jwt}/>}/>
                 </Route>
             </Route>
             <Route path="/dashboard" element={<Admin/>}>

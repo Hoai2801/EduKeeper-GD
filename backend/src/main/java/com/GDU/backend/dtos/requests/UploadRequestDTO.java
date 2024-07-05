@@ -26,16 +26,14 @@ public class UploadRequestDTO {
 //    @NotBlank
 //    private long department;
 
-//    @NotEmpty
-//    @NotBlank
-//    private long specialized;
+    @NotEmpty
+    @NotBlank
+    private long specialized;
 
     @NotEmpty
     @NotBlank
     private long category;
-
-    @NotEmpty
-    @NotBlank
+    
     private long subject;
     
     private String scope; 

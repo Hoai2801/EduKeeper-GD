@@ -16,8 +16,6 @@ public interface DocumentService {
 
     DocumentResponseDTO getDocumentBySlug(String slug);
 
-//    List<DocumentResponseDTO> getMostViewedDocuments(int limit);
-
     List<DocumentResponseDTO> getMostDownloadedDocuments(int limit);
 
     List<DocumentResponseDTO> getLatestDocuments(int limit);
@@ -35,8 +33,6 @@ public interface DocumentService {
     List<DocumentResponseDTO> getDocumentsByAuthor(Long id);
 
     int getDocumentsCountBySpecialized(Long id);
-
-//    int getTotalViewsByAuthor(Long authorId);
 
     int getTotalDownloadsByAuthor(Long authorId);
 

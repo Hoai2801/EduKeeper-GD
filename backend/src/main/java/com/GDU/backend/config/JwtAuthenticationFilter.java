@@ -31,7 +31,7 @@
              @NonNull FilterChain filterChain)
              throws ServletException, IOException {
          final String authHeader = request.getHeader("Authorization");
-
+         
          if (authHeader != null && authHeader.startsWith("Bearer ")) {
              String jwt = authHeader.substring(7);
              String email = jwtService.extractUsername(jwt);

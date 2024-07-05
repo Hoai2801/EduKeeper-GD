@@ -257,13 +257,13 @@ const [draftCount, setDraftCount] = useState(0);
                         </button>
                     </div>
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleDisplayPostDocs}
+                        <Link
+                            to={`/upload`}
+                            target="_blank" rel="noopener noreferrer"
                             className="px-4 py-2 rounded-lg border-solid	bg-blue-500 text-white text-sm font-medium"
-                            type="submit"
                         >
                             <span>Thêm tài liệu</span>
-                        </button>
+                        </Link>
                         <button
                             onClick={handleFillDocs}
                             className=" p-2 w-20 rounded-lg border-solid flex border border-gray-500 text-gray-500 text-sm"
@@ -518,7 +518,7 @@ const [draftCount, setDraftCount] = useState(0);
                         }
                     </div>
                 </div>
-                {isPostDocs && <PostDocs onClose={handleHiddenPostDocs}/>}
+                {/*{isPostDocs && <PostDocs onClose={handleHiddenPostDocs}/>}*/}
             </div>
         </div>
     );

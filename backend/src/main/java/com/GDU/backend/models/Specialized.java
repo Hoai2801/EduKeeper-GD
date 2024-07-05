@@ -1,6 +1,7 @@
 package com.GDU.backend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "specialized")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Specialized {
 
     @Id

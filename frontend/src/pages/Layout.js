@@ -1,7 +1,8 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Outlet, useLocation} from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import {jwtDecode} from "jwt-decode";
 
 const Layout = () => {
     const { pathname } = useLocation();
@@ -9,6 +10,7 @@ const Layout = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [pathname]);
+
   return (
     <div className='bg-slate-200'>
         <Navbar />

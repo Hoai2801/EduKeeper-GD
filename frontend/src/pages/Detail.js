@@ -21,6 +21,7 @@ const Detail = () => {
         const parts = url.split('/');
         // Get the last part of the URL
         const lastPart = parts[parts.length - 1];
+        console.log(lastPart)
         // Return the last part as the slug
         return lastPart;
     }
@@ -51,6 +52,8 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug)
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
+
                 setData(data)
             });
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
@@ -85,9 +88,11 @@ const Detail = () => {
 
     const fetchComment = () => {
         if (data) {
+            console.log(data)
             fetch('http://localhost:8080/api/v1/comments/' + data?.id)
                 .then(res => res.json())
                 .then(data => {
+                    console.log(data)
                     setCommentList(data)
                 })
         }
@@ -229,14 +234,16 @@ const Detail = () => {
         } else window.location.href = "/login";
     }
 
+    console.log(data)
+
     return (
         <div>
-            <h2 className={`text-[28px] mt-10 font-bold ${data?.scope === "public" || data?.user_upload.staffCode === staffCode ? "hidden" : "block"}`}>
+            <h2 className={`text-[28px] mt-10 font-bold ${data?.scope === "public" || data?.user_upload?.staffCode === staffCode ? "hidden" : "block"}`}>
                 Bạn không thể xem tài liệu này vì đây là tài liệu riêng tư</h2>
-            <div className={`${data?.scope === "public" || data?.user_upload.staffCode === staffCode ? "" : "hidden"}`}>
+            <div className={`${data?.scope === "public" || data?.user_upload?.staffCode === staffCode ? "" : "hidden"}`}>
                 <div className={`pt-[50px] md:px-5 md:px-2 px-5`}>
                     <p className='text-blue-500 text-lg'><Link
-                        to={`/search?category=${data?.category.categorySlug}`}>{data?.category.categoryName}</Link> -
+                        to={`/search?category=${data?.category?.categorySlug}`}>{data?.category?.categoryName}</Link> -
                         <Link
                             to={`/search?subject=${data?.subject?.subjectSlug}`}> Môn {data?.subject?.subjectName}</Link>
                     </p>
@@ -244,19 +251,18 @@ const Detail = () => {
                     <h2 className='md:text-[52px] md:mt-5 font-bold md:max-w-[900px] leading-[50px] text-2xl'>{data?.title}</h2>
                     <div className='flex justify-between mt-3 md:flex-row flex-col'>
                         <div className="flex flex-wrap gap-5 md:flex-col md:gap-1 md:mt-5 text-xl">
-                            <p>Giáo viên: <Link to={`/profile/${data?.user_upload.staffCode}`}
-                                                className='text-blue-500'>{data?.user_upload.username}</Link></p>
+                            <p>Giáo viên: <Link to={`/profile/${data?.user_upload?.staffCode}`}
+                                                className='text-blue-500'>{data?.user_upload?.username}</Link></p>
                             <p>Tác giả: <span className=''>{data?.author}</span></p>
                             <p>Ngày đăng: {data?.upload_date}</p>
                             <p>Trang: {data?.pages}</p>
                         </div>
                         <div className='flex flex-col gap-5 md:gap-2'>
-                            <button className={`w-full hover:shadow-lg rounded-md bg-white p-4`}
+                            <button className={`w-full hover:shadow-lg rounded-md bg-white p-4 mt-5`}
                                     onClick={() => favorite()}>
                                 <div className={`w-full min-w-[220px] flex items-center gap-2 h-10 justify-center`}>
                                     <p className="font-bold text-lg">{isFavorite ? "Đã lưu" : "Lưu vào yêu thích"}</p>
-                                    <div
-                                        className={`hover:shadow-lg rounded-md w-5 mt-1 h-5 overflow-hidden bg-white ${isFavorite ? "p-1" : ""}`}>
+                                    <div className={`hover:shadow-lg rounded-md w-5 mt-1 h-5 overflow-hidden bg-white ${isFavorite ? "p-1" : ""}`}>
                                         <img src={isFavorite ? love : unlove} className={`w-full h-full`}/>
                                     </div>
                                 </div>
@@ -335,7 +341,7 @@ const Detail = () => {
                             </button>
                         </div>
                         <div>
-                            {commentList.map((comment, index) => {
+                            {commentList && commentList?.map((comment, index) => {
                                 if (index < limitComments) {
                                     return (
                                         <Comment

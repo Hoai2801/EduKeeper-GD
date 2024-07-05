@@ -36,6 +36,21 @@ public class UserController {
     public ResponseEntity<String> updateUser(@RequestBody UserDetailDTO userDetailDTO) {
         return ResponseEntity.ok(userService.updateUser(userDetailDTO));
     }
+    
+    @PutMapping("/block/{staffCode}")
+    public ResponseEntity<String> blockUser(@PathVariable("staffCode") String staffCode) {
+        return ResponseEntity.ok(userService.blockUser(staffCode));
+    }
+    
+    @PutMapping("/unblock/{staffCode}")
+    public ResponseEntity<String> unblockUser(@PathVariable("staffCode") String staffCode) {
+        return ResponseEntity.ok(userService.unblockUser(staffCode));
+    }
+    
+    @GetMapping("/is-blocked/{staffCode}")
+    public ResponseEntity<Boolean> isUserBlocked(@PathVariable("staffCode") String staffCode) {
+        return ResponseEntity.ok(userService.isUserBlocked(staffCode));
+    }
 
 
     @DeleteMapping("/{id}")

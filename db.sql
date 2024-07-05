@@ -171,6 +171,7 @@ CREATE TABLE `document` (
 			    -- chứa đường dẫn đến nơi lưu file
                             `path` varchar(500) NOT NULL,
                             `description` varchar(2000) NOT NULL,
+                            `specialized_id` int not null,
                             `category_id` int DEFAULT NULL,
                             `subject_id` int DEFAULT NULL,
                             `thumbnail` varchar(200),
@@ -178,11 +179,10 @@ CREATE TABLE `document` (
                             `user_upload` int not null,
                             `is_delete` boolean default false,
                             `deleted_at` datetime,
---                             `download` int not null,
---                             `views` int not null,
                             PRIMARY KEY (`id`),
                             KEY `document_ibfk_2` (`category_id`),
                             KEY `document_ibfk_4` (`author`),
+                            constraint document_specialized_id_fk foreign key (specialized_id) references specialized (id),
                             CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
                             CONSTRAINT `document_ibfk_1` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`),
                             CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`)

@@ -136,6 +136,9 @@ public class AuthenticationService {
         if (!user.isEnabled()) {
             throw new RuntimeException("User not activated");
         }
+        if (user.isAccountLocked()) {
+            throw new RuntimeException("User account locked");
+        }
         claims.put("staff_code", user.getUsername());
         claims.put("user_name", user.getName());
         claims.put("role", user.getRoles().getName());

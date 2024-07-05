@@ -47,6 +47,10 @@ public class DocumentResponseDTO {
 
     private Subject subject;
     
+    private Department department;
+    
+    private Specialized specialized; 
+    
     private Category category;
 
     private int views;
@@ -76,6 +80,8 @@ public class DocumentResponseDTO {
                 .author(document.getAuthor())
                 .category(document.getCategory())
                 .upload_date(document.getUploadDate())
+                .specialized(document.getSpecialized())
+                .department(document.getSpecialized().getDepartment())
                 .scope(document.getScope())
                 .status(document.getStatus())
                 .subject(document.getSubject())

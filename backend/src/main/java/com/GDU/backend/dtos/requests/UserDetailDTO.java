@@ -1,8 +1,5 @@
 package com.GDU.backend.dtos.requests;
 
-import com.GDU.backend.models.Department;
-import com.GDU.backend.models.Role;
-import com.GDU.backend.models.Specialized;
 import lombok.Builder;
 import lombok.Data;
 
@@ -26,4 +23,6 @@ public class UserDetailDTO {
     private LocalDateTime birthDay;
 
     private boolean enable;
+    
+    private String role;
 }
