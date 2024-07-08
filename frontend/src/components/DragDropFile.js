@@ -25,7 +25,6 @@ const DragDropFile = ({handleFiles, fileSupport}) => {
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFiles(e.dataTransfer.files);
-      // console.log(e.dataTransfer.files)
     }
   };
 
@@ -38,10 +37,15 @@ const DragDropFile = ({handleFiles, fileSupport}) => {
         e.target.files[0].type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           || fileSupport === "image"
       ) {
-        handleFiles(e.target.files);
+        if (e.target.files[0].size < 52428800) {
+          handleFiles(e.target.files);
+        }
+        else {
+          alert("Kiểu file tối đa 50MB")
+        }
       }
       else {
-        alert("File not supported")
+        alert("Định dạng file hiện đang chưa hỗ trợ")
       }
     }
   };

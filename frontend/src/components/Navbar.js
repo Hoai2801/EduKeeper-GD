@@ -27,7 +27,13 @@ const Navbar = () => {
         const [user, setUser] = useState(null);
 
         useEffect(() => {
-            fetch("http://localhost:8080/api/v1/specializes/count")
+            fetch("http://localhost:8080/api/v1/specializes/count", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Access-Control-Allow-Origin': '*',
+                },
+            })
                 .then((res) => res.json())
                 .then((data) => {
                     setSpecialized(data);
@@ -84,7 +90,7 @@ const Navbar = () => {
         const search = () => {
             localStorage.setItem('search', searchTerm);
             if (localStorage.getItem('search') !== null) {
-                window.location.href = `http://localhost:3000/search?filter=&order=lasted`;
+                window.location.href = `http://localhost:8080:3000/search?filter=&order=lasted`;
             }
         }
 
@@ -187,7 +193,7 @@ const Navbar = () => {
                                     Thể loại
                                 </p>
                                 <div
-                                    className={`w-fit p-5 absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border ${isShowCategory ? "" : "hidden"}`}
+                                    className={`w-[500px] h-[300px] overflow-scroll absolute top-[85px] translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowCategory ? "" : "hidden"}`}
                                     onMouseLeave={() => setIsShownCategory(false)}>
                                     {category && category?.map((item, index) => (
                                         <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index}

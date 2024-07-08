@@ -29,6 +29,7 @@ const Login = () => {
                 } else {
                     response.json()
                         .then(data => {
+                                console.log(data)
                         if (data.token !== undefined) {
                             localStorage.setItem("token", data.token);
                             window.location.href = "/";
@@ -67,7 +68,7 @@ const Login = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form className="space-y-5">
+                    <form className="space-y-5" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="staffCode" className="block text-sm font-medium text-gray-700">
                                 Mã giáo viên
@@ -123,6 +124,7 @@ const Login = () => {
                             </div>
                             <div className="text-sm">
                                 <button onClick={forgotPassword}
+                                        type={`button`}
                                         className="font-medium text-blue-600 hover:text-blue-500">
                                     Quên mật khẩu?
                                 </button>
@@ -135,7 +137,7 @@ const Login = () => {
 
                         <div>
                             <button
-                                type='button'
+                                type='submit'
                                 onClick={(e) => handleSubmit(e)}
                                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 Đăng nhập

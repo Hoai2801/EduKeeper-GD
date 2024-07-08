@@ -3,10 +3,8 @@ package com.GDU.backend.controllers;
 import com.GDU.backend.dtos.requests.AuthenticationRequest;
 import com.GDU.backend.dtos.requests.ChangePasswordRequest;
 import com.GDU.backend.dtos.requests.RegisterRequest;
-import com.GDU.backend.dtos.responses.AuthenticationResponse;
 import com.GDU.backend.services.Impl.AuthenticationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@CrossOrigin
 @Tag(name = "Authentication", description = "Auth API")
 public class AuthController {
     private final AuthenticationService authenticationService;

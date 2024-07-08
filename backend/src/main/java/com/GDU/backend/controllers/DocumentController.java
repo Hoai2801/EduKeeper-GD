@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.util.List;
 
-//@CrossOrigin
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor

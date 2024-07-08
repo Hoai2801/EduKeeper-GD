@@ -15,21 +15,28 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
 @CrossOrigin
-public class SecurityConfiguration {
+public class SecurityConfiguration implements WebMvcConfigurer {
     private final JwtAuthenticationFilter JwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*");
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -55,6 +62,13 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/v1/role/**"
                         ).hasAnyRole("ADMIN", "SUB-ADMIN")
+                        .requestMatchers(POST, 
+                                "/api/v1/users/**",
+                                "/api/v1/departments/**",
+                                "/api/v1/specializes",
+                                "/api/v1/subjects"
+                        )
+                        .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(DELETE, "api/v1/users/**")
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(
@@ -88,7 +102,6 @@ public class SecurityConfiguration {
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(JwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout.logoutUrl("/api/v1/auth/logout"))
                 .build();
     }
 }

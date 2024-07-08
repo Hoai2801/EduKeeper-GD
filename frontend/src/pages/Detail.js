@@ -21,7 +21,6 @@ const Detail = () => {
         const parts = url.split('/');
         // Get the last part of the URL
         const lastPart = parts[parts.length - 1];
-        console.log(lastPart)
         // Return the last part as the slug
         return lastPart;
     }
@@ -52,8 +51,6 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
-
                 setData(data)
             });
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
@@ -88,11 +85,9 @@ const Detail = () => {
 
     const fetchComment = () => {
         if (data) {
-            console.log(data)
             fetch('http://localhost:8080/api/v1/comments/' + data?.id)
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data)
                     setCommentList(data)
                 })
         }
@@ -233,8 +228,6 @@ const Detail = () => {
             }
         } else window.location.href = "/login";
     }
-
-    console.log(data)
 
     return (
         <div>

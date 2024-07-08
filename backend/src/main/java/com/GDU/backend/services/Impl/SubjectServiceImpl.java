@@ -31,22 +31,32 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public void createSubject(SubjectDTO subject) {
         String name = subject.getName();
+        Subject newSubject = new Subject();
+        newSubject.setSubjectName(name);
+        String normalized = Normalizer.normalize(subject.getName(), Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String slug = pattern.matcher(normalized)
+                .replaceAll("")
+                .toLowerCase()
+                .replace(" ", "-");
+        newSubject.setSubjectSlug(slug);
+        Subject savedSubject = subjectRepository.save(newSubject);
         for (Integer s : subject.getSpecializedIds()) {
-            System.out.println(s);
+            
             Specialized specialized = specializedService.getSpecializedById((long) s);
             if (specialized == null) {
                 continue;
             }
-            Subject newSubject = new Subject();
-            newSubject.setSubjectName(name);
-            String normalized = Normalizer.normalize(subject.getName(), Normalizer.Form.NFD);
-            Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-            String slug = pattern.matcher(normalized)
-                    .replaceAll("")
-                    .toLowerCase()
-                    .replace(" ", "-");
-            newSubject.setSubjectSlug(slug);
-            subjectRepository.save(newSubject);
+            SubjectSpecialized subjectSpecialized = SubjectSpecialized.builder()
+                    .subject(savedSubject)
+                    .specialized(specialized)
+                    .build();
+            List<SubjectSpecialized> exists = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(subjectSpecialized.getSubject().getId(), subjectSpecialized.getSpecialized().getSpecializedName());
+            // have a same subject in database
+            if (!exists.isEmpty()) {
+                continue;
+            }
+            subjectSpecializedRepository.save(subjectSpecialized);
         }
     }
 

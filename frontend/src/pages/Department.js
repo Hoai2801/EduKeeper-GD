@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import removeIcon from "../assets/logo192.png";
 import editIcon from "../assets/edit-246.png";
 import DepartmentItems from "../components/DepartmentItems";
@@ -11,6 +11,9 @@ const Department = () => {
     const [specialized, setSpecialized] = useState(null);
     const [isShowPostSpecialized, setIsShowPostSpecialized] = useState(false);
     const [activeDocumentId, setActiveDocumentId] = useState(null);
+
+    const [jwt, setJwt] = useState(null);
+
     const handleToggleDetails = (id) => {
         setActiveDocumentId((prevId) => (prevId === id ? null : id));
     };
@@ -24,12 +27,36 @@ const Department = () => {
         if (!specialized) {
             toast.error("Bạn đang để trống tên chuyên ngành !");
         } else {
+            const specializedDTO = {
+                departmentId: selectDepartment.id,
+                specializedName: specialized,
+            };
+            fetch('http://localhost:8080/api/v1/specializes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': 'Bearer ' + jwt
+                },
+                body: JSON.stringify(specializedDTO),
+            }).then((res) => res.text())
+                .then((data) => {
+                    console.log(data)
+                    if (data === "Create new specialized successfully") {
+                        toast.success(
+                            "Tạo chuyên ngành mới cho khoa " +
+                            selectDepartment.departmentName +
+                            " thành công."
+                        );
+                    } else {
+                        toast.error(
+                            "Lỗi hệ thống!, vui lòng thử lại sao!"
+                        );
+                    }
+                }).catch(e => {
+                toast.error(e);
+            })
             // Call api
-            toast.success(
-                "Tạo chuyên ngành mới cho khoa " +
-                selectDepartment.departmentName +
-                " thành công."
-            );
+
 
             setSpecialized("");
         }
@@ -41,6 +68,10 @@ const Department = () => {
             .then((data) => {
                 setDepartment(data);
             });
+        const token = localStorage.getItem("token");
+        if (token) {
+        setJwt(token);
+        }
     }, []);
     return (
         <div>

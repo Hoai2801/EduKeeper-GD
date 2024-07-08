@@ -52,7 +52,7 @@ export const Upload = () => {
 
     useEffect(() => {
         if (specialized) {
-            fetch('http://localhost:8080/api/v1/subjects/' + specialized?.id).then(response => response.json())
+            fetch('http://localhost:8080/api/v1/subjects/specialized/' + specialized?.id).then(response => response.json())
                 .then(data => {
                     console.log(data)
                     setListSubject(data)
@@ -82,7 +82,10 @@ export const Upload = () => {
         if (token !== "undefined" && token !== null) {
             setJwt(jwtDecode(token));
         } else window.location.href = "/";
-        if (path) {
+    }, [])
+
+    useEffect(() => {
+        if (path && path.slug) {
             fetch('http://localhost:8080/api/v1/documents/' + path.slug).then(response => response.json())
                 .then(data => {
                     console.log(data)
@@ -117,7 +120,7 @@ export const Upload = () => {
 
             fetchFile();
         }
-    }, [])
+    }, [path]);
 
     useEffect(() => {
         if (selectedDepartment) {
@@ -133,25 +136,60 @@ export const Upload = () => {
     }, [selectedDepartment])
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/v1/subjects/' + specialized?.id).then(response => response.json())
-            .then(data => {
-                setListSubject(data)
-            })
-            .catch(error => console.error(error));
+        if (specialized) {
+            fetch('http://localhost:8080/api/v1/subjects/specialized/' + specialized?.id).then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    setListSubject(data)
+                })
+                .catch(error => console.error(error));
+        }
     }, [specialized])
 
     const createDocument = (event) => {
         event.preventDefault();
+
+        // check data
+        if (selectedFile === null) {
+            alert("Vui lòng chọn tài liệu")
+            return
+        }
+        if (title === null || title === "") {
+            alert("Vui lòng nhập tiêu đề")
+            return
+        }
+        if (category === null || category === "") {
+            alert("Vui lòng chọn thể loại")
+            return
+        }
+        if (selectedDepartment === null || selectedDepartment === "") {
+            alert("Vui lòng chọn đơn vị")
+            return
+        }
+        if (specialized === null || specialized === "") {
+            alert("Vui lòng chọn chuyên ngành")
+            return
+        }
+        if (author === null || author === "") {
+            alert("Vui lòng nhập tên tác giả")
+            return
+        }
+        if (scope === null || scope === "") {
+            alert("Vui lòng chọn quyền riêng tư")
+            return
+        }
+
+
         const formData = new FormData();
         formData.append('document', selectedFile);
         formData.append('title', title);
         formData.append('department', selectedDepartment.id);
         formData.append('category', category);
         formData.append('description', description);
-        formData.append('subject', subject);
-        formData.append('specialized', specialized);
+        formData.append('subject', subject || -1);
+        formData.append('specialized', specialized?.id);
         formData.append('userUpload', jwt.staff_code);
-        formData.append('scope', scope);
+        formData.append('scope', scope || "public");
         formData.append('author', author);
 
         console.log(formData)
@@ -163,7 +201,6 @@ export const Upload = () => {
             }
         })
             .then(response => {
-                console.log(response)
                 if (response.status === 200) {
                     alert("Đăng tài liệu thành công")
                     setFile(null)
@@ -175,11 +212,13 @@ export const Upload = () => {
                     setSubject('')
                     setTitle('')
                     setScope(null)
-                    setAuthor(null)
+                    setAuthor("")
                 }
             })
             .catch(error => console.error(error));
     }
+
+    console.log(author)
 
     const updateDocument = (event) => {
         event.preventDefault();
@@ -246,7 +285,7 @@ export const Upload = () => {
                 <form>
                     <div className="mb-4">
                         <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
-                            Tên tài liệu
+                            Tên tài liệu <span className={`text-red-500`}>*</span>
                         </label>
                         <input type="text" id="name" name="name" placeholder="Báo cáo môn học ..." required
                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
@@ -257,7 +296,8 @@ export const Upload = () => {
 
                     <div className="max-w-sm mx-auto mb-3">
                         <label htmlFor="department"
-                               className="block mb-2 text-sm font-semibold text-gray-900">Khoa</label>
+                               className="block mb-2 text-sm font-semibold text-gray-900">Khoa <span
+                            className={`text-red-500`}>*</span></label>
                         <select id="department"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 onChange={event => {
@@ -281,7 +321,8 @@ export const Upload = () => {
                     </div>
                     <div className="max-w-sm mx-auto mb-3">
                         <label htmlFor="department"
-                               className="block mb-2 text-sm font-semibold text-gray-900">Ngành</label>
+                               className="block mb-2 text-sm font-semibold text-gray-900">Ngành <span
+                            className={`text-red-500`}>*</span></label>
                         <select id="department"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 onChange={e => setSpecialized(JSON.parse(e.target.value))}
@@ -299,13 +340,13 @@ export const Upload = () => {
                     </div>
                     <div className="max-w-sm mx-auto mb-3">
                         <label htmlFor="department" className="block mb-2 text-sm font-semibold text-gray-900">Thể
-                            loại</label>
+                            loại <span className={`text-red-500`}>*</span></label>
                         <select id="department"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 onChange={e => setCategory(e.target.value)}
                                 value={category}
                         >
-                            <option>Chọn thể loại</option>
+                            <option value={null}>Chọn thể loại</option>
                             {
                                 Array.isArray(listCategory) && listCategory.map(category => (
                                     <option value={category.id} key={category.id}>{category.categoryName}</option>
@@ -319,7 +360,7 @@ export const Upload = () => {
                         <select id="department"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 onChange={e => setSubject(e.target.value)}>
-                            <option>Chọn môn</option>
+                            <option value={null}>Chọn môn</option>
                             {
                                 Array.isArray(listSubject) && listSubject.map(subject => (
                                     <option value={subject.id} key={subject.id}>{subject.subjectName}</option>
@@ -329,13 +370,14 @@ export const Upload = () => {
                     </div>
                     <div className="max-w-sm mx-auto mb-3">
                         <label htmlFor="department"
-                               className="block mb-2 text-sm font-semibold text-gray-900">Quyền riêng tư</label>
+                               className="block mb-2 text-sm font-semibold text-gray-900">Quyền riêng tư <span
+                            className={`text-red-500`}>*</span></label>
                         <select id="department"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 onChange={e => setScope(e.target.value)}
                                 value={scope}
                         >
-                            <option>Chọn quyền riêng tư</option>
+                            <option value={""}>Chọn quyền riêng tư</option>
                             {
                                 scopeList.map((scope, index) => (
                                     <option value={scope.scope} key={index}>{scope.name}</option>
@@ -345,14 +387,17 @@ export const Upload = () => {
                     </div>
                     <div className="mb-4">
                         <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Giáo
-                            viên</label>
+                            viên <span className={`text-gray-400`}>(Người đăng tài liệu)</span></label>
                         <input type="text" id="teacher" name="teacher" placeholder="" required
                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
                                disabled
                                value={jwt?.user_name}/>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Tác giả</label>
+                        <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Tác giả <span
+                            className={`text-red-500`}>*</span>
+                            <span className={`text-gray-400 block text-xs`}>(Tác giả của tài liệu. vd: Thạc sĩ Nguyễn Văn A, Adam Freeman...)</span>
+                        </label>
                         <input type="text" id="teacher" name="teacher" placeholder="" required
                                onChange={e => setAuthor(e.target.value)}
                                value={author}

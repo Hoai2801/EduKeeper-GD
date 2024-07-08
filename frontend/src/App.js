@@ -24,6 +24,7 @@ import DeletedDocument from "./pages/ListDocsDeleted";
 import BannerManager from "./pages/BannerManager";
 import {useEffect, useState} from "react";
 import {jwtDecode} from "jwt-decode";
+import Subject from "./pages/Subject";
 
 function App() {
     window.scrollTo(0, 0);
@@ -86,6 +87,7 @@ function App() {
                 <Route path="users" element={<User/>}/>
                 <Route path="department" element={<Department/>}/>
                 <Route path="document" element={<Document/>}/>
+                <Route path="subject" element={<Subject />}/>
                 <Route path="banner" element={<BannerManager/>}/>
                 <Route path="deleted" element={<DeletedDocument/>}/>
             </Route>
