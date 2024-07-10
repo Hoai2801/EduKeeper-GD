@@ -27,14 +27,38 @@ const Home = () => {
     }
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/v1/view-history/top-documents/9').then(res => res?.json()).then(data => {
+        fetch('http://localhost:8080/api/v1/view-history/top-documents/9', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+        }).then(res => res?.json()).then(data => {
             setMostViewed(data)
         })
-        fetch('http://localhost:8080/api/v1/documents/most-downloaded?limit=9').then(res => res?.json()).then(data => setMostDownloaded(data))
-        fetch('http://localhost:8080/api/v1/documents/latest?limit=9').then(res => res?.json()).then(data => {
+        fetch('http://localhost:8080/api/v1/documents/most-downloaded?limit=9', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+        }).then(res => res?.json()).then(data => setMostDownloaded(data))
+        fetch('http://localhost:8080/api/v1/documents/latest?limit=9', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+        }).then(res => res?.json()).then(data => {
             setLastedDocuments(data)
         })
-        fetch('http://localhost:8080/api/v1/banners')
+        fetch('http://localhost:8080/api/v1/banners', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                'Access-Control-Allow-Origin': '*',
+            },
+        })
             .then(res => res?.json())
             .then(data => {
                 setBanner(data)
@@ -60,15 +84,21 @@ const Home = () => {
 
     return (
         <div>
-            <div className={`w-full h-[300px] fit md:h-[600px] ${banner?.length === 0 ? "hidden" : "block"}`}>
-                {banner?.map((banner, index) => (
-                    <a href={banner?.url?.includes('http') ? banner?.url : banner.url !== null ? `https://${banner?.url}` : ''}
-                       className={`${banner?.url === null ? "" : "disabled"}`}>
+            <div className={`w-full h-fit md:h-[600px] ${banner?.length === 0 ? "hidden" : "block"} relative`}>
+                {banner?.map((banner, index) => {
+                    console.log(banner.url);
+                    return (
+                    <a href={banner?.url?.includes('http') || banner?.url?.includes('https') ? banner?.url : banner.url !== null ? `https://${banner?.url}` : ''}>
                         <img src={`http://localhost:8080/api/v1/images/banner/${banner.image}`} alt=""
                              className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 md:rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
                         />
                     </a>
-                ))}
+                )})}
+                    <div className={`w-full flex justify-center ${banner?.length === 0 || banner?.length === 1 ? "hidden" : "block"} flex gap-2 absolute bottom-5 right-0`}>
+                        {banner?.map((banner, index) => (
+                            <button onClick={() => setIndexBanner(index)} className={`${index === indexBanner ? "bg-gray-700" : "bg-gray-400"} w-3 h-3 rounded-full mt-5`}></button>
+                        ))}
+                    </div>
             </div>
             <div
                 className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2'>

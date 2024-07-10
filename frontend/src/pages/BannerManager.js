@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import DragDropFile from "../components/DragDropFile";
 
-const BannerManager = () => {
+const BannerManager = ({jwt}) => {
     const [bannerList, setBannerList] = useState([]);
 
     const [isEditShow, setIsEditShow] = useState(false);
@@ -25,7 +25,7 @@ const BannerManager = () => {
 
     const handleDelete = (id) => {
         fetch('http://localhost:8080/api/v1/banners/' + id, {
-            method: "DELETE",
+            method: "DELETE"
         })
             .then((res) => res.text())
             .then((data) => {

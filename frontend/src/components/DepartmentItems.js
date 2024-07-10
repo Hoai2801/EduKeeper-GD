@@ -1,19 +1,61 @@
 import React, { useEffect, useState } from "react";
 import "./editDocs.css";
 import toast from "react-hot-toast";
-const DepartmentItems = ({ isActive, id }) => {
+const DepartmentItems = ({ isActive, id , dep}) => {
     const [items, setItems] = useState([]);
     const [isEdit, setIsEdit] = useState(false);
     const [itemEdit, setItemEdit] = useState(null);
+    const [newName, setNewName] = useState(null);
 
     const hanldeClickEdit = (specialized) => {
+        console.log(jwt)
+        setNewName(specialized.specializedName)
         setIsEdit(true);
         setItemEdit(specialized);
     };
 
-    const handleEditSpecialized = (id, name) => {
-        toast.error("Hiện tại tính năng này đang trong quá trình phát triển!");
-    };
+    const [jwt, setJwt] = useState(null);
+    useEffect(() => {
+        const jwt = localStorage.getItem("token");
+        if (jwt) {
+            setJwt(jwt);
+        }
+    }, [jwt]);
+
+    console.log(jwt)
+
+    const handleEditSpecialized = () => {
+                const specializedDTO = {
+                    specializedName: newName,
+                    departmentId: itemEdit.department.id
+                };
+                console.log(specializedDTO)
+                fetch(
+                    "http://localhost:8080/api/v1/specializes/" + itemEdit.id,
+                    {
+                        method: "PUT",
+                        headers: {"Content-Type": "application/json",
+                            "authorization": "Bearer " + jwt
+                        },
+                        body: JSON.stringify({
+                            specializedName: newName,
+                            departmentId: itemEdit.department.id
+                        }),
+                    }
+                ).then((res ) => res.text())
+                    .then((data) => {
+                        console.log(data)
+                        if (data === "Update specialized successfully") {
+                            toast.success("Chỉnh sửa chuyên ngành này.");
+                        } else {
+                            const errorResponse = data;
+                            toast.error("Error: " + (errorResponse.message || "Unknown error"));
+                        }
+                    })
+                    .catch((e) => {
+                        toast.error(e);
+                    });
+    }
 
     useEffect(() => {
         fetch(`http://localhost:8080/api/v1/specializes/department/${id}`)
@@ -66,8 +108,8 @@ const DepartmentItems = ({ isActive, id }) => {
                                         placeholder="Tên chuyên ngành ..."
                                         required
                                         className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-                                        value={itemEdit.specializedName}
-                                        onChange={(e) => setItemEdit(e.target.value)}
+                                        value={newName}
+                                        onChange={(e) => setNewName(e.target.value)}
                                     />
                                 </div>
                             </form>

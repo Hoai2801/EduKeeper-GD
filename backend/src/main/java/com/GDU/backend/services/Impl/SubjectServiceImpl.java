@@ -75,4 +75,15 @@ public class SubjectServiceImpl implements SubjectService {
         return subjectRepository.findById(id).orElse(null);
     }
 
+    @Override
+    public void deleteSubject(Long id) {
+        Subject subject = getSubjectById(id);
+        if (subject == null) {
+            return;
+        }
+        List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectSpecializedBySubjectId(subject.getId());
+        subjectSpecializedRepository.deleteAll(subjectSpecializeds);
+        subjectRepository.deleteById(id);
+    }
+
 }

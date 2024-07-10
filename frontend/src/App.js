@@ -88,7 +88,7 @@ function App() {
                 <Route path="department" element={<Department/>}/>
                 <Route path="document" element={<Document/>}/>
                 <Route path="subject" element={<Subject />}/>
-                <Route path="banner" element={<BannerManager/>}/>
+                <Route path="banner" element={<BannerManager jwt={jwt}/>}/>
                 <Route path="deleted" element={<DeletedDocument/>}/>
             </Route>
         </Routes>

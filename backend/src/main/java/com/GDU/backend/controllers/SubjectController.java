@@ -29,4 +29,10 @@ public class SubjectController {
         subjectService.createSubject(subject);
         return ResponseEntity.ok().body("Subject created successfully");
     }
+    
+    @DeleteMapping("/{id}")
+    ResponseEntity<?> deleteSubject(@PathVariable("id") Long id) {
+        subjectService.deleteSubject(id);
+        return ResponseEntity.ok().body("Subject deleted successfully");
+    }
 }

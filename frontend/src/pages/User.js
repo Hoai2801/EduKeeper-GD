@@ -14,7 +14,7 @@ const User = () => {
     username: '',
     email: '',
     password: '',
-    roles: 'USER' // Default role is 'user'
+    roles: 'ROLE_USER' // Default role is 'user'
   });
 
   const [editUser, setEditUser] = useState({
@@ -22,7 +22,7 @@ const User = () => {
     username: '',
     email: '',
     password: '',
-    role: 'USER' // Default role is 'user'
+    role: 'ROLE_USER' // Default role is 'user'
   });
 
   // Handle form input change

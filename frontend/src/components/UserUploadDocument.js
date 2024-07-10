@@ -36,7 +36,7 @@ const UserUploadDocument = () => {
             <div className={`flex flex-wrap gap-5 mt-5`}>
                 {documentList.length === 0 ? <div className={`w-full mt-10`}>Không có tài liệu</div> : null}
                 {documentList?.map((item, index) => (
-                    <div className={`relative`}>
+                    <div className={`relative ${item._delete ? "hidden" : ""}`}>
                         <div
                             className={`absolute top-0 right-0 rounded-lg p-2 m-4 text-white ${item.status !== "Draft" ? "hidden" : "bg-red-500"}`}>
                             Chưa duyệt

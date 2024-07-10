@@ -17,4 +17,7 @@ public interface SubjectSpecializedRepository extends JpaRepository<SubjectSpeci
 
     @Query("SELECT s FROM SubjectSpecialized s WHERE s.specialized.id = :specializedId AND s.subject.subjectName = :subjectName")
     List<SubjectSpecialized> getSubjectSpecializedBySpecializedAndSubject(Long specializedId, String subjectName);
+
+    @Query("SELECT s FROM SubjectSpecialized s WHERE s.subject.id = :id")
+    List<SubjectSpecialized> getSubjectSpecializedBySubjectId(Long id);
 }

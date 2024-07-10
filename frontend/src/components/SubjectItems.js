@@ -98,6 +98,32 @@ const SubjectItems = ({ isActive, dep }) => {
                 setSpecialized(data);
             });
     }, []);
+
+    const [jwt, setJwt] = useState(null);
+    useEffect(() => {
+        const jwt = localStorage.getItem("token");
+        setJwt(jwt);
+    }, []);
+
+    function removeSubjectWithId(id) {
+        if (window.confirm("Bạn có xác nhận xóa môn học này không?")) {
+
+        fetch(`http://localhost:8080/api/v1/subjects/${id}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': 'Bearer ' + jwt,
+            },
+        })
+            .then((res) => res.text())
+            .then((data) => {
+                console.log(data)
+                if (data === "Subject deleted successfully") {
+                    setItems(items.filter((item) => item.id !== id));
+                }
+            });
+        }
+    }
+
     return (
         <div>
             {isActive && (
@@ -115,7 +141,7 @@ const SubjectItems = ({ isActive, dep }) => {
                                             Đổi tên
                                         </button>
                                         <button
-                                            onClick={() => hanldeClickEdit(item)}
+                                            onClick={() => removeSubjectWithId(item.id)}
                                             className=" font-medium text-red-600 hover:underline hover:cursor-pointer"
                                         >
                                             Gỡ

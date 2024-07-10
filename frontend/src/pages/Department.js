@@ -99,6 +99,7 @@ const Department = () => {
                             <DepartmentItems
                                 isActive={activeDocumentId == dep.id}
                                 id={activeDocumentId}
+                                dep={dep}
                             />
                         )}
                     </div>

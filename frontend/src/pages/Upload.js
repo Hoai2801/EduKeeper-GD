@@ -54,7 +54,6 @@ export const Upload = () => {
         if (specialized) {
             fetch('http://localhost:8080/api/v1/subjects/specialized/' + specialized?.id).then(response => response.json())
                 .then(data => {
-                    console.log(data)
                     setListSubject(data)
                 })
                 .catch(error => console.error(error));
@@ -96,7 +95,7 @@ export const Upload = () => {
                     setSpecialized(data.specialized)
                     setSelectedDepartment(data.specialized.department)
                     setCategory(data.category.id)
-                    setSubject(data.subject.id)
+                    setSubject(data.subject?.id)
                     setDocumentEdit(data)
                 })
                 .catch(error => console.error(error));
@@ -126,7 +125,6 @@ export const Upload = () => {
         if (selectedDepartment) {
         fetch('http://localhost:8080/api/v1/specializes/department/' + selectedDepartment?.id).then(data => data.json())
             .then(data => {
-                console.log(data)
                 if (data.length > 0) {
                     setListSpecialized(data)
                 }
@@ -139,7 +137,6 @@ export const Upload = () => {
         if (specialized) {
             fetch('http://localhost:8080/api/v1/subjects/specialized/' + specialized?.id).then(response => response.json())
                 .then(data => {
-                    console.log(data)
                     setListSubject(data)
                 })
                 .catch(error => console.error(error));
@@ -218,8 +215,6 @@ export const Upload = () => {
             .catch(error => console.error(error));
     }
 
-    console.log(author)
-
     const updateDocument = (event) => {
         event.preventDefault();
         const formData = new FormData();
@@ -232,8 +227,7 @@ export const Upload = () => {
         formData.append('userUpload', jwt.staff_code);
         formData.append('scope', scope);
         formData.append('author', author);
-        console.log(formData)
-        console.log(bearToken)
+        console.log(documentEdit)
         fetch('http://localhost:8080/api/v1/documents/' + documentEdit?.id, {
             method: 'PUT',
             body: formData,

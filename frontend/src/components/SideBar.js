@@ -44,9 +44,10 @@ const SideBar = () => {
   useEffect(() => {
     if (specialized) {
       console.log(specialized.id);
-      fetch("http://localhost:8080/api/v1/subjects/" + specialized.id)
+      fetch("http://localhost:8080/api/v1/subjects/specialized/" + specialized.id)
         .then((response) => response.json())
         .then((data) => {
+          console.log(data)
           setSubjectList(data);
         });
     }

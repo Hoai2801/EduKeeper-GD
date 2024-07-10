@@ -120,7 +120,6 @@ const Subject = () => {
         if (isCheck) {
             toast.error("Chuyên ngành này đã được thêm vào danh sách trên.");
         } else {
-            console.log(spe)
             setListSpeciaziles((prevList) => [...prevList, spe]);
             setIsShowSpecialized(true);
         }
@@ -153,7 +152,7 @@ const Subject = () => {
         if (token !== "undefined" && token !== null) {
             setJwt(token);
         }
-    }, []);
+    }, [listSpeciaziles]);
 
     return (
         <div>

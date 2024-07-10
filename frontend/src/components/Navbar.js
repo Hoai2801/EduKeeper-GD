@@ -31,7 +31,7 @@ const Navbar = () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    'Access-Control-Allow-Origin': '*',
+                    // 'Access-Control-Allow-Origin': '*',
                 },
             })
                 .then((res) => res.json())
@@ -77,7 +77,6 @@ const Navbar = () => {
         const logout = () => {
             fetch('http://localhost:8080/api/v1/auth/logout', {
                 method: 'POST',
-                credentials: 'include',
             })
                 .then((data) => {
                     if (data.status === 200) {
@@ -90,43 +89,49 @@ const Navbar = () => {
         const search = () => {
             localStorage.setItem('search', searchTerm);
             if (localStorage.getItem('search') !== null) {
-                window.location.href = `http://localhost:8080:3000/search?filter=&order=lasted`;
+                window.location.href = `http://localhost/search?filter=&order=lasted`;
             }
         }
 
         const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+        const getNotification = () => {
+            fetch('http://localhost:8080/api/v1/notifications/user/' + user.staffCode)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data)
+                    // console.log(data)
+                    setNotification(data);
+                    let uncheckedCount = 0;
+
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i]._check === false) {
+                            uncheckedCount++;
+                        }
+
+                        // Stop counting if unchecked notifications reach 10
+                        if (uncheckedCount >= 10) {
+                            setIsHasNotification("9+");
+                            break;
+                        }
+                    }
+
+                    // If the loop completes and there are less than 10 unchecked notifications
+                    if (uncheckedCount < 10) {
+                        setIsHasNotification(uncheckedCount);
+                    }
+                });
+        }
+
         const POLLING_INTERVAL = 30000; // 30 seconds
         useEffect(() => {
             if (user) {
-            const intervalId = setInterval(() => {
-                fetch('http://localhost:8080/api/v1/notifications/user/' + user.staffCode)
-                    .then((res) => res.json())
-                    .then((data) => {
-                        // console.log(data)
-                        setNotification(data);
-                        let uncheckedCount = 0;
+                getNotification();
+                const intervalId = setInterval(() => {
+                    getNotification()
 
-                        for (let i = 0; i < data.length; i++) {
-                            if (data[i]._check === false) {
-                                uncheckedCount++;
-                            }
-
-                            // Stop counting if unchecked notifications reach 10
-                            if (uncheckedCount >= 10) {
-                                setIsHasNotification("9+");
-                                break;
-                            }
-                        }
-
-                        // If the loop completes and there are less than 10 unchecked notifications
-                        if (uncheckedCount < 10) {
-                            setIsHasNotification(uncheckedCount);
-                        }
-                    });
-
-            }, POLLING_INTERVAL);
-            return () => clearInterval(intervalId); // Cleanup on component unmount
+                }, POLLING_INTERVAL);
+                return () => clearInterval(intervalId); // Cleanup on component unmount
             }
         }, [user]);
 
@@ -193,7 +198,7 @@ const Navbar = () => {
                                     Thể loại
                                 </p>
                                 <div
-                                    className={`w-[500px] h-[300px] overflow-scroll absolute top-[85px] translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowCategory ? "" : "hidden"}`}
+                                    className={`w-[300px] h-fit overflow-scroll absolute top-[85px] translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowCategory ? "" : "hidden"}`}
                                     onMouseLeave={() => setIsShownCategory(false)}>
                                     {category && category?.map((item, index) => (
                                         <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index}
@@ -240,7 +245,9 @@ const Navbar = () => {
                     </form>
                     <>
                         <div className="flex gap-5 justify-end w-[500px]">
-                            <button onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                            <button onClick={() => {
+                                setIsNotificationOpen(!isNotificationOpen)
+                            }}
                                     className={`relative`}>
                                 <div className={`w-8 h-8 flex`}>
                                     <img src={bell} alt="" className={`w-full h-full`}/>
@@ -249,7 +256,7 @@ const Navbar = () => {
                                     className={`bg-red-500 rounded-full w-fit h-5 absolute text-white p-1 text-[10px] top-0 right-[-10px] ${isHasNotification ? "block" : "hidden"}`}>{isHasNotification}</div>
                             </button>
                             <div
-                                className={`${isNotificationOpen ? "block" : "hidden"} flex flex-col gap-2 absolute top-[85px] md:right-[80px] bg-white rounded-lg shadow-lg w-[400px] h-fit max-h-[300px] overflow-scroll`}
+                                className={`${isNotificationOpen ? "block" : "hidden"} z-50 flex flex-col gap-2 absolute top-[85px] md:right-[80px] right-0 bg-white rounded-lg shadow-lg md:w-[400px] w-[90%] h-fit max-h-[300px] overflow-scroll`}
                                 onMouseLeave={() => {
                                     setIsNotificationOpen(!isNotificationOpen)
                                     checkNotification()
@@ -284,7 +291,8 @@ const Navbar = () => {
                                             </Link>
                                             {/*<Link to={`/profile/${jwt?.staff_code}/setting`}*/}
                                             {/*      className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>*/}
-                                            <Link to={`/dashboard/home`} className={`${jwt?.role === "ROLE_ADMIN" || jwt?.role === "ROLE_SUB-ADMIN" ? "block" : "hidden"} hover:bg-blue-300 w-full h-[50px]`}>
+                                            <Link to={`/dashboard/home`}
+                                                  className={`${jwt?.role === "ROLE_ADMIN" || jwt?.role === "ROLE_SUB-ADMIN" ? "block" : "hidden"} hover:bg-blue-300 w-full h-[50px]`}>
                                                 Admin
                                             </Link>
                                             <Link onClick={() => logout()} className="hover:bg-blue-300 w-full h-[50px]">
@@ -335,6 +343,10 @@ const Navbar = () => {
                                         onMouseEnter={() => setIsShownSpecialized(false)}
                                     >
                                         Trang chủ
+                                    </Link>
+                                    <Link to={`/dashboard/home`}
+                                          className={`${jwt?.role === "ROLE_ADMIN" || jwt?.role === "ROLE_SUB-ADMIN" ? "block" : "hidden"}`}>
+                                        Admin
                                     </Link>
                                     <div className="flex flex-col gap-3 items-center">
                                         <button onClick={() => setIsShownSpecialized(!isShowSpecialized)}
