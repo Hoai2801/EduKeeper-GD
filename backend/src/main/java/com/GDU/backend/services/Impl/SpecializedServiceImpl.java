@@ -5,12 +5,15 @@ import com.GDU.backend.dtos.responses.SpecializesWithCount;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.Department;
 import com.GDU.backend.models.Specialized;
+import com.GDU.backend.models.SubjectSpecialized;
 import com.GDU.backend.repositories.DepartmentRepository;
 import com.GDU.backend.repositories.SpecializedRepository;
+import com.GDU.backend.repositories.SubjectSpecializedRepository;
 import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.SpecializedService;
 import jakarta.persistence.NonUniqueResultException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
@@ -24,6 +27,7 @@ public class SpecializedServiceImpl implements SpecializedService {
     private final SpecializedRepository specializedRepository;
     private final DocumentService documentService;
     private final DepartmentRepository departmentRepository;
+    private final SubjectSpecializedRepository subjectSpecializedRepository;
 
     @Override
     public List<Specialized> getSpecializes() {
@@ -49,7 +53,6 @@ public class SpecializedServiceImpl implements SpecializedService {
                 SpecializesWithCount specializesWithCount = new SpecializesWithCount();
                 specializesWithCount.setSpecialized(specialized);
                 int count = documentService.getDocumentsCountBySpecialized(specialized.getId());
-                // specializesWithCount.setDocumentsCount(documentService.getDocumentsCountBySpecialized(specialized.getId()));
                 specializesWithCount.setDocumentsCount(count);
                 result.add(specializesWithCount);
             }
@@ -65,7 +68,7 @@ public class SpecializedServiceImpl implements SpecializedService {
     }
 
     @Override
-    public String updateSpecializedById(Long id, SpecializedDTO specializedDTO) {
+    public ResponseEntity<String> updateSpecializedById(Long id, SpecializedDTO specializedDTO) {
         try {
             Specialized existSpecialized = specializedRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
@@ -75,14 +78,14 @@ public class SpecializedServiceImpl implements SpecializedService {
             existSpecialized.setSpecializedSlug(createSlug(specializedDTO.getSpecializedName()));
             existSpecialized.setDepartment(existDepartment);
             specializedRepository.save(existSpecialized);
-            return "Update specialized successfully";
+            return ResponseEntity.ok("Cập nhật chuyên ngành thành công");
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method 'updateSpecializedById'" + e.getMessage());
         }
     }
 
     @Override
-    public String createSpecialized(SpecializedDTO specializedDTO) {
+    public ResponseEntity<String> createSpecialized(SpecializedDTO specializedDTO) {
         try {
             String slug = createSlug(specializedDTO.getSpecializedName());
             Department existDepartment = departmentRepository.findById(specializedDTO.getDepartmentId())
@@ -91,9 +94,43 @@ public class SpecializedServiceImpl implements SpecializedService {
                     .department(existDepartment).specializedSlug(slug)
                     .build();
             specializedRepository.save(newSpecialized);
-            return "Create new specialized successfully";
+            return ResponseEntity.ok("Tạo chuyên ngành thành công");
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method 'updateSpecializedById'" + e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> deleteSpecializedById(Long id) {
+        try {
+            Specialized existSpecialized = specializedRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
+            List<SubjectSpecialized> subjectSpecializedList = subjectSpecializedRepository.getSubjectsBySpecializedId(id);
+            if (!subjectSpecializedList.isEmpty()) {
+                return ResponseEntity.badRequest().body("Chuyên ngành đang được sử dụng và có môn học");
+            }
+            specializedRepository.delete(existSpecialized);
+            return ResponseEntity.ok("Xoá chuyên ngành thành công");
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method 'deleteSpecializedById'" + e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> lockSpecializedById(Long id) {
+        try {
+            Specialized existSpecialized = specializedRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
+            if (existSpecialized.isLocked()) {
+                existSpecialized.setLocked(false);
+                specializedRepository.save(existSpecialized);
+                return ResponseEntity.ok("Mở khoá chuyên ngành thành công");
+            }
+            existSpecialized.setLocked(true);
+            specializedRepository.save(existSpecialized);
+            return ResponseEntity.ok("Khoá chuyên ngành thành công");
+        } catch (Exception e) {
+            throw new UnsupportedOperationException("Unimplemented method 'lockSpecializedById'" + e.getMessage());
         }
     }
 

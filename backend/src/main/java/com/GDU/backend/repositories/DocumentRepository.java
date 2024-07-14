@@ -55,30 +55,27 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query(value = "SELECT d.* FROM document d JOIN specialized s ON s.id = d.specialized_id where s.specialized_slug like %:slug%", nativeQuery = true)
     List<Document> getDocumentsBySlugSpecialized(@Param("slug") String slug);
 
-    @Query(value = "SELECT d.* FROM document d " +
-            "JOIN subject_specialized ss ON ss.subject_id = d.subject_id " +
-            "JOIN specialized s ON s.id = ss.specialized_id " +
+    @Query(value = "SELECT DISTINCT d.* FROM document d " +
+            "JOIN specialized s ON s.id = d.specialized_id " +
             "JOIN category c ON c.id = d.category_id " +
-            "JOIN subject sj ON sj.id = d.subject_id " +
+            "LEFT JOIN subject sj ON sj.id = d.subject_id " +
             "JOIN department dm ON dm.id = s.department_id " +
-            "WHERE d.status = 'published' "
-            + " AND (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%'))"
-            +
-            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%'))  OR (d.author LIKE CONCAT('%', :searchTerm, '%')))"
-            +
-            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%'))"
-            +
-            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%'))"
-            +
-            "AND (:dateTime IS NULL OR d.upload_date LIKE CONCAT('%', COALESCE(:dateTime, ''), '%'))"
-            +
-            "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) ", nativeQuery = true)
+            "WHERE d.status = 'published' " +
+            "AND (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%')) " +
+            "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%') OR d.author LIKE CONCAT('%', :searchTerm, '%'))) " +
+            "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%')) " +
+            "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) " +
+            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%') OR d.subject_id IS NULL) " +
+            "AND (:dateTime IS NULL OR d.upload_date LIKE CONCAT('%', COALESCE(:dateTime, ''), '%'))",
+            nativeQuery = true)
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,
                                         @Param("subjectName") String subjectName,
                                         @Param("specializedSlug") String specializedSlug,
                                         @Param("categoryName") String categoryName,
                                         @Param("dateTime") String dateTime);
+
+
 
 
     // Get total number of documents this year
@@ -106,7 +103,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("select d from Document d where d.userUpload.id = :id")
     List<Document> findAllByAuthorId(Long id);
 
-    @Query("SELECT COUNT(d) FROM Document d JOIN SubjectSpecialized ss ON d.subject.id = ss.subject.id WHERE ss.specialized.id = :id and d.status = 'published' and d.isDelete = false and d.scope != 'private'")
+    @Query("SELECT COUNT(d) FROM Document d JOIN Specialized s ON d.specialized.id = s.id WHERE s.id = :id and d.status = 'published' and d.isDelete = false and d.scope != 'private'")
     int findAllBySpecializedId(Long id);
 
     @Query(value = "SELECT * FROM document d WHERE d.status = 'draft' and is_delete = 0", nativeQuery = true)

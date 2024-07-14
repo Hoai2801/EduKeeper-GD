@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,11 +43,11 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT", "OPTIONS", "PATCH", "DELETE"));
+        corsConfiguration.setAllowedOrigins(List.of("http://103.241.43.206:3000", "http://localhost:3000"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfiguration.setAllowCredentials(true);
         return http
-                .cors(corsSpec -> corsSpec.configurationSource(request -> corsConfiguration))
+                .cors((cors) -> cors.configurationSource(request -> corsConfiguration))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(
@@ -63,13 +64,20 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 "/api/v1/role/**"
                         ).hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(POST, 
-                                "/api/v1/users/**",
-                                "/api/v1/departments/**",
                                 "/api/v1/specializes",
                                 "/api/v1/subjects"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
-                        .requestMatchers(DELETE, "api/v1/users/**")
+                        .requestMatchers(PUT, 
+                                "/api/v1/departments/**"
+                        )
+                        .hasAnyRole("ADMIN", "SUB-ADMIN")
+                        .requestMatchers(DELETE, 
+                                "/api/v1/users/**",
+                                "/api/v1/subjects/**",
+                                "/api/v1/specializes/**",
+                                "/api/v1/departments/**"
+                        )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(
                                 "/api/v1/documents/upload"
@@ -79,13 +87,12 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 "/api/v1/documents/filter",
                                 "/api/v1/favorites/**",
                                 "/api/v1/downloads/**",
-                                "/api/v1/notifications/**",
                                 "/api/v1/documents/**",
-                                "/api/v1/users/avatar/**",
                                 "/api/v1/view-history",
                                 "/api/v1/banners/**",
                                 "/api/v1/comments/**",
-                                "/api/v1/users/**"
+                                "/api/v1/users/**",
+                                "/api/v1/specializes/**"
                         ).permitAll()
                         .requestMatchers(GET).permitAll()
                 )

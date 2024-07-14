@@ -96,7 +96,7 @@ const SignUp = () => {
                     <form className="space-y-6" action="#" method="POST">
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                                Họ và tên
+                                Họ và tên <span className={`text-red-500`}>*</span>
                             </label>
                             <div className="mt-1">
                                 <input id="fullName" name="fullName" type="text" autoComplete="name" required
@@ -109,7 +109,7 @@ const SignUp = () => {
                         </div>
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                                Mã số sinh viên
+                                Mã số sinh viên <span className={`text-red-500`}>*</span>
                             </label>
                             <div className="mt-1">
                                 <input id="fullName" name="fullName" type="text" autoComplete="name" required
@@ -122,7 +122,7 @@ const SignUp = () => {
                         </div>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Địa chỉ Gmail
+                                Địa chỉ Gmail sinh viên <span className={`text-red-500`}>*</span>
                             </label>
                             <div className="mt-1">
                                 <input id="email" name="email" type="email" autoComplete="email" required
@@ -135,7 +135,8 @@ const SignUp = () => {
                         </div>
                         <div className="max-w-sm mx-auto mb-3">
                             <label htmlFor="department"
-                                   className="block mb-2 text-sm text-gray-700">Khoa</label>
+                                   className="block mb-2 text-sm text-gray-700">Khoa <span
+                                className={`text-red-500`}>*</span></label>
                             <select id="department"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                     onChange={event => {
@@ -148,14 +149,16 @@ const SignUp = () => {
                                 <option>Chọn khoa</option>
                                 {
                                     listDepartment?.map(dep => (
-                                        <option value={JSON.stringify(dep)} key={dep.id}>{dep.departmentName}</option>
+                                        // hidden the 'tất cả' department
+                                        <option value={JSON.stringify(dep)} key={dep.id} className={`${dep.id === 18 ? 'hidden' : ''}`}>{dep.departmentName}</option>
                                     ))
                                 }
                             </select>
                         </div>
                         <div className="max-w-sm mx-auto mb-3">
                             <label htmlFor="department"
-                                   className="block mb-2 text-sm text-gray-700">Ngành</label>
+                                   className="block mb-2 text-sm text-gray-700">Ngành <span
+                                className={`text-red-500`}>*</span></label>
                             <select id="department"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                     onChange={e => setSelectedSpecialized(e.target.value)}>
@@ -163,14 +166,16 @@ const SignUp = () => {
                                 {
                                     Array.isArray(listSpecialized) && listSpecialized.map(specialized => (
                                         <option value={specialized.id}
-                                                key={specialized.id}>{specialized.specializedName}</option>
+                                                key={specialized.id}>
+                                            {specialized.specializedName}
+                                        </option>
                                     ))
                                 }
                             </select>
                         </div>
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                                Lớp
+                                Lớp <span className={`text-red-500`}>*</span>
                             </label>
                             <div className="mt-1">
                                 <input id="fullName" name="fullName" type="text" autoComplete="name" required
@@ -184,7 +189,7 @@ const SignUp = () => {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Mật khẩu
+                                Mật khẩu <span className={`text-red-500`}>*</span>
                             </label>
                             <div className="mt-1">
                                 <input id="password" name="password" type="password" autoComplete="new-password"
@@ -198,7 +203,7 @@ const SignUp = () => {
                         </div>
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Nhập lại mật khẩu
+                                Nhập lại mật khẩu <span className={`text-red-500`}>*</span>
                             </label>
                             <div className="mt-1">
                                 <input id="password" name="password" type="password" autoComplete="new-password"

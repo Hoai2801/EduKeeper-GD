@@ -11,7 +11,6 @@ import Search from "./pages/Search";
 import AccoutAction from "./pages/AccoutAction";
 import User from "./pages/User";
 import Admin from "./pages/Admin";
-import AcceptDocs from "./pages/AcceptDocs";
 import Department from "./pages/Department";
 import Dashboard from "./pages/Dashboard";
 import Document from "./pages/Document";
@@ -22,27 +21,32 @@ import UserUploadDocument from "./components/UserUploadDocument";
 import UserFavoriteDocument from "./components/UserFavoriteDocument";
 import DeletedDocument from "./pages/ListDocsDeleted";
 import BannerManager from "./pages/BannerManager";
-import {useEffect, useState} from "react";
+import {createContext, useEffect, useState} from "react";
 import {jwtDecode} from "jwt-decode";
 import Subject from "./pages/Subject";
+
+export const JWTContext = createContext(null)
 
 function App() {
     window.scrollTo(0, 0);
 
-    const [jwt, setJwt] = useState(null);
+    const [jwtDecoded, setJwtDecoded] = useState(null);
+
+    const [token, setToken] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token !== "undefined" && token !== null) {
+            setToken(token);
             const decodedJwt = jwtDecode(token);
-            setJwt(decodedJwt);
+            setJwtDecoded(decodedJwt);
         }
     }, []);
 
     useEffect(() => {
-        if (jwt) {
+        if (jwtDecoded) {
             const checkIfBlocked = () => {
-                fetch('http://localhost:8080/api/v1/users/is-blocked/' + jwt?.staff_code)
+                fetch('http://localhost:8080/api/v1/users/is-blocked/' + jwtDecoded?.staff_code)
                     .then(res => res.text())
                     .then(data => {
                         if (data === "true") {
@@ -61,37 +65,39 @@ function App() {
             // Cleanup interval on component unmount
             return () => clearInterval(intervalId);
         }
-    }, [jwt]);
+    }, [jwtDecoded]);
     return (
-        <Routes>
-            <Route element={<Layout/>}>
-                <Route path='/' element={<Home/>}/>
-                <Route path='/upload' element={<Upload />}/>
-                <Route path='/edit/:slug' element={<Upload/>}/>
-                <Route path='/profile/:staff_code' element={<Profile/>}>
-                    <Route path='' element={<UserHome/>}/>
-                    <Route path='document/upload' element={<UserUploadDocument/>}/>
-                    <Route path='document/favorite' element={<UserFavoriteDocument/>}/>
-                    <Route path='information' element={<UserInfor/>}/>
+        <JWTContext.Provider value={{jwtDecoded, token}}>
+            <Routes>
+                <Route element={<Layout/>}>
+                    <Route path='/' element={<Home/>}/>
+                    <Route path='/upload' element={<Upload/>}/>
+                    <Route path='/edit/:slug' element={<Upload/>}/>
+                    <Route path='/profile/:staff_code' element={<Profile/>}>
+                        <Route path='' element={<UserHome/>}/>
+                        <Route path='document/upload' element={<UserUploadDocument/>}/>
+                        <Route path='document/favorite' element={<UserFavoriteDocument/>}/>
+                        <Route path='information' element={<UserInfor/>}/>
+                    </Route>
+                    <Route path="/document/:slug" element={<Detail/>}/>
+                    <Route path="/login" element={<Login/>}/>
+                    <Route path="/register" element={<SignUp/>}/>
+                    <Route path="/account/:action/:token" element={<AccoutAction/>}/>
+                    <Route element={<SideBar/>}>
+                        <Route path="/search" element={<Search />}/>
+                    </Route>
                 </Route>
-                <Route path="/document/:slug" element={<Detail/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/register" element={<SignUp/>}/>
-                <Route path="/account/:action/:token" element={<AccoutAction/>}/>
-                <Route element={<SideBar/>}>
-                    <Route path="/search" element={<Search jwt={jwt}/>}/>
+                <Route path="/dashboard" element={<Admin/>}>
+                    <Route index path="home" element={<Dashboard/>}/>
+                    <Route path="users" element={<User/>}/>
+                    <Route path="department" element={<Department/>}/>
+                    <Route path="document" element={<Document/>}/>
+                    <Route path="subject" element={<Subject/>}/>
+                    <Route path="banner" element={<BannerManager />}/>
+                    <Route path="deleted" element={<DeletedDocument/>}/>
                 </Route>
-            </Route>
-            <Route path="/dashboard" element={<Admin/>}>
-                <Route index path="home" element={<Dashboard/>}/>
-                <Route path="users" element={<User/>}/>
-                <Route path="department" element={<Department/>}/>
-                <Route path="document" element={<Document/>}/>
-                <Route path="subject" element={<Subject />}/>
-                <Route path="banner" element={<BannerManager/>}/>
-                <Route path="deleted" element={<DeletedDocument/>}/>
-            </Route>
-        </Routes>
+            </Routes>
+        </JWTContext.Provider>
     );
 }
 

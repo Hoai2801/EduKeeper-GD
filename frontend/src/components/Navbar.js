@@ -1,14 +1,14 @@
-import {jwtDecode} from "jwt-decode";
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 // asset
 import menuIcon from "../assets/menu-hamburge.png";
 import bell from "../assets/free-bell-icon-860-thumb.png"
 import Notification from "./Notification";
+import {JWTContext} from "../App";
 
 const Navbar = () => {
 
-        const [jwt, setJwt] = useState(null);
+        const jwtDecoded = useContext(JWTContext);
 
         const [isShowSpecialized, setIsShownSpecialized] = useState(false);
         const [isShowCategory, setIsShownCategory] = useState(false);
@@ -31,12 +31,13 @@ const Navbar = () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    'Access-Control-Allow-Origin': '*',
-                },
+                }
             })
                 .then((res) => res.json())
                 .then((data) => {
-                    setSpecialized(data);
+                    console.log(data)
+                    // filter the specialized that is not locked
+                    setSpecialized(data.filter(item => (item.specialized.locked === false && item.specialized.department.locked === false)));
                 });
 
             fetch("http://localhost:8080/api/v1/categories")
@@ -44,29 +45,22 @@ const Navbar = () => {
                 .then((data) => {
                     setCategory(data);
                 });
-
-            const token = localStorage.getItem("token");
-            if (token !== "undefined" && token !== null) {
-                setJwt(jwtDecode(token));
-            }
-
-
         }, [])
 
         useEffect(() => {
-            if (jwt) {
-                fetch('http://localhost:8080/api/v1/users/' + jwt?.staff_code)
+            if (jwtDecoded?.jwtDecoded) {
+                fetch('http://localhost:8080/api/v1/users/' + jwtDecoded?.jwtDecoded?.staff_code)
                     .then((res) => res.json())
                     .then((data) => {
                         setUser(data);
                     });
             }
-        }, [jwt]);
+            if (jwtDecoded?.jwtDecoded && jwtDecoded?.jwtDecoded.exp < Date.now() / 1000) {
+                localStorage.removeItem("token");
+                window.location.href = "/";
+            }
+        }, [jwtDecoded?.jwtDecoded]);
 
-        if (jwt && jwt.exp < Date.now() / 1000) {
-            localStorage.removeItem("token");
-            window.location.href = "/";
-        }
 
         const out = () => {
             setIsShownSpecialized(false);
@@ -77,7 +71,6 @@ const Navbar = () => {
         const logout = () => {
             fetch('http://localhost:8080/api/v1/auth/logout', {
                 method: 'POST',
-                credentials: 'include',
             })
                 .then((data) => {
                     if (data.status === 200) {
@@ -90,57 +83,70 @@ const Navbar = () => {
         const search = () => {
             localStorage.setItem('search', searchTerm);
             if (localStorage.getItem('search') !== null) {
-                window.location.href = `http://localhost:8080:3000/search?filter=&order=lasted`;
+                window.location.href = `http://localhost/search?filter=&order=lasted`;
             }
         }
 
         const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+        const getNotification = () => {
+            fetch('http://localhost:8080/api/v1/notifications/user/' + user.staffCode)
+                .then((res) => res.json())
+                .then((data) => {
+                    // console.log(data)
+                    setNotification(data);
+                    let uncheckedCount = 0;
+
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i]._check === false) {
+                            uncheckedCount++;
+                        }
+
+                        // Stop counting if unchecked notifications reach 10
+                        if (uncheckedCount >= 10) {
+                            setIsHasNotification("9+");
+                            break;
+                        }
+                    }
+
+                    // If the loop completes and there are less than 10 unchecked notifications
+                    if (uncheckedCount < 10) {
+                        setIsHasNotification(uncheckedCount);
+                    }
+                });
+        }
+
         const POLLING_INTERVAL = 30000; // 30 seconds
         useEffect(() => {
             if (user) {
-            const intervalId = setInterval(() => {
-                fetch('http://localhost:8080/api/v1/notifications/user/' + user.staffCode)
-                    .then((res) => res.json())
-                    .then((data) => {
-                        // console.log(data)
-                        setNotification(data);
-                        let uncheckedCount = 0;
+                getNotification();
+                const intervalId = setInterval(() => {
+                    getNotification()
 
-                        for (let i = 0; i < data.length; i++) {
-                            if (data[i]._check === false) {
-                                uncheckedCount++;
-                            }
-
-                            // Stop counting if unchecked notifications reach 10
-                            if (uncheckedCount >= 10) {
-                                setIsHasNotification("9+");
-                                break;
-                            }
-                        }
-
-                        // If the loop completes and there are less than 10 unchecked notifications
-                        if (uncheckedCount < 10) {
-                            setIsHasNotification(uncheckedCount);
-                        }
-                    });
-
-            }, POLLING_INTERVAL);
-            return () => clearInterval(intervalId); // Cleanup on component unmount
+                }, POLLING_INTERVAL);
+                return () => clearInterval(intervalId); // Cleanup on component unmount
             }
         }, [user]);
 
         const checkNotification = () => {
-            if (jwt) {
-                fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwt.staff_code);
+            if (jwtDecoded?.jwtDecoded) {
+                fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwtDecoded?.jwtDecoded.staff_code);
             }
+        }
+
+        function getOnlyName(user_name) {
+            const name = user_name.split(" ");
+            return name[name.length - 1];
         }
 
         return (
             <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
                 <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
-                    <div className="flex gap-4 lg:w-[250px] h-full w-fit items-center pl-2">
-                        <Link to={"/"}>
+                    <div className="flex gap-4 lg:w-[250px] h-full w-fit items-center pl-3">
+                        <Link to={"/"} onClick={() => {
+                            setIsMobileMenuOpen(false)
+                            setIsNotificationOpen(false)
+                        }}>
                             <div className="lg:min-w-[135px] min-w-[90px]">
                                 <img
                                     src="https://giadinh.edu.vn/upload/photo/logofooter-8814.png"
@@ -170,7 +176,7 @@ const Navbar = () => {
                                     Ngành
                                 </p>
                                 <div
-                                    className={`w-[500px] h-[300px] overflow-scroll absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`}
+                                    className={`w-[500px] h-[300px] overflow-y-auto no-scrollbar absolute mt-8 translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowSpecialized ? "" : "hidden"}`}
                                     onMouseLeave={() => setIsShownSpecialized(false)}>
                                     {specialized && specialized.map((item, index) => (
                                         <Link to={`/search?specialized=${item.specialized.specializedSlug}&order=lastest`}
@@ -193,16 +199,16 @@ const Navbar = () => {
                                     Thể loại
                                 </p>
                                 <div
-                                    className={`w-[500px] h-[300px] overflow-scroll absolute top-[85px] translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowCategory ? "" : "hidden"}`}
+                                    className={`w-[300px] h-fit absolute top-[85px] translate-x-[-50%] bg-white shadow-lg rounded-lg border flex flex-col ${isShowCategory ? "" : "hidden"}`}
                                     onMouseLeave={() => setIsShownCategory(false)}>
                                     {category && category?.map((item, index) => (
                                         <Link to={`/search?category=${item.categorySlug}&order=lastest`} key={index}
-                                              className={`py-3 px-5 hover:bg-[#C5D6F8] rounded-xl`}>{item.categoryName}</Link>
+                                              className={`py-3 px-5 hover:bg-[#C5D6F8] rounded-lg`}>{item.categoryName}</Link>
                                     ))}
                                 </div>
                             </div>
                         </Link>
-                        {jwt?.role === "ROLE_ADMIN" || jwt?.role === "ROLE_TEACHER" || jwt?.role === "ROLE_SUB-ADMIN" ? (
+                        {jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" || jwtDecoded?.jwtDecoded?.role === "ROLE_TEACHER" || jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN" ? (
                             <Link
                                 to="/upload"
                                 className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
@@ -213,7 +219,7 @@ const Navbar = () => {
                         ) : " "}
                     </div>
 
-                    <form className="max-w-md mx-auto w-full md:block hidden min-w-[400px] mt-[-7px]"
+                    <form className="max-w-md mx-auto w-full md:block hidden min-w-[300px] mt-[-7px]"
                           onKeyDown={(event) => {
                               // press enter make page reload before search
                               if (event.keyCode === 13) {
@@ -239,17 +245,19 @@ const Navbar = () => {
                         </div>
                     </form>
                     <>
-                        <div className="flex gap-5 justify-end w-[500px]">
-                            <button onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                        <div className="flex gap-5 justify-end w-[300px]">
+                            <button onClick={() => {
+                                setIsNotificationOpen(!isNotificationOpen)
+                            }}
                                     className={`relative`}>
-                                <div className={`w-8 h-8 flex`}>
+                                <div className={`md:w-8 md:h-8 h-6 w-6 flex`}>
                                     <img src={bell} alt="" className={`w-full h-full`}/>
                                 </div>
                                 <div
                                     className={`bg-red-500 rounded-full w-fit h-5 absolute text-white p-1 text-[10px] top-0 right-[-10px] ${isHasNotification ? "block" : "hidden"}`}>{isHasNotification}</div>
                             </button>
                             <div
-                                className={`${isNotificationOpen ? "block" : "hidden"} flex flex-col gap-2 absolute top-[85px] md:right-[80px] bg-white rounded-lg shadow-lg w-[400px] h-fit max-h-[300px] overflow-scroll`}
+                                className={`${isNotificationOpen ? "block" : "hidden"} z-50 flex flex-col gap-2 absolute top-[85px] md:right-[80px] right-0 bg-white rounded-lg shadow-lg md:w-[400px] w-[90%] h-fit max-h-[300px] overflow-scroll`}
                                 onMouseLeave={() => {
                                     setIsNotificationOpen(!isNotificationOpen)
                                     checkNotification()
@@ -258,18 +266,19 @@ const Navbar = () => {
                             >
                                 {notification && notification?.length ? notification?.map((item, index) => (
                                     <Notification notification={item}/>
-                                )) : <div className={`text-center h-[80px] text-xl`}>Không có thông báo nào!</div>}
+                                )) : <div className={`text-center h-[80px] text-xl text-gray-500 p-5`}>Không có thông báo
+                                    nào!</div>}
                             </div>
                             <div className="flex text-center">
-                                {jwt ? (
+                                {jwtDecoded?.jwtDecoded ? (
                                     <div>
                                         <button
                                             onClick={() => {
                                                 setIsSubMenuShown(!isSubMenuShow);
                                             }}
-                                            className="lg:mt-2 mt-3 lg:text-xl xl:flex gap-3 hidden"
+                                            className="xl:mt-2 mt-3 2xl:text-xl md:flex gap-3 hidden text-sm text-gray-500"
                                         >
-                                            Chào {jwt.user_name}
+                                            Chào {getOnlyName(jwtDecoded?.jwtDecoded?.user_name)}
                                             <img
                                                 src={user && user?.avatar ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
                                                 alt=""
@@ -278,13 +287,14 @@ const Navbar = () => {
                                         <div
                                             className={`bg-white absolute flex flex-col items-center leading-[50px] max-w-[300px] w-[300px] overflow-hidden h-fit top-[90px] right-2 rounded-lg shadow-2xl ${isSubMenuShow ? "absolute" : "hidden"}`}
                                             onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}>
-                                            <Link to={`/profile/${jwt?.staff_code}`}
+                                            <Link to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}`}
                                                   className="hover:bg-blue-300 w-full h-[50px]">
                                                 Trang cá nhân
                                             </Link>
-                                            {/*<Link to={`/profile/${jwt?.staff_code}/setting`}*/}
+                                            {/*<Link to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}/setting`}*/}
                                             {/*      className="hover:bg-blue-300 w-full h-[50px]">Cài đặt</Link>*/}
-                                            <Link to={`/dashboard/home`} className={`${jwt?.role === "ROLE_ADMIN" || jwt?.role === "ROLE_SUB-ADMIN" ? "block" : "hidden"} hover:bg-blue-300 w-full h-[50px]`}>
+                                            <Link to={`/dashboard/home`}
+                                                  className={`${jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" || jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN" ? "block" : "hidden"} hover:bg-blue-300 w-full h-[50px]`}>
                                                 Admin
                                             </Link>
                                             <Link onClick={() => logout()} className="hover:bg-blue-300 w-full h-[50px]">
@@ -295,16 +305,19 @@ const Navbar = () => {
                                 ) : (
                                     <Link
                                         to="/login"
-                                        className="text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full md:text-sm text-xs w-[80px] md:w-[150px] md:px-4 px-0 md:py-3 py-1 text-center"
+                                        className="w-[100px] text-white pt-3 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-2 md:pl-3 md:py-3 py-1 text-center md:flex hidden"
                                     >
                                         Đăng nhập
                                     </Link>
                                 )}
                             </div>
                             {/* mobile menu button */}
-                            <div className="lg:hidden w-[50px]">
-                                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                        className="w-[50px] pr-5 md:mt-3 mt-2">
+                            <div className="xl:hidden w-[50px]">
+                                <button onClick={() => {
+                                    setIsMobileMenuOpen(!isMobileMenuOpen)
+                                    setIsNotificationOpen(false)
+                                }}
+                                        className="w-[20px] mt-3">
                                     <img src={menuIcon} alt="" className="w-full"/>
                                 </button>
                             </div>
@@ -335,6 +348,10 @@ const Navbar = () => {
                                         onMouseEnter={() => setIsShownSpecialized(false)}
                                     >
                                         Trang chủ
+                                    </Link>
+                                    <Link to={`/dashboard/home`}
+                                          className={`${jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" || jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN" ? "block" : "hidden"}`}>
+                                        Admin
                                     </Link>
                                     <div className="flex flex-col gap-3 items-center">
                                         <button onClick={() => setIsShownSpecialized(!isShowSpecialized)}
@@ -369,7 +386,7 @@ const Navbar = () => {
                                             ))}
                                         </div>
                                     </div>
-                                    {jwt?.role === "ADMIN" ? (
+                                    {jwtDecoded?.jwtDecoded?.role === "ADMIN" ? (
                                         <Link
                                             to="/upload"
                                             onClick={() => setIsMobileMenuOpen(false)}
@@ -377,10 +394,10 @@ const Navbar = () => {
                                             Upload tài liệu
                                         </Link>
                                     ) : " "}
-                                    {jwt ? (
+                                    {jwtDecoded?.jwtDecoded ? (
                                         <>
                                             <div className="flex flex-col items-center w-full gap-3">
-                                                <Link to={`/profile/${jwt?.staff_code}`}
+                                                <Link to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}`}
                                                       onClick={() => setIsMobileMenuOpen(false)}
                                                 >Trang cá nhân</Link>
                                                 <button onClick={() => {

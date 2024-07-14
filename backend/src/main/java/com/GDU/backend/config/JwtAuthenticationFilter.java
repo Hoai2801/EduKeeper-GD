@@ -1,5 +1,6 @@
  package com.GDU.backend.config;
 
+ import com.GDU.backend.models.User;
  import com.GDU.backend.services.Impl.JwtService;
  import jakarta.servlet.FilterChain;
  import jakarta.servlet.ServletException;

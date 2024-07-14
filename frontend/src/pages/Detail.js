@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react'
-import {Document, Page, pdfjs} from 'react-pdf';
+import React, {useContext, useEffect, useRef, useState} from 'react'
 import './Detail.css'
 import {Link} from 'react-router-dom';
 import 'react-pdf/dist/esm/Page/TextLayer.css'
@@ -8,12 +7,14 @@ import {jwtDecode} from "jwt-decode";
 import unlove from '../assets/unlove.png';
 import love from '../assets/love.png';
 import Comment from "../components/Comment";
+import {Document, Page, pdfjs} from "react-pdf";
+import {JWTContext} from "../App";
+
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.js',
+    'pdfjs-dist/build/pdf.worker.min.mjs',
     import.meta.url,
 ).toString();
-
 
 const Detail = () => {
     function extractSlugFromURL(url) {
@@ -25,7 +26,7 @@ const Detail = () => {
         return lastPart;
     }
 
-    const [staffCode, setStaffCode] = useState(null);
+    const staffCode = useContext(JWTContext)?.jwtDecoded?.staff_code;
 
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -51,13 +52,17 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug)
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
                 setData(data)
             });
+
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
-            .then((res) => res.blob())
-            .then((blob) => {
-                setFile(blob)
-            });
+            .then((res) => {
+                res.blob().then(r => {
+                    console.log(r)
+                    setFile(r)
+                })
+            })
 
         // make view history
         const increaseView = setTimeout(() => {
@@ -126,14 +131,6 @@ const Detail = () => {
             console.error('Error fetching favorite status:', error);
         })
     };
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            const jwt = jwtDecode(token);
-            setStaffCode(jwt?.staff_code);
-        }
-    }, []);
 
     useEffect(() => {
         if (staffCode && data?.id) { // Ensure staffCode is not null before making the request
@@ -279,10 +276,10 @@ const Detail = () => {
                         <div dangerouslySetInnerHTML={{__html: data?.description}}></div>
                     </div>
                 </div>
-                {/*<div className='mt-10'>*/}
-                {/*    /!* File pdf render *!/*/}
-                {/*</div>*/}
-                <div className='overflow-y-scroll h-screen rounded-lg mt-5'>
+                <div className='mt-10'>
+                    {/* File pdf render */}
+                </div>
+                <div className={`overflow-y-scroll h-screen rounded-lg`}>
                     <Document file={file} onLoadSuccess={onDocumentLoadSuccess}
                               className={'flex flex-col items-center'}>
                         {Array.apply(null, Array(numPages))
@@ -297,7 +294,6 @@ const Detail = () => {
                                                 renderAnnotationLayer={false}
                                                 // renderMode="svg"
                                                 width={width}
-                                                className="mt-3"
                                             />
                                         </div>
                                     );
@@ -305,13 +301,14 @@ const Detail = () => {
                             })
                         }
                     </Document>
+                    {/*<iframe src={"http://localhost:8080/api/v1/documents/" + slug + "/file"} frameborder="0"></iframe>*/}
                     <div className='w-full h-[100px] flex justify-center align-middle mt-8'>
                         <button onClick={() => setPageNumber(pageNumber + 10)}
                                 className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm
                         </button>
                     </div>
                 </div>
-                <section className="bg-white py-8 lg:py-16 antialiased mt-3">
+                <section className="bg-white py-8 lg:py-16 antialiased mt-3 rounded-lg">
                     <div className="max-w-2xl mx-auto px-4">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg lg:text-2xl font-bold text-gray-900">Bình luận

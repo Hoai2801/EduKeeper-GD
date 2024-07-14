@@ -70,7 +70,6 @@ public class DocumentController {
             @ModelAttribute UploadRequestDTO uploadRequestDTO
     ) {
         try {
-            System.out.println(uploadRequestDTO.toString());
             return ResponseEntity.ok(documentService.uploadDocument(uploadRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -21,13 +21,12 @@ public class SpecializedController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateSpecialize(@PathVariable("id") Long id,
-                                              @ModelAttribute SpecializedDTO specializedDTO) {
+                                              @RequestBody SpecializedDTO specializedDTO
+    ) {
         try {
-            System.out.println("I'm in put");
             return ResponseEntity.ok(specializedService.updateSpecializedById(id, specializedDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-
         }
     }
 
@@ -35,11 +34,9 @@ public class SpecializedController {
     public ResponseEntity<?> createSpecialize(
             @RequestBody SpecializedDTO specializedDTO) {
         try {
-            System.out.println("I'm in post");
             return ResponseEntity.ok(specializedService.createSpecialized(specializedDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-
         }
     }
 
@@ -56,5 +53,23 @@ public class SpecializedController {
     @GetMapping("/department/{id}")
     public List<Specialized> getSpecializedByDepartmentId(@PathVariable("id") Long id) {
         return specializedService.getSpecializedByDepartmentId(id);
+    }
+    
+    @PutMapping("/lock/{id}")
+    public ResponseEntity<String> lockSpecializedById(@PathVariable("id") Long id) {
+        try {
+            return specializedService.lockSpecializedById(id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSpecializedById(@PathVariable("id") Long id) {
+        try {
+            return specializedService.deleteSpecializedById(id);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import DragDropFile from "../components/DragDropFile";
 
-const BannerManager = () => {
+const BannerManager = ({jwt}) => {
     const [bannerList, setBannerList] = useState([]);
 
     const [isEditShow, setIsEditShow] = useState(false);
@@ -25,19 +25,21 @@ const BannerManager = () => {
 
     const handleDelete = (id) => {
         fetch('http://localhost:8080/api/v1/banners/' + id, {
-            method: "DELETE",
+            method: "DELETE"
         })
-            .then((res) => res.text())
-            .then((data) => {
-                if (data === "success") {
-                setBannerList(bannerList.filter(banner => banner.id !== id));
+            .then((res) => {
+                if (res.status === 200) {
+                    setBannerList(bannerList.filter(banner => banner.id !== id));
+                } else {
+                    alert(res.text())
                 }
-            });
+
+            })
     }
     const handleEdit = () => {
         const formData = new FormData();
         formData.append('url', url);
-        formData.append('banner', file[0]);
+        // formData.append('banner', file[0]);
         formData.append('enable', activeBanner);
         console.log(formData)
 
@@ -45,11 +47,13 @@ const BannerManager = () => {
             method: "PUT",
             body: formData
         })
-            .then((res) => res.text())
-            .then((data) => {
-                console.log(data)
-                if (data === "success") fetchBanner()
-                setIsEditShow(false)
+            .then((res) => {
+                if (res.status === 200) {
+                    fetchBanner()
+                    setIsEditShow(false)
+                } else {
+                    alert(res.text())
+                }
             });
     }
 
@@ -64,24 +68,30 @@ const BannerManager = () => {
             method: "POST",
             body: formData
         })
-            .then((res) => res.text())
-            .then((data) => {
-                if (data === "success") fetchBanner()
-                setIsEditShow(false)
-            });
+            .then((res) => {
+                if (res.status === 200) {
+                    fetchBanner()
+                    setIsEditShow(false)
+                } else {
+                    alert(res.text())
+                }
+                res.text()
+            })
     }
 
     return (
         <div className={``}>
             <div className={`bg-white rounded-lg p-3`}>
                 <p className="text-xl font-bold">Banner</p>
+                {/*set all null to reset banner value*/}
                 <button className={`my-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded`}
                         onClick={() => {
                             setIsEditShow(true)
                             setBannerEdit(null)
-                            setUrl(null)
+                            // if set null, json will make null become to 'null'
+                            setUrl("")
                             setFile(null)
-                            setActiveBanner(null)
+                            setActiveBanner(false)
                         }}
                 >
                     Thêm banner
@@ -138,7 +148,6 @@ const BannerManager = () => {
                                     </td>
                                     <td className="px-6 py-4 text-right flex gap-3">
                                         <button onClick={() => {
-                                            setActiveBanner(item.enable)
                                             setUrl(item?.url)
                                             setActiveBanner(item?.enable)
                                             setIsEditShow(true)
@@ -151,7 +160,8 @@ const BannerManager = () => {
                                                 handleDelete(item.id)
                                             }
                                         }}
-                                            className="font-medium text-red-600 hover:underline">Xóa</button>
+                                                className="font-medium text-red-600 hover:underline">Xóa
+                                        </button>
                                     </td>
                                 </tr>
                             )
@@ -170,9 +180,13 @@ const BannerManager = () => {
                                 </button>
                             </div>
                             <div className={`flex flex-col justify-center items-center pt-5`}>
-                                <DragDropFile handleFiles={setFile} fileSupport={"image"}/>
+                                <div className={`${bannerEdit ? 'hidden' : 'block'}`}>
+                                    <DragDropFile handleFiles={setFile} fileSupport={"image"}/>
+                                </div>
                                 <div className={`w-full px-5 mt-5 border-b-2`}>
-                                <img src={file ? URL.createObjectURL(file[0]) : `http://localhost:8080/api/v1/images/banner/${bannerEdit?.image}`} alt="" className={`w-full`}/>
+                                    <img
+                                        src={file ? URL.createObjectURL(file[0]) : `http://localhost:8080/api/v1/images/banner/${bannerEdit?.image}`}
+                                        alt="" className={`w-full`}/>
                                 </div>
                             </div>
                             <div className={`p-5 flex flex-col gap-3`}>
@@ -192,7 +206,7 @@ const BannerManager = () => {
                             <div className={`w-full h-[50px] flex justify-center`}>
 
                                 <button onClick={bannerEdit ? handleEdit : handleCreate}
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Lưu
+                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Lưu
                                 </button>
                             </div>
                         </div>

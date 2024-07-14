@@ -10,6 +10,7 @@ import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -131,14 +132,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public String blockUser(String staffCode) {
+    public ResponseEntity<String> blockUser(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
             user.setAccountLocked(true);
             userRepository.save(user);
-            return "Đã khoá người dùng!";
+            return ResponseEntity.ok("Đã khoá người dùng!");
         }
-        return "Lỗi hệ thống, hiện tại không thể thực hiện thao tác!";
+        return ResponseEntity.badRequest().body("Lỗi hệ thống, hiện tại không thể thực hiện thao tác này");
     }
 
     @Override
@@ -151,14 +152,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public String unblockUser(String staffCode) {
+    public ResponseEntity<String> unblockUser(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
             user.setAccountLocked(false);
             userRepository.save(user);
-            return "Đã mở khoá người dùng!";
+            return ResponseEntity.ok("Đã mở khoá người dùng!");
         }
-        return "Lỗi hệ thống, hiện tại không thể thực hiện thao tác!";
+        return ResponseEntity.badRequest().body("Lỗi hệ thống, hiện tại không thể thực hiện thao tác không");
     }
 
     @Override

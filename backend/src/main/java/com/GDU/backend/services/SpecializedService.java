@@ -3,6 +3,7 @@ package com.GDU.backend.services;
 import com.GDU.backend.dtos.requests.SpecializedDTO;
 import com.GDU.backend.dtos.responses.SpecializesWithCount;
 import com.GDU.backend.models.Specialized;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -15,7 +16,11 @@ public interface SpecializedService {
 
     List<Specialized> getSpecializedByDepartmentId(Long id);
 
-    String updateSpecializedById(Long id, SpecializedDTO specializedDTO);
+    ResponseEntity<String> updateSpecializedById(Long id, SpecializedDTO specializedDTO);
 
-    String createSpecialized(SpecializedDTO specializedDTO);
+    ResponseEntity<String> createSpecialized(SpecializedDTO specializedDTO);
+
+    ResponseEntity<String> deleteSpecializedById(Long id);
+
+    ResponseEntity<String> lockSpecializedById(Long id);
 }

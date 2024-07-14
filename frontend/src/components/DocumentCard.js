@@ -1,15 +1,22 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import docIcon from '../assets/docs.jpg'
 
 const DocumentCard = ({ document }) => {
     return (
-        <div className={`p-3 rounded-lg bg-white flex flex-col border h-[580px] lg:w-[350px] md:min-w-[350px] gap-5 shadow-sm`}>
+        <div className={`p-3 rounded-lg bg-white flex flex-col border h-fit min-h-[600px] md:h-[580px] lg:w-[350px] md:min-w-[350px] gap-5 shadow-sm ${document?._delete ? "hidden" : ""}`}>
             <Link to={`/document/${document?.slug}`}>
                 <div className='w-full h-[380px] border rounded-xl overflow-hidden min-w-[250px]'>
-                    {document?.thumbnail ? <img src={"http://localhost:8080/api/v1/images/" + document?.thumbnail} alt="" className='w-full h-full' /> : <img src="https://via.placeholder.com/150" alt="" />}
+                    {document?.thumbnail ? <img src={"http://localhost:8080/api/v1/images/" + document?.thumbnail} alt="" className='w-full h-full' /> : <img src={docIcon} alt="" className={`w-full h-full`} />}
                 </div>
                 <div className='h-[50px] w-full pt-2'>
-                    <Link to={`/search?subject=${document?.subject.subjectSlug}`} className='text-purple-600 text-[16px] font-semibold'>{document?.subject.subjectName}</Link>
+                    {
+                        document?.subject ?
+                    <Link to={`/search?subject=${document?.subject?.subjectSlug}`} className='text-purple-600 text-[16px] font-semibold'>{document?.subject?.subjectName}</Link>
+                    :
+                    <Link to={`/search?specialized=${document?.specialized?.specializedSlug}`} className='text-purple-600 text-[16px] font-semibold'>{document?.specialized?.specializedName}</Link>
+
+                    }
                 </div>
                 <div className='w-full flex flex-col gap-2'>
                     <div className='min-h-[45px] h-fit'>
@@ -20,7 +27,7 @@ const DocumentCard = ({ document }) => {
                             <img src={"http://localhost:8080/api/v1/images/avatar/" + document?.user_upload.avatar} alt="" className='w-full h-full' />
                         </div>
                         <div>
-                            <span className='text-blue-500'>{document?.user_upload.username}</span>
+                            <Link  to={`/profile/${document?.user_upload.staffCode}`} className='text-blue-500'>{document?.user_upload.username}</Link>
                             <p>{document?.upload_date}</p>
                         </div>
                     </div>

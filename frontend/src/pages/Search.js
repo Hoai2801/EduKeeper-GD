@@ -30,6 +30,7 @@ const Search = ({jwt}) => {
         };
 
         const api = "http://localhost:8080/api/v1/documents/filter"
+        console.log(dataSearch)
         fetch(api, {
             method: 'POST',
             headers: {

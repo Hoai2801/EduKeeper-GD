@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    @Query("SELECT n FROM Notification n WHERE n.receiver.id = :id or n.sender.id = :id")
-    List<Notification> findByUserId(long id);
+    @Query("SELECT n FROM Notification n WHERE n.receiver.id = :id")
+    List<Notification> findByReceiverUser(long id);
 }

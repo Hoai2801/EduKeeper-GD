@@ -3,6 +3,7 @@ package com.GDU.backend.services;
 import com.GDU.backend.dtos.requests.UserDetailDTO;
 import com.GDU.backend.dtos.responses.*;
 import com.GDU.backend.models.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,9 +32,9 @@ public interface UserService {
 
     String changeAvatar(String id, MultipartFile avatar);
 
-    String blockUser(String staffCode);
+    ResponseEntity<String> blockUser(String staffCode);
 
     Boolean isUserBlocked(String staffCode);
 
-    String unblockUser(String staffCode);
+    ResponseEntity<String> unblockUser(String staffCode);
 }

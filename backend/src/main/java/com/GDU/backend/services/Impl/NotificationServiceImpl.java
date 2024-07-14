@@ -25,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public List<NotificationDTO> getAllNotificationOfUser(String staffCode) {
         User user = userService.getUserByStaffCode(staffCode);
-        List<Notification> notificationList = notificationRepository.findByUserId(user.getId());
+        List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
         // return list of notification
         return notificationList.stream().map(
                         notification -> NotificationDTO.builder()
@@ -56,7 +56,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void makeCheckedAllNotificationOfUser(String staffCode) {
         User user = userService.getUserByStaffCode(staffCode);
-        List<Notification> notificationList = notificationRepository.findByUserId(user.getId());
+        List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
         notificationList.forEach(notification -> notification.set_check(true));
         notificationRepository.saveAll(notificationList);
     }

@@ -16,6 +16,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,11 +43,11 @@ public class AuthenticationService {
     @Value("${spring.application.mailing.frontend.activation-url}")
     private String activationUrl;
 
-    public String register(RegisterRequest registerRequest) throws MessagingException {
+    public ResponseEntity<String> register(RegisterRequest registerRequest) throws MessagingException {
         User user = new User();
-        // role is optional<Role>
         var role = roleRepository.findByName(registerRequest.getRoles()).orElseThrow(
                 () -> new RuntimeException("Role not found"));
+        // if user is student, we need to check the information
         if (role.getName().equals("USER")) {
             var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
                     () -> new RuntimeException("Department not found")
@@ -59,10 +60,16 @@ public class AuthenticationService {
             user.setSpecialized(specialized);
             user.setKlass(registerRequest.getClassroom());
             user.setEnable(false);
+            // if user is teacher, we don't need to check the information
+            // because the information is not required
+            // teacher do not belong to any department
         } else {
             user.setDepartment(null);
             user.setSpecialized(null);
             user.setKlass(null);
+            // admin create the account
+            // so we don't want to access the email
+            // to get the access token
             user.setEnable(true);
         }
         // check if user exists
@@ -72,7 +79,7 @@ public class AuthenticationService {
 
         // check if staffCode exists
         if (userRepository.existsByStaffCode(registerRequest.getStaffCode())) {
-            throw new RuntimeException("Mã đã được sử dụng");
+            throw new RuntimeException("Mã sinh viên đã được sử dụng bởi tài khoản khác");
         }
         // save user
         user.setUsername(registerRequest.getUsername());
@@ -87,7 +94,7 @@ public class AuthenticationService {
         if (role.getName().equals("USER")) {
             sendValidationEmail(user);
         }
-        return "registered";
+        return ResponseEntity.ok("success");
     }
 
     private void sendValidationEmail(User user) throws MessagingException {
@@ -99,7 +106,6 @@ public class AuthenticationService {
     }
 
     private String generateToken(User user) {
-        // generate token
         String generatedToken = generateActivationCode(6);
         var token = Token.builder()
                 .token(generatedToken)
@@ -121,7 +127,7 @@ public class AuthenticationService {
         return sb.toString();
     }
 
-    public AuthenticationResponse login(AuthenticationRequest loginRequest) {
+    public ResponseEntity<?> login(AuthenticationRequest loginRequest) {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         // use staff code to log in
@@ -129,7 +135,7 @@ public class AuthenticationService {
                         loginRequest.getPassword()));
 
         if (auth == null) {
-            throw new RuntimeException("Sai mật khẩu");
+            return ResponseEntity.badRequest().body("Sai mật khẩu");
         }
         var claims = new HashMap<String, Object>();
         var user = (User) auth.getPrincipal();
@@ -144,15 +150,18 @@ public class AuthenticationService {
         claims.put("role", user.getRoles().getName());
         claims.put("email", user.getEmail());
         var jwt = jwtService.generateToken(claims, user);
-        return AuthenticationResponse.builder()
-                .token(jwt)
-                .build();
+        return ResponseEntity.ok(
+                AuthenticationResponse.builder()
+                    .token(jwt)
+                    .build()
+        );
     }
 
     public String activate(String token) {
         var dbToken = tokenRepository.findByToken(token).orElseThrow(
                 () -> new RuntimeException("Invalid token"));
         if (dbToken.getExpiresDate().isBefore(LocalDateTime.now())) {
+            tokenRepository.delete(dbToken);
             throw new RuntimeException("Token expired");
         }
         User user = dbToken.getUser();
@@ -161,11 +170,11 @@ public class AuthenticationService {
         }
         user.setEnable(true);
         userRepository.save(user);
-//        tokenRepository.delete(dbToken);
+        tokenRepository.delete(dbToken);
         return "activated";
     }
 
-    public String forgotPassword(String staffCode) {
+    public ResponseEntity<String> forgotPassword(String staffCode) {
         try {
             var user = userRepository.findByStaffCode(staffCode).orElseThrow(
                     () -> new UserNotFoundException("User not found")
@@ -173,22 +182,24 @@ public class AuthenticationService {
             String newToken = generateToken(user);
             // send email
             String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" + newToken;
-            emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.FORGOT_PASSWORD,
+            emailService.sendEmail(user.getEmail(),
+                    user.getName(), 
+                    EmailTemplateName.FORGOT_PASSWORD,
                     forgotPasswordUrl);
-            return "sent";
+            return ResponseEntity.ok("success");
         } catch (UserNotFoundException e) {
             throw new UserNotFoundException("User not found");
         } catch (MessagingException e) {
             log.error("Error sending forgot password email", e);
-            return "Failed to send forgot password email";
+            return ResponseEntity.badRequest().body("Lỗi hệ thống không thể gửi email");
         }
     }
 
-    public String resetPassword(String token, ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity<String> resetPassword(String token, ChangePasswordRequest changePasswordRequest) {
         var dbToken = tokenRepository.findByToken(token).orElseThrow(
                 () -> new InvalidTokenException("Invalid token"));
         if (dbToken.getExpiresDate().isBefore(LocalDateTime.now())) {
-            throw new TokenExpiredException("Token expired");
+            return ResponseEntity.badRequest().body("Token expired");
         }
         if (!changePasswordRequest.getPassword().equals(changePasswordRequest.getConfirmPassword())) {
             throw new PasswordsDoNotMatchException("Passwords do not match");
@@ -196,6 +207,6 @@ public class AuthenticationService {
         User user = dbToken.getUser();
         userService.changePassword(user, changePasswordRequest.getPassword());
         tokenRepository.delete(dbToken);
-        return "reset";
+        return ResponseEntity.ok("success");
     }
 }

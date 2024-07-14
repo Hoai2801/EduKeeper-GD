@@ -9,6 +9,7 @@ import com.GDU.backend.repositories.SubjectSpecializedRepository;
 import com.GDU.backend.services.SpecializedService;
 import com.GDU.backend.services.SubjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
@@ -51,9 +52,9 @@ public class SubjectServiceImpl implements SubjectService {
                     .subject(savedSubject)
                     .specialized(specialized)
                     .build();
-            List<SubjectSpecialized> exists = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(subjectSpecialized.getSubject().getId(), subjectSpecialized.getSpecialized().getSpecializedName());
+            SubjectSpecialized exists = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(subjectSpecialized.getSubject().getId(), subjectSpecialized.getSpecialized().getId());
             // have a same subject in database
-            if (!exists.isEmpty()) {
+            if (exists != null) {
                 continue;
             }
             subjectSpecializedRepository.save(subjectSpecialized);
@@ -71,8 +72,13 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject getSubjectById(Long id) {
-        return subjectRepository.findById(id).orElse(null);
+    public ResponseEntity<String> deleteSubject(Long id_specialized, Long id_subject) {
+        SubjectSpecialized subjectSpecialized = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(id_specialized, id_subject);
+        if (subjectSpecialized == null) {
+            return ResponseEntity.badRequest().body("Môn học không tìm thấy");
+        }
+        subjectSpecializedRepository.delete(subjectSpecialized);
+        return ResponseEntity.ok("Xóa môn học thành công");
     }
 
 }

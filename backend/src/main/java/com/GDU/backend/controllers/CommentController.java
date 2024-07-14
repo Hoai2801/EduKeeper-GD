@@ -3,6 +3,7 @@ package com.GDU.backend.controllers;
 import com.GDU.backend.dtos.requests.CommentDTO;
 import com.GDU.backend.services.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

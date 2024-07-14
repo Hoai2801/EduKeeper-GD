@@ -1,27 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {jwtDecode} from "jwt-decode";
+import React, {useContext, useEffect, useState} from 'react';
 import DocumentCard from "./DocumentCard";
 import edit from '../assets/edit-246.png';
 import {Link, useParams} from "react-router-dom";
+import {JWTContext} from "../App";
 
 const UserUploadDocument = () => {
-    const [jwt, setJwt] = useState(null);
+    const userJWT = useContext(JWTContext);
+    console.log(userJWT)
     const location = useParams();
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            setJwt(jwtDecode(token));
-        }
-    }, []);
-
     const [documentList, setDocumentList] = useState([]);
-    if (jwt) {
-        if (location.valueOf("staff_code").staff_code !== jwt?.staff_code) {
-            window.location.href = `/profile/${jwt?.staff_code}/document/upload`;
-        }
-    } else {
 
-    }
+    // if user login, check if user is the same
+
     useEffect(() => {
         fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
             .then((res) => res.json())
@@ -35,21 +25,31 @@ const UserUploadDocument = () => {
             <h2 className={`text-3xl font-semibold `}>Tài liệu đã đăng</h2>
             <div className={`flex flex-wrap gap-5 mt-5`}>
                 {documentList.length === 0 ? <div className={`w-full mt-10`}>Không có tài liệu</div> : null}
-                {documentList?.map((item, index) => (
-                    <div className={`relative`}>
+                {documentList?.map((item, index) => {
+                    return (
+                        // if document is soft deleted, hidden it
+                    <div className={`relative ${item._delete ? "hidden" : ""} 
+                    ${item.status === "draft" && item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
+                    ${item.scope === "private" && item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
+                    ${item.scope === "student-only" && !userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
+                    `}>
                         <div
-                            className={`absolute top-0 right-0 rounded-lg p-2 m-4 text-white ${item.status !== "Draft" ? "hidden" : "bg-red-500"}`}>
+                            className={`absolute top-0 right-0 rounded-lg p-2 m-4 text-white ${item.status !== "draft" ? "hidden" : "bg-red-500"}`}>
                             Chưa duyệt
                         </div>
                         <DocumentCard key={index} document={item}/>
                         <div
-                            className={`absolute bottom-[20%] right-0 rounded-lg p-2 m-4 text-white w-10 h-10 overflow-hidden cursor-pointer`}>
+                            className={`absolute bottom-[20%] right-0 rounded-lg p-2 m-4 text-white w-10 h-10 overflow-hidden cursor-pointer
+                                ${userJWT.jwtDecoded?.staff_code === item.user_upload.staffCode ? "block" : "hidden"}
+                            `}>
                             <Link to={`/edit/${item.slug}`}>
                                 <img src={edit} alt="" className={`w-full h-full`}/>
                             </Link>
                         </div>
                         <div
-                            className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white ${item.scope !== "public" ?
+                            className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white 
+                            ${item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
+                            ${item.scope !== "public" ?
                                 item.scope === "private" ? "bg-gray-500" :
                                     // only for student
                                     "bg-amber-200"
@@ -57,7 +57,7 @@ const UserUploadDocument = () => {
                             {item.scope}
                         </div>
                     </div>
-                ))}
+                )})}
             </div>
         </div>
     );

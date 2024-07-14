@@ -35,6 +35,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,7 +89,7 @@ public class DocumentServiceImpl implements DocumentService {
                 e.printStackTrace();
             }
         }
-
+        System.out.println(uploadRequestDTO.getDocument().getContentType());
         Document newDocument = Document.builder()
                 .title(uploadRequestDTO.getTitle())
                 .author(uploadRequestDTO.getAuthor())
