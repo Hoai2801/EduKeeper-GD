@@ -214,12 +214,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponseDTO> filterDocuments(FilterRequestDTO filterRequestDTO) {
-        System.out.println(filterRequestDTO);
-        if (!Objects.equals(filterRequestDTO.getSubjectName(), "")) {
-            System.out.println("subject");
-            filterRequestDTO.setDepartmentSlug(null);
-            filterRequestDTO.setSpecializedSlug(null);
-        } else filterRequestDTO.setSubjectName(null);
         List<Document> documents = documentRepository.getDocumentsByFilter(
                 filterRequestDTO.getDepartmentSlug(),
                 filterRequestDTO.getSearchTerm(),

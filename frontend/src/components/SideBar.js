@@ -24,7 +24,7 @@ const SideBar = () => {
     fetch("http://localhost:8080/api/v1/departments")
       .then((res) => res.json())
       .then((data) => {
-        setDepartmentList(data);
+        setDepartmentList(data.filter((item) => item.locked === false));
       });
   }, []);
 
@@ -35,7 +35,6 @@ const SideBar = () => {
       )
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           setSpecializesList(data);
         });
     }
@@ -47,7 +46,6 @@ const SideBar = () => {
       fetch("http://localhost:8080/api/v1/subjects/specialized/" + specialized.id)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data)
           setSubjectList(data);
         });
     }

@@ -141,6 +141,7 @@ const Subject = () => {
         fetch("http://localhost:8080/api/v1/specializes")
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
                 setSpecialized(data);
                 const objectFake = {
                     id: data[0].id,
@@ -170,7 +171,8 @@ const Subject = () => {
                 specialized.map((spe) => (
                     <div key={spe.id}>
                         <div className="flex justify-between w-full border shadow-lg rounded-xl border-black p-4 mt-5">
-                            <h1 className="text-2xl">{spe.specializedName}</h1>
+                            <h1 className="text-2xl w-[50%]">{spe.specializedName}</h1>
+                            <p>{spe.locked ? <span className={`text-red-600`}>Đã khóa</span> : "Hoạt động"}</p>
                             <div className=" flex items-end">
                                 <a
                                     onClick={() => handleToggleDetails(spe.id)}

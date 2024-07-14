@@ -29,12 +29,11 @@ const Login = () => {
                 } else {
                     response.json()
                         .then(data => {
-                                console.log(data)
-                        if (data.token !== undefined) {
-                            localStorage.setItem("token", data.token);
-                            window.location.href = "/";
-                        }
-                    });
+                            if (data.token !== undefined) {
+                                localStorage.setItem("token", data.token);
+                                window.location.href = "/";
+                            }
+                        });
                 }
             })
             .catch(error => {
@@ -45,7 +44,7 @@ const Login = () => {
 
     const forgotPassword = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
-        if (window.confirm("Bạn muốn gửi email xác nhận đặt lại mật khẩu?") == true) {
+        if (window.confirm("Bạn muốn gửi email xác nhận đặt lại mật khẩu?") === true) {
             // User clicked OK
             fetch('http://localhost:8080/api/v1/auth/forgot-password/' + staffCode, {
                 method: 'POST',

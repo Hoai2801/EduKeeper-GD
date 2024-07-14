@@ -30,9 +30,8 @@ public class SubjectController {
         return ResponseEntity.ok().body("Subject created successfully");
     }
     
-    @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteSubject(@PathVariable("id") Long id) {
-        subjectService.deleteSubject(id);
-        return ResponseEntity.ok().body("Subject deleted successfully");
+    @DeleteMapping("/specialized/{id_specialized}/{id_subject}")
+    ResponseEntity<String> removeSubjects(@PathVariable("id_specialized") Long id_specialized, @PathVariable("id_subject") Long id) {
+        return subjectService.deleteSubject(id_specialized, id);
     }
 }

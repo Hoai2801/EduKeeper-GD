@@ -1,69 +1,110 @@
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import "./editDocs.css";
 import toast from "react-hot-toast";
-const DepartmentItems = ({ isActive, id , dep}) => {
+import {JWTContext} from "../App";
+const DepartmentItems = ({ isActive, id}) => {
     const [items, setItems] = useState([]);
     const [isEdit, setIsEdit] = useState(false);
     const [itemEdit, setItemEdit] = useState(null);
     const [newName, setNewName] = useState(null);
+    const [selectedDepartment, setSelectedDepartment] = useState(null);
+    const [departments, setDepartments] = useState([]);
 
     const hanldeClickEdit = (specialized) => {
-        console.log(jwt)
         setNewName(specialized.specializedName)
         setIsEdit(true);
         setItemEdit(specialized);
     };
 
-    const [jwt, setJwt] = useState(null);
-    useEffect(() => {
-        const jwt = localStorage.getItem("token");
-        if (jwt) {
-            setJwt(jwt);
-        }
-    }, [jwt]);
-
-    console.log(jwt)
+    const jwt = useContext(JWTContext)?.token;
 
     const handleEditSpecialized = () => {
-                const specializedDTO = {
+        console.log(selectedDepartment.id, newName, itemEdit.id)
+        fetch(
+            "http://localhost:8080/api/v1/specializes/" + itemEdit.id,
+            {
+                method: "PUT",
+                headers: {"Content-Type": "application/json",
+                    "authorization": "Bearer " + jwt
+                },
+                body: JSON.stringify({
                     specializedName: newName,
-                    departmentId: itemEdit.department.id
-                };
-                console.log(specializedDTO)
-                fetch(
-                    "http://localhost:8080/api/v1/specializes/" + itemEdit.id,
-                    {
-                        method: "PUT",
-                        headers: {"Content-Type": "application/json",
-                            "authorization": "Bearer " + jwt
-                        },
-                        body: JSON.stringify({
-                            specializedName: newName,
-                            departmentId: itemEdit.department.id
-                        }),
-                    }
-                ).then((res ) => res.text())
-                    .then((data) => {
-                        console.log(data)
-                        if (data === "Update specialized successfully") {
-                            toast.success("Chỉnh sửa chuyên ngành này.");
-                        } else {
-                            const errorResponse = data;
-                            toast.error("Error: " + (errorResponse.message || "Unknown error"));
-                        }
-                    })
-                    .catch((e) => {
-                        toast.error(e);
-                    });
+                    departmentId: selectedDepartment
+                }),
+            }
+        ).then((res ) => {
+            if (res.status === 200) {
+                toast.success("Thay đổi chuyên ngành thành công!")
+                setIsEdit(false);
+                fetchSpecialized()
+            } else {
+                toast.error("Lỗi hệ thống, vui lòng thử thay đổi chuyên ngành sau!")
+                setIsEdit(false);
+                res.text().then((data) => toast.error(data));
+            }
+        })
     }
 
-    useEffect(() => {
-        fetch(`http://localhost:8080/api/v1/specializes/department/${id}`)
+    const handleDeleteSpecialized = (id) => {
+        fetch("http://localhost:8080/api/v1/specializes/" + id, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "authorization": "Bearer " + jwt
+            },
+        }).then((res) => {
+            if (res.status === 200) {
+                toast.success("Xóa chuyên ngành thành công!")
+                setIsEdit(false);
+                fetchSpecialized()
+            } else {
+                res.text().then((data) => toast.error(data));
+            }
+        });
+    };
+
+    const fetchDepartment = () => {
+        fetch("http://localhost:8080/api/v1/departments")
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data)
+                setDepartments(data);
+            });
+    };
+
+    const fetchSpecialized = () => {
+        fetch("http://localhost:8080/api/v1/specializes/department/" + id)
             .then((res) => res.json())
             .then((data) => {
                 setItems(data);
             });
+    };
+
+    useEffect(() => {
+        fetchSpecialized();
+        fetchDepartment();
     }, [id]);
+
+    function handleLockSpecialized(id) {
+        fetch("http://localhost:8080/api/v1/specializes/lock/" + id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "authorization": "Bearer " + jwt
+            },
+        }).then((res) => {
+            if (res.status === 200) {
+                res.text().then((data) => {
+                    toast.success(data)
+                    fetchSpecialized()
+                    setItemEdit(itemEdit => ({...itemEdit, locked: !itemEdit.locked}))
+                });
+            } else {
+                res.text().then((data) => toast.error(data));
+            }
+        });
+    }
+
     return (
         <div>
             {isActive && (
@@ -72,7 +113,11 @@ const DepartmentItems = ({ isActive, id , dep}) => {
                         <ul>
                             {items.map((item, index) => (
                                 <li key={index} className="flex justify-between ">
-                                    <strong>{item.specializedName}</strong>
+                                    <strong className={`w-[50%]`}>{item.specializedName}</strong>
+                                    <div className="">
+
+                                    <div>{item.locked ? <span className="text-red-600">Đã khóa</span> : "Hoạt động"}</div>
+                                    </div>
                                     <a
                                         onClick={() => hanldeClickEdit(item)}
                                         class=" font-medium text-blue-600 dark:text-blue-500 hover:underline hover:cursor-pointer"
@@ -113,20 +158,45 @@ const DepartmentItems = ({ isActive, id , dep}) => {
                                     />
                                 </div>
                             </form>
-                            <div className="mt-6  flex justify-end ">
+                            <form className="mt-4">
+                                <div className="mb-4">
+                                    <label
+                                        htmlFor="name"
+                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                    >
+                                        Chuyển ngành sang khoa
+                                    </label>
+                                    <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)}
+                                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+                                    >
+                                        <option value="">Chọn khoa</option>
+                                        {
+                                            departments.map((dep, index) => (
+                                                <option selected={itemEdit.department.id === dep.id} key={index} value={dep.id}>{dep.departmentName}</option>
+                                            ))
+                                        }
+                                    </select>
+                                </div>
+                            </form>
+                            <div className="mt-6  flex justify-center ">
                                 <button
                                     onClick={() => setIsEdit(false)}
-                                    className="font-medium text-slate-500 rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-white border border-1 border-slate-500"
+                                    className="font-medium text-slate-500 rounded-xl w-full h-10 min-w-max px-12 bg-white border border-1 border-slate-500"
                                 >
                                     Hủy
                                 </button>
                                 <button
                                     onClick={() => handleEditSpecialized()}
-                                    className="ml-4 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-blue-500"
+                                    className="ml-4 font-medium  text-white rounded-xl w-full text-center h-10 min-w-max px-12 bg-blue-500"
                                 >
                                     Xác nhận
                                 </button>
                             </div>
+                            <button onClick={() => handleLockSpecialized(itemEdit.id)}
+                                    className={`w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-blue-400`}>{itemEdit.locked ? "Mở khóa" : "Khóa"}</button>
+                            <button onClick={() => handleDeleteSpecialized(itemEdit.id)}
+                                    className={`w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-red-500`}>Xóa
+                            </button>
                         </div>
                     </div>
                 </div>

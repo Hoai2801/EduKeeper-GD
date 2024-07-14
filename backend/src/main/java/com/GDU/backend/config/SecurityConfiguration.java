@@ -64,22 +64,24 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 "/api/v1/role/**"
                         ).hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(POST, 
-                                "/api/v1/departments/**",
                                 "/api/v1/specializes",
                                 "/api/v1/subjects"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
+                        .requestMatchers(PUT, 
+                                "/api/v1/departments/**"
+                        )
+                        .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(DELETE, 
                                 "/api/v1/users/**",
-                                "/api/v1/subjects/**"
+                                "/api/v1/subjects/**",
+                                "/api/v1/specializes/**",
+                                "/api/v1/departments/**"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(
                                 "/api/v1/documents/upload"
                         ).hasAnyRole("TEACHER", "ADMIN", "SUB-ADMIN")
-                        .requestMatchers(
-                                "/api/v1/notifications/**"
-                        )
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/documents/filter",

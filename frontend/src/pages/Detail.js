@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
 import './Detail.css'
 import {Link} from 'react-router-dom';
 import 'react-pdf/dist/esm/Page/TextLayer.css'
@@ -8,6 +8,7 @@ import unlove from '../assets/unlove.png';
 import love from '../assets/love.png';
 import Comment from "../components/Comment";
 import {Document, Page, pdfjs} from "react-pdf";
+import {JWTContext} from "../App";
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -25,7 +26,7 @@ const Detail = () => {
         return lastPart;
     }
 
-    const [staffCode, setStaffCode] = useState(null);
+    const staffCode = useContext(JWTContext)?.jwtDecoded?.staff_code;
 
     const [isFavorite, setIsFavorite] = useState(false);
 
@@ -97,8 +98,6 @@ const Detail = () => {
         }
     }
 
-    const viewer = useRef(null);
-
     const width = window.innerWidth > 1050 ? 1050 : window.innerWidth - 30;
 
     const downloadClick = () => {
@@ -132,14 +131,6 @@ const Detail = () => {
             console.error('Error fetching favorite status:', error);
         })
     };
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            const jwt = jwtDecode(token);
-            setStaffCode(jwt?.staff_code);
-        }
-    }, []);
 
     useEffect(() => {
         if (staffCode && data?.id) { // Ensure staffCode is not null before making the request
@@ -288,7 +279,7 @@ const Detail = () => {
                 <div className='mt-10'>
                     {/* File pdf render */}
                 </div>
-                <div className={`overflow-y-scroll h-screen rounded-lg mt-5 ${data?.style === "application/pdf" ? "" : "hidden"}}`}>
+                <div className={`overflow-y-scroll h-screen rounded-lg`}>
                     <Document file={file} onLoadSuccess={onDocumentLoadSuccess}
                               className={'flex flex-col items-center'}>
                         {Array.apply(null, Array(numPages))
@@ -303,7 +294,6 @@ const Detail = () => {
                                                 renderAnnotationLayer={false}
                                                 // renderMode="svg"
                                                 width={width}
-                                                className="mt-3"
                                             />
                                         </div>
                                     );
@@ -318,7 +308,7 @@ const Detail = () => {
                         </button>
                     </div>
                 </div>
-                <section className="bg-white py-8 lg:py-16 antialiased mt-3">
+                <section className="bg-white py-8 lg:py-16 antialiased mt-3 rounded-lg">
                     <div className="max-w-2xl mx-auto px-4">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg lg:text-2xl font-bold text-gray-900">Bình luận

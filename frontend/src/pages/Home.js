@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import Post from '../components/DocumentCard'
 import {Link} from 'react-router-dom'
 import {jwtDecode} from "jwt-decode";
+import Banner from "../components/Banner";
 
 const Home = () => {
 
@@ -72,36 +73,23 @@ const Home = () => {
 
         // Cleanup the timeout on component unmount
         return () => clearTimeout(timeout);
-    }, [indexBanner, banner]);
+    }, [indexBanner]);
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            const jwt = jwtDecode(token);
-            setStaffCode(jwt?.staff_code);
-        }
-    }, []);
+    // useEffect(() => {
+    //     const token = localStorage.getItem("token");
+    //     if (token !== "undefined" && token !== null) {
+    //         const jwt = jwtDecode(token);
+    //         setStaffCode(jwt?.staff_code);
+    //     }
+    // }, []);
 
     return (
         <div>
-            <div className={`w-full h-fit md:h-[600px] ${banner?.length === 0 ? "hidden" : "block"} relative`}>
-                {banner?.map((banner, index) => {
-                    console.log(banner.url);
-                    return (
-                    <a href={banner?.url?.includes('http') || banner?.url?.includes('https') ? banner?.url : banner.url !== null ? `https://${banner?.url}` : ''}>
-                        <img src={`http://localhost:8080/api/v1/images/banner/${banner.image}`} alt=""
-                             className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 md:rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
-                        />
-                    </a>
-                )})}
-                    <div className={`w-full flex justify-center ${banner?.length === 0 || banner?.length === 1 ? "hidden" : "block"} flex gap-2 absolute bottom-5 right-0`}>
-                        {banner?.map((banner, index) => (
-                            <button onClick={() => setIndexBanner(index)} className={`${index === indexBanner ? "bg-gray-700" : "bg-gray-400"} w-3 h-3 rounded-full mt-5`}></button>
-                        ))}
-                    </div>
+            <div className={`w-full h-fit relative`}>
+                <Banner />
             </div>
             <div
-                className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2'>
+                className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2 gap-10 pb-10'>
                 <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
                 <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
                     {lastedDocuments && lastedDocuments?.map((item, index) => (
