@@ -4,6 +4,18 @@ import {Link, NavLink} from "react-router-dom";
 const SideBarAdmin = () => {
     const [documentsDraft, setDocumentsDraft] = useState([]);
 
+    const POLLING_INTERVAL = 30000; // 30 seconds
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            fetch('http://localhost:8080/api/v1/documents/count-draft')
+                .then((res) => res.text())
+                .then((data) => {
+                    setDocumentsDraft(data);
+                })
+        }, POLLING_INTERVAL);
+        return () => clearInterval(intervalId); // Cleanup on component unmount
+    }, []);
+
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/documents/count-draft')
             .then((res) => res.text())
@@ -11,7 +23,6 @@ const SideBarAdmin = () => {
                 setDocumentsDraft(data);
             })
     }, []);
-
 
     return (
         <aside

@@ -150,10 +150,22 @@ const Subject = () => {
 
     return (
         <div>
-            <div className="flex justify-end">
+            <div className="flex justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold mt-5">Danh sách khoa</h1>
+                    <div>
+                        <p className={`text-red-500`}>Lưu ý: </p>
+                        <p>
+                            - Các môn học thuộc ngành là các môn học chuyên ngành
+                        </p>
+                        <p>
+                            - Các môn học mà ngành nào cũng có như Triết học, tư tưởng... sẽ thuộc Tất cả
+                        </p>
+                    </div>
+                </div>
                 <button
                     onClick={() => handleClickCreateSpecialized()}
-                    className="px-4 py-4 rounded-lg border-solid bg-blue-500 text-white mt-5 font-semibold hover:shadow-lg"
+                    className="px-6 py-6 mt-5 rounded-lg bg-blue-500 text-white mt-5 font-semibold hover:shadow-lg h-fit"
                     type="submit"
                 >
                     <span>Thêm môn học</span>
@@ -167,7 +179,7 @@ const Subject = () => {
                             <h1 className="text-2xl w-[50%]">{spe.specializedName}</h1>
                             <p>{spe.locked ? <span className={`text-red-600`}>Đã khóa</span> : "Hoạt động"}</p>
                             <div className=" flex items-end">
-                                <a
+                            <a
                                     onClick={() => handleToggleDetails(spe.id)}
                                     class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
                                 >
