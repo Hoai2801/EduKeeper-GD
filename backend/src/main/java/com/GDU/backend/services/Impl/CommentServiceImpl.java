@@ -12,6 +12,7 @@ import com.GDU.backend.repositories.NotificationRepository;
 import com.GDU.backend.repositories.UserRepository;
 import com.GDU.backend.services.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
     private final NotificationRepository notificationRepository;
 
     @Override
-    public String insertComment(CommentDTO commentDTO, Long documentId) {
+    public ResponseEntity<String> insertComment(CommentDTO commentDTO, Long documentId) {
         Document existDocument = documentRepository.findById(documentId).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
         User existUser = userRepository.findByStaffCode(commentDTO.getStaffCode()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         if (existDocument != null) {
@@ -40,17 +41,17 @@ public class CommentServiceImpl implements CommentService {
             );
             if (!existUser.getStaffCode().equals(existDocument.getUserUpload().getStaffCode())) {
                 Notification notification = Notification.builder()
-                        .title("Có người đã bình luận về tài liệu của bạn")
-                        .content(existUser.getName() + " đã bình luận về tài liệu của bạn")
+                        .title("Bình luận mới")
+                        .content(existUser.getName() + " đã bình luận về tài liệu " + existDocument.getTitle() + " của bạn")
                         .created_at(LocalDateTime.now())
                         .sender(existUser)
                         .receiver(existDocument.getUserUpload())
                         .build();
                 notificationRepository.save(notification);
             }
-            return "success";
+            return ResponseEntity.ok("success");
         }
-        return "fail";
+        return ResponseEntity.badRequest().body("Không tìm thấy tài liệu");
     }
 
     @Override

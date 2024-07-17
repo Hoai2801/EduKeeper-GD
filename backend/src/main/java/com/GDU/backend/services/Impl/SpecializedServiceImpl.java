@@ -45,7 +45,6 @@ public class SpecializedServiceImpl implements SpecializedService {
             List<SpecializesWithCount> result = new ArrayList<>();
             List<Specialized> specializedList = specializedRepository.findAll();
             if (specializedList.isEmpty()) {
-                System.out.println("specializedList is empty");
                 return result;
             }
             specializedList.sort(Comparator.comparing(Specialized::getId));

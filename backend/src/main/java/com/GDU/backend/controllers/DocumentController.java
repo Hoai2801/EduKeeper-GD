@@ -70,7 +70,7 @@ public class DocumentController {
             @ModelAttribute UploadRequestDTO uploadRequestDTO
     ) {
         try {
-            return ResponseEntity.ok(documentService.uploadDocument(uploadRequestDTO));
+            return documentService.uploadDocument(uploadRequestDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error uploading document: " + e.getMessage());

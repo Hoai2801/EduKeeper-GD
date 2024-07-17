@@ -9,7 +9,7 @@ import java.util.List;
 public interface SubjectService {
     
     List<Subject> getAllSubjects();
-    void createSubject(SubjectDTO subject);
+    ResponseEntity<String> createSubject(SubjectDTO subject);
 
     List<Subject> getSubjectsBySpecializedId(String specializedId);
     

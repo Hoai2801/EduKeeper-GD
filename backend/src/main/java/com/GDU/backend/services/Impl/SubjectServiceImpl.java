@@ -16,6 +16,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -30,7 +31,7 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public void createSubject(SubjectDTO subject) {
+    public ResponseEntity<String> createSubject(SubjectDTO subject) {
         String name = subject.getName();
         Subject newSubject = new Subject();
         newSubject.setSubjectName(name);
@@ -59,14 +60,21 @@ public class SubjectServiceImpl implements SubjectService {
             }
             subjectSpecializedRepository.save(subjectSpecialized);
         }
+        return ResponseEntity.ok("Thêm môn học thành công");
     }
 
     @Override
     public List<Subject> getSubjectsBySpecializedId(String specializedId) {
         List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectsBySpecializedId(Long.parseLong(specializedId));
+        List<SubjectSpecialized> subjectsOfAllSpecialized = subjectSpecializedRepository.getSubjectsBySpecializedId(40L);
         List<Subject> subjects = new ArrayList<>();
         for (SubjectSpecialized subjectSpecialized : subjectSpecializeds) {
             subjects.add(subjectSpecialized.getSubject());
+        }
+        for (SubjectSpecialized subjectSpecialized : subjectsOfAllSpecialized) {
+            if (!subjects.contains(subjectSpecialized.getSubject())) {
+                subjects.add(subjectSpecialized.getSubject());
+            }
         }
         return subjects;
     }

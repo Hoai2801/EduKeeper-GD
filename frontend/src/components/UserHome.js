@@ -16,9 +16,6 @@ const UserHome = () => {
     const [documentsViewed, setDocumentsViewed] = useState(0);
     const userJWT = useContext(JWTContext);
 
-    console.log(userJWT?.jwtDecoded)
-
-
     const location = useParams();
 
     const staffCode = location.valueOf("staff_code").staff_code;
@@ -124,22 +121,6 @@ const UserHome = () => {
                 <h2 className='text-3xl font-semibold mt-5 mb-3 text-start'>Lịch sử xem</h2>
                 <div className='flex gap-2 w-[1050px] py-5 overflow-hidden overflow-x-scroll'>
                     {
-                        documentsViewed && documentsViewed?.map((document, index) => {
-                            if (index < 10) {
-                                return (
-                                    <DocumentCard document={document} key={document.id}/>
-                                )
-                            }
-                        })
-                    }{
-                        documentsViewed && documentsViewed?.map((document, index) => {
-                            if (index < 10) {
-                                return (
-                                    <DocumentCard document={document} key={document.id}/>
-                                )
-                            }
-                        })
-                    }{
                         documentsViewed && documentsViewed?.map((document, index) => {
                             if (index < 10) {
                                 return (

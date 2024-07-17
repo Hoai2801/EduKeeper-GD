@@ -115,7 +115,7 @@ const BannerManager = ({jwt}) => {
                         </tr>
                         </thead>
                         <tbody>
-                        {bannerList?.map((item, index) => {
+                        {bannerList?.map((item) => {
                             return (
                                 <tr className="bg-white border-b hover:bg-gray-50">
                                     <th scope="row"

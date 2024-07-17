@@ -307,6 +307,7 @@ export const Upload = () => {
                                 departments && departments.map(dep => {
                                     return (
                                         <option value={JSON.stringify(dep)}
+                                                className={`${dep.locked ? "hidden" : "block"}`}
                                                 key={dep.id}>{dep.departmentName}</option>
                                     )
                                 })
@@ -327,6 +328,7 @@ export const Upload = () => {
                                 listSpecialized && listSpecialized?.map(specialized => {
                                     return(
                                     <option value={JSON.stringify(specialized)}
+                                            className={`${specialized.locked ? "hidden" : "block"}`}
                                             key={specialized.id}>{specialized.specializedName}</option>
                                 )})
                             }

@@ -24,7 +24,9 @@ const UserUploadDocument = () => {
         <div>
             <h2 className={`text-3xl font-semibold `}>Tài liệu đã đăng</h2>
             <div className={`flex flex-wrap gap-5 mt-5`}>
-                {documentList.length === 0 ? <div className={`w-full mt-10`}>Không có tài liệu</div> : null}
+                {documentList.length === 0 ?
+                    <p className={`text-xl font-semibold mb-5 text-gray-500`}>
+                        Không có tài liệu nào được đăng </p> : null}
                 {documentList?.map((item, index) => {
                     return (
                         // if document is soft deleted, hidden it

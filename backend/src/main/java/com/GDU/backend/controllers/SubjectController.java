@@ -26,8 +26,7 @@ public class SubjectController {
 
     @PostMapping
     ResponseEntity<?> createSubject(@RequestBody SubjectDTO subject) {
-        subjectService.createSubject(subject);
-        return ResponseEntity.ok().body("Subject created successfully");
+        return subjectService.createSubject(subject);
     }
     
     @DeleteMapping("/specialized/{id_specialized}/{id_subject}")

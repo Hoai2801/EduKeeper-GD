@@ -69,7 +69,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(PUT, 
-                                "/api/v1/departments/**"
+                                "/api/v1/departments/**",
+                                "/api/v1/settings/**"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(DELETE, 

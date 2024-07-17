@@ -17,6 +17,7 @@ const DepartmentItems = ({ isActive, id}) => {
     };
 
     const jwt = useContext(JWTContext)?.token;
+    const userJWT = useContext(JWTContext).jwtDecoded;
 
     const handleEditSpecialized = () => {
         console.log(selectedDepartment.id, newName, itemEdit.id)
@@ -193,7 +194,7 @@ const DepartmentItems = ({ isActive, id}) => {
                                 </button>
                             </div>
                             <button onClick={() => handleLockSpecialized(itemEdit.id)}
-                                    className={`w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-blue-400`}>{itemEdit.locked ? "Mở khóa" : "Khóa"}</button>
+                                    className={`w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-gray-500 ${userJWT.role === "ROLE_ADMIN" ? "" : "hidden"}`}>{itemEdit.locked ? "Mở khóa" : "Khóa"}</button>
                             <button onClick={() => handleDeleteSpecialized(itemEdit.id)}
                                     className={`w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-red-500`}>Xóa
                             </button>

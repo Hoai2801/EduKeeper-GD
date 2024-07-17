@@ -110,6 +110,8 @@ create table `role` (
     `name` varchar(100) not null
 );
 
+insert into role(id, name) values (1, 'ROLE_ADMIN'), (2, 'ROLE_TEACHER'), (3, 'ROLE_USER');
+
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
@@ -134,6 +136,10 @@ CREATE TABLE `users` (
                          CONSTRAINT `dpm_fk` FOREIGN KEY (`department`) REFERENCES `department` (`id`),
                          CONSTRAINT `spec_fk` FOREIGN KEY (`specialized`) REFERENCES `specialized` (`id`)
 );
+
+
+INSERT INTO `users` (`user_name`, `password`, `role_id`, `account_locked`, `enable`, `email`, `department`, `specialized`, `date_of_birth`, `class`, `created_date`, `last_modified_date`, `staff_code`)VALUES ('john_doe', '$2a$10$e9N3TvUKzRBe0Xz4.Y0bUef0gXmCFENNV6rnmrukiCB3ynvdRC4Ia', 1, false, true, 'john.doe@example.com', 1, 1, '1990-05-15', 'A', NOW(), NOW(), '22140044');
+
 
 -- INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN'); 
 
@@ -264,6 +270,11 @@ create table comment(
       constraint `cmt_fk_dcm` foreign key(document_id) references document(id)
 );
 
+create table setting(
+	id int not null auto_increment primary key,
+	name varchar(50) not null,
+    value varchar(50) not null
+);
 
 -- Performance
 -- create index idx_slug on document (slug);

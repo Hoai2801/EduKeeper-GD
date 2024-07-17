@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import SubjectItems from "../components/SubjectItems";
 import toast from "react-hot-toast";
 import "./Department.css";
 import {jwtDecode} from "jwt-decode";
+import {JWTContext} from "../App";
 
 const Subject = () => {
     const [subject, setSubject] = useState(null);
@@ -14,7 +15,8 @@ const Subject = () => {
     const [isShowSpecializes, setIsShowSpecialized] = useState(false);
     const [listSpeciaziles, setListSpeciaziles] = useState([]);
 
-    const [jwt, setJwt] = useState(null);
+    const context = useContext(JWTContext);
+    const jwt = context?.token;
     const handleToggleDetails = (id) => {
         setActiveSpecializedtId((prevId) => (prevId === id ? null : id));
     };
@@ -110,13 +112,8 @@ const Subject = () => {
     const handleAddSpecialized = (spe) => {
         const isCheck = listSpeciaziles.find((item) => item.id === spe.id)
             ? true
-            : false;
-        // the "All subject" option is selected
-        if (spe.id === 40) {
-            setListSpeciaziles(specialized.map((item) => {
-                return { id: item.id, name: item.specializedName };
-            }));
-        }
+            : false || listSpeciaziles.find((item) => item.id === 40);
+
         if (isCheck) {
             toast.error("Chuyên ngành này đã được thêm vào danh sách trên.");
         } else {
@@ -149,18 +146,14 @@ const Subject = () => {
                 };
                 setSelectSpecializes(objectFake);
             });
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            setJwt(token);
-        }
-    }, [listSpeciaziles]);
+    }, []);
 
     return (
         <div>
             <div className="flex justify-end">
                 <button
                     onClick={() => handleClickCreateSpecialized()}
-                    className="px-4 py-2 rounded-lg border-solid	bg-blue-500 text-white text-sm font-medium"
+                    className="px-4 py-4 rounded-lg border-solid bg-blue-500 text-white mt-5 font-semibold hover:shadow-lg"
                     type="submit"
                 >
                     <span>Thêm môn học</span>
@@ -220,16 +213,15 @@ const Subject = () => {
                                     <div>
                                         <label
                                             htmlFor="specialized"
-                                            className="block mb-2 text-sm font-semibold text-gray-900"
+                                            className="block mb-2 text-sm font-semibold text-gray-900 mt-5"
                                         >
                                             Thuộc ngành
                                         </label>
                                         <div className="max-h-40 overflow-auto">
                                             {isShowSpecializes &&
                                                 listSpeciaziles.map((spe, index) => {
-                                                    console.log(spe);
                                                     return (
-                                                        <li className={`flex flex-row justify-between ${spe.id === 40 ? "hidden" : ""}`}>
+                                                        <li className={`flex flex-row justify-between`}>
                                                             <a className="text-gray-500 font-medium">
                                                                 {index + 1}
                                                                 {". "}{" "}

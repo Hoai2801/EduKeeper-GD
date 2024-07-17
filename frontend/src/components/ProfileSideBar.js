@@ -60,7 +60,6 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 <button className={`border border-gray-500 p-2 rounded-lg w-fit absolute top-0 right-0 lg:hidden z-20`}
                         onClick={() => {
                             setDocumentMobileShow(!documentMobileShow)
-                            console.log(documentMobileShow)
                         }}>
                     ...
                 </button>
@@ -144,10 +143,12 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 </button>
                 <div className={`${documentMenuShow ? "block" : "hidden"} flex flex-col`}>
                     <Link to="document/upload"
-                          className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10`}>Tài
-                        liệu đã đăng</Link>
-                    <Link to="document/favorite" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>Tài liệu ưu
-                        thích</Link>
+                          className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10 ${user}`}>
+                        Tài liệu đã đăng
+                    </Link>
+                    <Link to="document/favorite" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>
+                        Tài liệu ưu thích
+                    </Link>
                 </div>
                 <Link to={"information"}
                       className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>

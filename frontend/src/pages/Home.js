@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import Post from '../components/DocumentCard'
 import {Link} from 'react-router-dom'
 import {jwtDecode} from "jwt-decode";
 import Banner from "../components/Banner";
+import {JWTContext} from "../App";
 
 const Home = () => {
 
@@ -12,20 +13,9 @@ const Home = () => {
 
     const [lastedDocuments, setLastedDocuments] = useState([])
 
-    const [staffCode, setStaffCode] = useState(null)
+    const context = useContext(JWTContext);
+    const staffCode = context?.jwtDecoded?.staff_code;
 
-    const [banner, setBanner] = useState([])
-
-    const [indexBanner, setIndexBanner] = useState(0)
-
-
-    const handleNextBanner = () => {
-        if (indexBanner < banner?.length - 1) {
-            setIndexBanner(indexBanner + 1)
-        } else {
-            setIndexBanner(0)
-        }
-    }
 
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/view-history/top-documents/9', {
@@ -53,35 +43,9 @@ const Home = () => {
         }).then(res => res?.json()).then(data => {
             setLastedDocuments(data)
         })
-        fetch('http://localhost:8080/api/v1/banners', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            },
-        })
-            .then(res => res?.json())
-            .then(data => {
-                setBanner(data)
-            })
     }, [])
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            handleNextBanner();
-        }, 5000);
 
-        // Cleanup the timeout on component unmount
-        return () => clearTimeout(timeout);
-    }, [indexBanner]);
-
-    // useEffect(() => {
-    //     const token = localStorage.getItem("token");
-    //     if (token !== "undefined" && token !== null) {
-    //         const jwt = jwtDecode(token);
-    //         setStaffCode(jwt?.staff_code);
-    //     }
-    // }, []);
 
     return (
         <div>

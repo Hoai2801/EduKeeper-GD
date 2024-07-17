@@ -61,12 +61,13 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "LEFT JOIN subject sj ON sj.id = d.subject_id " +
             "JOIN department dm ON dm.id = s.department_id " +
             "WHERE d.status = 'published' " +
-            "AND (:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%')) " +
+            "AND d.is_delete = 0 " +
+            "OR (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%') OR d.subject_id IS NULL) " +
+            "AND ((:departmentSlug IS NULL OR dm.department_slug LIKE CONCAT('%', COALESCE(:departmentSlug, ''), '%')) " +
             "AND (:searchTerm IS NULL OR (d.title LIKE CONCAT('%', :searchTerm, '%') OR d.author LIKE CONCAT('%', :searchTerm, '%'))) " +
             "AND (:categoryName IS NULL OR c.category_slug LIKE CONCAT('%', COALESCE(:categoryName, ''), '%')) " +
             "AND (:specializedSlug IS NULL OR s.specialized_slug LIKE CONCAT('%', COALESCE(:specializedSlug, ''), '%')) " +
-            "AND (:subjectName IS NULL OR sj.subject_slug LIKE CONCAT('%', COALESCE(:subjectName, ''), '%') OR d.subject_id IS NULL) " +
-            "AND (:dateTime IS NULL OR d.upload_date LIKE CONCAT('%', COALESCE(:dateTime, ''), '%'))",
+            "AND (:dateTime IS NULL OR d.upload_date LIKE CONCAT('%', COALESCE(:dateTime, ''), '%')))",
             nativeQuery = true)
     List<Document> getDocumentsByFilter(@Param("departmentSlug") String departmentSlug,
                                         @Param("searchTerm") String searchTerm,
@@ -100,7 +101,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.slug = :slug")
     Optional<Document> findBySlug(String slug);
 
-    @Query("select d from Document d where d.userUpload.id = :id")
+    @Query("select d from Document d where d.userUpload.id = :id and d.status = 'published' and d.isDelete = false and d.scope != 'private'")
     List<Document> findAllByAuthorId(Long id);
 
     @Query("SELECT COUNT(d) FROM Document d JOIN Specialized s ON d.specialized.id = s.id WHERE s.id = :id and d.status = 'published' and d.isDelete = false and d.scope != 'private'")

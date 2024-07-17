@@ -74,6 +74,14 @@ const SideBar = () => {
     };
   }, [sort, department, specialized]);
 
+  useEffect(() => {
+    fetch('http://localhost:8080/api/v1/subjects/specialized/40')
+        .then((res) => res.json())
+        .then((data) => {
+          setSubjectList(data);
+        });
+  }, []);
+
   return (
     <div className="flex justify-between w-full gap-5 p-5">
       <div
@@ -215,7 +223,7 @@ const SideBar = () => {
               htmlFor="specialies"
               className="block mb-2 text-xl text-gray-900 font-semibold"
             >
-              Chuyên môn
+              Môn học
             </label>
             <select
               id="specialies"

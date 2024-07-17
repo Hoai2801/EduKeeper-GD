@@ -35,7 +35,6 @@ const Navbar = () => {
             })
                 .then((res) => res.json())
                 .then((data) => {
-                    console.log(data)
                     // filter the specialized that is not locked
                     setSpecialized(data.filter(item => (item.specialized.locked === false && item.specialized.department.locked === false)));
                 });
@@ -131,6 +130,7 @@ const Navbar = () => {
         const checkNotification = () => {
             if (jwtDecoded?.jwtDecoded) {
                 fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwtDecoded?.jwtDecoded.staff_code);
+                getNotification();
             }
         }
 
