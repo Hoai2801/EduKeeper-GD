@@ -52,14 +52,12 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setData(data)
             });
 
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
             .then((res) => {
                 res.blob().then(r => {
-                    console.log(r)
                     setFile(r)
                 })
             })
@@ -68,6 +66,7 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/download")
             .then((res) => {
                 res.blob().then(r => {
+                    console.log(r)
                     setFileDownload(r)
                 })
             })
@@ -112,7 +111,7 @@ const Detail = () => {
         console.log(data)
         // Creating new object of PDF file
         const fileURL = window.URL.createObjectURL(new Blob([fileDownload], {
-            type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            type: data?.download_file_type || 'application/pdf',
             name: data?.title
         }));
 
@@ -269,7 +268,7 @@ const Detail = () => {
                                 onClick={() => downloadClick()}
                                 className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4 mt-2 text-center cursor-pointer'>Tải
                                 tài liệu
-                                ({data?.document_size} MB)
+                                ({Math.round(fileDownload?.size / 1024 / 1024) < 1 ? "Nhỏ hơn 1" : Math.round(fileDownload?.size / 1024 / 1024)} MB)
                             </buttonN>
                             <div className='flex gap-5'>
                                 <p>Lượt xem: {data?.views}</p>

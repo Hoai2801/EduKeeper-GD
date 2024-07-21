@@ -29,7 +29,6 @@ public class DocumentController {
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
-            System.out.println(slug);
             File file = new File(document.getPath());
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(document.getDocument_type()))
@@ -43,6 +42,13 @@ public class DocumentController {
     public ResponseEntity<Resource> getDownloadFileBySlug(@PathVariable("slug") String slug) {
         try {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
+            // null because the raw file is pdf
+            if (document.getFile_download() == null) {
+                File file = new File(document.getPath());
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(document.getDocument_type()))
+                        .body(new FileSystemResource(file));
+            }
             File file = new File(UPLOAD_DIR + document.getFile_download());
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(document.getDownload_file_type()))
