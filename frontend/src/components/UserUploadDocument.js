@@ -16,7 +16,6 @@ const UserUploadDocument = () => {
         fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setDocumentList(data);
             });
     }, [location])

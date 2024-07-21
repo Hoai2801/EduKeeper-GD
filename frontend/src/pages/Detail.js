@@ -3,7 +3,6 @@ import './Detail.css'
 import {Link} from 'react-router-dom';
 import 'react-pdf/dist/esm/Page/TextLayer.css'
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
-import {jwtDecode} from "jwt-decode";
 import unlove from '../assets/unlove.png';
 import love from '../assets/love.png';
 import Comment from "../components/Comment";
@@ -36,6 +35,7 @@ const Detail = () => {
     const [numPages, setNumPages] = useState();
     const [pageNumber, setPageNumber] = useState(20);
     const [file, setFile] = useState(null);
+    const [fileDownload, setFileDownload] = useState(null);
     const [data, setData] = useState(null);
 
     const [commentList, setCommentList] = useState([]);
@@ -61,6 +61,14 @@ const Detail = () => {
                 res.blob().then(r => {
                     console.log(r)
                     setFile(r)
+                })
+            })
+
+
+        fetch("http://localhost:8080/api/v1/documents/" + slug + "/download")
+            .then((res) => {
+                res.blob().then(r => {
+                    setFileDownload(r)
                 })
             })
 
@@ -101,10 +109,10 @@ const Detail = () => {
     const width = window.innerWidth > 1050 ? 1050 : window.innerWidth - 30;
 
     const downloadClick = () => {
-
+        console.log(data)
         // Creating new object of PDF file
-        const fileURL = window.URL.createObjectURL(new Blob([file], {
-            type: data?.document_type,
+        const fileURL = window.URL.createObjectURL(new Blob([fileDownload], {
+            type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             name: data?.title
         }));
 

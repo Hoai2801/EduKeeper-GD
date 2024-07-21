@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import toast from "react-hot-toast";
 
 const DragDropFile = ({handleFiles, fileSupport}) => {
   // drag state
@@ -32,20 +33,19 @@ const DragDropFile = ({handleFiles, fileSupport}) => {
   const handleChange = function (e) {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      if (e.target.files[0].type === "application/pdf" ||
-        e.target.files[0].type === "application/msword" ||
-        e.target.files[0].type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          || fileSupport === "image"
+      if (e.target.files[0].type === "application/pdf"
+          || e.target.files[0].type === fileSupport
+          || fileSupport === "any" && e.target.files[0].type !== "image/png" && e.target.files[0].type !== "image/jpeg" && e.target.files[0].type !== "image/jpg"
       ) {
         if (e.target.files[0].size < 52428800) {
           handleFiles(e.target.files);
         }
         else {
-          alert("Kiểu file tối đa 50MB")
+          toast.error("File quá lớn. Vui lòng chọn file nhỏ hơn 50MB")
         }
       }
       else {
-        alert("Định dạng file hiện đang chưa hỗ trợ")
+        toast.error("Định dạng file hiện đang chưa hỗ trợ")
       }
     }
   };
@@ -59,9 +59,9 @@ const DragDropFile = ({handleFiles, fileSupport}) => {
     <form id="form-file-upload" onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()}>
       <input ref={inputRef} type="file" id="input-file-upload" multiple={true} onChange={handleChange} />
       <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : ""}>
-        <div>
-          <p>Drag and drop your file here or</p>
-          <button className="upload-button" onClick={onButtonClick}>Upload a file</button>
+        <div className={`flex flex-col items-center justify-center h-full`}>
+          <p>Kéo và thả file vào khu vực này hoặc là</p>
+          <button className="upload-button text-blue-400" onClick={onButtonClick}>Tải file từ máy</button>
         </div>
       </label>
       {dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}

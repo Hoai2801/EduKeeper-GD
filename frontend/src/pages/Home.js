@@ -16,7 +16,6 @@ const Home = () => {
     const context = useContext(JWTContext);
     const staffCode = context?.jwtDecoded?.staff_code;
 
-
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/view-history/top-documents/9', {
             method: "GET",
@@ -41,6 +40,7 @@ const Home = () => {
                 'Access-Control-Allow-Origin': '*',
             },
         }).then(res => res?.json()).then(data => {
+            console.log(data)
             setLastedDocuments(data)
         })
     }, [])
@@ -58,7 +58,7 @@ const Home = () => {
                 <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
                     {lastedDocuments && lastedDocuments?.map((item, index) => (
                         <div
-                            className={`${item.scope === "private" || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
+                            className={`${item.scope === "private" && !staffCode || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
                             <Post key={index} document={item}/>
                         </div>
                     ))}

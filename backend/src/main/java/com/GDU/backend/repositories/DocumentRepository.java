@@ -101,7 +101,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("SELECT d FROM Document d WHERE d.slug = :slug")
     Optional<Document> findBySlug(String slug);
 
-    @Query("select d from Document d where d.userUpload.id = :id and d.status = 'published' and d.isDelete = false and d.scope != 'private'")
+    @Query("select d from Document d where d.userUpload.id = :id and d.isDelete = false")
     List<Document> findAllByAuthorId(Long id);
 
     @Query("SELECT COUNT(d) FROM Document d JOIN Specialized s ON d.specialized.id = s.id WHERE s.id = :id and d.status = 'published' and d.isDelete = false and d.scope != 'private'")

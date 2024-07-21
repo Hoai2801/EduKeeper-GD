@@ -26,6 +26,8 @@ public class DocumentResponseDTO {
 
     private String document_type;
 
+    private String download_file_type;
+
     private Long document_size;
 
     private LocalDate upload_date;
@@ -33,6 +35,8 @@ public class DocumentResponseDTO {
     private String thumbnail;
 
     private String path;
+    
+    private String file_download; 
     
     private String description;
     
