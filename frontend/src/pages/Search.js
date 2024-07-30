@@ -30,7 +30,6 @@ const Search = ({jwt}) => {
         };
 
         const api = "http://localhost:8080/api/v1/documents/filter"
-        console.log(dataSearch)
         fetch(api, {
             method: 'POST',
             headers: {
@@ -40,8 +39,8 @@ const Search = ({jwt}) => {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 if (data) {
+                    console.log(data)
                     setDocument(data)
                     setTimeout(() => {
                         localStorage.removeItem('search')
@@ -59,9 +58,7 @@ const Search = ({jwt}) => {
                 {documents && documents.map((item, index) => {
                         if (index < limit) {
                             return (
-                                <div className={`${jwt ? '' : 'hidden'}`}>
-                                    <DocumentCard key={index} document={item}/>
-                                </div>
+                                <DocumentCard key={index} document={item}/>
                             )
                         }
                     }

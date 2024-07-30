@@ -124,7 +124,7 @@ const Dashboard = () => {
             <div className="border-t border-blue-gray-50 p-4">
               <p className="block antialiased font-sans text-base leading-relaxed font-normal text-blue-gray-600">
                 <strong className="text-green-500">
-                  {(totalDraftDocuments ? totalDraftDocuments : 0) * 100 / totalDocuments}%
+                  {Math.round((totalDraftDocuments ? totalDraftDocuments : 0) * 100 / totalDocuments)}%
                 </strong>
                 &nbsp;so với tổng tài liệu
               </p>

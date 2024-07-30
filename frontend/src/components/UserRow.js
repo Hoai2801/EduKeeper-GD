@@ -1,9 +1,14 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import removeIcon from '../assets/logo192.png'
 import editIcon from '../assets/edit-246.png'
+import {JWTContext} from "../App";
 
 const UserRow = ({user, setEditUser, setIsEditOpen}) => {
     const [isShow, setIsShow] = useState(true)
+
+    const userContext = useContext(JWTContext);
+    const userJWT = userContext?.jwtDecoded;
+
     const removeUser = () => {
         fetch(`http://localhost:8080/api/v1/users/${user.id}`, {
             method: 'DELETE',
@@ -29,7 +34,6 @@ const UserRow = ({user, setEditUser, setIsEditOpen}) => {
         });
         setIsEditOpen(true);
     }
-
     return (
         <tr key={user.id}
             className={`p-2 mt-5 ${user.enabled ? "bg-white" : "bg-gray-100"} w-full ${isShow ? "" : "hidden"}`}>
@@ -44,12 +48,15 @@ const UserRow = ({user, setEditUser, setIsEditOpen}) => {
             <td className="px-4 py-2">{new Date(user.createdDate).toLocaleDateString()}</td>
             <div>
                 <td className="px-4 py-2 flex gap-10">
-                    <button className='mt-2' onClick={removeUser}>
-                        <img src={removeIcon} alt="" className='w-5 h-5'/>
-                    </button>
-                    <button className='mt-2' onClick={handleUserEdit}>
-                        <img src={editIcon} alt="" className='w-5 h-5'/>
-                    </button>
+                    <div
+                        className={`${(user.roles.name === "ROLE_ADMIN" || user.roles.name === "ROLE_SUB-ADMIN") && userJWT?.role === "ROLE_SUB-ADMIN" ? "hidden" : ""}`}>
+                        <button className={`mt-2 ${userJWT?.role === "ROLE_SUB-ADMIN" ? "hidden" : ""}`} onClick={removeUser}>
+                            <img src={removeIcon} alt="" className='w-5 h-5'/>
+                        </button>
+                        <button className='mt-2' onClick={handleUserEdit}>
+                            <img src={editIcon} alt="" className='w-5 h-5'/>
+                        </button>
+                    </div>
                 </td>
             </div>
         </tr>

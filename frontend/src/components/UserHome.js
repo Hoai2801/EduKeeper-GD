@@ -16,9 +16,6 @@ const UserHome = () => {
     const [documentsViewed, setDocumentsViewed] = useState(0);
     const userJWT = useContext(JWTContext);
 
-    console.log(userJWT?.jwtDecoded)
-
-
     const location = useParams();
 
     const staffCode = location.valueOf("staff_code").staff_code;
@@ -76,7 +73,7 @@ const UserHome = () => {
         fetchData();
     }, []);
     return (
-        <div>
+        <div className={`p-5 h-full w-full`}>
             <div className='flex gap-5 flex-wrap md:justify-center flex-row md:w-[1050px]'>
                 <div
                     className='bg-white shadow-lg py-3 text-center text-gray-500 font-bold md:w-fit w-full xl:w-fit xl:h-[100px] rounded-lg xl:p-3'>
@@ -132,22 +129,22 @@ const UserHome = () => {
                             }
                         })
                     }{
-                        documentsViewed && documentsViewed?.map((document, index) => {
-                            if (index < 10) {
-                                return (
-                                    <DocumentCard document={document} key={document.id}/>
-                                )
-                            }
-                        })
-                    }{
-                        documentsViewed && documentsViewed?.map((document, index) => {
-                            if (index < 10) {
-                                return (
-                                    <DocumentCard document={document} key={document.id}/>
-                                )
-                            }
-                        })
-                    }
+                    documentsViewed && documentsViewed?.map((document, index) => {
+                        if (index < 10) {
+                            return (
+                                <DocumentCard document={document} key={document.id}/>
+                            )
+                        }
+                    })
+                }{
+                    documentsViewed && documentsViewed?.map((document, index) => {
+                        if (index < 10) {
+                            return (
+                                <DocumentCard document={document} key={document.id}/>
+                            )
+                        }
+                    })
+                }
                 </div>
             </div>
         </div>

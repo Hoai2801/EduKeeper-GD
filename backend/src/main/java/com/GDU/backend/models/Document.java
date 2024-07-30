@@ -31,6 +31,10 @@ public class Document {
     @Column(nullable = false, length = 30)
     private String documentType;
 
+    @Column(name = "download_file_type" ,nullable = false, length = 30)
+    private String downloadFileType;
+
+
     @Column(nullable = false)
     private Long documentSize;
 
@@ -45,6 +49,9 @@ public class Document {
 
     @Column(nullable = false, length = 500)
     private String path;
+    
+    @Column(name = "path_download" ,nullable = false, length = 500)
+    private String documentDownload;
 
     @Column(nullable = false, length = 500)
     private String thumbnail;

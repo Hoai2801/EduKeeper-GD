@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +28,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
-    // private final PasswordEncoder passwordEncoder;
+     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final SpecializedRepository specializedRepository;
@@ -160,6 +161,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return ResponseEntity.ok("Đã mở khoá người dùng!");
         }
         return ResponseEntity.badRequest().body("Lỗi hệ thống, hiện tại không thể thực hiện thao tác không");
+    }
+
+    @Override
+    public ResponseEntity<?> resetPassword(String staffCode) {
+        User user = getUserByStaffCode(staffCode);
+        if (user != null) {
+            String newPassword = "GDU13456";
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return ResponseEntity.ok(newPassword);
+        }
+        return null;
     }
 
     @Override

@@ -5,23 +5,24 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name = "subject")
-public class Subject {
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "setting")
+public class Setting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "subject_name", nullable = false, length = 50)
-    private String subjectName;
-
-    @Column(name = "subject_slug", nullable = false, length = 80)
-    private String subjectSlug;
-
+    
+    @Column
+    private String name;
+    
+    @Column
+    private String value;
 }

@@ -23,6 +23,7 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     @GetMapping("/{slug}/file")
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
@@ -31,6 +32,26 @@ public class DocumentController {
             File file = new File(document.getPath());
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(document.getDocument_type()))
+                    .body(new FileSystemResource(file));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/{slug}/download")
+    public ResponseEntity<Resource> getDownloadFileBySlug(@PathVariable("slug") String slug) {
+        try {
+            DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
+            // null because the raw file is pdf
+            if (document.getFile_download() == null) {
+                File file = new File(document.getPath());
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(document.getDocument_type()))
+                        .body(new FileSystemResource(file));
+            }
+            File file = new File(UPLOAD_DIR + document.getFile_download());
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(document.getDownload_file_type()))
                     .body(new FileSystemResource(file));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -70,7 +91,7 @@ public class DocumentController {
             @ModelAttribute UploadRequestDTO uploadRequestDTO
     ) {
         try {
-            return ResponseEntity.ok(documentService.uploadDocument(uploadRequestDTO));
+            return documentService.uploadDocument(uploadRequestDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error uploading document: " + e.getMessage());

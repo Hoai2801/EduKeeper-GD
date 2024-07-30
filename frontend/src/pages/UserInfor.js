@@ -154,7 +154,7 @@ const UserInfor = () => {
                     </div>
                 </div>
             </div>
-            <div className={`flex flex-col gap-5 mt-5 w-[85%] mx-auto md:w-full`}>
+            <div className={`flex flex-col gap-5 mt-5 w-[85%] mx-auto md:w-full max-w-[820px]`}>
                 <div className="mx-auto w-full">
                     <label htmlFor="department"
                            className="block mb-2 font-semibold text-gray-500">Khoa</label>
@@ -206,7 +206,7 @@ const UserInfor = () => {
                 </div>
                 <div className='flex justify-center p-5'>
                     <button onClick={updateUser}
-                            className='hover:rounded-lg hover:bg-[#C5D6F8] p-2 bg-blue-400 rounded-lg'>Cập nhật
+                            className='hover:rounded-lg hover:bg-[#C5D6F8] p-3 bg-blue-400 rounded-lg text-lg text-white'>Cập nhật
                     </button>
                 </div>
             </div>

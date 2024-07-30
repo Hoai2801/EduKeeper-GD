@@ -94,4 +94,11 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    
+    @PutMapping("/reset-password/{staffCode}")
+    public ResponseEntity<?> resetPassword(
+            @PathVariable("staffCode") String staffCode
+    ) {
+        return userService.resetPassword(staffCode);
+    }
 }

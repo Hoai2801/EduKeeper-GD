@@ -9,8 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Nullable;
-
 @Data
 @Builder
 @AllArgsConstructor
@@ -44,4 +42,6 @@ public class UploadRequestDTO {
 
     @NotNull
     private MultipartFile document;
+    
+    private MultipartFile documentDownload;
 }

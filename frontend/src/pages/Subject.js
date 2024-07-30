@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import SubjectItems from "../components/SubjectItems";
 import toast from "react-hot-toast";
 import "./Department.css";
 import {jwtDecode} from "jwt-decode";
+import {JWTContext} from "../App";
 
 const Subject = () => {
     const [subject, setSubject] = useState(null);
@@ -14,7 +15,8 @@ const Subject = () => {
     const [isShowSpecializes, setIsShowSpecialized] = useState(false);
     const [listSpeciaziles, setListSpeciaziles] = useState([]);
 
-    const [jwt, setJwt] = useState(null);
+    const context = useContext(JWTContext);
+    const jwt = context?.token;
     const handleToggleDetails = (id) => {
         setActiveSpecializedtId((prevId) => (prevId === id ? null : id));
     };
@@ -110,13 +112,8 @@ const Subject = () => {
     const handleAddSpecialized = (spe) => {
         const isCheck = listSpeciaziles.find((item) => item.id === spe.id)
             ? true
-            : false;
-        // the "All subject" option is selected
-        if (spe.id === 40) {
-            setListSpeciaziles(specialized.map((item) => {
-                return { id: item.id, name: item.specializedName };
-            }));
-        }
+            : false || listSpeciaziles.find((item) => item.id === 40);
+
         if (isCheck) {
             toast.error("Chuyên ngành này đã được thêm vào danh sách trên.");
         } else {
@@ -149,18 +146,26 @@ const Subject = () => {
                 };
                 setSelectSpecializes(objectFake);
             });
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            setJwt(token);
-        }
-    }, [listSpeciaziles]);
+    }, []);
 
     return (
         <div>
-            <div className="flex justify-end">
+            <div className="flex justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold mt-5">Danh sách khoa</h1>
+                    <div>
+                        <p className={`text-red-500`}>Lưu ý: </p>
+                        <p>
+                            - Các môn học thuộc ngành là các môn học chuyên ngành
+                        </p>
+                        <p>
+                            - Các môn học mà ngành nào cũng có như Triết học, tư tưởng... sẽ thuộc Tất cả
+                        </p>
+                    </div>
+                </div>
                 <button
                     onClick={() => handleClickCreateSpecialized()}
-                    className="px-4 py-2 rounded-lg border-solid	bg-blue-500 text-white text-sm font-medium"
+                    className="px-6 py-6 mt-5 rounded-lg bg-blue-500 text-white mt-5 font-semibold hover:shadow-lg h-fit"
                     type="submit"
                 >
                     <span>Thêm môn học</span>
@@ -174,7 +179,7 @@ const Subject = () => {
                             <h1 className="text-2xl w-[50%]">{spe.specializedName}</h1>
                             <p>{spe.locked ? <span className={`text-red-600`}>Đã khóa</span> : "Hoạt động"}</p>
                             <div className=" flex items-end">
-                                <a
+                            <a
                                     onClick={() => handleToggleDetails(spe.id)}
                                     class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
                                 >
@@ -220,16 +225,15 @@ const Subject = () => {
                                     <div>
                                         <label
                                             htmlFor="specialized"
-                                            className="block mb-2 text-sm font-semibold text-gray-900"
+                                            className="block mb-2 text-sm font-semibold text-gray-900 mt-5"
                                         >
                                             Thuộc ngành
                                         </label>
                                         <div className="max-h-40 overflow-auto">
                                             {isShowSpecializes &&
                                                 listSpeciaziles.map((spe, index) => {
-                                                    console.log(spe);
                                                     return (
-                                                        <li className={`flex flex-row justify-between ${spe.id === 40 ? "hidden" : ""}`}>
+                                                        <li className={`flex flex-row justify-between`}>
                                                             <a className="text-gray-500 font-medium">
                                                                 {index + 1}
                                                                 {". "}{" "}

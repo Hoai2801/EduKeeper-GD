@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import DragDropFile from '../components/DragDropFile'
 import {jwtDecode} from 'jwt-decode';
 import {CKEditor} from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import {Document, Page} from 'react-pdf';
 import {useLocation, useParams} from "react-router-dom";
+import {JWTContext} from "../App";
+import toast from "react-hot-toast";
 
 export const Upload = () => {
     const location = useLocation();
@@ -18,8 +20,12 @@ export const Upload = () => {
     // file upload
     const [selectedFile, setFile] = useState(null);
 
+    const [haveDownloadFile, setHaveDownloadFile] = useState(false);
+    const [downloadFile, setDownloadFile] = useState(null);
+
+
     const [departments, setDepartments] = useState([]);
-    const [listCategory, setListCategory] = useState(null);
+    const [listCategory, setListCategory] = useState([]);
     const [category, setCategory] = useState(1);
     const [description, setDescription] = useState(null);
     const [scopeList, setScopeList] = useState([
@@ -46,8 +52,19 @@ export const Upload = () => {
     const [listSubject, setListSubject] = useState(null);
     const [author, setAuthor] = useState(null);
 
-    const [bearToken, setBearToken] = useState(null);
-    const [jwt, setJwt] = useState(null);
+    const context = useContext(JWTContext);
+    const jwt = context?.token;
+    const user = context?.jwtDecoded;
+
+    useEffect(() => {
+        if (path && path.slug) {
+            fetch('http://localhost:8080/api/v1/documents/' + path.slug).then(response => response.json())
+                .then(data => {
+                    setDocumentEdit(data)
+                })
+                .catch(error => console.error(error));
+        }
+    }, [path])
 
 
     useEffect(() => {
@@ -64,6 +81,10 @@ export const Upload = () => {
         setFile(updatedFile[0]);
     };
 
+    const handleFileDownload = (updatedFile) => {
+        setDownloadFile(updatedFile[0]);
+    };
+
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/departments').then(response => response.json())
             .then(data => {
@@ -76,11 +97,6 @@ export const Upload = () => {
                 setListCategory(data)
             })
             .catch(error => console.error(error));
-        const token = localStorage.getItem("token");
-        setBearToken(token)
-        if (token !== "undefined" && token !== null) {
-            setJwt(jwtDecode(token));
-        } else window.location.href = "/";
     }, [])
 
     useEffect(() => {
@@ -123,13 +139,13 @@ export const Upload = () => {
 
     useEffect(() => {
         if (selectedDepartment) {
-        fetch('http://localhost:8080/api/v1/specializes/department/' + selectedDepartment?.id).then(data => data.json())
-            .then(data => {
-                if (data.length > 0) {
-                    setListSpecialized(data)
-                }
-            })
-            .catch(error => console.error(error));
+            fetch('http://localhost:8080/api/v1/specializes/department/' + selectedDepartment?.id).then(data => data.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        setListSpecialized(data)
+                    }
+                })
+                .catch(error => console.error(error));
         }
     }, [selectedDepartment])
 
@@ -178,6 +194,7 @@ export const Upload = () => {
 
 
         const formData = new FormData();
+        console.log(user)
         formData.append('document', selectedFile);
         formData.append('title', title);
         formData.append('department', selectedDepartment.id);
@@ -185,21 +202,23 @@ export const Upload = () => {
         formData.append('description', description);
         formData.append('subject', subject || -1);
         formData.append('specialized', specialized?.id);
-        formData.append('userUpload', jwt.staff_code);
+        formData.append('userUpload', user?.staff_code);
         formData.append('scope', scope || "public");
         formData.append('author', author);
-
+        formData.append('documentDownload', downloadFile);
         console.log(formData)
+
         fetch('http://localhost:8080/api/v1/documents/upload', {
             method: 'POST',
             body: formData,
             headers: {
-                'Authorization': 'Bearer ' + bearToken
+                'Authorization': 'Bearer ' + jwt
             }
         })
             .then(response => {
+                console.log(response)
                 if (response.status === 200) {
-                    alert("Đăng tài liệu thành công")
+                    toast.success("Tài liệu đã được tải lên")
                     setFile(null)
                     setCategory('')
                     setSelectedDepartment('')
@@ -210,6 +229,8 @@ export const Upload = () => {
                     setTitle('')
                     setScope(null)
                     setAuthor("")
+                } else {
+                    response.text().then(data => toast.error(data))
                 }
             })
             .catch(error => console.error(error));
@@ -232,11 +253,10 @@ export const Upload = () => {
             method: 'PUT',
             body: formData,
             headers: {
-                'Authorization': `Bearer ${bearToken}`,
+                'Authorization': `Bearer ${jwt}`,
             }
         })
             .then(response => {
-                console.log(response)
                 if (response.status === 200) {
                     alert("Cập nhật tài liệu thành công")
                 }
@@ -252,14 +272,19 @@ export const Upload = () => {
     }
 
     return (
-        <div>
-            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${isEditPage ? "block" : "hidden"}`}>Cập nhật
-                tài liệu</h2>
-            <div className={`${isEditPage ? "hidden" : "block"}`}>
-                <p className='text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0'>Đăng tài liệu</p>
-                <DragDropFile handleFiles={handleFiles} fileSupport={`application/pdf`}/>
+        <div className={`w-full p-2`}>
+            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${isEditPage ? "block" : "hidden"}`}>
+                Cập nhật tài liệu
+            </h2>
+            <div className={`${isEditPage ? "hidden" : "block"} max-w-[450px] mx-auto`}>
+                <p className='text-3xl font-bold mb-5 mt-10'>Đăng tài liệu</p>
+                <p className={`text-lg`}>Tài liệu <span className='text-red-500'>*</span></p>
+                <p className={`text-red-500 mb-2`}>Lưu ý chỉ hỗ trợ file PDF</p>
+                <div className={`${selectedFile ? "hidden" : "block"}`}>
+                    <DragDropFile handleFiles={handleFiles} fileSupport={`application/pdf`}/>
+                </div>
             </div>
-            <div>
+            <div className={`flex justify-center p-2`}>
                 {selectedFile && (
                     <div className='bg-white p-5 rounded-2xl flex gap-3 max-w-md mt-2'>
                         <Document file={selectedFile} type={selectedFile.type}>
@@ -271,8 +296,52 @@ export const Upload = () => {
                             <p className='w-full'>{selectedFile?.name}</p>
                             <p>{(selectedFile?.size / (1024 * 1024)).toFixed(1)} MB</p>
                         </div>
+                        <button
+                            onClick={() => setFile(null)}
+                            className='text-red-500'>Xóa
+                        </button>
                     </div>
                 )}
+            </div>
+            <div
+                className={`${haveDownloadFile ? "bg-white rounded-2xl mt-2" : ""} flex flex-col items-center max-w-[450px] mx-auto`}>
+                {/*toggle*/}
+                <label className="inline-flex items-center cursor-pointer my-3 p-2">
+                    <input type="checkbox" value="" className="sr-only peer" checked={haveDownloadFile}
+                           onChange={(e) => {
+                               setHaveDownloadFile(e.target.checked)
+                               setDownloadFile(null)
+                           }}/>
+                    <div
+                        className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <p className="ml-3 w-[70%] text-gray-900 font-semibold">
+                        Tôi muốn file người dùng tải về
+                        là file khác (word,
+                        powerpoint, excel...)
+                    </p>
+
+                </label>
+                <div className={`p-10 max-w-[450px]`}>
+                    {
+                        haveDownloadFile && !downloadFile && (
+                            <div className={`${isEditPage ? "hidden" : "block"} max-w-[450px]`}>
+                                <DragDropFile handleFiles={handleFileDownload} fileSupport={`any`}/>
+                            </div>
+                        )
+                    }
+                    {
+                        downloadFile && haveDownloadFile && (
+                            <div
+                                className={`${isEditPage ? "hidden" : "block"} max-w-[450px] overflow-hidden p-2 flex justify-between gap-5 rounded-2xl border border-gray-300`}>
+                                <p className={`text-gray-700 font-semibold`}>Tải lên thành công <span
+                                    className={`text-gray-900 font-semibold`}>{downloadFile.name}</span></p>
+                                <button className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2`}
+                                        onClick={() => setDownloadFile(null)}>Xóa
+                                </button>
+                            </div>
+                        )
+                    }
+                </div>
             </div>
             <div className="max-w-md mx-auto p-8 bg-white rounded-md shadow-md mt-5">
                 <h2 className="text-2xl font-semibold mb-6">Thông tin tài liệu</h2>
@@ -307,6 +376,7 @@ export const Upload = () => {
                                 departments && departments.map(dep => {
                                     return (
                                         <option value={JSON.stringify(dep)}
+                                                className={`${dep.locked ? "hidden" : "block"}`}
                                                 key={dep.id}>{dep.departmentName}</option>
                                     )
                                 })
@@ -325,10 +395,12 @@ export const Upload = () => {
                             <option>Chọn ngành</option>
                             {
                                 listSpecialized && listSpecialized?.map(specialized => {
-                                    return(
-                                    <option value={JSON.stringify(specialized)}
-                                            key={specialized.id}>{specialized.specializedName}</option>
-                                )})
+                                    return (
+                                        <option value={JSON.stringify(specialized)}
+                                                className={`${specialized.locked ? "hidden" : "block"}`}
+                                                key={specialized.id}>{specialized.specializedName}</option>
+                                    )
+                                })
                             }
                         </select>
                     </div>
@@ -385,7 +457,7 @@ export const Upload = () => {
                         <input type="text" id="teacher" name="teacher" placeholder="" required
                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
                                disabled
-                               value={jwt?.user_name}/>
+                               value={user?.user_name}/>
                     </div>
                     <div className="mb-4">
                         <label htmlFor="teacher" className="block text-gray-700 text-sm font-bold mb-2">Tác giả <span

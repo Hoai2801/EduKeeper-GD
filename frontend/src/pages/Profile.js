@@ -27,7 +27,7 @@ const Profile = () => {
   return (
     <div className='w-full p-2 flex flex-col lg:flex-row'>
       <ProfileSideBar isTrueLegit={isTrueLegit} jwt={jwt} />
-      <div className='p-5'>
+      <div className='p-5 w-full'>
         <Outlet />
       </div>
     </div>

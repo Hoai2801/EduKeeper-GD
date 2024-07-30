@@ -3,7 +3,7 @@ import {Route, Routes} from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import {Upload} from "./pages/Upload";
-import SideBar from "./components/SideBar";
+import SideBar from "./components/SearchSideBar";
 import Detail from "./pages/Detail";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
@@ -24,6 +24,7 @@ import BannerManager from "./pages/BannerManager";
 import {createContext, useEffect, useState} from "react";
 import {jwtDecode} from "jwt-decode";
 import Subject from "./pages/Subject";
+import Setting from "./pages/Setting";
 
 export const JWTContext = createContext(null)
 
@@ -95,6 +96,7 @@ function App() {
                     <Route path="subject" element={<Subject/>}/>
                     <Route path="banner" element={<BannerManager />}/>
                     <Route path="deleted" element={<DeletedDocument/>}/>
+                    <Route path="setting" element={<Setting/>}/>
                 </Route>
             </Routes>
         </JWTContext.Provider>

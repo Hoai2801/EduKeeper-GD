@@ -18,7 +18,7 @@ public class CommentController {
             @RequestBody CommentDTO commentDTO,
             @PathVariable Long documentId
     ) {
-        return ResponseEntity.ok(commentService.insertComment(commentDTO, documentId));
+        return commentService.insertComment(commentDTO, documentId);
     }
     
     @GetMapping("/{documentId}")

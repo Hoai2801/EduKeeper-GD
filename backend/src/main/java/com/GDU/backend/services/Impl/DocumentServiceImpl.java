@@ -7,18 +7,20 @@ import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.*;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
-import com.GDU.backend.repositories.CategoryRepository;
-import com.GDU.backend.repositories.DocumentRepository;
-import com.GDU.backend.repositories.SpecializedRepository;
-import com.GDU.backend.repositories.SubjectRepository;
+import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.NotificationService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,9 +35,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,12 +51,15 @@ public class DocumentServiceImpl implements DocumentService {
     private final SubjectRepository subjectRepository;
     private final NotificationService notificationService;
     private final SpecializedRepository specializedRepository;
+    private final SettingRepository settingRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
-    public String uploadDocument(UploadRequestDTO uploadRequestDTO) throws IOException {
+    public ResponseEntity<String> uploadDocument(UploadRequestDTO uploadRequestDTO) throws IOException {
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-        
+
         Specialized specialized = specializedRepository.findById(uploadRequestDTO.getSpecialized())
                 .orElseThrow(() -> new ResourceNotFoundException("Specialized not found"));
 
@@ -72,24 +77,20 @@ public class DocumentServiceImpl implements DocumentService {
         Files.createDirectories(uploadDir);
         Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        int numberOfPages = 0;
-        String thumbnail = "";
+        int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
+        String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
 
-        // check file type
-        if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".pdf")) {
-            numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
-            thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
-        } else if (uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".docx") || uploadRequestDTO.getDocument().getOriginalFilename().endsWith(".doc")) {
-            try {
-                File file = new File(destFile.getAbsolutePath());
-                System.out.println(file.isFile());
-                PDDocument doc = PDDocument.load(file);
-                numberOfPages = doc.getNumberOfPages();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        String downloadFileName = null;
+        // file download
+        if (!uploadRequestDTO.getDocumentDownload().isEmpty()) {
+            // save file
+            downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
+            File downloadFile = new File(UPLOAD_DIR + downloadFileName);
+            MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
+            Files.createDirectories(uploadDir);
+            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
-        System.out.println(uploadRequestDTO.getDocument().getContentType());
+        
         Document newDocument = Document.builder()
                 .title(uploadRequestDTO.getTitle())
                 .author(uploadRequestDTO.getAuthor())
@@ -97,8 +98,9 @@ public class DocumentServiceImpl implements DocumentService {
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .path(destFile.getAbsolutePath())
                 .documentType(uploadRequestDTO.getDocument().getContentType())
-                .status("draft")
+                .documentDownload(uploadRequestDTO.getDocumentDownload() != null ? downloadFileName : null)
                 .scope(uploadRequestDTO.getScope())
+                .downloadFileType(uploadRequestDTO.getDocumentDownload().getContentType())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
                 .description(uploadRequestDTO.getDescription())
                 .specialized(specialized)
@@ -108,17 +110,27 @@ public class DocumentServiceImpl implements DocumentService {
                 .subject(subject)
                 .uploadDate(LocalDate.now())
                 .build();
+
+        // get auto accept document setting
+        settingRepository.findById(1L).ifPresent(setting -> {
+            if (setting.getValue().equals("true")) {
+                newDocument.setStatus("published");
+            } else {
+                newDocument.setStatus("draft");
+            }
+        });
+
         documentRepository.save(newDocument);
-        
+
         // create notification
         NotificationDTO notificationDTO = NotificationDTO.builder()
                 .sender(userUpload.getStaffCode())
                 .receiver("22140044")
-                .content("New document uploaded by " + userUpload.getStaffCode())
-                .title("New document uploaded")
+                .content("Một tài liệu đã được đăng bởi " + userUpload.getStaffCode())
+                .title("Tài liệu mới")
                 .build();
         notificationService.send(notificationDTO);
-        return "Document uploaded successfully";
+        return ResponseEntity.ok("Đăng tài liệu thành công");
     }
 
     private int calculateNumberOfPages(InputStream inputStream) throws IOException {
@@ -214,32 +226,65 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentResponseDTO> filterDocuments(FilterRequestDTO filterRequestDTO) {
-        List<Document> documents = documentRepository.getDocumentsByFilter(
-                filterRequestDTO.getDepartmentSlug(),
-                filterRequestDTO.getSearchTerm(),
-                filterRequestDTO.getSubjectName(),
-                filterRequestDTO.getSpecializedSlug(),
-                filterRequestDTO.getCategoryName(),
-                filterRequestDTO.getPublishYear()
-        );
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Document> cq = cb.createQuery(Document.class);
+        Root<Document> document = cq.from(Document.class);
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (filterRequestDTO.getSubjectName() != null && !filterRequestDTO.getSubjectName().isEmpty()) {
+            Join<Document, Subject> subject = document.join("subject");
+            predicates.add(cb.equal(subject.get("subjectSlug"), filterRequestDTO.getSubjectName()));
+        } else if (filterRequestDTO.getSpecializedSlug() != null && !filterRequestDTO.getSpecializedSlug().isEmpty()) {
+            Join<Document, Specialized> specialized = document.join("specialized");
+            predicates.add(cb.equal(specialized.get("specializedSlug"), filterRequestDTO.getSpecializedSlug()));
+        } else if (filterRequestDTO.getDepartmentSlug() != null && !filterRequestDTO.getDepartmentSlug().isEmpty()) {
+            Join<Document, Specialized> specialized = document.join("specialized");
+            Join<Specialized, Department> department = specialized.join("department");
+            predicates.add(cb.equal(department.get("departmentSlug"), filterRequestDTO.getDepartmentSlug()));
+        }
+
+        if (filterRequestDTO.getSearchTerm() != null && !filterRequestDTO.getSearchTerm().isEmpty()) {
+            Predicate searchTermPredicate = cb.or(
+                    cb.like(document.get("title"), "%" + filterRequestDTO.getSearchTerm() + "%"),
+                    cb.like(document.get("description"), "%" + filterRequestDTO.getSearchTerm() + "%")
+            );
+            predicates.add(searchTermPredicate);
+        }
+
+        if (filterRequestDTO.getCategoryName() != null && !filterRequestDTO.getCategoryName().isEmpty()) {
+            Join<Document, Category> category = document.join("category");
+            predicates.add(cb.equal(category.get("categoryName"), filterRequestDTO.getCategoryName()));
+        }
+
+        if (filterRequestDTO.getPublishYear() != null && !filterRequestDTO.getPublishYear().isEmpty()) {
+            predicates.add(cb.equal(document.get("uploadDate"), LocalDate.parse(filterRequestDTO.getPublishYear())));
+        }
+
+        cq.where(predicates.toArray(new Predicate[0]));
+        TypedQuery<Document> query = entityManager.createQuery(cq);
+        List<Document> documents = query.getResultList();
 
         // Sort documents
         if (filterRequestDTO.getOrder() != null) {
             documents = switch (filterRequestDTO.getOrder().toLowerCase()) {
                 case "most-downloaded" -> documents.stream()
-                        .filter(document -> document.getDownloadsCount() > 0 && document.getScope().equals("public") || document.getScope().equals("student-only"))
+                        .filter(aDocument -> aDocument.getDownloadsCount() > 0 && (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getDownloadsCount).reversed())
+                        .collect(Collectors.toList());
+                case "most-viewed" -> documents.stream()
+                        .filter(aDocument -> aDocument.getViewsCount() > 0 && (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
+                        .sorted(Comparator.comparing(Document::getViewsCount).reversed())
                         .collect(Collectors.toList());
                 default -> documents
                         .stream()
-                        .filter(document -> document.getScope().equals("public") || document.getScope().equals("student-only"))
+                        .filter(aDocument -> (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getId).reversed())
                         .collect(Collectors.toList());
             };
         } else {
             documents = documents
                     .stream()
-                    .filter(document -> document.getScope().equals("public") || document.getScope().equals("student-only"))
+                    .filter(aDocument -> aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only") && !aDocument.isDelete())
                     .sorted(Comparator.comparing(Document::getId).reversed())
                     .collect(Collectors.toList());
         }
@@ -334,6 +379,8 @@ public class DocumentServiceImpl implements DocumentService {
                 .author(document.getAuthor())
                 .status(document.getStatus())
                 .scope(document.getScope())
+                .file_download(document.getDocumentDownload())
+                .download_file_type(document.getDownloadFileType())
                 .specialized(document.getSpecialized())
                 .department(document.getSpecialized().getDepartment())
                 .category(document.getCategory())

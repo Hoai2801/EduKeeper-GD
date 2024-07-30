@@ -1,9 +1,14 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import UserRow from '../components/UserRow';
+import {JWTContext} from "../App";
+import toast from "react-hot-toast";
+import ToastConfirm from "../components/toast/ToastConfirm";
 
 const User = () => {
     // list of users
     const [users, setUsers] = useState([])
+
+    const [copyOfFullUsers, setCopyOfFullUsers] = useState([])
 
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -25,6 +30,16 @@ const User = () => {
         accountLocked: false,
         role: 'ROLE_USER' // Default role is 'user'
     });
+
+    function removeDiacritics(str) {
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    const handleFindUsers = (e) => {
+        setUsers(copyOfFullUsers)
+        setUsers(user => user.filter(user => removeDiacritics(user.username.toLowerCase())
+            .includes(removeDiacritics(e.toLowerCase())) || user.staffCode.includes(e)))
+    }
 
     // Handle form input change
     const handleChange = (e) => {
@@ -61,6 +76,7 @@ const User = () => {
         fetch('http://localhost:8080/api/v1/users', {})
             .then((res) => res.json())
             .then((data) => {
+                setCopyOfFullUsers(data)
                 setUsers(data)
             })
     }
@@ -69,13 +85,16 @@ const User = () => {
         fetchUsers()
     }, [])
 
+    const context = useContext(JWTContext);
+    const jwt = context.token;
+
 
     function saveEditUser() {
         fetch(`http://localhost:8080/api/v1/users`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${jwt}`
             },
             body: JSON.stringify(editUser)
         })
@@ -94,7 +113,7 @@ const User = () => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${jwt}`
             }
         })
             .then((res) => {
@@ -113,7 +132,7 @@ const User = () => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': `Bearer ${jwt}`
             }
         })
             .then((res) => {
@@ -126,6 +145,43 @@ const User = () => {
                 }
             })
     }
+
+    const [confirm, setConfirm] = useState(false);
+
+    const handleConfirm = (confirmed, staffCode) => {
+        if (confirmed) {
+            fetch(`http://localhost:8080/api/v1/users/reset-password/${staffCode}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwt}`
+                }
+            })
+                .then((res) => {
+                    if (res.status === 200) {
+                        toast.success("Đặt lại mật khẩu thành công");
+                    } else {
+                        res.text().then((data) => toast.error(data));
+                    }
+                });
+        }
+    };
+
+    const showToast = (id) => {
+        toast.custom((t) => (
+            <div
+                className={`${
+                    t.visible ? 'animate-enter' : 'animate-leave'
+                } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+            >
+                <ToastConfirm confirm={confirm} setConfirm={(value) => {
+                    setConfirm(value);
+                    handleConfirm(value, id);
+                    toast.dismiss(t.id);
+                }} />
+            </div>
+        ));
+    };
 
     return (
         <div className="container mx-auto">
@@ -222,7 +278,7 @@ const User = () => {
                             >
                                 <option value="ROLE_USER">Người dùng</option>
                                 <option value="ROLE_TEACHER">Giáo viên</option>
-                                <option value="ROLE_SUB-ADMIN">Quản trị (Sub)</option>
+                                <option className={`${context.jwtDecoded.role === 'ROLE_SUB-ADMIN' ? 'hidden' : ''}`} value="ROLE_SUB-ADMIN">Quản trị (Sub)</option>
                             </select>
                         </div>
                         <div className="flex items-center justify-center">
@@ -234,6 +290,12 @@ const User = () => {
                         </div>
                     </form>
                 </div>
+            </div>
+            <div className={`my-5`}>
+                <label htmlFor="find" className={`block text-gray-700 text-sm font-bold mb-2`}>Tên tài khoản/mã số cần tìm</label>
+                <input type="text" id="find" className={`border-2 border-gray-300 rounded-lg p-2 w-full mt-2`} onChange={(e) => {
+                    handleFindUsers(e.target.value)
+                }}/>
             </div>
             <div className="overflow-x-auto text-center">
                 <table className="table-auto w-full">
@@ -271,6 +333,9 @@ const User = () => {
                             }} className='bg-red-400 text-white rounded-lg w-fit p-2'>
                                 {!editUser.accountLocked ? 'Khóa người dùng' : 'Mở khóa người dùng'}
                             </button>
+                        {context.jwtDecoded.role === 'ROLE_SUB-ADMIN' &&
+                            <button onClick={() => showToast(editUser.staffCode)} className='bg-red-400 text-white rounded-lg w-fit p-2'>Reset mật khẩu</button>
+                        }
                         </div>
                         <form className="px-8 py-6">
                             <div className="mb-4">
@@ -333,7 +398,7 @@ const User = () => {
                                     </option>
                                     <option value="ROLE_TEACHER" selected={editUser.role === 'ROLE_TEACHER'}>Giáo viên
                                     </option>
-                                    <option value="ROLE_SUB-ADMIN" selected={editUser.role === 'ROLE_SUB-ADMIN'}>Quản
+                                    <option value="ROLE_SUB-ADMIN" className={`${context.jwtDecoded?.role === 'ROLE_ADMIN' ? '' : 'hidden'}`} selected={editUser.role === 'ROLE_SUB-ADMIN'}>Quản
                                         trị (Sub)
                                     </option>
                                 </select>

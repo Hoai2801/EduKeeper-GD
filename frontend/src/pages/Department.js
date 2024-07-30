@@ -175,7 +175,7 @@ const Department = () => {
             </div>
             {department &&
                 department.map((dep) => (
-                    <div key={dep.id}>
+                    <div key={dep.id} className={`${dep.id === 18 ? "hidden" : ""}`}>
                         <div className="flex justify-between w-full border shadow-lg rounded-xl border-black p-4 mt-5">
                             <h1 className="text-2xl w-[50%]">{dep.departmentName}</h1>
                             <p>{dep.locked ? <span className="text-red-600">Đã khóa</span> : "Hoạt động"}</p>
@@ -351,13 +351,13 @@ const Department = () => {
                                     </button>
                                 </div>
                                 <button
-                                    className="w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-red-500"
+                                    className="w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-gray-500"
                                     onClick={() => lockDepartment(selectDepartment.id)}
                                 >
                                     {selectDepartment.locked ? "Mở khóa" : "Khóa"}
                                 </button>
                                 <button
-                                    className="w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-red-500"
+                                    className={`w-full mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-red-500 ${userJWT.jwtDecoded.role === 'ROLE_SUB-ADMIN' ? 'hidden' : ''}`}
                                     onClick={() => deleteDepartment(selectDepartment.id)}
                                 >
                                     Xóa

@@ -35,7 +35,6 @@ const Navbar = () => {
             })
                 .then((res) => res.json())
                 .then((data) => {
-                    console.log(data)
                     // filter the specialized that is not locked
                     setSpecialized(data.filter(item => (item.specialized.locked === false && item.specialized.department.locked === false)));
                 });
@@ -131,6 +130,7 @@ const Navbar = () => {
         const checkNotification = () => {
             if (jwtDecoded?.jwtDecoded) {
                 fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwtDecoded?.jwtDecoded.staff_code);
+                getNotification();
             }
         }
 
@@ -142,7 +142,7 @@ const Navbar = () => {
         return (
             <div className="sticky top-0 bg-white z-50" id="navbar" onMouseLeave={() => out()}>
                 <div className="h-[85px] w-full p-5 text-black flex justify-center gap-10 shadow-lg">
-                    <div className="flex gap-4 lg:w-[250px] h-full w-fit items-center pl-3">
+                    <div className="flex gap-4 lg:w-[250px] h-full min-w-[150px] items-center pl-3">
                         <Link to={"/"} onClick={() => {
                             setIsMobileMenuOpen(false)
                             setIsNotificationOpen(false)
@@ -156,7 +156,7 @@ const Navbar = () => {
                             </div>
                         </Link>
                     </div>
-                    <div className="lg:gap-4 text-[12px] lg:min-w-[400px] hidden lg:flex">
+                    <div className="lg:gap-4 text-[12px] lg:min-w-[450px] hidden lg:flex">
                         <Link
                             to={"/"}
                             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5 "
@@ -276,9 +276,12 @@ const Navbar = () => {
                                             onClick={() => {
                                                 setIsSubMenuShown(!isSubMenuShow);
                                             }}
-                                            className="xl:mt-2 mt-3 2xl:text-xl md:flex gap-3 hidden text-sm text-gray-500"
+                                            className="mt-2 md:flex hidden min-w-[50px]"
                                         >
-                                            Chào {getOnlyName(jwtDecoded?.jwtDecoded?.user_name)}
+                                            {/*<p className={`lg:block hidden`}>*/}
+
+                                            {/*Chào {getOnlyName(jwtDecoded?.jwtDecoded?.user_name)}*/}
+                                            {/*</p>*/}
                                             <img
                                                 src={user && user?.avatar ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
                                                 alt=""
@@ -312,12 +315,12 @@ const Navbar = () => {
                                 )}
                             </div>
                             {/* mobile menu button */}
-                            <div className="xl:hidden w-[50px]">
+                            <div className="lg:hidden w-[55px]">
                                 <button onClick={() => {
                                     setIsMobileMenuOpen(!isMobileMenuOpen)
                                     setIsNotificationOpen(false)
                                 }}
-                                        className="w-[20px] mt-3">
+                                        className="w-[25px] mt-3">
                                     <img src={menuIcon} alt="" className="w-full"/>
                                 </button>
                             </div>

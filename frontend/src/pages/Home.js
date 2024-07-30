@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import Post from '../components/DocumentCard'
 import {Link} from 'react-router-dom'
 import {jwtDecode} from "jwt-decode";
 import Banner from "../components/Banner";
+import {JWTContext} from "../App";
 
 const Home = () => {
 
@@ -12,20 +13,8 @@ const Home = () => {
 
     const [lastedDocuments, setLastedDocuments] = useState([])
 
-    const [staffCode, setStaffCode] = useState(null)
-
-    const [banner, setBanner] = useState([])
-
-    const [indexBanner, setIndexBanner] = useState(0)
-
-
-    const handleNextBanner = () => {
-        if (indexBanner < banner?.length - 1) {
-            setIndexBanner(indexBanner + 1)
-        } else {
-            setIndexBanner(0)
-        }
-    }
+    const context = useContext(JWTContext);
+    const staffCode = context?.jwtDecoded?.staff_code;
 
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/view-history/top-documents/9', {
@@ -51,37 +40,12 @@ const Home = () => {
                 'Access-Control-Allow-Origin': '*',
             },
         }).then(res => res?.json()).then(data => {
+            console.log(data)
             setLastedDocuments(data)
         })
-        fetch('http://localhost:8080/api/v1/banners', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            },
-        })
-            .then(res => res?.json())
-            .then(data => {
-                setBanner(data)
-            })
     }, [])
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            handleNextBanner();
-        }, 5000);
 
-        // Cleanup the timeout on component unmount
-        return () => clearTimeout(timeout);
-    }, [indexBanner]);
-
-    // useEffect(() => {
-    //     const token = localStorage.getItem("token");
-    //     if (token !== "undefined" && token !== null) {
-    //         const jwt = jwtDecode(token);
-    //         setStaffCode(jwt?.staff_code);
-    //     }
-    // }, []);
 
     return (
         <div>
@@ -89,12 +53,12 @@ const Home = () => {
                 <Banner />
             </div>
             <div
-                className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2 gap-10 pb-10'>
-                <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
+                className='bg-white rounded-lg max-w-[1200px] p-2 w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 gap-10 pb-10'>
+                <h2 className='font-bold text-[28px] mb-5 pl-5'>Tài liệu mới</h2>
                 <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
                     {lastedDocuments && lastedDocuments?.map((item, index) => (
                         <div
-                            className={`${item.scope === "private" || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
+                            className={`${item.scope === "private" && !staffCode || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
                             <Post key={index} document={item}/>
                         </div>
                     ))}

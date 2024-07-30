@@ -37,4 +37,6 @@ public interface UserService {
     Boolean isUserBlocked(String staffCode);
 
     ResponseEntity<String> unblockUser(String staffCode);
+
+    ResponseEntity<?> resetPassword(String staffCode);
 }

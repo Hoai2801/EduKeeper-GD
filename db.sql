@@ -110,6 +110,8 @@ create table `role` (
     `name` varchar(100) not null
 );
 
+insert into role(id, name) values (1, 'ROLE_ADMIN'), (2, 'ROLE_TEACHER'), (3, 'ROLE_USER');
+
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
@@ -135,6 +137,10 @@ CREATE TABLE `users` (
                          CONSTRAINT `spec_fk` FOREIGN KEY (`specialized`) REFERENCES `specialized` (`id`)
 );
 
+
+INSERT INTO `users` (`user_name`, `password`, `role_id`, `account_locked`, `enable`, `email`, `department`, `specialized`, `date_of_birth`, `class`, `created_date`, `last_modified_date`, `staff_code`)VALUES ('john_doe', '$2a$10$e9N3TvUKzRBe0Xz4.Y0bUef0gXmCFENNV6rnmrukiCB3ynvdRC4Ia', 1, false, true, 'john.doe@example.com', 1, 1, '1990-05-15', 'A', NOW(), NOW(), '22140044');
+
+
 -- INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN'); 
 
 DROP TABLE IF EXISTS `category`;
@@ -157,36 +163,43 @@ VALUES
 
 DROP TABLE IF EXISTS `document`;
 
--- dùng để lưu thông tin của tài liệu 
-CREATE TABLE `document` (
-                            `id` int NOT NULL AUTO_INCREMENT,
-                            `title` varchar(200) NOT NULL,
-                            `slug` varchar(300) NOT NULL,
-                            `document_type` varchar(30) NOT NULL,
-                            `document_size` smallint NOT NULL,
-                            `pages` smallint not null,
-                            `upload_date` date NOT NULL,
-                            `status` ENUM('draft', 'published') not null DEFAULT 'draft',
-                            `scope` ENUM('public', 'student-only', 'private') not null DEFAULT 'public',
-			    -- chứa đường dẫn đến nơi lưu file
-                            `path` varchar(500) NOT NULL,
-                            `description` varchar(2000) NOT NULL,
-                            `specialized_id` int not null,
-                            `category_id` int DEFAULT NULL,
-                            `subject_id` int DEFAULT NULL,
-                            `thumbnail` varchar(200),
-                            `author` varchar(100) NOT NULL,
-                            `user_upload` int not null,
-                            `is_delete` boolean default false,
-                            `deleted_at` datetime,
-                            PRIMARY KEY (`id`),
-                            KEY `document_ibfk_2` (`category_id`),
-                            KEY `document_ibfk_4` (`author`),
-                            constraint document_specialized_id_fk foreign key (specialized_id) references specialized (id),
-                            CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`),
-                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`)
+CREATE TABLE document
+(
+    id                 BIGINT AUTO_INCREMENT NOT NULL,
+    title              VARCHAR(200)          NOT NULL,
+    slug               VARCHAR(300)          NOT NULL,
+    document_type      VARCHAR(30)           NOT NULL,
+    download_file_type VARCHAR(30)           NOT NULL,
+    document_size      BIGINT                NOT NULL,
+    pages              INT                   NOT NULL,
+    `description`      VARCHAR(255)          NULL,
+    upload_date        date                  NOT NULL,
+    `path`             VARCHAR(500)          NOT NULL,
+    path_download      VARCHAR(500)          NOT NULL,
+    thumbnail          VARCHAR(500)          NOT NULL,
+    is_delete          BIT(1)                NOT NULL,
+    category_id        TINYINT               NULL,
+    user_upload        BIGINT                NOT NULL,
+    author             VARCHAR(255)          NULL,
+    deleted_at         datetime              NULL,
+    scope              VARCHAR(255)          NULL,
+    status             VARCHAR(255)          NULL,
+    subject_id         BIGINT                NULL,
+    specialized_id     BIGINT                NULL,
+    CONSTRAINT pk_document PRIMARY KEY (id)
 );
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_SPECIALIZED FOREIGN KEY (specialized_id) REFERENCES specialized (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_SUBJECT FOREIGN KEY (subject_id) REFERENCES subject (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_USER_UPLOAD FOREIGN KEY (user_upload) REFERENCES users (id);
 
 DROP TABLE IF EXISTS `favorite`;
 
@@ -264,6 +277,11 @@ create table comment(
       constraint `cmt_fk_dcm` foreign key(document_id) references document(id)
 );
 
+create table setting(
+	id int not null auto_increment primary key,
+	name varchar(50) not null,
+    value varchar(50) not null
+);
 
 -- Performance
 -- create index idx_slug on document (slug);
