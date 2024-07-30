@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
+import filterIcon from '../assets/filter.png';
 
-const SideBar = () => {
+const SearchSideBar = () => {
   const [sort, setSort] = useState("lastest");
   const handleSort = (value) => () => {
     setSort(value);
@@ -89,14 +90,14 @@ const SideBar = () => {
       >
         <button
           onClick={() => setIsFilterShow(!isFilterShow)}
-          className={`bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded ${
+          className={`flex justify-end ${
             isFilterShow ? "md:hidden" : "md:hidden"
           }`}
         >
-          Lọc tài liệu
+            <img src={filterIcon} alt="" className={`w-12 h-12`}/>
         </button>
         <div
-          className={`md:w-[25%] w-full h-full rounded-lg shadow-lg bg-white items-center flex-col gap-5 px-5 ${
+          className={`md:w-[25%] min-w-[270px] w-full h-full rounded-lg shadow-lg bg-white items-center flex-col gap-5 px-5 ${
             isFilterShow ? "md:flex" : "md:flex hidden"
           }`}
         >
@@ -287,4 +288,4 @@ const SideBar = () => {
   );
 };
 
-export default SideBar;
+export default SearchSideBar;

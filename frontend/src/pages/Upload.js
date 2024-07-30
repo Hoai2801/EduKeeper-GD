@@ -139,13 +139,13 @@ export const Upload = () => {
 
     useEffect(() => {
         if (selectedDepartment) {
-        fetch('http://localhost:8080/api/v1/specializes/department/' + selectedDepartment?.id).then(data => data.json())
-            .then(data => {
-                if (data.length > 0) {
-                    setListSpecialized(data)
-                }
-            })
-            .catch(error => console.error(error));
+            fetch('http://localhost:8080/api/v1/specializes/department/' + selectedDepartment?.id).then(data => data.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        setListSpecialized(data)
+                    }
+                })
+                .catch(error => console.error(error));
         }
     }, [selectedDepartment])
 
@@ -272,18 +272,19 @@ export const Upload = () => {
     }
 
     return (
-        <div className={`max-w-[500px]`}>
-            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${isEditPage ? "block" : "hidden"}`}>Cập nhật
-                tài liệu</h2>
-            <div className={`${isEditPage ? "hidden" : "block"}`}>
-                <p className='text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0'>Đăng tài liệu</p>
+        <div className={`w-full p-2`}>
+            <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${isEditPage ? "block" : "hidden"}`}>
+                Cập nhật tài liệu
+            </h2>
+            <div className={`${isEditPage ? "hidden" : "block"} max-w-[450px] mx-auto`}>
+                <p className='text-3xl font-bold mb-5 mt-10'>Đăng tài liệu</p>
                 <p className={`text-lg`}>Tài liệu <span className='text-red-500'>*</span></p>
                 <p className={`text-red-500 mb-2`}>Lưu ý chỉ hỗ trợ file PDF</p>
                 <div className={`${selectedFile ? "hidden" : "block"}`}>
-                <DragDropFile handleFiles={handleFiles} fileSupport={`application/pdf`}/>
+                    <DragDropFile handleFiles={handleFiles} fileSupport={`application/pdf`}/>
                 </div>
             </div>
-            <div>
+            <div className={`flex justify-center p-2`}>
                 {selectedFile && (
                     <div className='bg-white p-5 rounded-2xl flex gap-3 max-w-md mt-2'>
                         <Document file={selectedFile} type={selectedFile.type}>
@@ -297,13 +298,15 @@ export const Upload = () => {
                         </div>
                         <button
                             onClick={() => setFile(null)}
-                            className='text-red-500'>Xóa</button>
+                            className='text-red-500'>Xóa
+                        </button>
                     </div>
                 )}
             </div>
-            <div className={`${haveDownloadFile ? "bg-white p-5 rounded-2xl max-w-md mt-2" : ""}`}>
+            <div
+                className={`${haveDownloadFile ? "bg-white rounded-2xl mt-2" : ""} flex flex-col items-center max-w-[450px] mx-auto`}>
                 {/*toggle*/}
-                <label className="inline-flex items-center cursor-pointer w-[450px] my-3">
+                <label className="inline-flex items-center cursor-pointer my-3 p-2">
                     <input type="checkbox" value="" className="sr-only peer" checked={haveDownloadFile}
                            onChange={(e) => {
                                setHaveDownloadFile(e.target.checked)
@@ -311,28 +314,34 @@ export const Upload = () => {
                            }}/>
                     <div
                         className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    <p className="ml-3 font-medium w-[70%] text-gray-900 font-semibold">Tôi muốn file người dùng tải về
+                    <p className="ml-3 w-[70%] text-gray-900 font-semibold">
+                        Tôi muốn file người dùng tải về
                         là file khác (word,
-                        powerpoint, excel...)</p>
+                        powerpoint, excel...)
+                    </p>
 
                 </label>
-                {
-                    haveDownloadFile && !downloadFile && (
-                        <div className={`${isEditPage ? "hidden" : "block"}`}>
-                            <DragDropFile handleFiles={handleFileDownload} fileSupport={`any`}/>
-                        </div>
-                    )
-                }
-                {
-                    downloadFile && haveDownloadFile && (
-                        <div className={`${isEditPage ? "hidden" : "block"} max-w-[450px] overflow-hidden p-2 flex justify-between gap-5 rounded-2xl border border-gray-300`}>
-                            <p className={`text-gray-700 font-semibold`}>Tải lên thành công <span
-                                className={`text-gray-900 font-semibold`}>{downloadFile.name}</span></p>
-                            <button className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2`}
-                                    onClick={() => setDownloadFile(null)}>Xóa</button>
-                        </div>
-                    )
-                }
+                <div className={`p-10 max-w-[450px]`}>
+                    {
+                        haveDownloadFile && !downloadFile && (
+                            <div className={`${isEditPage ? "hidden" : "block"} max-w-[450px]`}>
+                                <DragDropFile handleFiles={handleFileDownload} fileSupport={`any`}/>
+                            </div>
+                        )
+                    }
+                    {
+                        downloadFile && haveDownloadFile && (
+                            <div
+                                className={`${isEditPage ? "hidden" : "block"} max-w-[450px] overflow-hidden p-2 flex justify-between gap-5 rounded-2xl border border-gray-300`}>
+                                <p className={`text-gray-700 font-semibold`}>Tải lên thành công <span
+                                    className={`text-gray-900 font-semibold`}>{downloadFile.name}</span></p>
+                                <button className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2`}
+                                        onClick={() => setDownloadFile(null)}>Xóa
+                                </button>
+                            </div>
+                        )
+                    }
+                </div>
             </div>
             <div className="max-w-md mx-auto p-8 bg-white rounded-md shadow-md mt-5">
                 <h2 className="text-2xl font-semibold mb-6">Thông tin tài liệu</h2>

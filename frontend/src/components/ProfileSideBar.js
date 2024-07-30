@@ -56,7 +56,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
     return (
         <div
             className='xl:w-fit w-full h-fit p-10 bg-white rounded-lg shadow-lg flex flex-col gap-5 items-center align-middle lg:mx-5'>
-            <div className='justify-center flex flex-col md:flex-row gap-5 w-full mt-5 relative'>
+            <div className='justify-center items-center flex flex-col md:flex-row gap-5 w-full mt-5 relative'>
                 <button className={`border border-gray-500 p-2 rounded-lg w-fit absolute top-0 right-0 lg:hidden z-20`}
                         onClick={() => {
                             setDocumentMobileShow(!documentMobileShow)
@@ -101,19 +101,19 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                         Đăng xuất
                     </button>
                 </div>
-                <div className='relative flex flex-col items-center'>
-                    <div className='lg:w-[150px] lg:h-[150px] w-[100px] h-[100px] rounded-full overflow-hidden'>
+                <div className='flex flex-col items-center justify-center relative w-[160px] mx-auto'>
+                    <div className='lg:w-[150px] lg:h-[150px] w-[150px] h-[150px] rounded-full overflow-hidden'>
                         <img
                             src={user && user?.avatar ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
                             alt="" className='w-full h-full object-cover'/>
-                    </div>
-                    <div className={`${!isTrueLegit && 'hidden'}`}>
-                        <label htmlFor="avatar"
-                               className='absolute lg:bottom-0 lg:right-0 right-[90px] bottom-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
-                            <img src={change} alt="" className='w-5 h-5'/>
-                        </label>
-                        <input id="avatar" type="file" className='hidden'
-                               onChange={(e) => setAvatar(e.target.files[0])}/>
+                        <div className={`${!isTrueLegit && 'hidden'} z-50`}>
+                            <label htmlFor="avatar"
+                                   className='absolute lg:bottom-0 lg:right-0 right-[90px] bottom-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
+                                <img src={change} alt="" className='w-5 h-5'/>
+                            </label>
+                            <input id="avatar" type="file" className='hidden'
+                                   onChange={(e) => setAvatar(e.target.files[0])}/>
+                        </div>
                     </div>
                 </div>
                 <div className='flex flex-col items-center mt-5'>

@@ -53,8 +53,8 @@ const Home = () => {
                 <Banner />
             </div>
             <div
-                className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2 gap-10 pb-10'>
-                <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
+                className='bg-white rounded-lg max-w-[1200px] p-2 w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 gap-10 pb-10'>
+                <h2 className='font-bold text-[28px] mb-5 pl-5'>Tài liệu mới</h2>
                 <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
                     {lastedDocuments && lastedDocuments?.map((item, index) => (
                         <div
