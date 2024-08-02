@@ -8,6 +8,7 @@ import love from '../assets/love.png';
 import Comment from "../components/Comment";
 import {Document, Page, pdfjs} from "react-pdf";
 import {JWTContext} from "../App";
+import toast from "react-hot-toast";
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -66,7 +67,6 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/download")
             .then((res) => {
                 res.blob().then(r => {
-                    console.log(r)
                     setFileDownload(r)
                 })
             })
@@ -98,15 +98,17 @@ const Detail = () => {
     const fetchComment = () => {
         if (data) {
             fetch('http://localhost:8080/api/v1/comments/' + data?.id)
-                .then(res => res.json())
-                .then(data => {
-                    setCommentList(data)
+                .then(res => {
+                    if (res.status === 200) {
+                        return res.json().then(data => {
+                            setCommentList(data)
+                        });
+                    }
                 })
         }
     }
 
     const width = window.innerWidth > 1050 ? 1050 : window.innerWidth - 30;
-    console.log(window.screen.width)
 
     const downloadClick = () => {
         console.log(data)
@@ -170,6 +172,7 @@ const Detail = () => {
         }
 
         if (commentContent === "") {
+            toast.error("Bạn chưa nhập nội dung");
             return;
         }
         fetch("http://localhost:8080/api/v1/comments/" + data?.id, {
@@ -191,6 +194,17 @@ const Detail = () => {
                 }
             })
     };
+
+    function countComments(commentList) {
+        let count = 0;
+        commentList.forEach(comment => {
+            count++; // count the current comment
+            if (comment.replies && comment.replies.length > 0) {
+                count += countComments(comment.replies); // count the nested replies
+            }
+        });
+        return count;
+    }
 
     function favorite() {
         if (staffCode) {
@@ -318,7 +332,7 @@ const Detail = () => {
                     <div className="max-w-2xl mx-auto px-4">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg lg:text-2xl font-bold text-gray-900">Bình luận
-                                ({commentList.length})</h2>
+                                ({countComments(commentList)})</h2>
                         </div>
                         <div className="mb-6">
                             <div
@@ -336,12 +350,16 @@ const Detail = () => {
                                 Đăng bình luận
                             </button>
                         </div>
-                        <div>
+                        <div className={`w-[800px]`}>
                             {commentList && commentList?.map((comment, index) => {
                                 if (index < limitComments) {
                                     return (
                                         <Comment
+                                            key={index}
+                                            isReply={false}
                                             comment={comment}
+                                            countReply={countComments}
+                                            fetchComment={fetchComment}
                                         />
                                     )
                                 }

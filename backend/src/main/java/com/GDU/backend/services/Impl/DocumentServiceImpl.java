@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,13 +83,15 @@ public class DocumentServiceImpl implements DocumentService {
 
         String downloadFileName = null;
         // file download
-        if (!uploadRequestDTO.getDocumentDownload().isEmpty()) {
+        if (!Objects.equals(uploadRequestDTO.getDocument().getOriginalFilename(), uploadRequestDTO.getDocumentDownload().getOriginalFilename()) && !Objects.equals(uploadRequestDTO.getDocument().getContentType(), uploadRequestDTO.getDocumentDownload().getContentType())) {
             // save file
             downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
             File downloadFile = new File(UPLOAD_DIR + downloadFileName);
             MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
             Files.createDirectories(uploadDir);
             Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            downloadFileName = fileName;
         }
         
         Document newDocument = Document.builder()
@@ -96,9 +99,9 @@ public class DocumentServiceImpl implements DocumentService {
                 .author(uploadRequestDTO.getAuthor())
                 .userUpload(userUpload)
                 .slug(createSlug(uploadRequestDTO.getTitle()))
-                .path(destFile.getAbsolutePath())
+                .path(fileName)
                 .documentType(uploadRequestDTO.getDocument().getContentType())
-                .documentDownload(uploadRequestDTO.getDocumentDownload() != null ? downloadFileName : null)
+                .documentDownload(downloadFileName)
                 .scope(uploadRequestDTO.getScope())
                 .downloadFileType(uploadRequestDTO.getDocumentDownload().getContentType())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
@@ -127,6 +130,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .sender(userUpload.getStaffCode())
                 .receiver("22140044")
                 .content("Một tài liệu đã được đăng bởi " + userUpload.getStaffCode())
+                .document(newDocument.getSlug())
                 .title("Tài liệu mới")
                 .build();
         notificationService.send(notificationDTO);
@@ -165,7 +169,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) {
+    public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) throws IOException {
         Document existDocument = documentRepository.findById(id).orElse(null);
         if (existDocument == null) {
             return "Document not existing";
@@ -174,6 +178,23 @@ public class DocumentServiceImpl implements DocumentService {
         User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
         if (userUpload == null) {
             return "User not existing";
+        }
+        if (!existDocument.getDocumentDownload().equals(uploadRequestDTO.getDocumentDownload().getOriginalFilename())) {
+            // delete old file download
+            File oldDownloadFile = new File(UPLOAD_DIR + existDocument.getDocumentDownload());
+            if (oldDownloadFile.exists()) {
+                oldDownloadFile.delete();
+            }
+            Path uploadDir = Paths.get(UPLOAD_DIR);
+            String downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
+            File downloadFile = new File(UPLOAD_DIR + downloadFileName);
+            MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
+            Files.createDirectories(uploadDir);
+            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            existDocument.setDocumentDownload(downloadFileName);
+            existDocument.setDownloadFileType(uploadRequestDTO.getDocumentDownload().getContentType());
+            existDocument.setDocumentSize(uploadRequestDTO.getDocumentDownload().getSize() / 1_000_000);
         }
         existDocument.setUserUpload(userUpload);
 
@@ -444,6 +465,7 @@ public class DocumentServiceImpl implements DocumentService {
                         .receiver(document.getUserUpload().getStaffCode())
                         .sender("22140044")
                         .created_at(LocalDateTime.now())
+                        .document(document.getSlug())
                         .title("Tài liệu của bạn đã được duyệt")
                         .content("Tài liệu " + document.getTitle() + " đã được duyệt")
                         .build();
@@ -549,17 +571,13 @@ public class DocumentServiceImpl implements DocumentService {
             File file = new File(path);
 
             if (file.isFile() && !document.isDelete()) {
-                // boolean deleted = file.delete();
-                // if (!deleted) {
-                // return "Delete file failed";
-                // } else {
-                // }
                 document.setDeleteDate(LocalDateTime.now());
                 document.setDelete(true);
                 NotificationDTO notification = NotificationDTO.builder()
                         .receiver(document.getUserUpload().getStaffCode())
                         .sender("22140044")
                         .created_at(LocalDateTime.now())
+                        .document(null)
                         .title("Tài liệu của bạn đã bị gỡ bởi hệ thống")
                         .content("Tài liệu " + document.getTitle() + " đã bị gỡ")
                         .build();

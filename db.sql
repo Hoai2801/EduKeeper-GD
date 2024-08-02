@@ -277,6 +277,19 @@ create table comment(
       constraint `cmt_fk_dcm` foreign key(document_id) references document(id)
 );
 
+CREATE TABLE sub_comment
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    content       VARCHAR(255)          NULL,
+    created_date  datetime              NULL,
+    user_upload   VARCHAR(255)          NULL,
+    comment_id_id BIGINT                NULL,
+    CONSTRAINT pk_sub_comment PRIMARY KEY (id)
+);
+
+ALTER TABLE sub_comment
+    ADD CONSTRAINT FK_SUB_COMMENT_ON_COMMENTID FOREIGN KEY (comment_id_id) REFERENCES comment (id);
+
 create table setting(
 	id int not null auto_increment primary key,
 	name varchar(50) not null,

@@ -10,4 +10,6 @@ public interface CommentService {
     ResponseEntity<String> insertComment(CommentDTO commentDTO, Long documentId);
 
     List<Comment> getComments(Long documentId);
+
+    ResponseEntity<String> insertReply(CommentDTO commentDTO, Long commentId);
 }

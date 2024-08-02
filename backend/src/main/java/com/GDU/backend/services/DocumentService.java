@@ -13,7 +13,7 @@ import java.util.List;
 public interface DocumentService {
     ResponseEntity<String> uploadDocument(UploadRequestDTO uploadRequestDto) throws IOException;
 
-    String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO);
+    String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) throws IOException;
 
     DocumentResponseDTO getDocumentBySlug(String slug);
 

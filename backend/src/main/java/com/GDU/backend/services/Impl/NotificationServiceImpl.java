@@ -1,8 +1,11 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.NotificationDTO;
+import com.GDU.backend.exceptions.ResourceNotFoundException;
+import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Notification;
 import com.GDU.backend.models.User;
+import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.repositories.NotificationRepository;
 import com.GDU.backend.services.NotificationService;
 import com.GDU.backend.services.UserService;
@@ -21,6 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private final NotificationRepository notificationRepository;
     private final UserService userService;
+    private final DocumentRepository documentRepository;
 
     @Override
     public List<NotificationDTO> getAllNotificationOfUser(String staffCode) {
@@ -33,6 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
                                 .receiver(notification.getReceiver().getStaffCode())
                                 .title(notification.getTitle())
                                 .content(notification.getContent())
+                                .document(notification.getDocument().getSlug())
                                 .is_check(notification.is_check())
                                 .created_at(notification.getCreated_at())
                                 .build())
@@ -42,10 +47,12 @@ public class NotificationServiceImpl implements NotificationService {
     public void send(NotificationDTO message) {
         User sender = userService.getUserByStaffCode(message.getSender());
         User receiver = userService.getUserByStaffCode(message.getReceiver());
+        Document document = documentRepository.findBySlug(message.getDocument()).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
         Notification notification = Notification.builder()
                 .sender(sender)
                 .receiver(receiver)
                 .title(message.getTitle())
+                .document(document)
                 .content(message.getContent())
                 .created_at(LocalDateTime.now())
                 .build();
