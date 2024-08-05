@@ -12,4 +12,5 @@ public class CommentDTO {
     private Long documentId;
     private String staffCode;
     private String content;
+    private Long parentId; 
 }

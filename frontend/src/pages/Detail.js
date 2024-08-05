@@ -6,14 +6,11 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 import unlove from '../assets/unlove.png';
 import love from '../assets/love.png';
 import Comment from "../components/Comment";
-import {Document, Page, pdfjs} from "react-pdf";
 import {JWTContext} from "../App";
+import toast from "react-hot-toast";
+import {Document, Page, pdfjs} from "react-pdf";
 
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.mjs',
-    import.meta.url,
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
 
 const Detail = () => {
     function extractSlugFromURL(url) {
@@ -66,8 +63,10 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/download")
             .then((res) => {
                 res.blob().then(r => {
-                    console.log(r)
-                    setFileDownload(r)
+                    r.arrayBuffer().then(r => {
+                        r = new Uint8Array(r)
+                        setFileDownload(r)
+                    })
                 })
             })
 
@@ -85,7 +84,7 @@ const Detail = () => {
                     }),
                 })
             }
-        }, 1000);
+        }, 30000);
 
         return () => clearTimeout(increaseView);
 
@@ -98,15 +97,17 @@ const Detail = () => {
     const fetchComment = () => {
         if (data) {
             fetch('http://localhost:8080/api/v1/comments/' + data?.id)
-                .then(res => res.json())
-                .then(data => {
-                    setCommentList(data)
+                .then(res => {
+                    if (res.status === 200) {
+                        return res.json().then(data => {
+                            setCommentList(data)
+                        });
+                    }
                 })
         }
     }
 
     const width = window.innerWidth > 1050 ? 1050 : window.innerWidth - 30;
-    console.log(window.screen.width)
 
     const downloadClick = () => {
         console.log(data)
@@ -170,6 +171,7 @@ const Detail = () => {
         }
 
         if (commentContent === "") {
+            toast.error("Bạn chưa nhập nội dung");
             return;
         }
         fetch("http://localhost:8080/api/v1/comments/" + data?.id, {
@@ -191,6 +193,17 @@ const Detail = () => {
                 }
             })
     };
+
+    function countComments(commentList) {
+        let count = 0;
+        commentList.forEach(comment => {
+            count++; // count the current comment
+            if (comment.replies && comment.replies.length > 0) {
+                count += countComments(comment.replies); // count the nested replies
+            }
+        });
+        return count;
+    }
 
     function favorite() {
         if (staffCode) {
@@ -293,21 +306,20 @@ const Detail = () => {
                                 if (i <= pageNumber) {
                                     return (
                                         // <div className='max-w-[1080px] p-2'>
-                                            <Page
-                                                key={i}
-                                                pageNumber={i + 1}
-                                                renderTextLayer={false}
-                                                renderAnnotationLayer={false}
-                                                // renderMode="svg"
-                                                width={width}
-                                            />
+                                        <Page
+                                            key={i}
+                                            pageNumber={i + 1}
+                                            renderTextLayer={false}
+                                            renderAnnotationLayer={false}
+                                            renderMode="svg"
+                                            width={width}
+                                        />
                                         // </div>
                                     );
                                 }
                             })
                         }
                     </Document>
-                    {/*<iframe src={"http://localhost:8080/api/v1/documents/" + slug + "/file"} frameborder="0"></iframe>*/}
                     <div className='w-full h-[100px] flex justify-center align-middle mt-8'>
                         <button onClick={() => setPageNumber(pageNumber + 10)}
                                 className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm
@@ -317,8 +329,8 @@ const Detail = () => {
                 <section className="bg-white py-8 lg:py-16 antialiased mt-3 rounded-lg">
                     <div className="max-w-2xl mx-auto px-4">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-lg lg:text-2xl font-bold text-gray-900">Bình luận
-                                ({commentList.length})</h2>
+                        <h2 className="text-lg lg:text-2xl font-bold text-gray-900">Bình luận
+                                ({countComments(commentList)})</h2>
                         </div>
                         <div className="mb-6">
                             <div
@@ -336,12 +348,16 @@ const Detail = () => {
                                 Đăng bình luận
                             </button>
                         </div>
-                        <div>
+                        <div className={`w-[800px]`}>
                             {commentList && commentList?.map((comment, index) => {
                                 if (index < limitComments) {
                                     return (
                                         <Comment
+                                            key={index}
+                                            isReply={false}
                                             comment={comment}
+                                            countReply={countComments}
+                                            fetchComment={fetchComment}
                                         />
                                     )
                                 }

@@ -83,6 +83,8 @@ const SearchSideBar = () => {
         });
   }, []);
 
+  console.log(sort)
+
   return (
     <div className="flex justify-between w-full gap-5 p-5">
       <div
@@ -141,7 +143,7 @@ const SearchSideBar = () => {
           <div className="flex gap-3 mt-5">
             <div
               className={`text-center border py-2 px-3 rounded-3xl border-black hover:bg-slate-500 hover:cursor-pointer hover:text-white ${
-                sort === "latest" ? "bg-slate-500 text-white" : ""
+                sort === "lastest" || sort === "" ? "bg-slate-500 text-white" : ""
               }`}
               onClick={handleSort("lastest")}
             >

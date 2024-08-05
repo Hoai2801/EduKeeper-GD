@@ -12,8 +12,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -25,7 +26,6 @@ import static org.springframework.http.HttpMethod.*;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(securedEnabled = true)
-@CrossOrigin
 public class SecurityConfiguration implements WebMvcConfigurer {
     private final JwtAuthenticationFilter JwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
@@ -33,20 +33,27 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*");
+                .allowedOrigins("http://103.241.43.206:3000", "http://103.241.43.206", "http://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowedOrigins(List.of("http://103.241.43.206:3000", "http://localhost:3000"));
+        corsConfiguration.setAllowedOrigins(List.of("http://103.241.43.206:3000", "http://103.241.43.206", "http://localhost:3000"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfiguration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+
         return http
-                .cors((cors) -> cors.configurationSource(request -> corsConfiguration))
+                .cors(cors -> cors.configurationSource(source))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((requests) -> requests
+                .authorizeHttpRequests(requests -> requests
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/v3/api-docs",
@@ -57,20 +64,20 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 "/api/v1/admin/**",
                                 "/webjars/**"
                         ).hasRole("ADMIN")
-                        .requestMatchers(
+                        .requestMatchers(GET,
                                 "/api/v1/role/**"
-                        ).hasAnyRole("ADMIN", "SUB-ADMIN")
-                        .requestMatchers(POST, 
+                        ).hasAnyRole("ADMIN", "SUB-ADMIN", "TEACHER", "USER")
+                        .requestMatchers(POST,
                                 "/api/v1/specializes",
                                 "/api/v1/subjects"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
-                        .requestMatchers(PUT, 
+                        .requestMatchers(PUT,
                                 "/api/v1/departments/**",
                                 "/api/v1/settings/**"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
-                        .requestMatchers(DELETE, 
+                        .requestMatchers(DELETE,
                                 "/api/v1/users/**",
                                 "/api/v1/subjects/**",
                                 "/api/v1/specializes/**",

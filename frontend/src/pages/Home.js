@@ -40,12 +40,9 @@ const Home = () => {
                 'Access-Control-Allow-Origin': '*',
             },
         }).then(res => res?.json()).then(data => {
-            console.log(data)
             setLastedDocuments(data)
         })
     }, [])
-
-
 
     return (
         <div>

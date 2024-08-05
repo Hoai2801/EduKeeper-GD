@@ -37,16 +37,22 @@ const Search = ({jwt}) => {
             },
             body: JSON.stringify(dataSearch),
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data) {
-                    console.log(data)
-                    setDocument(data)
-                    setTimeout(() => {
-                        localStorage.removeItem('search')
-                    }, 3000)
+            .then((res) => {
+                if (!res.ok) {
+                    setDocument([])
                 }
-            });
+                return res.json()
+                    .then((data) => {
+                        if (data) {
+                            console.log(data)
+                            setDocument(data)
+                            setTimeout(() => {
+                                localStorage.removeItem('search')
+                            }, 3000)
+                        }
+                    });
+            })
+
     }, [url, order, slugSpecialized, slugSubject, publishYear, category])
 
     const [limit, setLimit] = useState(20)

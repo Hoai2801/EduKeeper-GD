@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
+import toast from "react-hot-toast";
 
 const SignUp = () => {
     const [fullName, setFullName] = useState("");
@@ -42,16 +43,46 @@ const SignUp = () => {
             setError('Xác nhận mật khẩu không đúng');
             return;
         }
-        // const formData = new FormData();
-        // formData.append('username', fullName);
-        // formData.append('email', email);
-        // formData.append('staffCode', staffCode);
-        // formData.append('classroom', classroom);
-        // formData.append("roles", "STUDENT");
-        // formData.append('password', password);
-        // formData.append('department', selectedDepartment.id);
-        // formData.append('specialized', selectedspecialized);
-        // console.log(formData)
+        if (selectedDepartment === null || selectedDepartment === "") {
+            toast.error("Vui lòng chọn khoa");
+            return;
+        }
+        if (selectedspecialized === null || selectedspecialized === "") {
+            toast.error("Vui lòng chọn chuyên ngành");
+            return;
+        }
+        if (fullName === null || fullName === "") {
+            toast.error("Vui lòng nhập họ tên");
+            return;
+        }
+        if (email === null || email === "") {
+            toast.error("Vui lòng nhập email");
+            return;
+        }
+        if (staffCode === null || staffCode === "") {
+            toast.error("Vui lòng nhập mã sinh viên");
+            return;
+        }
+        if (staffCode.length < 8) {
+            toast.error("Mã sinh viên sai định dạng");
+            return;
+        }
+        if (classroom === null || classroom === "") {
+            toast.error("Vui lòng nhập lớp");
+            return;
+        }
+        if (classroom.length < 6) {
+            toast.error("Lớp sai định dạng");
+            return;
+        }
+        if (password === null || password === "") {
+            toast.error("Vui lòng nhập mật khẩu");
+            return;
+        }
+        if (password.length < 8) {
+            toast.error("Vui lòng nhập mật khẩu tối thiểu 8 ký tự");
+            return;
+        }
         fetch('http://localhost:8080/api/v1/auth/register', {
             method: 'POST',
             headers: {
@@ -68,15 +99,14 @@ const SignUp = () => {
                 specialized: selectedspecialized
             }),
         })
-            .then(response => response.text())
-            .then((data) => {
-                if (data === "registered") {
-                    alert("Đăng ký thành công");
-                    window.location.href = "/login";
-                } else setError(data)
+            .then(response => {
+                if (response.status === 200) {
+                    toast.success("Đăng ký tài khoản thành công");
+                    window.location.href = '/login';
+                } else {
+                    toast.error(response.text());
+                }
             })
-            .catch(error => console.error(error));
-
     };
     return (
         <div className="flex flex-col py-12 sm:px-6 lg:px-8">

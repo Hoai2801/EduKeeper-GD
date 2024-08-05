@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 
 const Notification = ({notification}) => {
     function formatDate(dateString) {
@@ -21,12 +22,15 @@ const Notification = ({notification}) => {
     }
 
     return (
-        <div className={`flex flex-col w-full min-h-32 border-b border-gray-300 p-3 ${notification._check ? "bg-gray-200" : "bg-white"}`}>
-            <div className={`flex justify-between`}>
-                <h3 className={`${!notification._check ? "font-semibold" : "text-gray-500 font-semibold"}`}>{notification.title}</h3>
-                <p>{(formatDate(notification.created_at))}</p>
-            </div>
-            <p className={`${!notification._check ? "" : "text-gray-500"}`}>{notification.content}</p>
+        <div
+            className={`flex flex-col w-full min-h-32 border-b border-gray-300 p-3 ${notification._check ? "bg-gray-200" : "bg-white"}`}>
+            <Link to={`/document/${notification.document}`}>
+                <div className={`flex justify-between`}>
+                    <h3 className={`${!notification._check ? "font-semibold" : "text-gray-500 font-semibold"}`}>{notification.title}</h3>
+                    <p>{(formatDate(notification.created_at))}</p>
+                </div>
+                <p className={`${!notification._check ? "" : "text-gray-500"}`}>{notification.content}</p>
+            </Link>
         </div>
     );
 };

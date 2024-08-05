@@ -5,12 +5,14 @@ import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.services.DocumentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
@@ -29,7 +31,7 @@ public class DocumentController {
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
-            File file = new File(document.getPath());
+            File file = new File(UPLOAD_DIR + document.getPath());
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(document.getDocument_type()))
                     .body(new FileSystemResource(file));
@@ -44,7 +46,7 @@ public class DocumentController {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
             // null because the raw file is pdf
             if (document.getFile_download() == null) {
-                File file = new File(document.getPath());
+                File file = new File(UPLOAD_DIR + document.getPath());
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(document.getDocument_type()))
                         .body(new FileSystemResource(file));

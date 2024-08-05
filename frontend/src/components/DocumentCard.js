@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import docIcon from '../assets/docs.jpg'
 
 const DocumentCard = ({ document }) => {
+    console.log(document)
     return (
-        <div className={`p-3 rounded-lg bg-white flex flex-col border w-[330px] gap-5 shadow-sm ${document?._delete || document?.status === "draft" ? "hidden" : ""} `}>
+        <div className={`p-3 rounded-lg bg-white flex flex-col border w-[330px] h-[600px] gap-5 shadow-sm ${document?._delete ? "hidden" : ""} `}>
             <Link to={`/document/${document?.slug}`}>
-                <div className='h-[380px] border rounded-xl overflow-hidden w-[300px]'>
+                <div className='h-[380px] border rounded-lg overflow-hidden w-[300px]'>
                     {document?.thumbnail ? <img src={"http://localhost:8080/api/v1/images/" + document?.thumbnail} alt="" className='w-full h-full' /> : <img src={docIcon} alt="" className={`w-full h-full`} />}
                 </div>
                 <div className='h-[50px] w-full pt-2'>
