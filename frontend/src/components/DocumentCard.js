@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import docIcon from '../assets/docs.jpg'
 
 const DocumentCard = ({ document }) => {
+    console.log(document)
     return (
         <div className={`p-3 rounded-lg bg-white flex flex-col border w-[330px] h-[600px] gap-5 shadow-sm ${document?._delete ? "hidden" : ""} `}>
             <Link to={`/document/${document?.slug}`}>

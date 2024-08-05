@@ -71,7 +71,6 @@ export const Upload = () => {
         fetch('http://localhost:8080/api/v1/specializes/department/' + departmentId)
             .then(response => response.json())
             .then(data => {
-                console.log(data)
                 setListSpecialized(data);
             })
             .catch(error => console.error(error));
@@ -82,46 +81,50 @@ export const Upload = () => {
             fetch('http://localhost:8080/api/v1/documents/' + path.slug)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
+                    console.log('Fetched data:', data);
                     if (data.path !== data.file_download) {
-                        setHaveDownloadFile(true)
+                        setHaveDownloadFile(true);
                         fetch('http://localhost:8080/api/v1/documents/' + data.slug + "/download")
                             .then(response => response.blob())
                             .then(blob => {
                                 const file = new File([blob], data.file_download, { type: blob.type });
-                                setDocumentEditId(data.id)
+                                setDocumentEditId(data.id);
                                 setUploadData({
                                     title: data.title,
                                     description: data.description,
-                                    specialized: data.specialized.id || '',
-                                    subject: data.subject.id || '',
-                                    category: data.category.id || '',
+                                    specialized: data.specialized?.id || '',
+                                    subject: data.subject?.id || '',
+                                    category: data.category?.id || '',
                                     scope: data.scope || '',
-                                    userUpload: data.user_upload.username || '',
+                                    userUpload: data.user_upload?.username || '',
                                     author: data.author,
                                     documentDownload: file
                                 });
                             })
-                            .catch(error => console.error(error));
+                            .catch(error => {
+                                console.error('Download error:', error);
+                            });
                     } else {
-                        setHaveDownloadFile(false)
+                        setHaveDownloadFile(false);
                         setUploadData({
                             title: data.title,
                             description: data.description,
-                            specialized: data.specialized.id || '',
-                            subject: data.subject.id || '',
-                            category: data.category.id || '',
+                            specialized: data.specialized?.id || '',
+                            subject: data.subject?.id || '',
+                            category: data.category?.id || '',
                             scope: data.scope || '',
-                            userUpload: data.user_upload.username || '',
+                            userUpload: data.user_upload?.username || '',
                             author: data.author,
                             document: null,
                             documentDownload: null
                         });
                     }
                     setSelectedDepartment(data.department.id);
-                    handleListSpecialized(data.department.id)
+                    handleListSpecialized(data.department.id);
                 })
-                .catch(error => console.error(error));
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
         }
     }, [path]);
 
@@ -222,7 +225,7 @@ export const Upload = () => {
         formData.append('userUpload', user?.staff_code);
         formData.append('scope', uploadData.scope);
         formData.append('author', uploadData.author);
-        formData.append('documentDownload', uploadData.documentDownload || uploadData.document);
+        formData.append('documentDownload', haveDownloadFile ? uploadData.documentDownload : uploadData.document);
 
         fetch('http://localhost:8080/api/v1/documents/upload', {
             method: 'POST',
@@ -442,9 +445,10 @@ export const Upload = () => {
                     </div>
                     <div className="max-w-sm mx-auto mb-3">
                         <label htmlFor="subject"
-                               className="block mb-2 text-sm font-semibold text-gray-900">Môn</label>
-                        <select id="subject"
-                                name="subject"
+                               className="block mb-2 text-sm font-semibold text-gray-900">Môn <span
+                            className={`text-red-500`}>*</span></label>
+                    <select id="subject"
+                            name="subject"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                 onChange={handleChange}>
                             <option value={null}>Chọn môn</option>

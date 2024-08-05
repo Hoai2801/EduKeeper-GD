@@ -80,7 +80,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
         String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
-
+        System.out.println(thumbnail);
         String downloadFileName = null;
         // file download
         if (!Objects.equals(uploadRequestDTO.getDocument().getOriginalFilename(), uploadRequestDTO.getDocumentDownload().getOriginalFilename()) && !Objects.equals(uploadRequestDTO.getDocument().getContentType(), uploadRequestDTO.getDocumentDownload().getContentType())) {
@@ -159,12 +159,27 @@ public class DocumentServiceImpl implements DocumentService {
             String url = "src/main/resources/static/thumbnail/";
             String fileName = System.currentTimeMillis() + ".png";
             String thumbnailPath = url + fileName;
-            ImageIO.write(image, "PNG", new File(thumbnailPath));
+
+            // Ensure the directory exists
+            File directory = new File(url);
+            if (!directory.exists()) {
+                boolean dirsCreated = directory.mkdirs();
+                if (!dirsCreated) {
+                    throw new IOException("Failed to create directories: " + url);
+                }
+            }
+
+            // Write the image to the file
+            File thumbnailFile = new File(thumbnailPath);
+            boolean result = ImageIO.write(image, "PNG", thumbnailFile);
+            if (!result) {
+                throw new IOException("Failed to write image to file: " + thumbnailPath);
+            }
 
             return fileName;
         } catch (IOException e) {
             log.error("Error generating thumbnail: {}", e.getMessage());
-            return null;
+            throw e;  // Rethrow the exception to handle it in the calling method
         }
     }
 
@@ -205,7 +220,14 @@ public class DocumentServiceImpl implements DocumentService {
         existDocument.setScope(uploadRequestDTO.getScope());
         existDocument.setTitle(uploadRequestDTO.getTitle());
         existDocument.setSlug(createSlug(uploadRequestDTO.getTitle()));
-        existDocument.setStatus("draft");
+        // get auto accept document setting
+        settingRepository.findById(2L).ifPresent(setting -> {
+            if (setting.getValue().equals("true")) {
+                existDocument.setStatus("published");
+            } else {
+                existDocument.setStatus("draft");
+            }
+        });
         documentRepository.save(existDocument);
         return "Update document successfully";
     }
@@ -278,12 +300,16 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         if (filterRequestDTO.getPublishYear() != null && !filterRequestDTO.getPublishYear().isEmpty()) {
-            predicates.add(cb.equal(document.get("uploadDate"), LocalDate.parse(filterRequestDTO.getPublishYear())));
+            int year = Integer.parseInt(filterRequestDTO.getPublishYear());
+            LocalDate startOfYear = LocalDate.of(year, 1, 1);
+            LocalDate endOfYear = LocalDate.of(year, 12, 31);
+            predicates.add(cb.between(document.get("uploadDate"), startOfYear, endOfYear));
         }
 
         cq.where(predicates.toArray(new Predicate[0]));
         TypedQuery<Document> query = entityManager.createQuery(cq);
         List<Document> documents = query.getResultList();
+        System.out.println(documents);
 
         // Sort documents
         if (filterRequestDTO.getOrder() != null) {
@@ -396,6 +422,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .title(document.getTitle())
                 .slug(document.getSlug())
                 .download(document.getDownloadsCount())
+                .views(document.getViewsCount())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
                 .status(document.getStatus())
