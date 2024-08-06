@@ -42,21 +42,7 @@ public class BackupServiceImpl {
         List<String> fileNames = new ArrayList<>();
         if (backupFiles != null) {
             for (File file : backupFiles) {
-                if (file.isFile() && file.getName().endsWith(".zip")) {
-                    fileNames.add(file.getName());
-                }
-            }
-        }
-        return fileNames;
-    }
-
-    public List<String> listBackupDatabase() {
-        File backupDir = new File(ZipUtils.getBackupPath());
-        File[] backupFiles = backupDir.listFiles();
-        List<String> fileNames = new ArrayList<>();
-        if (backupFiles != null) {
-            for (File file : backupFiles) {
-                if (file.isFile() && file.getName().endsWith(".sql")) {
+                if (file.isFile()) {
                     fileNames.add(file.getName());
                 }
             }
@@ -102,6 +88,16 @@ public class BackupServiceImpl {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteBackup(String fileName) {
+        File backupFile = new File(ZipUtils.getBackupPath() + fileName);
+        if (backupFile.exists()) {
+            backupFile.delete();
+            return true;
+        } else {
             return false;
         }
     }
