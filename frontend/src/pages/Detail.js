@@ -22,10 +22,11 @@ const Detail = () => {
         return lastPart;
     }
 
-    const staffCode = useContext(JWTContext)?.jwtDecoded?.staff_code;
+    const context = useContext(JWTContext);
+    const jwt = context?.token;
+    const staffCode = context?.jwtDecoded?.staff_code;
 
     const [isFavorite, setIsFavorite] = useState(false);
-
 
     const url = window.location.href;
     const slug = extractSlugFromURL(url);
@@ -63,10 +64,7 @@ const Detail = () => {
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/download")
             .then((res) => {
                 res.blob().then(r => {
-                    r.arrayBuffer().then(r => {
-                        r = new Uint8Array(r)
-                        setFileDownload(r)
-                    })
+                    setFileDownload(r)
                 })
             })
 
@@ -110,11 +108,10 @@ const Detail = () => {
     const width = window.innerWidth > 1050 ? 1050 : window.innerWidth - 30;
 
     const downloadClick = () => {
-        console.log(data)
+        const nameOfDocument = data?.title;
         // Creating new object of PDF file
         const fileURL = window.URL.createObjectURL(new Blob([fileDownload], {
             type: data?.download_file_type || 'application/pdf',
-            name: data?.title
         }));
 
         // increase download value of document
@@ -133,7 +130,7 @@ const Detail = () => {
                 // Setting various property values
                 let alink = document.createElement("a");
                 alink.href = fileURL;
-                alink.download = data?.title;
+                alink.download = nameOfDocument
                 alink.click();
             }
         }).catch((error) => {
@@ -165,7 +162,7 @@ const Detail = () => {
 
     const createComment = (event) => {
         event.preventDefault();
-        if (staffCode === null) {
+        if (!staffCode) {
             // redirect to login
             window.location.href = "/login";
         }
@@ -218,7 +215,6 @@ const Detail = () => {
                         "documentId": data?.id
                     }),
                 })
-                    // .then((res) => res.json())
                     .then((data) => {
                         if (data.status === 200) {
                             console.log(data)
@@ -238,7 +234,6 @@ const Detail = () => {
                 })
                     .then((data) => {
                         if (data.status === 200) {
-                            console.log(data)
                             setIsFavorite(!isFavorite)
                         }
                     })
@@ -369,7 +364,6 @@ const Detail = () => {
                         </div>
                     </div>
                 </section>
-                {/* </DocumentViewer> */}
             </div>
         </div>
     );
