@@ -69,7 +69,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         ).hasAnyRole("ADMIN", "SUB-ADMIN", "TEACHER", "USER")
                         .requestMatchers(POST,
                                 "/api/v1/specializes",
-                                "/api/v1/subjects"
+                                "/api/v1/subjects",
+                                "/api/v1/backups/**"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(PUT,
@@ -81,7 +82,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 "/api/v1/users/**",
                                 "/api/v1/subjects/**",
                                 "/api/v1/specializes/**",
-                                "/api/v1/departments/**"
+                                "/api/v1/departments/**",
+                                "/api/v1/backups/**"
                         )
                         .hasAnyRole("ADMIN", "SUB-ADMIN")
                         .requestMatchers(

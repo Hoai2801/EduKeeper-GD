@@ -1,5 +1,6 @@
 import {React, useEffect, useState} from "react";
 import {Link, NavLink} from "react-router-dom";
+import  backup  from "../assets/data-backup-128.png";
 
 const SideBarAdmin = () => {
     const [documentsDraft, setDocumentsDraft] = useState([]);
@@ -259,6 +260,23 @@ const SideBarAdmin = () => {
 
                             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
                                 Banner
+                            </p>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            className={({isActive, isPending}) =>
+                                isPending
+                                    ? "pending"
+                                    : isActive
+                                        ? "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85] w-full flex items-center gap-4 px-4 capitalize"
+                                        : "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white hover:bg-white/10 active:bg-white/30 w-full flex items-center gap-4 px-4 capitalize"
+                            }
+                            to="backup"
+                        >
+                            <img src={backup} alt="" className={`w-6 h-6`}/>
+                            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                                Sao lưu dữ liệu
                             </p>
                         </NavLink>
                     </li>

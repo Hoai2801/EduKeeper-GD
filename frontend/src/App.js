@@ -25,6 +25,7 @@ import {createContext, useEffect, useState} from "react";
 import {jwtDecode} from "jwt-decode";
 import Subject from "./pages/Subject";
 import Setting from "./pages/Setting";
+import Backup from "./pages/Backup";
 
 export const JWTContext = createContext(null)
 
@@ -97,6 +98,7 @@ function App() {
                     <Route path="banner" element={<BannerManager />}/>
                     <Route path="deleted" element={<DeletedDocument/>}/>
                     <Route path="setting" element={<Setting/>}/>
+                    <Route path="backup" element={<Backup/>}/>
                 </Route>
             </Routes>
         </JWTContext.Provider>

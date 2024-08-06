@@ -20,13 +20,13 @@ public class BackupController {
 
     private final BackupServiceImpl backupService;
     
-    @GetMapping
+    @PostMapping
     public String backupFiles() {
         backupService.createBackup();
         return "Backup created successfully.";
     }
 
-    @GetMapping("/download-backup/{fileName}")
+    @PostMapping("/download-backup/{fileName}")
     public ResponseEntity<Resource> downloadBackup(@PathVariable String fileName) {
         File backupFile = new File(ZipUtils.getBackupPath() + fileName);
         if (backupFile.exists()) {
@@ -48,13 +48,7 @@ public class BackupController {
         return ResponseEntity.ok(backupFiles);
     }
 
-    @GetMapping("/list-databases")
-    public ResponseEntity<List<String>> listBackupDatabase() {
-        List<String> backupFiles = backupService.listBackupDatabase();
-        return ResponseEntity.ok(backupFiles);
-    }
-
-    @GetMapping("/restore-backup/{fileName}")
+    @PostMapping("/restore-backup/{fileName}")
     public ResponseEntity<String> restoreBackup(@PathVariable String fileName) {
         boolean success = backupService.restoreBackup(fileName);
         if (success) {
@@ -64,13 +58,23 @@ public class BackupController {
         }
     }
     
-    @GetMapping("/restore-database/{fileName}")
+    @PostMapping("/restore-database/{fileName}")
     public ResponseEntity<String> restoreDatabase(@PathVariable String fileName) {
         boolean success = backupService.restoreDatabase(fileName);
         if (success) {
             return ResponseEntity.ok("Database restored successfully.");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to restore database.");
+        }
+    }
+    
+    @DeleteMapping("/{fileName}")
+    public ResponseEntity<String> deleteBackup(@PathVariable String fileName) {
+        boolean success = backupService.deleteBackup(fileName);
+        if (success) {
+            return ResponseEntity.ok("Backup deleted successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete backup.");
         }
     }
 }
