@@ -33,8 +33,9 @@ const DragDropFile = ({handleFiles, fileSupport}) => {
   const handleChange = function (e) {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      if (e.target.files[0].type === "application/pdf"
-          || e.target.files[0].type === fileSupport
+      if (e.target.files[0].type === fileSupport
+          || fileSupport.includes(e.target.files[0].type)
+          // use for the download document can be support any type but not image
           || fileSupport === "any" && e.target.files[0].type !== "image/png" && e.target.files[0].type !== "image/jpeg" && e.target.files[0].type !== "image/jpg"
       ) {
         if (e.target.files[0].size < 52428800) {

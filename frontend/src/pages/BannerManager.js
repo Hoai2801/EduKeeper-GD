@@ -181,7 +181,7 @@ const BannerManager = ({jwt}) => {
                             </div>
                             <div className={`flex flex-col justify-center items-center pt-5`}>
                                 <div className={`${bannerEdit ? 'hidden' : 'block'}`}>
-                                    <DragDropFile handleFiles={setFile} fileSupport={"image"}/>
+                                    <DragDropFile handleFiles={setFile} fileSupport={['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']}/>
                                 </div>
                                 <div className={`w-full px-5 mt-5 border-b-2`}>
                                     <img
