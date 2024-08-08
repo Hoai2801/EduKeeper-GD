@@ -243,7 +243,7 @@ const Detail = () => {
 
     return (
         <div className={`w-full`}>
-            <h2 className={`text-[28px] mt-10 font-bold ${data?.scope === "public" || data?.user_upload?.staffCode === staffCode ? "hidden" : "block"}`}>
+            <h2 className={`text-[28px] text-center mt-10 font-bold ${data?.scope === "public" || data?.user_upload?.staffCode === staffCode ? "hidden" : "block"}`}>
                 Bạn không thể xem tài liệu này vì đây là tài liệu riêng tư</h2>
             <div
                 className={`${data?.scope === "public" || data?.user_upload?.staffCode === staffCode ? "" : "hidden"}`}>

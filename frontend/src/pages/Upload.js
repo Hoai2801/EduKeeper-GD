@@ -25,7 +25,7 @@ export const Upload = () => {
 
     const [documentEditId, setDocumentEditId] = useState(-1);
 
-    const initialState = {
+    const [uploadData, setUploadData] = useState({
         title: '',
         description: '',
         specialized: '',
@@ -36,9 +36,7 @@ export const Upload = () => {
         author: '',
         document: null,
         documentDownload: null
-    };
-
-    const [uploadData, setUploadData] = useState(initialState);
+    });
 
     // Handler for input changes
     const handleChange = (e) => {
@@ -81,44 +79,51 @@ export const Upload = () => {
             fetch('http://localhost:8080/api/v1/documents/' + path.slug)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Fetched data:', data);
+                    setDocumentEditId(data.id)
+                    uploadData.title = data.title;
+                    uploadData.description = data.description;
+                    uploadData.specialized = data.specialized.id;
+                    uploadData.subject = data.subject.id;
+                    uploadData.category = data.category.id;
+                    uploadData.scope = data.scope;
+                    uploadData.userUpload = data.userUpload;
+                    uploadData.author = data.author;
+
                     if (data.path !== data.file_download) {
                         setHaveDownloadFile(true);
                         fetch('http://localhost:8080/api/v1/documents/' + data.slug + "/download")
                             .then(response => response.blob())
                             .then(blob => {
                                 const file = new File([blob], data.file_download, { type: blob.type });
-                                setDocumentEditId(data.id);
-                                setUploadData({
-                                    title: data.title,
-                                    description: data.description,
-                                    specialized: data.specialized?.id || '',
-                                    subject: data.subject?.id || '',
-                                    category: data.category?.id || '',
-                                    scope: data.scope || '',
-                                    userUpload: data.user_upload?.username || '',
-                                    author: data.author,
+                                setUploadData(prevState => ({
+                                    ...prevState,
                                     documentDownload: file
-                                });
+                                }));
                             })
                             .catch(error => {
                                 console.error('Download error:', error);
                             });
-                    } else {
-                        setHaveDownloadFile(false);
-                        setUploadData({
-                            title: data.title,
-                            description: data.description,
-                            specialized: data.specialized?.id || '',
-                            subject: data.subject?.id || '',
-                            category: data.category?.id || '',
-                            scope: data.scope || '',
-                            userUpload: data.user_upload?.username || '',
-                            author: data.author,
-                            document: null,
-                            documentDownload: null
-                        });
                     }
+                        fetch('http://localhost:8080/api/v1/documents/' + data.slug + "/file")
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const file = new File([blob], data.path, { type: blob.type });
+                                setUploadData(prevState => ({
+                                    ...prevState,
+                                    document: file,
+                                }));
+                                if (!haveDownloadFile) {
+                                    setUploadData(prevState => ({
+                                        ...prevState,
+                                        documentDownload: file
+                                    }));
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Download error:', error);
+                            });
+
+
                     setSelectedDepartment(data.department.id);
                     handleListSpecialized(data.department.id);
                 })
@@ -127,6 +132,7 @@ export const Upload = () => {
                 });
         }
     }, [path]);
+
 
     useEffect(() => {
         if (uploadData.specialized) {
@@ -262,7 +268,7 @@ export const Upload = () => {
     const updateDocument = (event) => {
         event.preventDefault();
         const formData = new FormData();
-        // formData.append('document', uploadData.document);
+        formData.append('document', uploadData.document);
         formData.append('title', uploadData.title);
         formData.append('specialized', uploadData.specialized);
         formData.append('category', uploadData.category);
@@ -287,6 +293,9 @@ export const Upload = () => {
             })
             .catch(error => console.error(error));
     };
+
+    console.log(uploadData.document)
+    console.log(uploadData.documentDownload)
     return (
         <div className={`w-full p-2`}>
             <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 text-center ${isEditPage ? "block" : "hidden"}`}>
@@ -347,10 +356,10 @@ export const Upload = () => {
                     {
                         uploadData.documentDownload && haveDownloadFile && (
                             <div
-                                className={`${isEditPage ? "block" : "block"} max-w-[450px] overflow-hidden p-2 flex justify-between gap-5 rounded-lg border border-gray-300`}>
+                                className={` p-2 overflow-hidden flex flex-wrap justify-between gap-5 rounded-lg border border-gray-300 h-fit`}>
                                 <p className={`text-gray-700 font-semibold`}>Tải lên thành công <span
-                                    className={`text-gray-900 font-semibold`}>{uploadData.documentDownload.name}</span></p>
-                                <button className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2`}
+                                    className={`text-gray-900 font-semibold w-[420px]`}>{uploadData.documentDownload.name}</span></p>
+                                <button className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2 w-full`}
                                         onClick={() => resetDownloadFiles()}
                                 >
                                     Xóa
