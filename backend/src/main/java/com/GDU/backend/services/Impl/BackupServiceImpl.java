@@ -53,7 +53,7 @@ public class BackupServiceImpl {
     public boolean restoreBackup(String fileName) {
         try {
             // Clean up old directories
-            String[] directories = {"avatar", "banner", "thumbnail", "upload"};
+            String[] directories = {"avatar", "banner", "thumbnail", "uploads"};
             for (String dir : directories) {
                 File directory = new File(ZipUtils.getStaticPath() + dir);
                 if (directory.exists()) {

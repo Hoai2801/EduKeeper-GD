@@ -195,10 +195,10 @@ public class DocumentServiceImpl implements DocumentService {
             return "User not existing";
         }
         if (!existDocument.getDocumentDownload().equals(uploadRequestDTO.getDocumentDownload().getOriginalFilename())) {
-            // delete old file download
-            File oldDownloadFile = new File(UPLOAD_DIR + existDocument.getDocumentDownload());
-            if (oldDownloadFile.exists()) {
-                oldDownloadFile.delete();
+            if (!existDocument.getPath().equals(uploadRequestDTO.getDocumentDownload().getOriginalFilename())) {
+                if (Files.exists(Paths.get(UPLOAD_DIR + existDocument.getDocumentDownload()))) {
+                    Files.delete(Paths.get(UPLOAD_DIR + existDocument.getDocumentDownload()));
+                }
             }
             Path uploadDir = Paths.get(UPLOAD_DIR);
             String downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
@@ -273,7 +273,7 @@ public class DocumentServiceImpl implements DocumentService {
         CriteriaQuery<Document> cq = cb.createQuery(Document.class);
         Root<Document> document = cq.from(Document.class);
         List<Predicate> predicates = new ArrayList<>();
-
+        System.out.println(filterRequestDTO);
         if (filterRequestDTO.getSubjectName() != null && !filterRequestDTO.getSubjectName().isEmpty()) {
             Join<Document, Subject> subject = document.join("subject");
             predicates.add(cb.equal(subject.get("subjectSlug"), filterRequestDTO.getSubjectName()));
@@ -296,7 +296,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         if (filterRequestDTO.getCategoryName() != null && !filterRequestDTO.getCategoryName().isEmpty()) {
             Join<Document, Category> category = document.join("category");
-            predicates.add(cb.equal(category.get("categoryName"), filterRequestDTO.getCategoryName()));
+            predicates.add(cb.equal(category.get("categorySlug"), filterRequestDTO.getCategoryName()));
         }
 
         if (filterRequestDTO.getPublishYear() != null && !filterRequestDTO.getPublishYear().isEmpty()) {
