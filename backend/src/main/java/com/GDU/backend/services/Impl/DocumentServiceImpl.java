@@ -33,6 +33,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -84,13 +85,15 @@ public class DocumentServiceImpl implements DocumentService {
         // file download
         if (!uploadRequestDTO.getDocumentDownload().isEmpty()) {
             // save file
-            downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
+            downloadFileName = System.currentTimeMillis() + "_"
+                    + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
             File downloadFile = new File(UPLOAD_DIR + downloadFileName);
             MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
             Files.createDirectories(uploadDir);
-            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
         }
-        
+
         Document newDocument = Document.builder()
                 .title(uploadRequestDTO.getTitle())
                 .author(uploadRequestDTO.getAuthor())
@@ -99,6 +102,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .path(destFile.getAbsolutePath())
                 .documentType(uploadRequestDTO.getDocument().getContentType())
                 .documentDownload(uploadRequestDTO.getDocumentDownload() != null ? downloadFileName : null)
+                .status("draft")
                 .scope(uploadRequestDTO.getScope())
                 .downloadFileType(uploadRequestDTO.getDocumentDownload().getContentType())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
@@ -139,10 +143,26 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
+    // private String createSlug(String title) {
+    // title = StringEscapeUtils.escapeHtml4(title);
+    // String slug = title.replaceAll("[^a-zA-Z0-9\\s]", "");
+    // slug = slug.replaceAll("\\s+", "-");
+    // return slug.toLowerCase() + "-" + System.currentTimeMillis();
+    // }
+
     private String createSlug(String title) {
-        title = StringEscapeUtils.escapeHtml4(title);
-        String slug = title.replaceAll("[^a-zA-Z0-9\\s]", "");
+
+        // Normalize and remove diacritics
+        String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD);
+        String slug = normalizedTitle.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        // Remove all non-alphanumeric characters except spaces
+        slug = slug.replaceAll("[^a-zA-Z0-9\\s]", "");
+
+        // Replace spaces with hyphens
         slug = slug.replaceAll("\\s+", "-");
+
+        // Convert to lowercase
         return slug.toLowerCase() + "-" + System.currentTimeMillis();
     }
 
@@ -166,27 +186,34 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) {
-        Document existDocument = documentRepository.findById(id).orElse(null);
-        if (existDocument == null) {
-            return "Document not existing";
-        }
+        try {
 
-        User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
-        if (userUpload == null) {
-            return "User not existing";
-        }
-        existDocument.setUserUpload(userUpload);
+            Document existDocument = documentRepository.findById(id).orElse(null);
+            if (existDocument == null) {
+                return "Document not existing";
+            }
 
-        Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
-        existDocument.setCategory(category);
-        existDocument.setAuthor(uploadRequestDTO.getAuthor());
-        existDocument.setDescription(uploadRequestDTO.getDescription());
-        existDocument.setScope(uploadRequestDTO.getScope());
-        existDocument.setTitle(uploadRequestDTO.getTitle());
-        existDocument.setSlug(createSlug(uploadRequestDTO.getTitle()));
-        existDocument.setStatus("draft");
-        documentRepository.save(existDocument);
-        return "Update document successfully";
+            User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
+            if (userUpload == null) {
+                return "User not existing";
+            }
+            existDocument.setUserUpload(userUpload);
+
+            Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
+            existDocument.setCategory(category);
+            existDocument.setAuthor(uploadRequestDTO.getAuthor());
+            existDocument.setDescription(uploadRequestDTO.getDescription());
+            existDocument.setScope(uploadRequestDTO.getScope());
+            existDocument.setTitle(uploadRequestDTO.getTitle());
+            existDocument.setSlug(createSlug(uploadRequestDTO.getTitle()));
+            existDocument.setStatus("draft");
+            documentRepository.save(existDocument);
+            System.out.println("Yeah");
+            return "Update document successfully";
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 
     @Override
@@ -216,11 +243,10 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO) {
         return documentRepository.getDocumentsSuggested(
-                        recommendationRequestDTO.getSpecialized(),
-                        recommendationRequestDTO.getCategory(),
-                        recommendationRequestDTO.getTitle(),
-                        recommendationRequestDTO.getAuthor()
-                )
+                recommendationRequestDTO.getSpecialized(),
+                recommendationRequestDTO.getCategory(),
+                recommendationRequestDTO.getTitle(),
+                recommendationRequestDTO.getAuthor())
                 .stream().map(this::convertToDocumentResponse).toList();
     }
 
@@ -246,8 +272,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (filterRequestDTO.getSearchTerm() != null && !filterRequestDTO.getSearchTerm().isEmpty()) {
             Predicate searchTermPredicate = cb.or(
                     cb.like(document.get("title"), "%" + filterRequestDTO.getSearchTerm() + "%"),
-                    cb.like(document.get("description"), "%" + filterRequestDTO.getSearchTerm() + "%")
-            );
+                    cb.like(document.get("description"), "%" + filterRequestDTO.getSearchTerm() + "%"));
             predicates.add(searchTermPredicate);
         }
 
@@ -268,23 +293,27 @@ public class DocumentServiceImpl implements DocumentService {
         if (filterRequestDTO.getOrder() != null) {
             documents = switch (filterRequestDTO.getOrder().toLowerCase()) {
                 case "most-downloaded" -> documents.stream()
-                        .filter(aDocument -> aDocument.getDownloadsCount() > 0 && (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
+                        .filter(aDocument -> aDocument.getDownloadsCount() > 0 && (aDocument.getScope().equals("public")
+                                || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getDownloadsCount).reversed())
                         .collect(Collectors.toList());
                 case "most-viewed" -> documents.stream()
-                        .filter(aDocument -> aDocument.getViewsCount() > 0 && (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
+                        .filter(aDocument -> aDocument.getViewsCount() > 0 && (aDocument.getScope().equals("public")
+                                || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getViewsCount).reversed())
                         .collect(Collectors.toList());
                 default -> documents
                         .stream()
-                        .filter(aDocument -> (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
+                        .filter(aDocument -> (aDocument.getScope().equals("public")
+                                || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getId).reversed())
                         .collect(Collectors.toList());
             };
         } else {
             documents = documents
                     .stream()
-                    .filter(aDocument -> aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only") && !aDocument.isDelete())
+                    .filter(aDocument -> aDocument.getScope().equals("public")
+                            || aDocument.getScope().equals("student-only") && !aDocument.isDelete())
                     .sorted(Comparator.comparing(Document::getId).reversed())
                     .collect(Collectors.toList());
         }
@@ -503,9 +532,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponseDTO> getTop3Documents() {
+    public List<DocumentResponseDTO> getTop10Documents() {
         try {
-            return documentRepository.getTop3Docs()
+            return documentRepository.getTop10Docs()
                     .stream()
                     .map(this::convertToDocumentResponse)
                     .toList();
@@ -531,12 +560,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Document getDocumentById(Long documentId) {
-        return documentRepository.findById(documentId).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+        return documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
     }
 
     @Override
-    public List<Document> findDocumentsWithMostDownloads(int limit) {
-        return documentRepository.findDocumentsWithMostDownloads(limit);
+    public List<Document> getTop10DocumentsWithMostDownloadsByDepartment(int departmentId) {
+        return documentRepository.findDocumentsWithMostDownloads(departmentId);
     }
 
     @Override

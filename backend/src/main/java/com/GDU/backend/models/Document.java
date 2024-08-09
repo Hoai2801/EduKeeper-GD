@@ -31,16 +31,15 @@ public class Document {
     @Column(nullable = false, length = 30)
     private String documentType;
 
-    @Column(name = "download_file_type" ,nullable = false, length = 30)
+    @Column(name = "download_file_type", nullable = false, length = 30)
     private String downloadFileType;
-
 
     @Column(nullable = false)
     private Long documentSize;
 
     @Column(nullable = false)
     private Integer pages;
-    
+
     @Column
     private String description;
 
@@ -49,8 +48,8 @@ public class Document {
 
     @Column(nullable = false, length = 500)
     private String path;
-    
-    @Column(name = "path_download" ,nullable = false, length = 500)
+
+    @Column(name = "path_download", nullable = false, length = 500)
     private String documentDownload;
 
     @Column(nullable = false, length = 500)
@@ -66,7 +65,7 @@ public class Document {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_upload", nullable = false)
     private User userUpload;
-    
+
     private String author;
 
     @OneToMany(mappedBy = "document")
@@ -76,12 +75,16 @@ public class Document {
     @JsonManagedReference
     private List<ViewHistory> views;
 
+    @OneToMany(mappedBy = "documentID", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Favorite> favorites;
+
     @Column(name = "deleted_at")
     private LocalDateTime deleteDate;
-    
+
     private String scope;
-    
-    private String status; 
+
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "subject_id")
@@ -98,5 +101,9 @@ public class Document {
 
     public int getDownloadsCount() {
         return downloads != null ? downloads.size() : 0;
+    }
+
+    public int getFavoritesCount() {
+        return favorites != null ? favorites.size() : 0;
     }
 }

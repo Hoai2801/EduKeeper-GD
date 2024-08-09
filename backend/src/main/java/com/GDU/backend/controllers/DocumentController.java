@@ -88,8 +88,7 @@ public class DocumentController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadDocument(
-            @ModelAttribute UploadRequestDTO uploadRequestDTO
-    ) {
+            @ModelAttribute UploadRequestDTO uploadRequestDTO) {
         try {
             return documentService.uploadDocument(uploadRequestDTO);
         } catch (Exception e) {
@@ -123,10 +122,12 @@ public class DocumentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(
+
             @PathVariable("id") Long id,
-            @ModelAttribute UploadRequestDTO uploadRequestDTO
-    ) {
+            @ModelAttribute UploadRequestDTO uploadRequestDTO) {
         try {
+            System.out.println(uploadRequestDTO);
+            System.out.println(id);
             return ResponseEntity.ok(documentService.updateDocumentById(id, uploadRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
@@ -169,11 +170,9 @@ public class DocumentController {
         }
     }
 
-
     @PostMapping("/recommend")
     public ResponseEntity<?> getRecommendedDocuments(
-            @ModelAttribute RecommendationRequestDTO recommendationRequestDTO
-    ) {
+            @ModelAttribute RecommendationRequestDTO recommendationRequestDTO) {
         try {
             return ResponseEntity.ok(documentService.getRecommendedDocuments(recommendationRequestDTO));
         } catch (Exception e) {
@@ -293,10 +292,10 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/top3")
-    public ResponseEntity<?> getTop3Documents() {
+    @GetMapping("/top10")
+    public ResponseEntity<?> getTop10Documents() {
         try {
-            return ResponseEntity.ok(documentService.getTop3Documents());
+            return ResponseEntity.ok(documentService.getTop10Documents());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

@@ -8,5 +8,5 @@ import java.util.List;
 public interface DownloadService {
     String createDownload(DownloadDTO downloadDTO);
 
-    List<DocumentResponseDTO> getTopDocuments(int limit);
+    List<DocumentResponseDTO> getTopDocuments(int departmentId);
 }
