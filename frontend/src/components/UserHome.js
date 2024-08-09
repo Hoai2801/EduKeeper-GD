@@ -119,33 +119,18 @@ const UserHome = () => {
             </div>
             <div className='lg:w-[1262px] mx-auto'>
                 <h2 className='text-3xl font-semibold mt-5 mb-3 text-start'>Lịch sử xem</h2>
-                <div className='flex gap-2 w-[1050px] py-5 overflow-hidden overflow-x-scroll'>
-                    {
-                        documentsViewed && documentsViewed?.map((document, index) => {
-                            if (index < 10) {
-                                return (
-                                    <DocumentCard document={document} key={document.id}/>
-                                )
-                            }
-                        })
-                    }{
-                    documentsViewed && documentsViewed?.map((document, index) => {
-                        if (index < 10) {
-                            return (
+                <div className='flex gap-2 lg:w-[1050px] py-5 overflow-x-auto w-full'>
+                    {documentsViewed && documentsViewed.length > 0 ? (
+                        documentsViewed.slice(0, 10).map(document => (
+                            <div className='flex-shrink-0 w-[90%] sm:w-[45%] md:w-[30%] lg:w-[20%] xl:w-[15%]'>
                                 <DocumentCard document={document} key={document.id}/>
-                            )
-                        }
-                    })
-                }{
-                    documentsViewed && documentsViewed?.map((document, index) => {
-                        if (index < 10) {
-                            return (
-                                <DocumentCard document={document} key={document.id}/>
-                            )
-                        }
-                    })
-                }
+                            </div>
+                        ))
+                    ) : (
+                        <p className='text-center w-full'>No documents viewed</p>
+                    )}
                 </div>
+
             </div>
         </div>
     )

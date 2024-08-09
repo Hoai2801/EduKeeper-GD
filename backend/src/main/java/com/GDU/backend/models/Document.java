@@ -33,7 +33,11 @@ public class Document {
 
     @Column(name = "download_file_type", nullable = false, length = 30)
     private String downloadFileType;
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
     @Column(nullable = false)
     private Long documentSize;
 
@@ -103,7 +107,35 @@ public class Document {
         return downloads != null ? downloads.size() : 0;
     }
 
+<<<<<<< HEAD
     public int getFavoritesCount() {
         return favorites != null ? favorites.size() : 0;
+=======
+    @Override
+    public String toString() {
+        return "Document{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", slug='" + slug + '\'' +
+                ", documentType='" + documentType + '\'' +
+                ", downloadFileType='" + downloadFileType + '\'' +
+                ", documentSize=" + documentSize +
+                ", pages=" + pages +
+                ", description='" + description + '\'' +
+                ", uploadDate=" + uploadDate +
+                ", path='" + path + '\'' +
+                ", documentDownload='" + documentDownload + '\'' +
+                ", thumbnail='" + thumbnail + '\'' +
+                ", isDelete=" + isDelete +
+                ", category=" + (category != null ? category.getId() : null) +
+                ", userUpload=" + (userUpload != null ? userUpload.getId() : null) +
+                ", author='" + author + '\'' +
+                ", deleteDate=" + deleteDate +
+                ", scope='" + scope + '\'' +
+                ", status='" + status + '\'' +
+                ", subject=" + (subject != null ? subject.getId() : null) +
+                ", specialized=" + (specialized != null ? specialized.getId() : null) +
+                '}';
+>>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
     }
 }

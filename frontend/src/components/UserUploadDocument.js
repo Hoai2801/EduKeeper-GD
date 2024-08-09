@@ -16,6 +16,7 @@ const UserUploadDocument = () => {
         fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
                 setDocumentList(data);
             });
     }, [location])
@@ -29,36 +30,38 @@ const UserUploadDocument = () => {
                 {documentList?.map((item, index) => {
                     return (
                         // if document is soft deleted, hidden it
-                    <div className={`relative ${item._delete ? "hidden" : ""} 
-                    ${item.status === "draft" && item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
-                    ${item.scope === "private" && item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
-                    ${item.scope === "student-only" && !userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
-                    `}>
-                        <div
-                            className={`absolute top-0 right-0 rounded-lg p-2 m-4 text-white ${item.status !== "draft" ? "hidden" : "bg-red-500"}`}>
-                            Chưa duyệt
-                        </div>
-                        <DocumentCard key={index} document={item}/>
-                        <div
-                            className={`absolute bottom-[20%] right-0 rounded-lg p-2 m-4 text-white w-10 h-10 overflow-hidden cursor-pointer
+                        <div className={`relative ${item._delete ? "hidden" : ""} 
+                            ${item.status === "draft" && item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
+                            ${item.scope === "private" && item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
+                            ${item.scope === "student-only" && !userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
+                            `}
+                        >
+                            <div
+                                className={`absolute top-0 right-0 rounded-lg p-2 m-4 text-white ${item.status !== "draft" ? "hidden" : "bg-red-500"}`}>
+                                Chưa duyệt
+                            </div>
+                            <DocumentCard key={index} document={item}/>
+                            <div
+                                className={`absolute bottom-[20%] right-0 rounded-lg p-2 m-4 text-white w-10 h-10 overflow-hidden cursor-pointer
                                 ${userJWT.jwtDecoded?.staff_code === item.user_upload.staffCode ? "block" : "hidden"}
                             `}>
-                            <Link to={`/edit/${item.slug}`}>
-                                <img src={edit} alt="" className={`w-full h-full`}/>
-                            </Link>
-                        </div>
-                        <div
-                            className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white 
+                                <Link to={`/edit/${item.slug}`}>
+                                    <img src={edit} alt="" className={`w-full h-full`}/>
+                                </Link>
+                            </div>
+                            <div
+                                className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white 
                             ${item.user_upload.staffCode !== userJWT.jwtDecoded?.staff_code ? "hidden" : ""}
                             ${item.scope !== "public" ?
-                                item.scope === "private" ? "bg-gray-500" :
-                                    // only for student
-                                    "bg-amber-200"
-                                : "bg-green-500"}`}>
-                            {item.scope}
+                                    item.scope === "private" ? "bg-gray-500" :
+                                        // only for student
+                                        "bg-amber-200"
+                                    : "bg-green-500"}`}>
+                                {item.scope}
+                            </div>
                         </div>
-                    </div>
-                )})}
+                    )
+                })}
             </div>
         </div>
     );

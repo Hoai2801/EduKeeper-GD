@@ -90,29 +90,31 @@ const Navbar = () => {
 
         const getNotification = () => {
             fetch('http://localhost:8080/api/v1/notifications/user/' + user.staffCode)
-                .then((res) => res.json())
-                .then((data) => {
-                    // console.log(data)
-                    setNotification(data);
-                    let uncheckedCount = 0;
+                .then((res) => {
+                    if (res.status === 200) {
+                        return res.json().then((data) => {
+                            setNotification(data);
+                            let uncheckedCount = 0;
 
-                    for (let i = 0; i < data.length; i++) {
-                        if (data[i]._check === false) {
-                            uncheckedCount++;
-                        }
+                            for (let i = 0; i < data.length; i++) {
+                                if (data[i]._check === false) {
+                                    uncheckedCount++;
+                                }
 
-                        // Stop counting if unchecked notifications reach 10
-                        if (uncheckedCount >= 10) {
-                            setIsHasNotification("9+");
-                            break;
-                        }
+                                // Stop counting if unchecked notifications reach 10
+                                if (uncheckedCount >= 10) {
+                                    setIsHasNotification("9+");
+                                    break;
+                                }
+                            }
+
+                            // If the loop completes and there are less than 10 unchecked notifications
+                            if (uncheckedCount < 10) {
+                                setIsHasNotification(uncheckedCount);
+                            }
+                        });;
                     }
-
-                    // If the loop completes and there are less than 10 unchecked notifications
-                    if (uncheckedCount < 10) {
-                        setIsHasNotification(uncheckedCount);
-                    }
-                });
+                })
         }
 
         const POLLING_INTERVAL = 30000; // 30 seconds
@@ -128,6 +130,7 @@ const Navbar = () => {
         }, [user]);
 
         const checkNotification = () => {
+            setIsHasNotification(0)
             if (jwtDecoded?.jwtDecoded) {
                 fetch('http://localhost:8080/api/v1/notifications/user/checked/' + jwtDecoded?.jwtDecoded.staff_code);
                 getNotification();

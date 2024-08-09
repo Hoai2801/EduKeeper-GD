@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,18 +81,24 @@ public class DocumentServiceImpl implements DocumentService {
 
         int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
         String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
-
+        System.out.println(thumbnail);
         String downloadFileName = null;
         // file download
-        if (!uploadRequestDTO.getDocumentDownload().isEmpty()) {
+        if (!Objects.equals(uploadRequestDTO.getDocument().getOriginalFilename(), uploadRequestDTO.getDocumentDownload().getOriginalFilename()) && !Objects.equals(uploadRequestDTO.getDocument().getContentType(), uploadRequestDTO.getDocumentDownload().getContentType())) {
             // save file
             downloadFileName = System.currentTimeMillis() + "_"
                     + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
             File downloadFile = new File(UPLOAD_DIR + downloadFileName);
             MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
             Files.createDirectories(uploadDir);
+<<<<<<< HEAD
             Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
+=======
+            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } else {
+            downloadFileName = fileName;
+>>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
         }
 
         Document newDocument = Document.builder()
@@ -99,10 +106,14 @@ public class DocumentServiceImpl implements DocumentService {
                 .author(uploadRequestDTO.getAuthor())
                 .userUpload(userUpload)
                 .slug(createSlug(uploadRequestDTO.getTitle()))
-                .path(destFile.getAbsolutePath())
+                .path(fileName)
                 .documentType(uploadRequestDTO.getDocument().getContentType())
+<<<<<<< HEAD
                 .documentDownload(uploadRequestDTO.getDocumentDownload() != null ? downloadFileName : null)
                 .status("draft")
+=======
+                .documentDownload(downloadFileName)
+>>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
                 .scope(uploadRequestDTO.getScope())
                 .downloadFileType(uploadRequestDTO.getDocumentDownload().getContentType())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
@@ -131,6 +142,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .sender(userUpload.getStaffCode())
                 .receiver("22140044")
                 .content("Một tài liệu đã được đăng bởi " + userUpload.getStaffCode())
+                .document(newDocument.getSlug())
                 .title("Tài liệu mới")
                 .build();
         notificationService.send(notificationDTO);
@@ -175,16 +187,32 @@ public class DocumentServiceImpl implements DocumentService {
             String url = "src/main/resources/static/thumbnail/";
             String fileName = System.currentTimeMillis() + ".png";
             String thumbnailPath = url + fileName;
-            ImageIO.write(image, "PNG", new File(thumbnailPath));
+
+            // Ensure the directory exists
+            File directory = new File(url);
+            if (!directory.exists()) {
+                boolean dirsCreated = directory.mkdirs();
+                if (!dirsCreated) {
+                    throw new IOException("Failed to create directories: " + url);
+                }
+            }
+
+            // Write the image to the file
+            File thumbnailFile = new File(thumbnailPath);
+            boolean result = ImageIO.write(image, "PNG", thumbnailFile);
+            if (!result) {
+                throw new IOException("Failed to write image to file: " + thumbnailPath);
+            }
 
             return fileName;
         } catch (IOException e) {
             log.error("Error generating thumbnail: {}", e.getMessage());
-            return null;
+            throw e;  // Rethrow the exception to handle it in the calling method
         }
     }
 
     @Override
+<<<<<<< HEAD
     public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) {
         try {
 
@@ -214,6 +242,54 @@ public class DocumentServiceImpl implements DocumentService {
             System.out.println(e.getMessage());
         }
         return null;
+=======
+    public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) throws IOException {
+        Document existDocument = documentRepository.findById(id).orElse(null);
+        if (existDocument == null) {
+            return "Document not existing";
+        }
+
+        User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
+        if (userUpload == null) {
+            return "User not existing";
+        }
+        if (!existDocument.getDocumentDownload().equals(uploadRequestDTO.getDocumentDownload().getOriginalFilename())) {
+            if (!existDocument.getPath().equals(uploadRequestDTO.getDocumentDownload().getOriginalFilename())) {
+                if (Files.exists(Paths.get(UPLOAD_DIR + existDocument.getDocumentDownload()))) {
+                    Files.delete(Paths.get(UPLOAD_DIR + existDocument.getDocumentDownload()));
+                }
+            }
+            Path uploadDir = Paths.get(UPLOAD_DIR);
+            String downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
+            File downloadFile = new File(UPLOAD_DIR + downloadFileName);
+            MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
+            Files.createDirectories(uploadDir);
+            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            existDocument.setDocumentDownload(downloadFileName);
+            existDocument.setDownloadFileType(uploadRequestDTO.getDocumentDownload().getContentType());
+            existDocument.setDocumentSize(uploadRequestDTO.getDocumentDownload().getSize() / 1_000_000);
+        }
+        existDocument.setUserUpload(userUpload);
+
+        Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
+        existDocument.setCategory(category);
+        existDocument.setAuthor(uploadRequestDTO.getAuthor());
+        existDocument.setDescription(uploadRequestDTO.getDescription());
+        existDocument.setScope(uploadRequestDTO.getScope());
+        existDocument.setTitle(uploadRequestDTO.getTitle());
+        existDocument.setSlug(createSlug(uploadRequestDTO.getTitle()));
+        // get auto accept document setting
+        settingRepository.findById(2L).ifPresent(setting -> {
+            if (setting.getValue().equals("true")) {
+                existDocument.setStatus("published");
+            } else {
+                existDocument.setStatus("draft");
+            }
+        });
+        documentRepository.save(existDocument);
+        return "Update document successfully";
+>>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
     }
 
     @Override
@@ -256,7 +332,7 @@ public class DocumentServiceImpl implements DocumentService {
         CriteriaQuery<Document> cq = cb.createQuery(Document.class);
         Root<Document> document = cq.from(Document.class);
         List<Predicate> predicates = new ArrayList<>();
-
+        System.out.println(filterRequestDTO);
         if (filterRequestDTO.getSubjectName() != null && !filterRequestDTO.getSubjectName().isEmpty()) {
             Join<Document, Subject> subject = document.join("subject");
             predicates.add(cb.equal(subject.get("subjectSlug"), filterRequestDTO.getSubjectName()));
@@ -278,16 +354,20 @@ public class DocumentServiceImpl implements DocumentService {
 
         if (filterRequestDTO.getCategoryName() != null && !filterRequestDTO.getCategoryName().isEmpty()) {
             Join<Document, Category> category = document.join("category");
-            predicates.add(cb.equal(category.get("categoryName"), filterRequestDTO.getCategoryName()));
+            predicates.add(cb.equal(category.get("categorySlug"), filterRequestDTO.getCategoryName()));
         }
 
         if (filterRequestDTO.getPublishYear() != null && !filterRequestDTO.getPublishYear().isEmpty()) {
-            predicates.add(cb.equal(document.get("uploadDate"), LocalDate.parse(filterRequestDTO.getPublishYear())));
+            int year = Integer.parseInt(filterRequestDTO.getPublishYear());
+            LocalDate startOfYear = LocalDate.of(year, 1, 1);
+            LocalDate endOfYear = LocalDate.of(year, 12, 31);
+            predicates.add(cb.between(document.get("uploadDate"), startOfYear, endOfYear));
         }
 
         cq.where(predicates.toArray(new Predicate[0]));
         TypedQuery<Document> query = entityManager.createQuery(cq);
         List<Document> documents = query.getResultList();
+        System.out.println(documents);
 
         // Sort documents
         if (filterRequestDTO.getOrder() != null) {
@@ -404,6 +484,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .title(document.getTitle())
                 .slug(document.getSlug())
                 .download(document.getDownloadsCount())
+                .views(document.getViewsCount())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
                 .status(document.getStatus())
@@ -473,6 +554,7 @@ public class DocumentServiceImpl implements DocumentService {
                         .receiver(document.getUserUpload().getStaffCode())
                         .sender("22140044")
                         .created_at(LocalDateTime.now())
+                        .document(document.getSlug())
                         .title("Tài liệu của bạn đã được duyệt")
                         .content("Tài liệu " + document.getTitle() + " đã được duyệt")
                         .build();
@@ -579,17 +661,13 @@ public class DocumentServiceImpl implements DocumentService {
             File file = new File(path);
 
             if (file.isFile() && !document.isDelete()) {
-                // boolean deleted = file.delete();
-                // if (!deleted) {
-                // return "Delete file failed";
-                // } else {
-                // }
                 document.setDeleteDate(LocalDateTime.now());
                 document.setDelete(true);
                 NotificationDTO notification = NotificationDTO.builder()
                         .receiver(document.getUserUpload().getStaffCode())
                         .sender("22140044")
                         .created_at(LocalDateTime.now())
+                        .document(null)
                         .title("Tài liệu của bạn đã bị gỡ bởi hệ thống")
                         .content("Tài liệu " + document.getTitle() + " đã bị gỡ")
                         .build();

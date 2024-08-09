@@ -48,7 +48,7 @@ public class AuthenticationService {
         var role = roleRepository.findByName(registerRequest.getRoles()).orElseThrow(
                 () -> new RuntimeException("Role not found"));
         // if user is student, we need to check the information
-        if (role.getName().equals("USER")) {
+        if (role.getName().equals("ROLE_USER")) {
             var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
                     () -> new RuntimeException("Department not found")
             );
