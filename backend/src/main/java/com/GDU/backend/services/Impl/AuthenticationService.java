@@ -49,20 +49,27 @@ public class AuthenticationService {
                 () -> new RuntimeException("Role not found"));
         // if user is student, we need to check the information
         if (role.getName().equals("ROLE_USER")) {
-            var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
-                    () -> new RuntimeException("Department not found")
-            );
-
-            var specialized = specializedRepository.findById(Long.parseLong(registerRequest.getSpecialized())).orElseThrow(
-                    () -> new RuntimeException("Specialized not found")
-            );
-            user.setDepartment(department);
-            user.setSpecialized(specialized);
-            user.setKlass(registerRequest.getClassroom());
-            user.setEnable(false);
-            // if user is teacher, we don't need to check the information
-            // because the information is not required
-            // teacher do not belong to any department
+            if (!registerRequest.getIsAdminCreate().equals("true")) {
+                var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
+                        () -> new RuntimeException("Department not found")
+                );
+    
+                var specialized = specializedRepository.findById(Long.parseLong(registerRequest.getSpecialized())).orElseThrow(
+                        () -> new RuntimeException("Specialized not found")
+                );
+                user.setDepartment(department);
+                user.setSpecialized(specialized);
+                user.setKlass(registerRequest.getClassroom());
+                user.setEnable(false);
+            } else {
+                user.setDepartment(null);
+                user.setSpecialized(null);
+                user.setKlass(null);
+                user.setEnable(true);
+            }
+        // if user is teacher, we don't need to check the information
+        // because the information is not required
+        // teacher do not belong to any department
         } else {
             user.setDepartment(null);
             user.setSpecialized(null);
@@ -73,14 +80,21 @@ public class AuthenticationService {
             user.setEnable(true);
         }
         // check if user exists
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email đã được sử dụng bởi tài khoản khác");
+        User existingUser = userRepository.findByEmail(registerRequest.getEmail()).orElse(null);
+        if (existingUser != null && existingUser.isEnable()) {
+            return ResponseEntity.badRequest().body("Email đã được sử dụng bởi tài khoản khác");
+        } else if (existingUser != null) {
+            userRepository.delete(existingUser);
         }
 
         // check if staffCode exists
-        if (userRepository.existsByStaffCode(registerRequest.getStaffCode())) {
-            throw new RuntimeException("Mã sinh viên đã được sử dụng bởi tài khoản khác");
+        existingUser = userRepository.findByStaffCode(registerRequest.getStaffCode()).orElse(null);
+        if (existingUser != null && existingUser.isEnable()) {
+            return ResponseEntity.badRequest().body("Mã sinh viên đã được sử dụng bởi tài khoản khác");
+        } else if (existingUser != null) {
+            userRepository.delete(existingUser);
         }
+
         // save user
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
@@ -91,7 +105,7 @@ public class AuthenticationService {
         userRepository.save(user);
 
         // send email for student
-        if (role.getName().equals("USER")) {
+        if (role.getName().equals("ROLE_USER") && !registerRequest.getIsAdminCreate().equals("true")) {
             sendValidationEmail(user);
         }
         return ResponseEntity.ok("success");
@@ -132,7 +146,8 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         // use staff code to log in
                         loginRequest.getStaffCode(),
-                        loginRequest.getPassword()));
+                        loginRequest.getPassword())
+        );
 
         if (auth == null) {
             return ResponseEntity.badRequest().body("Sai mật khẩu");

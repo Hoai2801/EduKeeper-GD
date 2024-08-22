@@ -64,6 +64,11 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 "/api/v1/admin/**",
                                 "/webjars/**"
                         ).hasRole("ADMIN")
+//                        .requestMatchers(POST, 
+//                                "/api/v1/auth/activate/**",
+//                                "/api/v1/auth/reset-password/**",
+//                                "/api/v1/auth/login"
+//                        ).permitAll()
                         .requestMatchers(GET,
                                 "/api/v1/role/**"
                         ).hasAnyRole("ADMIN", "SUB-ADMIN", "TEACHER", "USER")

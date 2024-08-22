@@ -1,7 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react'
 import Post from '../components/DocumentCard'
 import {Link} from 'react-router-dom'
-import {jwtDecode} from "jwt-decode";
 import Banner from "../components/Banner";
 import {JWTContext} from "../App";
 
@@ -23,31 +22,61 @@ const Home = () => {
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-        }).then(res => res?.json()).then(data => {
-            setMostViewed(data)
-        })
+        }).then(res => {
+            if (res?.status === 200) {
+                return res.json();
+            } else {
+                throw new Error(`Unexpected status code: ${res.status}`);
+            }
+        }).then(data => {
+            setMostViewed(data);
+        }).catch(err => {
+            console.error('Failed to fetch most viewed documents:', err);
+        });
+
         fetch('http://localhost:8080/api/v1/documents/most-downloaded?limit=9', {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-        }).then(res => res?.json()).then(data => setMostDownloaded(data))
+        }).then(res => {
+            if (res?.status === 200) {
+                return res.json();
+            } else {
+                throw new Error(`Unexpected status code: ${res.status}`);
+            }
+        }).then(data => {
+            setMostDownloaded(data);
+        }).catch(err => {
+            console.error('Failed to fetch most downloaded documents:', err);
+        });
+
         fetch('http://localhost:8080/api/v1/documents/latest?limit=9', {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-        }).then(res => res?.json()).then(data => {
-            setLastedDocuments(data)
-        })
-    }, [])
+        }).then(res => {
+            if (res?.status === 200) {
+                return res.json();
+            } else {
+                throw new Error(`Unexpected status code: ${res.status}`);
+            }
+        }).then(data => {
+            console.log(data)
+            setLastedDocuments(data);
+        }).catch(err => {
+            console.error('Failed to fetch latest documents:', err);
+        });
+    }, []);
+
 
     return (
         <div>
             <div className={`w-full h-fit relative`}>
-                <Banner />
+                <Banner/>
             </div>
             <div
                 className='bg-white rounded-lg max-w-[1200px] p-2 w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 gap-10 pb-10'>
@@ -55,7 +84,11 @@ const Home = () => {
                 <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
                     {lastedDocuments && lastedDocuments?.map((item, index) => (
                         <div
-                            className={`${item.scope === "private" && !staffCode || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
+                            className={`${
+                                ((item.scope === "private" && staffCode !== item.user_upload.staffCode) || (item.scope === "student-only" && !staffCode) || item.status !== "published")
+                                    ? "hidden"
+                                    : "block"
+                            }`}>
                             <Post key={index} document={item}/>
                         </div>
                     ))}

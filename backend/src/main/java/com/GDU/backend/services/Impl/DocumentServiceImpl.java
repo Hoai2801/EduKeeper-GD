@@ -10,13 +10,22 @@ import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.NotificationService;
+import fr.opensagres.poi.xwpf.converter.xhtml.Base64EmbedImgManager;
+import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLConverter;
+import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLOptions;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.poi.hpsf.SummaryInformation;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.converter.WordToHtmlConverter;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.fit.pdfdom.PDFDomTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +34,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,48 +84,191 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElse(null);
 
         User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
-        // generate file name and path
+        // save file
         String fileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocument().getOriginalFilename();
         File destFile = new File(UPLOAD_DIR + fileName);
-
-        // save file
         MultipartFile multipartFile = uploadRequestDTO.getDocument();
         Path uploadDir = Paths.get(UPLOAD_DIR);
         Files.createDirectories(uploadDir);
         Files.copy(multipartFile.getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
-        String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
-        System.out.println(thumbnail);
-        String downloadFileName = null;
-        // file download
-        if (!Objects.equals(uploadRequestDTO.getDocument().getOriginalFilename(), uploadRequestDTO.getDocumentDownload().getOriginalFilename()) && !Objects.equals(uploadRequestDTO.getDocument().getContentType(), uploadRequestDTO.getDocumentDownload().getContentType())) {
-            // save file
-            downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
-            File downloadFile = new File(UPLOAD_DIR + downloadFileName);
-            MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
-            Files.createDirectories(uploadDir);
-            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } else {
-            downloadFileName = fileName;
-        }
+        int totalPages = 0;
         
+        if (Objects.requireNonNull(uploadRequestDTO.getDocument().getOriginalFilename()).endsWith(".pdf")) {
+            PDDocument pdf = PDDocument.load(destFile);
+            // count the number of pages
+            totalPages = pdf.getNumberOfPages();
+            // convert pdf to html
+            PDFDomTree parser = new PDFDomTree();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Writer output = new PrintWriter(baos, true, StandardCharsets.UTF_8);
+            parser.writeText(pdf, output);
+            output.close();
+            pdf.close();
+            File file = new File("src/main/resources/static/convert/" + fileName + ".html");
+            Files.write(file.toPath(), baos.toByteArray());
+            // close the stream
+            baos.close();
+            System.out.println("Converted");
+        } else if (Objects.requireNonNull(uploadRequestDTO.getDocument().getOriginalFilename()).endsWith(".docx")) {
+            try {
+                //taking input from docx file
+                InputStream doc = new FileInputStream(destFile);
+                //load docx file
+                XWPFDocument document = new XWPFDocument(doc);
+                
+                // count the number of pages
+                XWPFWordExtractor extractor = new XWPFWordExtractor(document);
+                totalPages = extractor.getExtendedProperties().getUnderlyingProperties().getPages();
+                System.out.println("Number of Pages: " + totalPages);
+                
+                XHTMLOptions options = XHTMLOptions.create().setImageManager(new Base64EmbedImgManager());
+                FileOutputStream out = new FileOutputStream("src/main/resources/static/convert/" + fileName + ".html");
+                XHTMLConverter.getInstance().convert(document, out, options);
+                out.close();
+                document.close();
+                System.out.println("Converted word");
+                injectFontStyle("src/main/resources/static/convert/" + fileName + ".html");
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } else if (Objects.requireNonNull(uploadRequestDTO.getDocument().getOriginalFilename()).endsWith(".doc")) {
+            try {
+                // Load the DOC file
+                InputStream is = new FileInputStream(destFile);
+                HWPFDocument doc = new HWPFDocument(is);
+                
+                // count the number of pages
+                SummaryInformation summaryInfo = doc.getSummaryInformation();
+                totalPages = summaryInfo.getPageCount();
+                System.out.println("Number of Pages: " + totalPages);
+                
+                // Prepare XHTML conversion
+                WordToHtmlConverter wordToHtmlConverter = new WordToHtmlConverter(
+                        DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
+
+                wordToHtmlConverter.processDocument(doc);
+
+                // Convert to XHTML
+                org.w3c.dom.Document htmlDocument = wordToHtmlConverter.getDocument();
+                DOMSource domSource = new DOMSource(htmlDocument);
+                StreamResult streamResult = new StreamResult(new FileOutputStream("src/main/resources/static/convert/" + fileName + ".html"));
+
+                TransformerFactory tf = TransformerFactory.newInstance();
+                Transformer serializer = tf.newTransformer();
+                serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+                serializer.setOutputProperty(OutputKeys.METHOD, "html");
+                serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                serializer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "-//W3C//DTD XHTML 1.0 Transitional//EN");
+                serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+
+                serializer.transform(domSource, streamResult);
+
+                System.out.println("Conversion completed successfully!");
+
+                // Close the input stream
+                is.close();
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            } catch (TransformerException | ParserConfigurationException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (Objects.requireNonNull(uploadRequestDTO.getDocument().getOriginalFilename()).endsWith(".pptx") || Objects.requireNonNull(uploadRequestDTO.getDocument().getOriginalFilename()).endsWith(".ppt")) {
+            try {
+                //taking input from docx file
+                InputStream doc = new FileInputStream(destFile);
+                //process for creating pdf started
+                XMLSlideShow ppt = new XMLSlideShow(doc);
+                //getting the dimensions and size of the slide 
+                Dimension pgsize = ppt.getPageSize();
+                List<XSLFSlide> slides = ppt.getSlides();
+
+                // Define the scaling factor
+                double scale = 0.5;  // Scale down by 50% (adjust as needed)
+
+                // Adjusted width and height
+                int scaledWidth = (int) (pgsize.width * scale);
+                int scaledHeight = (int) (pgsize.height * scale);
+                
+                // count the number of pages
+                totalPages = slides.size();
+
+                // Prepare HTML output
+                StringBuilder htmlContent = new StringBuilder();
+                htmlContent.append("<html><body>");
+
+                // Process each slide
+                for (XSLFSlide slide : slides) {
+                    // Create a scaled-down BufferedImage
+                    BufferedImage img = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D graphics = img.createGraphics();
+
+                    // Apply scaling to the Graphics2D context
+                    graphics.scale(scale, scale);
+
+                    // Clear the drawing area
+                    graphics.setPaint(Color.white);
+                    graphics.fill(new Rectangle2D.Float(0, 0, pgsize.width, pgsize.height));
+
+                    // Render the slide
+                    slide.draw(graphics);
+
+                    // Save the image to a file
+                    String imgFileName = "slide_" + System.currentTimeMillis() + ".png";
+                    ImageIO.write(img, "png", new File("src/main/resources/static/images/" + imgFileName));
+
+                    // Add image to HTML content
+                    htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName).append("' style='width:100%; height:auto;'>");
+                    htmlContent.append("<br>");
+                }
+
+                // Close HTML tags
+                htmlContent.append("</body></html>");
+
+                // Write the HTML content to a file
+                FileWriter htmlFile = new FileWriter("src/main/resources/static/convert/" + fileName + ".html");
+                htmlFile.write(htmlContent.toString());
+                htmlFile.close();
+
+                // Close the PPT file
+                ppt.close();
+                doc.close();
+
+                System.out.println("HTML file created successfully!");
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+//        int numberOfPages = calculateNumberOfPages(uploadRequestDTO.getDocument().getInputStream());
+//        String thumbnail = generateThumbnail(uploadRequestDTO.getDocument().getInputStream());
+//        String downloadFileName;
+//        // file download
+//        if (!Objects.equals(uploadRequestDTO.getDocument().getOriginalFilename(), uploadRequestDTO.getDocumentDownload().getOriginalFilename()) && !Objects.equals(uploadRequestDTO.getDocument().getContentType(), uploadRequestDTO.getDocumentDownload().getContentType())) {
+//            // save file
+//            downloadFileName = System.currentTimeMillis() + "_"
+//                    + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
+//            File downloadFile = new File(UPLOAD_DIR + downloadFileName);
+//            MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
+//            Files.createDirectories(uploadDir);
+//            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//        } else {
+//            downloadFileName = fileName;
+//        }
+        System.out.println(uploadRequestDTO.getDocument().getContentType());
         Document newDocument = Document.builder()
                 .title(uploadRequestDTO.getTitle())
                 .author(uploadRequestDTO.getAuthor())
                 .userUpload(userUpload)
                 .slug(createSlug(uploadRequestDTO.getTitle()))
-                .path(fileName)
+                .file(fileName)
                 .documentType(uploadRequestDTO.getDocument().getContentType())
-                .documentDownload(downloadFileName)
                 .scope(uploadRequestDTO.getScope())
-                .downloadFileType(uploadRequestDTO.getDocumentDownload().getContentType())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
                 .description(uploadRequestDTO.getDescription())
                 .specialized(specialized)
-                .pages(numberOfPages)
+                .pages(totalPages)
                 .category(category)
-                .thumbnail(thumbnail)
                 .subject(subject)
                 .uploadDate(LocalDate.now())
                 .build();
@@ -137,51 +296,81 @@ public class DocumentServiceImpl implements DocumentService {
         return ResponseEntity.ok("Đăng tài liệu thành công");
     }
 
-    private int calculateNumberOfPages(InputStream inputStream) throws IOException {
-        try (PDDocument document = PDDocument.load(inputStream)) {
-            return document.getNumberOfPages();
+    private static void injectFontStyle(String htmlFilePath) {
+        try {
+            // Load the HTML content
+            String htmlContent = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(htmlFilePath)), StandardCharsets.UTF_8);
+
+            // Inject CSS style for Times New Roman font
+            String style = "<meta charset=\"UTF-8\">";
+
+            // Insert the style tag before the closing </head> tag
+            htmlContent = htmlContent.replace("</head>", style + "</head>");
+
+            // Write the modified HTML content back to the file
+            java.nio.file.Files.write(java.nio.file.Paths.get(htmlFilePath), htmlContent.getBytes(StandardCharsets.UTF_8));
+
+            System.out.println("Font style injected successfully!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+//    private int calculateNumberOfPages(InputStream inputStream) throws IOException {
+//        try (PDDocument document = PDDocument.load(inputStream)) {
+//            return document.getNumberOfPages();
+//        }
+//    }
+
     private String createSlug(String title) {
-        title = StringEscapeUtils.escapeHtml4(title);
-        String slug = title.replaceAll("[^a-zA-Z0-9\\s]", "");
+
+        // Normalize and remove diacritics
+        String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD);
+        String slug = normalizedTitle.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        // Remove all non-alphanumeric characters except spaces
+        slug = slug.replaceAll("[^a-zA-Z0-9\\s]", "");
+
+        // Replace spaces with hyphens
         slug = slug.replaceAll("\\s+", "-");
+
+        // Convert to lowercase
         return slug.toLowerCase() + "-" + System.currentTimeMillis();
     }
 
-    private String generateThumbnail(InputStream inputStream) throws IOException {
-        try (PDDocument document = PDDocument.load(inputStream)) {
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
-            // Render the first page of the PDF to an image
-            BufferedImage image = pdfRenderer.renderImage(0);
-
-            String url = "src/main/resources/static/thumbnail/";
-            String fileName = System.currentTimeMillis() + ".png";
-            String thumbnailPath = url + fileName;
-
-            // Ensure the directory exists
-            File directory = new File(url);
-            if (!directory.exists()) {
-                boolean dirsCreated = directory.mkdirs();
-                if (!dirsCreated) {
-                    throw new IOException("Failed to create directories: " + url);
-                }
-            }
-
-            // Write the image to the file
-            File thumbnailFile = new File(thumbnailPath);
-            boolean result = ImageIO.write(image, "PNG", thumbnailFile);
-            if (!result) {
-                throw new IOException("Failed to write image to file: " + thumbnailPath);
-            }
-
-            return fileName;
-        } catch (IOException e) {
-            log.error("Error generating thumbnail: {}", e.getMessage());
-            throw e;  // Rethrow the exception to handle it in the calling method
-        }
-    }
+//    private String generateThumbnail(InputStream inputStream) throws IOException {
+//        try (PDDocument document = PDDocument.load(inputStream)) {
+//            PDFRenderer pdfRenderer = new PDFRenderer(document);
+//            // Render the first page of the PDF to an image
+//            BufferedImage image = pdfRenderer.renderImage(0);
+//
+//            String url = "src/main/resources/static/thumbnail/";
+//            String fileName = System.currentTimeMillis() + ".png";
+//            String thumbnailPath = url + fileName;
+//
+//            // Ensure the directory exists
+//            File directory = new File(url);
+//            if (!directory.exists()) {
+//                boolean dirsCreated = directory.mkdirs();
+//                if (!dirsCreated) {
+//                    throw new IOException("Failed to create directories: " + url);
+//                }
+//            }
+//
+//            // Write the image to the file
+//            File thumbnailFile = new File(thumbnailPath);
+//            boolean result = ImageIO.write(image, "PNG", thumbnailFile);
+//            if (!result) {
+//                throw new IOException("Failed to write image to file: " + thumbnailPath);
+//            }
+//
+//            return fileName;
+//        } catch (IOException e) {
+//            log.error("Error generating thumbnail: {}", e.getMessage());
+//            throw e;  // Rethrow the exception to handle it in the calling method
+//        }
+//    }
 
     @Override
     public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) throws IOException {
@@ -194,23 +383,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (userUpload == null) {
             return "User not existing";
         }
-        if (!existDocument.getDocumentDownload().equals(uploadRequestDTO.getDocumentDownload().getOriginalFilename())) {
-            if (!existDocument.getPath().equals(uploadRequestDTO.getDocumentDownload().getOriginalFilename())) {
-                if (Files.exists(Paths.get(UPLOAD_DIR + existDocument.getDocumentDownload()))) {
-                    Files.delete(Paths.get(UPLOAD_DIR + existDocument.getDocumentDownload()));
-                }
-            }
-            Path uploadDir = Paths.get(UPLOAD_DIR);
-            String downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
-            File downloadFile = new File(UPLOAD_DIR + downloadFileName);
-            MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
-            Files.createDirectories(uploadDir);
-            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-            existDocument.setDocumentDownload(downloadFileName);
-            existDocument.setDownloadFileType(uploadRequestDTO.getDocumentDownload().getContentType());
-            existDocument.setDocumentSize(uploadRequestDTO.getDocumentDownload().getSize() / 1_000_000);
-        }
+        
         existDocument.setUserUpload(userUpload);
 
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
@@ -262,8 +435,7 @@ public class DocumentServiceImpl implements DocumentService {
                         recommendationRequestDTO.getSpecialized(),
                         recommendationRequestDTO.getCategory(),
                         recommendationRequestDTO.getTitle(),
-                        recommendationRequestDTO.getAuthor()
-                )
+                        recommendationRequestDTO.getAuthor())
                 .stream().map(this::convertToDocumentResponse).toList();
     }
 
@@ -289,8 +461,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (filterRequestDTO.getSearchTerm() != null && !filterRequestDTO.getSearchTerm().isEmpty()) {
             Predicate searchTermPredicate = cb.or(
                     cb.like(document.get("title"), "%" + filterRequestDTO.getSearchTerm() + "%"),
-                    cb.like(document.get("description"), "%" + filterRequestDTO.getSearchTerm() + "%")
-            );
+                    cb.like(document.get("description"), "%" + filterRequestDTO.getSearchTerm() + "%"));
             predicates.add(searchTermPredicate);
         }
 
@@ -315,23 +486,27 @@ public class DocumentServiceImpl implements DocumentService {
         if (filterRequestDTO.getOrder() != null) {
             documents = switch (filterRequestDTO.getOrder().toLowerCase()) {
                 case "most-downloaded" -> documents.stream()
-                        .filter(aDocument -> aDocument.getDownloadsCount() > 0 && (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
+                        .filter(aDocument -> aDocument.getDownloadsCount() > 0 && (aDocument.getScope().equals("public")
+                                || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getDownloadsCount).reversed())
                         .collect(Collectors.toList());
                 case "most-viewed" -> documents.stream()
-                        .filter(aDocument -> aDocument.getViewsCount() > 0 && (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
+                        .filter(aDocument -> aDocument.getViewsCount() > 0 && (aDocument.getScope().equals("public")
+                                || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getViewsCount).reversed())
                         .collect(Collectors.toList());
                 default -> documents
                         .stream()
-                        .filter(aDocument -> (aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
+                        .filter(aDocument -> (aDocument.getScope().equals("public")
+                                || aDocument.getScope().equals("student-only")) && !aDocument.isDelete())
                         .sorted(Comparator.comparing(Document::getId).reversed())
                         .collect(Collectors.toList());
             };
         } else {
             documents = documents
                     .stream()
-                    .filter(aDocument -> aDocument.getScope().equals("public") || aDocument.getScope().equals("student-only") && !aDocument.isDelete())
+                    .filter(aDocument -> aDocument.getScope().equals("public")
+                            || aDocument.getScope().equals("student-only") && !aDocument.isDelete())
                     .sorted(Comparator.comparing(Document::getId).reversed())
                     .collect(Collectors.toList());
         }
@@ -427,8 +602,6 @@ public class DocumentServiceImpl implements DocumentService {
                 .author(document.getAuthor())
                 .status(document.getStatus())
                 .scope(document.getScope())
-                .file_download(document.getDocumentDownload())
-                .download_file_type(document.getDownloadFileType())
                 .specialized(document.getSpecialized())
                 .department(document.getSpecialized().getDepartment())
                 .category(document.getCategory())
@@ -436,8 +609,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .is_delete(document.isDelete())
                 .deleted_at(document.getDeleteDate())
                 .subject(document.getSubject())
-                .path(document.getPath())
-                .thumbnail(document.getThumbnail())
+                .file(document.getFile())
                 .pages(document.getPages())
                 .description(document.getDescription())
                 .document_type(document.getDocumentType())
@@ -552,9 +724,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponseDTO> getTop3Documents() {
+    public List<DocumentResponseDTO> getTop10Documents() {
         try {
-            return documentRepository.getTop3Docs()
+            return documentRepository.getTop10Docs()
                     .stream()
                     .map(this::convertToDocumentResponse)
                     .toList();
@@ -580,12 +752,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Document getDocumentById(Long documentId) {
-        return documentRepository.findById(documentId).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+        return documentRepository.findById(documentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
     }
 
     @Override
-    public List<Document> findDocumentsWithMostDownloads(int limit) {
-        return documentRepository.findDocumentsWithMostDownloads(limit);
+    public List<Document> getTop10DocumentsWithMostDownloadsByDepartment(int departmentId) {
+        return documentRepository.findDocumentsWithMostDownloads(departmentId);
     }
 
     @Override
@@ -594,26 +767,19 @@ public class DocumentServiceImpl implements DocumentService {
             Document document = documentRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
 
-            String path = document.getPath();
-            File file = new File(path);
-
-            if (file.isFile() && !document.isDelete()) {
-                document.setDeleteDate(LocalDateTime.now());
-                document.setDelete(true);
-                NotificationDTO notification = NotificationDTO.builder()
-                        .receiver(document.getUserUpload().getStaffCode())
-                        .sender("22140044")
-                        .created_at(LocalDateTime.now())
-                        .document(null)
-                        .title("Tài liệu của bạn đã bị gỡ bởi hệ thống")
-                        .content("Tài liệu " + document.getTitle() + " đã bị gỡ")
-                        .build();
-                notificationService.send(notification);
-                documentRepository.save(document);
-                return true;
-            } else {
-                return false;
-            }
+            document.setDeleteDate(LocalDateTime.now());
+            document.setDelete(true);
+            NotificationDTO notification = NotificationDTO.builder()
+                    .receiver(document.getUserUpload().getStaffCode())
+                    .sender("22140044")
+                    .created_at(LocalDateTime.now())
+                    .document(document.getSlug())
+                    .title("Tài liệu của bạn đã bị gỡ bởi hệ thống")
+                    .content("Tài liệu " + document.getTitle() + " đã bị gỡ")
+                    .build();
+            notificationService.send(notification);
+            documentRepository.save(document);
+            return true;
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method delete document " + e.getMessage());
 
@@ -623,7 +789,18 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentResponseDTO> getDeletedDocument() {
         try {
-            return documentRepository.getDeleteDocuments()
+            List<Document> list = documentRepository.getDeleteDocuments()
+                    .stream()
+                    .toList();
+            // delete documents which be deleted more than 30 days
+            LocalDateTime now = LocalDateTime.now();
+            for (Document document : list) {
+                if (document.getDeleteDate().plusDays(30).isBefore(now)) {
+                    documentRepository.delete(document);
+                }
+            }
+
+            return list
                     .stream()
                     .map(this::convertToDocumentResponse)
                     .toList();

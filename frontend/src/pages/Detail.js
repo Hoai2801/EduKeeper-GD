@@ -46,6 +46,8 @@ const Detail = () => {
         setNumPages(numPages);
     }
 
+    const [htmlContent, setHtmlContent] = useState(null);
+
     useEffect(() => {
         fetch("http://localhost:8080/api/v1/documents/" + slug)
             .then((res) => res.json())
@@ -53,13 +55,12 @@ const Detail = () => {
                 setData(data)
             });
 
-        fetch("http://localhost:8080/api/v1/documents/" + slug + "/file")
+        fetch("http://localhost:8080/api/v1/documents/" + slug + "/html")
             .then((res) => {
-                res.blob().then(r => {
-                    setFile(r)
+                res.text().then(r => {
+                    setHtmlContent(r)
                 })
             })
-
 
         fetch("http://localhost:8080/api/v1/documents/" + slug + "/download")
             .then((res) => {
@@ -293,33 +294,34 @@ const Detail = () => {
                         <div dangerouslySetInnerHTML={{__html: data?.description}}></div>
                     </div>
                 </div>
-                <div className={`overflow-y-scroll h-screen rounded-lg flex flex-col max-w-[1080px] mt-5 mx-auto`}>
-                    <Document file={file} onLoadSuccess={onDocumentLoadSuccess}
-                              className={'flex flex-col items-center'}>
-                        {Array.apply(null, Array(numPages))
-                            .map((x, i) => {
-                                if (i <= pageNumber) {
-                                    return (
-                                        // <div className='max-w-[1080px] p-2'>
-                                        <Page
-                                            key={i}
-                                            pageNumber={i + 1}
-                                            renderTextLayer={false}
-                                            renderAnnotationLayer={false}
-                                            renderMode="svg"
-                                            width={width}
-                                        />
-                                        // </div>
-                                    );
-                                }
-                            })
-                        }
-                    </Document>
-                    <div className='w-full h-[100px] flex justify-center align-middle mt-8'>
-                        <button onClick={() => setPageNumber(pageNumber + 10)}
-                                className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm
-                        </button>
-                    </div>
+                <div className={`bg-white overflow-y-scroll h-screen rounded-lg flex flex-col max-w-[1080px] mt-5 mx-auto`}>
+                    {/*<Document file={file} onLoadSuccess={onDocumentLoadSuccess}*/}
+                    {/*          className={'flex flex-col items-center'}>*/}
+                    {/*    {Array.apply(null, Array(numPages))*/}
+                    {/*        .map((x, i) => {*/}
+                    {/*            if (i <= pageNumber) {*/}
+                    {/*                return (*/}
+                    {/*                    // <div className='max-w-[1080px] p-2'>*/}
+                    {/*                    <Page*/}
+                    {/*                        key={i}*/}
+                    {/*                        pageNumber={i + 1}*/}
+                    {/*                        renderTextLayer={false}*/}
+                    {/*                        renderAnnotationLayer={false}*/}
+                    {/*                        renderMode="svg"*/}
+                    {/*                        width={width}*/}
+                    {/*                    />*/}
+                    {/*                    // </div>*/}
+                    {/*                );*/}
+                    {/*            }*/}
+                    {/*        })*/}
+                    {/*    }*/}
+                    {/*</Document>*/}
+                    <div dangerouslySetInnerHTML={{ __html: htmlContent }}></div>
+                    {/*<div className='w-full h-[100px] flex justify-center align-middle mt-8'>*/}
+                    {/*    <button onClick={() => setPageNumber(pageNumber + 10)}*/}
+                    {/*            className='bg-blue-500 text-white px-10 py-3 h-fit rounded-lg'>Xem thêm*/}
+                    {/*    </button>*/}
+                    {/*</div>*/}
                 </div>
                 <section className="bg-white py-8 lg:py-16 antialiased mt-3 rounded-lg">
                     <div className="max-w-2xl mx-auto px-4">

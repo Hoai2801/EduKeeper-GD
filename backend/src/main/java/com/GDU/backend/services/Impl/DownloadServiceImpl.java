@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DownloadServiceImpl implements DownloadService {
     private final UserService userService;
-    private final DocumentService documentService; 
+    private final DocumentService documentService;
     private final DownloadRepository downloadRepository;
-    
+
     @Override
     public String createDownload(DownloadDTO downloadDTO) {
         User user = userService.getUserByStaffCode(downloadDTO.getStaffCode());
@@ -38,8 +38,9 @@ public class DownloadServiceImpl implements DownloadService {
     }
 
     @Override
-    public List<DocumentResponseDTO> getTopDocuments(int limit) {
-        List<Document> mostDownloadDocuments = documentService.findDocumentsWithMostDownloads(limit);
+    public List<DocumentResponseDTO> getTopDocuments(int departmentId) {
+        List<Document> mostDownloadDocuments = documentService
+                .getTop10DocumentsWithMostDownloadsByDepartment(departmentId);
         return mostDownloadDocuments.stream().map(DocumentResponseDTO::from).collect(Collectors.toList());
     }
 }

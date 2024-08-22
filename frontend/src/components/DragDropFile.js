@@ -1,12 +1,11 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
-const DragDropFile = ({handleFiles, fileSupport}) => {
+const DragDropFile = ({ handleFiles, fileSupport }) => {
   // drag state
   const [dragActive, setDragActive] = useState(false);
   // ref
   const inputRef = useRef(null);
-
 
   // handle drag events
   const handleDrag = function (e) {
@@ -33,20 +32,19 @@ const DragDropFile = ({handleFiles, fileSupport}) => {
   const handleChange = function (e) {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
+      console.log(e.target.files[0].type);
       if (e.target.files[0].type === fileSupport
           || fileSupport.includes(e.target.files[0].type)
           // use for the download document can be support any type but not image
-          || fileSupport === "any" && e.target.files[0].type !== "image/png" && e.target.files[0].type !== "image/jpeg" && e.target.files[0].type !== "image/jpg"
+          || (fileSupport === "any" && e.target.files[0].type !== "image/png" && e.target.files[0].type !== "image/jpeg" && e.target.files[0].type !== "image/jpg")
       ) {
         if (e.target.files[0].size < 52428800) {
           handleFiles(e.target.files);
+        } else {
+          toast.error("File quá lớn. Vui lòng chọn file nhỏ hơn 50MB");
         }
-        else {
-          toast.error("File quá lớn. Vui lòng chọn file nhỏ hơn 50MB")
-        }
-      }
-      else {
-        toast.error("Định dạng file hiện đang chưa hỗ trợ")
+      } else {
+        toast.error("Định dạng file hiện đang chưa hỗ trợ");
       }
     }
   };
@@ -57,17 +55,44 @@ const DragDropFile = ({handleFiles, fileSupport}) => {
   };
 
   return (
-    <form id="form-file-upload" onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()}>
-      <input ref={inputRef} type="file" id="input-file-upload" multiple={true} onChange={handleChange} />
-      <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : ""}>
+    <form
+      id="form-file-upload"
+      onDragEnter={handleDrag}
+      onSubmit={(e) => e.preventDefault()}
+    >
+      <input
+        ref={inputRef}
+        type="file"
+        id="input-file-upload"
+        multiple={true}
+        onChange={handleChange}
+      />
+      <label
+        id="label-file-upload"
+        htmlFor="input-file-upload"
+        className={dragActive ? "drag-active" : ""}
+      >
         <div className={`flex flex-col items-center justify-center h-full`}>
           <p>Kéo và thả file vào khu vực này hoặc là</p>
-          <button className="upload-button text-blue-400" onClick={onButtonClick}>Tải file từ máy</button>
+          <button
+            className="upload-button text-blue-400"
+            onClick={onButtonClick}
+          >
+            Tải file từ máy
+          </button>
         </div>
       </label>
-      {dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
+      {dragActive && (
+        <div
+          id="drag-file-element"
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+        ></div>
+      )}
     </form>
   );
-}
+};
 
-export default DragDropFile
+export default DragDropFile;

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class DocumentResponseDTO {
 
     private Long id;
-    
+
     private String title;
 
     private String slug;
@@ -34,35 +34,36 @@ public class DocumentResponseDTO {
 
     private String thumbnail;
 
-    private String path;
-    
-    private String file_download; 
-    
+    private String file;
+
+    private String file_download;
+
     private String description;
-    
+
     private String status;
-    
+
     private String scope;
-    
+
     @Column(name = "user_upload")
     private UserResponse user_upload;
-    
+
     private String author;
 
     private Subject subject;
-    
+
     private Department department;
-    
-    private Specialized specialized; 
-    
+
+    private Specialized specialized;
+
     private Category category;
 
     private int views;
 
     private int download;
-    
+    private int favorites;
+
     private boolean is_delete;
-    
+
     private LocalDateTime deleted_at;
 
     private int pages;
@@ -80,6 +81,7 @@ public class DocumentResponseDTO {
                 .slug(document.getSlug())
                 .views(document.getViewsCount())
                 .download(document.getDownloadsCount())
+                .favorites(document.getFavoritesCount())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
                 .category(document.getCategory())
@@ -89,8 +91,7 @@ public class DocumentResponseDTO {
                 .scope(document.getScope())
                 .status(document.getStatus())
                 .subject(document.getSubject())
-                .path(document.getPath())
-                .thumbnail(document.getThumbnail())
+                .file(document.getFile())
                 .is_delete(document.isDelete())
                 .deleted_at(document.getDeleteDate())
                 .pages(document.getPages())

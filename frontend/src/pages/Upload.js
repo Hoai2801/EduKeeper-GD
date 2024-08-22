@@ -67,7 +67,13 @@ export const Upload = () => {
 
     const handleListSpecialized = (departmentId) => {
         fetch('http://localhost:8080/api/v1/specializes/department/' + departmentId)
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            })
             .then(data => {
                 setListSpecialized(data);
             })
@@ -154,21 +160,6 @@ export const Upload = () => {
         }));
     };
 
-    const handleFileDownload = (updatedFile) => {
-        setUploadData(prevState => ({
-            ...prevState,
-            documentDownload: updatedFile[0]
-        }));
-    };
-
-    // Handler to reset file inputs to null
-    const resetDownloadFiles = () => {
-        setUploadData(prevState => ({
-            ...prevState,
-            documentDownload: null
-        }));
-    };
-
     const resetUploadFiles = () => {
         setUploadData(prevState => ({
             ...prevState,
@@ -178,14 +169,26 @@ export const Upload = () => {
 
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/departments')
-            .then(response => response.json())
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Unexpected status code: ${response.status}`);
+                }
+            })
             .then(data => {
                 setListDepartment(data);
             })
             .catch(error => console.error(error));
 
         fetch('http://localhost:8080/api/v1/categories')
-            .then(response => response.json())
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error(`Unexpected status code: ${response.status}`);
+                }
+            })
             .then(data => {
                 setListCategory(data);
             })
@@ -294,8 +297,6 @@ export const Upload = () => {
             .catch(error => console.error(error));
     };
 
-    console.log(uploadData.document)
-    console.log(uploadData.documentDownload)
     return (
         <div className={`w-full p-2`}>
             <h2 className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 text-center ${isEditPage ? "block" : "hidden"}`}>
@@ -304,19 +305,28 @@ export const Upload = () => {
             <div className={`${isEditPage ? "hidden" : "block"} max-w-[450px] mx-auto`}>
                 <p className='text-3xl font-bold mb-5 mt-10'>Đăng tài liệu</p>
                 <p className={`text-lg`}>Tài liệu <span className='text-red-500'>*</span></p>
-                <p className={`text-red-500 mb-2`}>Lưu ý chỉ hỗ trợ file PDF</p>
+                <p className={`text-red-500 mb-2`}>Lưu ý chỉ hỗ trợ file PDF, Doc, Docx, PPT và PPTX</p>
                 <div className={`${uploadData.document ? "hidden" : "block"}`}>
-                    <DragDropFile handleFiles={handleFiles} fileSupport={`application/pdf`}/>
+                    <DragDropFile handleFiles={handleFiles} fileSupport={`application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/pdf, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/msword`}/>
                 </div>
             </div>
             <div className={`flex justify-center p-2 ${isEditPage ? "hidden" : "block"}`}>
                 {uploadData?.document && (
                     <div className='bg-white p-5 rounded-2xl flex gap-3 max-w-md mt-2'>
-                        <Document file={uploadData.document} type={uploadData.document.type}>
-                            <div className='max-h-[50px] overflow-hidden'>
-                                <Page pageNumber={1} width={40} height={50}/>
-                            </div>
-                        </Document>
+                        {
+                            uploadData?.document.type === "application/pdf" ? (
+
+                            <Document file={uploadData.document} type={uploadData.document.type}>
+                                <div className='max-h-[50px] overflow-hidden'>
+                                    <Page pageNumber={1} width={40} height={50}/>
+                                </div>
+                            </Document>
+                            ) : (
+                                {
+
+                                }
+                            )
+                        }
                         <div className={`max-w-md overflow-hidden flex flex-col gap-2`}>
                             <p className='w-full'>{uploadData?.document.name}</p>
                             <p>{(uploadData?.document.size / (1024 * 1024)).toFixed(1)} MB</p>
@@ -328,47 +338,47 @@ export const Upload = () => {
                     </div>
                 )}
             </div>
-            <div
-                className={`${haveDownloadFile ? "bg-white rounded-2xl mt-2" : ""} flex flex-col items-center max-w-[450px] mx-auto`}>
-                {/*toggle*/}
-                <label className="inline-flex items-center cursor-pointer my-3 p-2 h-fit">
-                    <input type="checkbox" value="" className="sr-only peer" checked={haveDownloadFile}
-                           onChange={(e) => {
-                               setHaveDownloadFile(prevState => !prevState)
-                           }}/>
-                    <div
-                        className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    <p className="ml-3 w-[70%] text-gray-900 font-semibold">
-                        Tôi muốn file người dùng tải về
-                        là file khác (word,
-                        powerpoint, excel...)
-                    </p>
+            {/*<div*/}
+            {/*    className={`${haveDownloadFile ? "bg-white rounded-2xl mt-2" : ""} flex flex-col items-center max-w-[450px] mx-auto`}>*/}
+            {/*    /!*toggle*!/*/}
+            {/*    <label className="inline-flex items-center cursor-pointer my-3 p-2 h-fit">*/}
+            {/*        <input type="checkbox" value="" className="sr-only peer" checked={haveDownloadFile}*/}
+            {/*               onChange={(e) => {*/}
+            {/*                   setHaveDownloadFile(prevState => !prevState)*/}
+            {/*               }}/>*/}
+            {/*        <div*/}
+            {/*            className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>*/}
+            {/*        <p className="ml-3 w-[70%] text-gray-900 font-semibold">*/}
+            {/*            Tôi muốn file người dùng tải về*/}
+            {/*            là file khác (word,*/}
+            {/*            powerpoint, excel...)*/}
+            {/*        </p>*/}
 
-                </label>
-                <div className={`max-w-[450px] p-4`}>
-                    {
-                        haveDownloadFile && !uploadData.documentDownload && (
-                            <div className={`max-w-[450px]`}>
-                                <DragDropFile handleFiles={handleFileDownload} fileSupport={`any`}/>
-                            </div>
-                        )
-                    }
-                    {
-                        uploadData.documentDownload && haveDownloadFile && (
-                            <div
-                                className={` p-2 overflow-hidden flex flex-wrap justify-between gap-5 rounded-lg border border-gray-300 h-fit`}>
-                                <p className={`text-gray-700 font-semibold`}>Tải lên thành công <span
-                                    className={`text-gray-900 font-semibold w-[420px]`}>{uploadData.documentDownload.name}</span></p>
-                                <button className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2 w-full`}
-                                        onClick={() => resetDownloadFiles()}
-                                >
-                                    Xóa
-                                </button>
-                            </div>
-                        )
-                    }
-                </div>
-            </div>
+            {/*    </label>*/}
+            {/*    <div className={`max-w-[450px] p-4`}>*/}
+            {/*        {*/}
+            {/*            haveDownloadFile && !uploadData.documentDownload && (*/}
+            {/*                <div className={`max-w-[450px]`}>*/}
+            {/*                    <DragDropFile handleFiles={handleFileDownload} fileSupport={`any`}/>*/}
+            {/*                </div>*/}
+            {/*            )*/}
+            {/*        }*/}
+            {/*        {*/}
+            {/*            uploadData.documentDownload && haveDownloadFile && (*/}
+            {/*                <div*/}
+            {/*                    className={` p-2 overflow-hidden flex flex-wrap justify-between gap-5 rounded-lg border border-gray-300 h-fit`}>*/}
+            {/*                    <p className={`text-gray-700 font-semibold`}>Tải lên thành công <span*/}
+            {/*                        className={`text-gray-900 font-semibold w-[420px]`}>{uploadData.documentDownload.name}</span></p>*/}
+            {/*                    <button className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2 w-full`}*/}
+            {/*                            onClick={() => resetDownloadFiles()}*/}
+            {/*                    >*/}
+            {/*                        Xóa*/}
+            {/*                    </button>*/}
+            {/*                </div>*/}
+            {/*            )*/}
+            {/*        }*/}
+            {/*    </div>*/}
+            {/*</div>*/}
             <div className="max-w-md mx-auto p-8 bg-white rounded-md shadow-md mt-5">
                 <h2 className="text-2xl font-semibold mb-6">Thông tin tài liệu</h2>
                 <form>

@@ -30,16 +30,13 @@ public class Document {
 
     @Column(nullable = false, length = 30)
     private String documentType;
-
-    @Column(name = "download_file_type" ,nullable = false, length = 30)
-    private String downloadFileType;
     
     @Column(nullable = false)
     private Long documentSize;
 
     @Column(nullable = false)
     private Integer pages;
-    
+
     @Column
     private String description;
 
@@ -47,13 +44,7 @@ public class Document {
     private LocalDate uploadDate;
 
     @Column(nullable = false, length = 500)
-    private String path;
-    
-    @Column(name = "path_download" ,nullable = false, length = 500)
-    private String documentDownload;
-
-    @Column(nullable = false, length = 500)
-    private String thumbnail;
+    private String file;
 
     @Column(name = "is_delete", nullable = false)
     private boolean isDelete;
@@ -65,7 +56,7 @@ public class Document {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_upload", nullable = false)
     private User userUpload;
-    
+
     private String author;
 
     @OneToMany(mappedBy = "document")
@@ -75,12 +66,16 @@ public class Document {
     @JsonManagedReference
     private List<ViewHistory> views;
 
+    @OneToMany(mappedBy = "documentID", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Favorite> favorites;
+
     @Column(name = "deleted_at")
     private LocalDateTime deleteDate;
-    
+
     private String scope;
-    
-    private String status; 
+
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "subject_id")
@@ -99,6 +94,10 @@ public class Document {
         return downloads != null ? downloads.size() : 0;
     }
 
+    public int getFavoritesCount() {
+        return favorites != null ? favorites.size() : 0;
+    }
+        
     @Override
     public String toString() {
         return "Document{" +
@@ -106,14 +105,11 @@ public class Document {
                 ", title='" + title + '\'' +
                 ", slug='" + slug + '\'' +
                 ", documentType='" + documentType + '\'' +
-                ", downloadFileType='" + downloadFileType + '\'' +
                 ", documentSize=" + documentSize +
                 ", pages=" + pages +
                 ", description='" + description + '\'' +
                 ", uploadDate=" + uploadDate +
-                ", path='" + path + '\'' +
-                ", documentDownload='" + documentDownload + '\'' +
-                ", thumbnail='" + thumbnail + '\'' +
+                ", file='" + file + '\'' +
                 ", isDelete=" + isDelete +
                 ", category=" + (category != null ? category.getId() : null) +
                 ", userUpload=" + (userUpload != null ? userUpload.getId() : null) +
