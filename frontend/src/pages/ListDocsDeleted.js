@@ -6,6 +6,7 @@ import { useHandleDetailDocs } from "../components/HandleEvent";
 export default function DeletedDocument(params) {
     const [documents, setDocuments] = useState([]);
     const [activePage, setActivePage] = useState(1);
+    const [isCheck, setIsCheck] = useState(true);
     const navigate = useNavigate();
     const handleDetailDocs = useHandleDetailDocs();
     const goBack = () => {
@@ -110,6 +111,7 @@ export default function DeletedDocument(params) {
         fetch(`http://localhost:8080/api/v1/documents/deleted`)
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
                 setDocuments(data);
             });
     }, []);

@@ -38,7 +38,6 @@ public class AuthController {
             @Valid @RequestBody AuthenticationRequest loginRequest
     ) {
         try {
-            System.out.println("Login");
             return authenticationService.login(loginRequest);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -48,6 +47,7 @@ public class AuthController {
     @PostMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         if (authentication != null) {
+            System.out.println("logout: " + authentication.getName());
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
         response.setStatus(HttpServletResponse.SC_OK);

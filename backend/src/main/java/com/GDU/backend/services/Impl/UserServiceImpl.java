@@ -28,7 +28,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
-    private final PasswordEncoder passwordEncoder;
+     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final SpecializedRepository specializedRepository;
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void changePassword(User user, String newPassword) {
-        user.setPassword(passwordEncoder.encode(newPassword));
+        // user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 
@@ -214,7 +214,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setSpecialized(specialized);
         }
         var role = roleRepository.findByName(userDetailDTO.getRole()).orElseThrow(
-                () -> new UsernameNotFoundException("Role not found"));
+                () -> new UsernameNotFoundException("Role not found")
+        );
         user.setRoles(role);
         user.setUsername(userDetailDTO.getUsername());
         user.setKlass(userDetailDTO.getKlass());

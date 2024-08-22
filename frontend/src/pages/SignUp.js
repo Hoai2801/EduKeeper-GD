@@ -104,7 +104,11 @@ const SignUp = () => {
                     toast.success("Đăng ký tài khoản thành công");
                     window.location.href = '/login';
                 } else {
-                    toast.error(response.text());
+                    const responseText = response.text().then(data => {
+                        toast.error(data);
+                    });
+                    // console.log(responseText);
+                    // toast.error(response.text());
                 }
             })
     };

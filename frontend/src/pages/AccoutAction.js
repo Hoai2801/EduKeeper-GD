@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 
-const AccountAction = () => {
+const AccoutAction = () => {
     const { action, token } = useParams();
 
     const [content, setContent] = useState('');
@@ -20,10 +20,34 @@ const AccountAction = () => {
         setConfirmPassword(event.target.value);
     };
 
+    // const [acctionType, setActionType] = useState('');
+
+    // const resendActiveLink = () => {
+
+    //     axios.post("http://localhost:8080/api/v1/auth/" + action + "/" + token)
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             console.log(data)
+    //             if (data.status === 500) {
+    //                 alert('');
+    //             }
+    //             if (data.data === "activated") {
+    //                 window.location.href = "/";
+    //             }
+    //         })
+    //         .catch((err) => {
+    //             setContent('Mã xác thực không quá hình');
+    //         })
+    // }
+
     useEffect(() => {
         if (action === "activate") {
             axios.post("http://localhost:8080/api/v1/auth/" + action + "/" + token)
                 .then((data) => {
+                    console.log(data)
+                    // if (data === "activated") {
+                    //     window.location.href = "/";
+                    // }
                     window.location.href = "/";
                 })
                 .catch((err) => {
@@ -44,7 +68,8 @@ const AccountAction = () => {
             setError('Mật khẩu phải lớn hơn 8 kí tự');
             return;
         }
-        fetch('http://localhost:8080/api/v1/auth/reset-password/' + token, {
+        console.log(token)
+        const response = fetch('http://localhost:8080/api/v1/auth/reset-password/' + token, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -54,13 +79,10 @@ const AccountAction = () => {
                 confirmPassword
             }),
         })
-            .then(response => {
-                if (response.status === 200) {
-                    window.location.href = "/";
-                } else {
-                    setError("Sai mật khẩu")
-                }
-            })
+        console.log(response)
+        if (response.status === 200) {
+            window.location.href = "/";
+        }
     };
 
     return (
@@ -112,4 +134,4 @@ const AccountAction = () => {
     )
 }
 
-export default AccountAction
+export default AccoutAction

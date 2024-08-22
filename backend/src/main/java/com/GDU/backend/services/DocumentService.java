@@ -38,7 +38,7 @@ public interface DocumentService {
     int getTotalDownloadsByAuthor(Long authorId);
 
     int getDocumentsCountByAuthor(String authorId);
-
+    
     int countDocumentsToday();
 
     int countPublishedDocuments();
@@ -55,18 +55,20 @@ public interface DocumentService {
 
     List<Monthly> countDocumentsMonthly(int year);
 
+
     List<TypeRes> countDocumentsByType(int year);
 
-    List<DocumentResponseDTO> getTop10Documents();
+    List<DocumentResponseDTO> getTop3Documents();
 
     List<DocumentResponseDTO> getPaginationDocs(int page);
 
     Document getDocumentById(Long documentId);
 
-    List<Document> getTop10DocumentsWithMostDownloadsByDepartment(int departmentId);
+    List<Document> findDocumentsWithMostDownloads(int limit);
+
 
     List<DocumentResponseDTO> getDeletedDocument();
-
+    
     boolean deleteDocumentById(Long id);
 
     String recoveryDocument(List<Long> ids) throws IOException;

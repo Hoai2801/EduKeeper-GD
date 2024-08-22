@@ -1,5 +1,10 @@
 import React, {useContext, useEffect, useState} from 'react'
-import {useParams} from "react-router-dom";
+import download from '../assets/download.png'
+import view from '../assets/view.jpg'
+import love from '../assets/love.png'
+import document from '../assets/document.jpg'
+import {jwtDecode} from "jwt-decode";
+import {useLocation, useParams} from "react-router-dom";
 import DocumentCard from "./DocumentCard";
 import {JWTContext} from "../App";
 
@@ -13,7 +18,7 @@ const UserHome = () => {
 
     const location = useParams();
 
-    const staffCode = location?.staff_code;
+    const staffCode = location.valueOf("staff_code").staff_code;
 
     useEffect(() => {
         const limit = 10;
@@ -24,7 +29,15 @@ const UserHome = () => {
                     setDocumentsViewed(data);
                 }
             });
-    }, [staffCode]);
+    }, []);
+
+    // useEffect(() => {
+    //     if (jwt) {
+    //         if (location.valueOf("staff_code").staff_code === jwt?.staff_code) {
+    //             setStaffCode(jwt?.staff_code);
+    //         } else setStaffCode(location.valueOf("staff_code").staff_code);
+    //     }
+    // }, [jwt, location]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -67,6 +80,9 @@ const UserHome = () => {
                     <h3 className='xl:text-lg'>
                         Tổng lượt tải về
                     </h3>
+                    {/*<div className='md:w-[40px] md:h-[40px] w-[30px] h-[30px] rounded-full overflow-hidden mx-auto my-3'>*/}
+                    {/*    <img src={download} alt="" className='w-full h-full object-center'/>*/}
+                    {/*</div>*/}
                     <p className='xl:text-lg text-sm text-red-400'>{totalDownloads || 0}</p>
                 </div>
                 <div
@@ -74,6 +90,9 @@ const UserHome = () => {
                     <h3 className='xl:text-lg'>
                         Tổng lượt được xem
                     </h3>
+                    {/*<div className='md:w-[40px] md:h-[40px] w-[30px] h-[30px] rounded-full mx-auto my-3 overflow-hidden border-2'>*/}
+                    {/*    <img src={view} alt="" className='w-full h-full'/>*/}
+                    {/*</div>*/}
                     <p className='xl:text-lg text-sm text-blue-400'>{totalViews || 0}</p>
                 </div>
                 <div
@@ -81,6 +100,9 @@ const UserHome = () => {
                     <h3 className='xl:text-lg'>
                         Tổng được yêu thích
                     </h3>
+                    {/*<div className='md:w-[40px] md:h-[40px] w-[30px] h-[30px] rounded-full mx-auto my-3 overflow-hidden'>*/}
+                    {/*    <img src={love} alt="" className='w-full h-full object-center'/>*/}
+                    {/*</div>*/}
                     <p className='xl:text-lg text-sm text-pink-400'>{totalFavorites || 0}</p>
                 </div>
                 <div
@@ -88,6 +110,9 @@ const UserHome = () => {
                     <h3 className='xl:text-lg'>
                         Tổng tài liệu
                     </h3>
+                    {/*<div className='md:w-[40px] md:h-[40px] w-[30px] h-[30px] rounded-full mx-auto my-3 overflow-hidden'>*/}
+                    {/*    <img src={document} alt="" className='w-full h-full object-center'/>*/}
+                    {/*</div>*/}
                     <p className='xl:text-lg text-sm text-green-400'>{totalDocuments || 0}</p>
                 </div>
 
@@ -97,7 +122,7 @@ const UserHome = () => {
                 <div className='flex gap-2 lg:w-[1050px] py-5 overflow-x-auto w-full'>
                     {documentsViewed && documentsViewed.length > 0 ? (
                         documentsViewed.slice(0, 10).map(document => (
-                            <div className='flex-shrink-0'>
+                            <div className='flex-shrink-0 w-[90%] sm:w-[45%] md:w-[30%] lg:w-[20%] xl:w-[15%]'>
                                 <DocumentCard document={document} key={document.id}/>
                             </div>
                         ))

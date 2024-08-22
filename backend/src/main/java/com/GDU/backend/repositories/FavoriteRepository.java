@@ -12,9 +12,9 @@ import java.util.List;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     @Query(value = "SELECT * FROM favorite WHERE user_id = :userId", nativeQuery = true)
-    List<Favorite> findAllByUserID(@Param("userId") long userId);
+    List<Favorite> findAllByUserID(long userId);
 
     @Query("SELECT f FROM Favorite f WHERE f.userID.id = :userId AND f.documentID.id = :documentId")
-    Favorite existsByUserIDAndDocumentID(@Param("userId") Long userId, @Param("documentId") Long documentId);
-
+    Favorite existsByUserIDAndDocumentID(Long userId, Long documentId);
+    
 }

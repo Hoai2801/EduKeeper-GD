@@ -31,23 +31,10 @@ public class DocumentController {
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
-            File file = new File(UPLOAD_DIR + document.getFile());
+            File file = new File(UPLOAD_DIR + document.getPath());
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(document.getDocument_type()))
                     .body(new FileSystemResource(file));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    
-    @GetMapping("/{slug}/html")
-    public ResponseEntity<Resource> getHtmlFileBySlug(@PathVariable("slug") String slug) {
-        try {
-            DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
-            String path = "src/main/resources/static/convert/" + document.getFile() + ".html";
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType("text/html"))
-                    .body(new FileSystemResource(path));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -59,7 +46,7 @@ public class DocumentController {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
             // null because the raw file is pdf
             if (document.getFile_download() == null) {
-                File file = new File(UPLOAD_DIR + document.getFile());
+                File file = new File(UPLOAD_DIR + document.getPath());
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(document.getDocument_type()))
                         .body(new FileSystemResource(file));
@@ -103,7 +90,8 @@ public class DocumentController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadDocument(
-            @ModelAttribute UploadRequestDTO uploadRequestDTO) {
+            @ModelAttribute UploadRequestDTO uploadRequestDTO
+    ) {
         try {
             return documentService.uploadDocument(uploadRequestDTO);
         } catch (Exception e) {
@@ -137,12 +125,10 @@ public class DocumentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(
-
             @PathVariable("id") Long id,
-            @ModelAttribute UploadRequestDTO uploadRequestDTO) {
+            @ModelAttribute UploadRequestDTO uploadRequestDTO
+    ) {
         try {
-            System.out.println(uploadRequestDTO);
-            System.out.println(id);
             return ResponseEntity.ok(documentService.updateDocumentById(id, uploadRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
@@ -185,9 +171,11 @@ public class DocumentController {
         }
     }
 
+
     @PostMapping("/recommend")
     public ResponseEntity<?> getRecommendedDocuments(
-            @ModelAttribute RecommendationRequestDTO recommendationRequestDTO) {
+            @ModelAttribute RecommendationRequestDTO recommendationRequestDTO
+    ) {
         try {
             return ResponseEntity.ok(documentService.getRecommendedDocuments(recommendationRequestDTO));
         } catch (Exception e) {
@@ -307,10 +295,10 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/top10")
-    public ResponseEntity<?> getTop10Documents() {
+    @GetMapping("/top3")
+    public ResponseEntity<?> getTop3Documents() {
         try {
-            return ResponseEntity.ok(documentService.getTop10Documents());
+            return ResponseEntity.ok(documentService.getTop3Documents());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
