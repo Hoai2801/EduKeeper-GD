@@ -38,6 +38,9 @@ public class RegisterRequest {
     private String specialized;
     
     private String classroom;
+    
+    // if data type is boolean, it always return false
+    private String isAdminCreate;
 
     @NotEmpty
     @NotBlank

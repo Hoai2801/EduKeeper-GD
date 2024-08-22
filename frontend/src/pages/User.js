@@ -20,6 +20,7 @@ const User = () => {
     email: "",
     password: "",
     roles: "ROLE_USER", // Default role is 'user'
+    "isAdminCreate": true,
   });
 
   const [editUser, setEditUser] = useState({

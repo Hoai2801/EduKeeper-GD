@@ -18,24 +18,12 @@ import java.util.Optional;
 public interface DocumentRepository extends JpaRepository<Document, Long> {
         Document getDocumentBySlug(@Param("slug") String slug);
 
-        // @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) =
-        // MONTH(CURRENT_DATE())\n" +
-        // "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.views) DESC
-        // LIMIT :limit")
-        // List<Document> getMostViewedDocuments(int limit);
-
         @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
                         "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.downloads) DESC LIMIT :limit")
         List<Document> getMostDownloadedDocuments(@Param("limit") int limit);
 
         @Query("SELECT d FROM Document d WHERE d.isDelete = false and d.status = 'published' and (d.scope = 'student-only' or d.scope = 'public') ORDER BY d.id DESC LIMIT :limit")
         List<Document> getLastedDocuments(@Param("limit") int limit);
-
-        @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
-        List<Document> getPopularDocumentThisWeek();
-
-        @Query(value = "SELECT * FROM document d where d.upload_date >= DATE_SUB(NOW(), INTERVAL '30' DAY)  ORDER BY d.download DESC, d.views DESC ", nativeQuery = true)
-        List<Document> getPopularDocumentThisMonth();
 
         @Query(value = "SELECT * FROM document d WHERE d.is_delete = 1 ", nativeQuery = true)
         List<Document> getDeleteDocuments();
@@ -52,9 +40,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                         @Param("category") Long category,
                         @Param("title") String title,
                         @Param("author") String author);
-
-        @Query(value = "SELECT d.* FROM document d JOIN specialized s ON s.id = d.specialized_id where s.specialized_slug like %:slug%", nativeQuery = true)
-        List<Document> getDocumentsBySlugSpecialized(@Param("slug") String slug);
 
         @Query(value = "SELECT DISTINCT d.* FROM document d " +
                         "JOIN specialized s ON s.id = d.specialized_id " +
@@ -157,13 +142,13 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                         +
                         "COALESCE((SELECT COUNT(*) FROM favorite f WHERE f.document_id = d.id), 0) AS totalFavotites "
                         +
-                        "FROM Document d " +
+                        "FROM document d " +
                         "LEFT JOIN (" +
                         "    SELECT document_id, COUNT(document_id) AS total_downloads " +
                         "    FROM downloads " +
                         "    GROUP BY document_id " +
                         ") dl ON d.id = dl.document_id " +
-                        "JOIN Specialized spe ON d.specialized_id = spe.id " +
+                        "JOIN specialized spe ON d.specialized_id = spe.id " +
                         "WHERE spe.department_id = :departmentId " +
                         "ORDER BY totalDownloads DESC " +
                         "LIMIT 10", nativeQuery = true)

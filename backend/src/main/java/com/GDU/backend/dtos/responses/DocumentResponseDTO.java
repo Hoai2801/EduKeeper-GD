@@ -34,7 +34,7 @@ public class DocumentResponseDTO {
 
     private String thumbnail;
 
-    private String path;
+    private String file;
 
     private String file_download;
 
@@ -91,8 +91,7 @@ public class DocumentResponseDTO {
                 .scope(document.getScope())
                 .status(document.getStatus())
                 .subject(document.getSubject())
-                .path(document.getPath())
-                .thumbnail(document.getThumbnail())
+                .file(document.getFile())
                 .is_delete(document.isDelete())
                 .deleted_at(document.getDeleteDate())
                 .pages(document.getPages())
