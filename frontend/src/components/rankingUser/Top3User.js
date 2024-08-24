@@ -39,17 +39,7 @@ export default function Top3User({ user, totalDownloads, totalViews }) {
             <p className="text-sm font-medium">Lượt tải tài liệu</p>
           </div>
         </div>
-        {/* <div className="absolute left-1/2 -top-1/2 transform translate-x-[-50%] min-w-56 h-auto p-4 bg-gray-100 shadow-lg rounded-lg  group-hover:block hidden ">
-          {" "}
-          <div className="text-gray-600 text-sm">
-            <h4 className="text-center font-semibold ">Thông tin sinh viên</h4>
-            <p>Ho va ten: {user.username} </p>
-            <p>Mssv: {user.staffCode}</p>
-            <p>Lop: {user.klass}</p>
-            <p>Khoa: {user.department}</p>
-            <p>Email: {user.email}</p>
-          </div>
-        </div> */}
+
         {user && (
           <Information
             user={user}
