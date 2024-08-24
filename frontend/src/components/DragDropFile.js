@@ -32,25 +32,15 @@ const DragDropFile = ({ handleFiles, fileSupport }) => {
   const handleChange = function (e) {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-<<<<<<< HEAD
-      const fileType = e.target.files[0].type;
-
-      const isFileTypeSupported =
-        fileType === "application/pdf" ||
-        fileType === fileSupport ||
-        (fileSupport === "image" &&
-          (fileType === "image/png" ||
-            fileType === "image/jpeg" ||
-            fileType === "image/jpg"));
-
-      if (isFileTypeSupported) {
-=======
-      if (e.target.files[0].type === fileSupport
-          || fileSupport.includes(e.target.files[0].type)
-          // use for the download document can be support any type but not image
-          || fileSupport === "any" && e.target.files[0].type !== "image/png" && e.target.files[0].type !== "image/jpeg" && e.target.files[0].type !== "image/jpg"
+      if (
+        e.target.files[0].type === fileSupport ||
+        fileSupport.includes(e.target.files[0].type) ||
+        // use for the download document can be support any type but not image
+        (fileSupport === "any" &&
+          e.target.files[0].type !== "image/png" &&
+          e.target.files[0].type !== "image/jpeg" &&
+          e.target.files[0].type !== "image/jpg")
       ) {
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
         if (e.target.files[0].size < 52428800) {
           handleFiles(e.target.files);
         } else {

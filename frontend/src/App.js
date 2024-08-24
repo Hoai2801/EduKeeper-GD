@@ -74,7 +74,6 @@ function App() {
       // Set interval to run every 30 seconds
       const intervalId = setInterval(checkIfBlocked, 30000);
 
-<<<<<<< HEAD
       // Cleanup interval on component unmount
       return () => clearInterval(intervalId);
     }
@@ -120,47 +119,6 @@ function App() {
       </Routes>
     </JWTContext.Provider>
   );
-=======
-            // Cleanup interval on component unmount
-            return () => clearInterval(intervalId);
-        }
-    }, [jwtDecoded]);
-    return (
-        <JWTContext.Provider value={{jwtDecoded, token}}>
-            <Routes>
-                <Route element={<Layout/>}>
-                    <Route path='/' element={<Home/>}/>
-                    <Route path='/upload' element={<Upload/>}/>
-                    <Route path='/edit/:slug' element={<Upload/>}/>
-                    <Route path='/profile/:staff_code' element={<Profile/>}>
-                        <Route path='' element={<UserHome/>}/>
-                        <Route path='document/upload' element={<UserUploadDocument/>}/>
-                        <Route path='document/favorite' element={<UserFavoriteDocument/>}/>
-                        <Route path='information' element={<UserInfor/>}/>
-                    </Route>
-                    <Route path="/document/:slug" element={<Detail/>}/>
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="/register" element={<SignUp/>}/>
-                    <Route path="/account/:action/:token" element={<AccoutAction/>}/>
-                    <Route element={<SideBar/>}>
-                        <Route path="/search" element={<Search />}/>
-                    </Route>
-                </Route>
-                <Route path="/dashboard" element={<Admin/>}>
-                    <Route index path="home" element={<Dashboard/>}/>
-                    <Route path="users" element={<User/>}/>
-                    <Route path="department" element={<Department/>}/>
-                    <Route path="document" element={<Document/>}/>
-                    <Route path="subject" element={<Subject/>}/>
-                    <Route path="banner" element={<BannerManager />}/>
-                    <Route path="deleted" element={<DeletedDocument/>}/>
-                    <Route path="setting" element={<Setting/>}/>
-                    <Route path="backup" element={<Backup/>}/>
-                </Route>
-            </Routes>
-        </JWTContext.Provider>
-    );
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
 }
 
 export default App;
