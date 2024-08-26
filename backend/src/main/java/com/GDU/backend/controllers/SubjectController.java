@@ -26,13 +26,11 @@ public class SubjectController {
 
     @PostMapping
     ResponseEntity<?> createSubject(@RequestBody SubjectDTO subject) {
-        subjectService.createSubject(subject);
-        return ResponseEntity.ok().body("Subject created successfully");
+        return subjectService.createSubject(subject);
     }
     
-    @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteSubject(@PathVariable("id") Long id) {
-        subjectService.deleteSubject(id);
-        return ResponseEntity.ok().body("Subject deleted successfully");
+    @DeleteMapping("/specialized/{id_specialized}/{id_subject}")
+    ResponseEntity<String> removeSubjects(@PathVariable("id_specialized") Long id_specialized, @PathVariable("id_subject") Long id) {
+        return subjectService.deleteSubject(id_specialized, id);
     }
 }

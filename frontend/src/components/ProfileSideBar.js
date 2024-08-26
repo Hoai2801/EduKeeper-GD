@@ -4,6 +4,7 @@ import change from '../assets/change.png'
 
 const ProfileSideBar = ({isTrueLegit, jwt}) => {
     const [documentMenuShow, setDocumentMenuShow] = useState(false);
+    const [documentMobileShow, setDocumentMobileShow] = useState(false);
     const [user, setUser] = useState(null);
 
     const [avatar, setAvatar] = useState(null);
@@ -12,18 +13,18 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
         if (avatar) {
             const formData = new FormData();
             formData.append('avatar', avatar);
-        let isTrue = window.confirm("Bạn có muốn thay đổi ảnh đại diện?");
-        if (isTrue) {
-            fetch("http://localhost:8080/api/v1/users/avatar/" + user.staffCode, {
-                method: "POST",
-                body: formData
-            })
-                .then((res) => res.text())
-                .then((data) => {
-                    console.log(data)
-                    alert(data)
+            let isTrue = window.confirm("Bạn có muốn thay đổi ảnh đại diện?");
+            if (isTrue) {
+                fetch("http://localhost:8080/api/v1/users/avatar/" + user.staffCode, {
+                    method: "POST",
+                    body: formData
                 })
-        }
+                    .then((res) => res.text())
+                    .then((data) => {
+                        console.log(data)
+                        alert(data)
+                    })
+            }
         }
     }, [avatar]);
 
@@ -42,30 +43,77 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
     }
 
     const location = useParams().valueOf("staff_code");
-    if (location.staff_code !== jwt?.staff_code) {
-        fetch('http://localhost:8080/api/v1/users/' + location.staff_code)
-            .then(res => res.json())
-            .then(data => {
-                setUser(data)
-            })
-    }
+    useEffect(() => {
+        if (location.staff_code !== jwt?.staff_code) {
+            fetch('http://localhost:8080/api/v1/users/' + location.staff_code)
+                .then(res => res.json())
+                .then(data => {
+                    setUser(data)
+                })
+        }
+    }, [location]);
 
     return (
         <div
-            className='md:w-fit w-full h-fit p-10 bg-white rounded-lg shadow-lg flex flex-col gap-5 items-center align-middle lg:mx-5'>
-            <div className='justify-center flex flex-col md:flex-row gap-5 w-full mt-5'>
-                <div className='relative flex flex-col items-center'>
-                    <div className='lg:w-[150px] lg:h-[150px] w-[100px] h-[100px] rounded-full overflow-hidden'>
+            className='xl:w-fit w-full h-fit p-10 bg-white rounded-lg shadow-lg flex flex-col gap-5 items-center align-middle lg:mx-5'>
+            <div className='justify-center items-center flex flex-col md:flex-row gap-5 w-full mt-5 relative'>
+                <button className={`border border-gray-500 p-2 rounded-lg w-fit absolute top-0 right-0 lg:hidden z-20`}
+                        onClick={() => {
+                            setDocumentMobileShow(!documentMobileShow)
+                        }}>
+                    ...
+                </button>
+                <div
+                    className={`absolute top-10 right-0 bg-white shadow-lg rounded-lg p-5 z-50 flex flex-col lg:hidden ${documentMobileShow ? "" : "hidden"}`}>
+                    <Link
+                        to={`/profile/${location.staff_code}`}
+                        className='hover:rounded-xl hover:bg-[#C5D6F8] p-5'
+                        onClick={() => setDocumentMobileShow(!documentMobileShow)}
+                    >
+                        Tổng quan
+                    </Link>
+                    <button onClick={() => setDocumentMenuShow(!documentMenuShow)}
+                            className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 text-left'>
+                        Quản lý tài liệu
+                    </button>
+                    <div className={`${documentMenuShow ? "block" : "hidden"} flex flex-col`}>
+                        <Link to="document/upload"
+                              className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10`}
+                              onClick={() => setDocumentMobileShow(!documentMobileShow)}
+                        >
+                            Tài liệu đã đăng</Link>
+                        <Link
+                            to="document/favorite"
+                            className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'
+                            onClick={() => setDocumentMobileShow(!documentMobileShow)}
+                        >
+                            Tài liệu ưu thích
+                        </Link>
+                    </div>
+                    <Link to={"information"}
+                          className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}
+                          onClick={() => setDocumentMobileShow(!documentMobileShow)}
+                    >
+                        Thông tin tài khoản
+                    </Link>
+                    <button onClick={() => out()}
+                            className={`hover:rounded-xl hover:bg-[#C5D6F8] text-left p-5 ${!isTrueLegit ? "hidden" : ""}`}>
+                        Đăng xuất
+                    </button>
+                </div>
+                <div className='flex flex-col items-center justify-center relative w-[160px] mx-auto'>
+                    <div className='lg:w-[150px] lg:h-[150px] w-[150px] h-[150px] rounded-full overflow-hidden'>
                         <img
                             src={user && user?.avatar ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
                             alt="" className='w-full h-full object-cover'/>
-                    </div>
-                    <div className={`${!isTrueLegit && 'hidden'}`}>
-                        <label htmlFor="avatar"
-                               className='absolute lg:bottom-0 lg:right-0 right-[90px] bottom-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
-                            <img src={change} alt="" className='w-5 h-5'/>
-                        </label>
-                        <input id="avatar" type="file" className='hidden' onChange={(e) => setAvatar(e.target.files[0])}/>
+                        <div className={`${!isTrueLegit && 'hidden'} z-50`}>
+                            <label htmlFor="avatar"
+                                   className='absolute lg:bottom-0 lg:right-0 right-[90px] bottom-0 bg-green-300 rounded-lg p-2 cursor-pointer border-white border-4'>
+                                <img src={change} alt="" className='w-5 h-5'/>
+                            </label>
+                            <input id="avatar" type="file" className='hidden'
+                                   onChange={(e) => setAvatar(e.target.files[0])}/>
+                        </div>
                     </div>
                 </div>
                 <div className='flex flex-col items-center mt-5'>
@@ -95,21 +143,19 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 </button>
                 <div className={`${documentMenuShow ? "block" : "hidden"} flex flex-col`}>
                     <Link to="document/upload"
-                          className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10 ${!isTrueLegit ? "hidden" : ""}`}>Tài
-                        liệu đã đăng</Link>
-                    <Link to="document/favorite" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>Tài liệu ưu
-                        thích</Link>
+                          className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10 ${user}`}>
+                        Tài liệu đã đăng
+                    </Link>
+                    <Link to="document/favorite" className='hover:rounded-xl hover:bg-[#C5D6F8] p-5 ml-10'>
+                        Tài liệu ưu thích
+                    </Link>
                 </div>
-                <Link to={"information"} className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
+                <Link to={"information"}
+                      className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>
                     Thông tin tài khoản
                 </Link>
-                {/*<Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>*/}
-                {/*    Thông báo*/}
-                {/*</Link>*/}
-                {/*<Link to="notification"  className={`hover:rounded-xl hover:bg-[#C5D6F8] p-5 ${!isTrueLegit ? "hidden" : ""}`}>*/}
-                {/*    Cài đặt*/}
-                {/*</Link>*/}
-                <button onClick={() => out()} className={`hover:rounded-xl hover:bg-[#C5D6F8] text-left p-5 ${!isTrueLegit ? "hidden" : ""}`}>
+                <button onClick={() => out()}
+                        className={`hover:rounded-xl hover:bg-[#C5D6F8] text-left p-5 ${!isTrueLegit ? "hidden" : ""}`}>
                     Đăng xuất
                 </button>
             </div>

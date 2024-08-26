@@ -9,12 +9,14 @@ import com.GDU.backend.repositories.SubjectSpecializedRepository;
 import com.GDU.backend.services.SpecializedService;
 import com.GDU.backend.services.SubjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -29,7 +31,7 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public void createSubject(SubjectDTO subject) {
+    public ResponseEntity<String> createSubject(SubjectDTO subject) {
         String name = subject.getName();
         Subject newSubject = new Subject();
         newSubject.setSubjectName(name);
@@ -51,39 +53,40 @@ public class SubjectServiceImpl implements SubjectService {
                     .subject(savedSubject)
                     .specialized(specialized)
                     .build();
-            List<SubjectSpecialized> exists = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(subjectSpecialized.getSubject().getId(), subjectSpecialized.getSpecialized().getSpecializedName());
+            SubjectSpecialized exists = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(subjectSpecialized.getSubject().getId(), subjectSpecialized.getSpecialized().getId());
             // have a same subject in database
-            if (!exists.isEmpty()) {
+            if (exists != null) {
                 continue;
             }
             subjectSpecializedRepository.save(subjectSpecialized);
         }
+        return ResponseEntity.ok("Thêm môn học thành công");
     }
 
     @Override
     public List<Subject> getSubjectsBySpecializedId(String specializedId) {
         List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectsBySpecializedId(Long.parseLong(specializedId));
+        List<SubjectSpecialized> subjectsOfAllSpecialized = subjectSpecializedRepository.getSubjectsBySpecializedId(40L);
         List<Subject> subjects = new ArrayList<>();
         for (SubjectSpecialized subjectSpecialized : subjectSpecializeds) {
             subjects.add(subjectSpecialized.getSubject());
+        }
+        for (SubjectSpecialized subjectSpecialized : subjectsOfAllSpecialized) {
+            if (!subjects.contains(subjectSpecialized.getSubject())) {
+                subjects.add(subjectSpecialized.getSubject());
+            }
         }
         return subjects;
     }
 
     @Override
-    public Subject getSubjectById(Long id) {
-        return subjectRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public void deleteSubject(Long id) {
-        Subject subject = getSubjectById(id);
-        if (subject == null) {
-            return;
+    public ResponseEntity<String> deleteSubject(Long id_specialized, Long id_subject) {
+        SubjectSpecialized subjectSpecialized = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(id_specialized, id_subject);
+        if (subjectSpecialized == null) {
+            return ResponseEntity.badRequest().body("Môn học không tìm thấy");
         }
-        List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectSpecializedBySubjectId(subject.getId());
-        subjectSpecializedRepository.deleteAll(subjectSpecializeds);
-        subjectRepository.deleteById(id);
+        subjectSpecializedRepository.delete(subjectSpecialized);
+        return ResponseEntity.ok("Xóa môn học thành công");
     }
 
 }

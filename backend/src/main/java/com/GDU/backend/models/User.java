@@ -23,19 +23,36 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-@NamedNativeQuery(name = "User.getRakingUser", query = "SELECT COUNT(dl.user_id) AS total, u.id AS id, " +
-        "u.user_name AS username, u.staff_code AS staffCode, u.email AS email " +
-        "FROM downloads dl " +
-        "JOIN users u ON u.id = dl.user_id " +
-        "WHERE u.staff_code LIKE 'user' " +
-        "GROUP BY dl.user_id " +
-        "ORDER BY total DESC LIMIT 10", resultSetMapping = "UserRankingMapping")
+@NamedNativeQuery(name = "User.getRakingUser", query = "SELECT u.id as id, u.user_name as userName, u.class as class, u.department as department, u.staff_code as staffCode, u.email as email, "
+        +
+        "COALESCE(dl.total_downloads, 0) AS totalDownloads, " +
+        "COALESCE(v.total_views, 0) AS totalViews " +
+        "FROM users u " +
+        "JOIN role r ON u.role_id = r.id " +
+        "LEFT JOIN ( " +
+        "    SELECT user_id, COUNT(id) AS total_downloads " +
+        "    FROM downloads " +
+        "    GROUP BY user_id " +
+        ") dl ON u.id = dl.user_id " +
+        "LEFT JOIN ( " +
+        "    SELECT user_id, COUNT(id) AS total_views " +
+        "    FROM view_history " +
+        "    GROUP BY user_id " +
+        ") v ON u.id = v.user_id " +
+        "WHERE r.name LIKE 'ROLE_USER' " +
+        "GROUP BY u.id, u.user_name, u.class, u.department, u.staff_code, u.email " +
+        "ORDER BY total_downloads DESC, total_views DESC " +
+        "LIMIT 10", resultSetMapping = "UserRankingMapping")
+
 @SqlResultSetMapping(name = "UserRankingMapping", classes = @ConstructorResult(targetClass = com.GDU.backend.dtos.responses.UserRakingResI.class, columns = {
-        @ColumnResult(name = "total", type = Integer.class),
+        @ColumnResult(name = "totalDownloads", type = Integer.class),
+        @ColumnResult(name = "totalViews", type = Integer.class),
         @ColumnResult(name = "id", type = Long.class),
         @ColumnResult(name = "staffCode", type = String.class),
-        @ColumnResult(name = "username", type = String.class),
-        @ColumnResult(name = "email", type = String.class)
+        @ColumnResult(name = "userName", type = String.class),
+        @ColumnResult(name = "email", type = String.class),
+        @ColumnResult(name = "class", type = String.class),
+        @ColumnResult(name = "department", type = String.class),
 }))
 @EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails, Principal {
@@ -60,23 +77,23 @@ public class User implements UserDetails, Principal {
 
     @Column(name = "account_locked")
     private boolean accountLocked;
-    
+
     @ManyToOne
     @JoinColumn(name = "department")
     private Department department;
-    
+
     @ManyToOne
     @JoinColumn(name = "specialized")
     private Specialized specialized;
-    
+
     @Column(name = "class")
     private String klass;
-    
+
     @Column(name = "date_of_birth")
     private LocalDateTime birthDay;
 
     private boolean enable;
-    
+
     private String avatar;
 
     @CreatedDate

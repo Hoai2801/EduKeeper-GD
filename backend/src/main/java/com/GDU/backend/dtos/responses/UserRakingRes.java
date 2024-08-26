@@ -1,7 +1,9 @@
 package com.GDU.backend.dtos.responses;
 
 public interface UserRakingRes {
-    int getTotal();
+    int getTotalDownloads();
+
+    int getTotalViews();
 
     UserRes getUser();
 }

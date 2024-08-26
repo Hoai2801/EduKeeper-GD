@@ -1,16 +1,18 @@
 import React, {useState} from 'react';
 import {Link} from "react-router-dom";
+import InputStaffCode from "../components/toast/InputStaffCode";
 
 const Login = () => {
     const [staffCode, setStaffCode] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
 
+    const [isInputStaffCodeOpen, setIsInputStaffCodeOpen] = useState(false);
+
     const [error, setError] = useState('');
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        // Handle form submission here
         fetch('http://localhost:8080/api/v1/auth/login', {
             method: 'POST',
             headers: {
@@ -23,18 +25,15 @@ const Login = () => {
         })
             .then(response => {
                 if (!response.ok) {
-                    response.text().then(r => {
-                        if (r) setError("Sai mật khẩu")
-                    })
+                    setError("Sai mật khẩu")
                 } else {
                     response.json()
                         .then(data => {
-                                console.log(data)
-                        if (data.token !== undefined) {
-                            localStorage.setItem("token", data.token);
-                            window.location.href = "/";
-                        }
-                    });
+                            if (data.token !== undefined) {
+                                localStorage.setItem("token", data.token);
+                                window.location.href = "/";
+                            }
+                        });
                 }
             })
             .catch(error => {
@@ -45,16 +44,9 @@ const Login = () => {
 
     const forgotPassword = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
-        if (window.confirm("Bạn muốn gửi email xác nhận đặt lại mật khẩu?") == true) {
+        if (window.confirm("Bạn muốn gửi email xác nhận đặt lại mật khẩu?") === true) {
             // User clicked OK
-            fetch('http://localhost:8080/api/v1/auth/forgot-password/' + staffCode, {
-                method: 'POST',
-            })
-                .then((data) => {
-                    if (data.status === 200) {
-                        alert("Email xác nhận đã được gửi đến email của bạn")
-                    }
-                })
+            setIsInputStaffCodeOpen(true)
         }
     }
 
@@ -65,7 +57,9 @@ const Login = () => {
                     Đăng nhập
                 </h2>
             </div>
-
+            <div className={`${isInputStaffCodeOpen ? '' : 'hidden'}`}>
+                <InputStaffCode setIsInputStaffCodeOpen={setIsInputStaffCodeOpen}/>
+            </div>
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
                     <form className="space-y-5" onSubmit={handleSubmit}>

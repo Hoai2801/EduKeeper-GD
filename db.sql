@@ -4,11 +4,13 @@ use documentDB;
 DROP TABLE IF EXISTS `department`;
 
 -- dùng để lưu thông tin khoa của tài liệu (ví dụ: khoa công nghệ thông tin, khoa kinh tế, khoa marketing...)
-CREATE TABLE `department` (
-                              `id` int NOT NULL AUTO_INCREMENT,
-                              `department_name` varchar(100) NOT NULL,
-                              `department_slug` varchar(100) not null,
-                              PRIMARY KEY (`id`)
+create table department
+(
+    id              int auto_increment
+        primary key,
+    department_name varchar(100)         not null,
+    department_slug varchar(100)         not null,
+    is_locked       tinyint(1) default 0 null
 );
 
 INSERT INTO `department` (`department_name`, `department_slug`)
@@ -36,14 +38,16 @@ VALUES
 DROP TABLE IF EXISTS `specialized`;
 
 -- Chuyên ngành
-CREATE TABLE `specialized` (
-                               id int not null auto_increment,
-                               `specialized_name` varchar(50) not null,
-                               `specialized_slug` varchar(100) not null,
-                               `department_id` int not null,
-                               PRIMARY KEY (`id`),
-                               KEY `department_id` (`department_id`),
-                               CONSTRAINT `specialized_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`)
+create table specialized
+(
+    id               int auto_increment
+        primary key,
+    specialized_name varchar(50)          not null,
+    specialized_slug varchar(100)         not null,
+    department_id    int                  not null,
+    is_locked        tinyint(1) default 0 null,
+    constraint specialized_ibfk_1
+        foreign key (department_id) references department (id)
 );
 
 INSERT INTO `specialized` (`specialized_name`, `specialized_slug`, `department_id`)
@@ -110,10 +114,12 @@ create table `role` (
     `name` varchar(100) not null
 );
 
+insert into role(id, name) values (1, 'ROLE_ADMIN'), (2, 'ROLE_TEACHER'), (3, 'ROLE_USER');
+
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-                         `id` int NOT NULL AUTO_INCREMENT,
+                         `id` BIGINT NOT NULL AUTO_INCREMENT,
                          `user_name` varchar(200) NOT NULL,
                          `password` varchar(200) NOT NULL,
                          `role_id` tinyint NOT NULL,
@@ -127,13 +133,20 @@ CREATE TABLE `users` (
                          `created_date` datetime,
                          `avatar` varchar(200),
                          `last_modified_date` datetime,
-						`staff_code` varchar(20) not null,
+			 `staff_code` varchar(20) not null,
                          PRIMARY KEY (`id`),
                          KEY `role_id` (`role_id`),
                          CONSTRAINT `role_fk` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`),
                          CONSTRAINT `dpm_fk` FOREIGN KEY (`department`) REFERENCES `department` (`id`),
                          CONSTRAINT `spec_fk` FOREIGN KEY (`specialized`) REFERENCES `specialized` (`id`)
 );
+
+
+INSERT INTO users (id, user_name, password, role_id, account_locked, enable, email, department, specialized, date_of_birth, class, created_date, avatar, last_modified_date, staff_code) VALUES (1, 'Thac sĩ Hoài', '$2a$10$xXWuWl2TUQMeqyzOSn2fouG1yAUYxc7Zw2a1Lwx.w/bX0Gu6skSr2', 1, 0, 1, 'hackhoai@gmail.com', 1, 1, null, '123', '2024-07-04 15:18:50', null, '2024-08-22 13:26:01', '22140044');
+INSERT INTO users (id, user_name, password, role_id, account_locked, enable, email, department, specialized, date_of_birth, class, created_date, avatar, last_modified_date, staff_code) VALUES (2, 'Thạc sĩ Nguyễn Văn A', '$2a$10$xXWuWl2TUQMeqyzOSn2fouG1yAUYxc7Zw2a1Lwx.w/bX0Gu6skSr2', 2, 0, 1, 'a@gmail.com', null, null, null, null, '2024-07-09 10:08:32', null, '2024-07-21 18:25:39', '22140033');
+INSERT INTO users (id, user_name, password, role_id, account_locked, enable, email, department, specialized, date_of_birth, class, created_date, avatar, last_modified_date, staff_code) VALUES (23, 'user', '$2a$10$HBRRzBxDqoB2DDDGS72OFuPsb99nhXFxV6i4/mVxMZyUm.JR6nG92', 3, 0, 1, 'c@gmail.com', null, null, null, null, '2024-08-22 09:58:54', null, null, '22140066');
+
+
 
 -- INSERT INTO users(user_name, department_id, password, role) value('hoai', 1, 'password', 'ADMIN'); 
 
@@ -157,44 +170,48 @@ VALUES
 
 DROP TABLE IF EXISTS `document`;
 
--- dùng để lưu thông tin của tài liệu 
-CREATE TABLE `document` (
-                            `id` int NOT NULL AUTO_INCREMENT,
-                            `title` varchar(200) NOT NULL,
-                            `slug` varchar(300) NOT NULL,
-                            `document_type` varchar(30) NOT NULL,
-                            `document_size` smallint NOT NULL,
-                            `pages` smallint not null,
-                            `upload_date` date NOT NULL,
-                            `status` ENUM('draft', 'published') not null DEFAULT 'draft',
-                            `scope` ENUM('public', 'student-only', 'private') not null DEFAULT 'public',
-			    -- chứa đường dẫn đến nơi lưu file
-                            `path` varchar(500) NOT NULL,
-                            `description` varchar(2000) NOT NULL,
-                            `specialized_id` int not null,
-                            `category_id` int DEFAULT NULL,
-                            `subject_id` int DEFAULT NULL,
-                            `thumbnail` varchar(200),
-                            `author` varchar(100) NOT NULL,
-                            `user_upload` int not null,
-                            `is_delete` boolean default false,
-                            `deleted_at` datetime,
-                            PRIMARY KEY (`id`),
-                            KEY `document_ibfk_2` (`category_id`),
-                            KEY `document_ibfk_4` (`author`),
-                            constraint document_specialized_id_fk foreign key (specialized_id) references specialized (id),
-                            CONSTRAINT `document_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
-                            CONSTRAINT `document_ibfk_1` FOREIGN KEY (`user_upload`) REFERENCES `users` (`id`),
-                            CONSTRAINT `document_ibfk_3` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`)
+CREATE TABLE document
+(
+    id             BIGINT AUTO_INCREMENT NOT NULL,
+    title          VARCHAR(200)          NOT NULL,
+    slug           VARCHAR(300)          NOT NULL,
+    document_type	  VARCHAR(30)           NOT NULL,
+    document_size  BIGINT                NOT NULL,
+    pages          INT                   NOT NULL,
+    `description`  VARCHAR(255)          NULL,
+    upload_date    date                  NOT NULL,
+    file           VARCHAR(500)          NOT NULL,
+    is_delete      boolean                NOT NULL,
+    category_id    TINYINT               NULL,
+    user_upload    BIGINT                NOT NULL,
+    author         VARCHAR(255)          NULL,
+    deleted_at     datetime              NULL,
+    scope          VARCHAR(255)          NULL,
+    status         VARCHAR(255)          NULL,
+    subject_id     BIGINT                NULL,
+    specialized_id BIGINT                NULL,
+    CONSTRAINT pk_document PRIMARY KEY (id)
 );
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_CATEGORY FOREIGN KEY (category_id) REFERENCES category (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_SPECIALIZED FOREIGN KEY (specialized_id) REFERENCES specialized (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_SUBJECT FOREIGN KEY (subject_id) REFERENCES subject (id);
+
+ALTER TABLE document
+    ADD CONSTRAINT FK_DOCUMENT_ON_USER_UPLOAD FOREIGN KEY (user_upload) REFERENCES users (id);
 
 DROP TABLE IF EXISTS `favorite`;
 
 -- dùng để lưu thông tin các tài liệu mà người dùng ưu thích, muốn đọc lại, tham khảo nhiều lần
 CREATE TABLE `favorite` (
                             `id` int NOT NULL AUTO_INCREMENT,
-                            `user_id` int NOT NULL,
-                            `document_id` int NOT NULL,
+                            `user_id` BIGINT NOT NULL,
+                            `document_id` BIGINT NOT NULL,
                             PRIMARY KEY (`id`),
                             KEY `user_id` (`user_id`),
                             KEY `document_id` (`document_id`),
@@ -215,18 +232,18 @@ CREATE TABLE token (
 
 create table view_history (
 	id int auto_increment primary key,
-	user_id int not null,
-	document_id int not null,
+	user_id BIGINT not null,
+	document_id BIGINT not null,
     created_at datetime not null,
     is_lastest boolean default true not null,
 	constraint `vh_fk_u` FOREIGN key (`user_id`) REFERENCES `users` (`id`),
-	CONSTRAINT `vh_fk_d` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
+	CONSTRAINT `vh_fk_do` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
 );
 
 CREATE TABLE `downloads` (
                             `id` int NOT NULL AUTO_INCREMENT,
-                            `user_id` int NOT NULL,
-                            `document_id` int NOT NULL,
+                            `user_id` BIGINT NOT NULL,
+                            `document_id` BIGINT NOT NULL,
                             PRIMARY KEY (`id`),
                             KEY `user_id` (`user_id`),
                             KEY `document_id` (`document_id`),
@@ -234,17 +251,27 @@ CREATE TABLE `downloads` (
                             CONSTRAINT `dl_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
 );
 
-CREATE TABLE notification(
-	id int not null auto_increment primary key,
-    sender int not null,
-    receiver int not null,
-    title varchar(50) not null,
-    content varchar(100) not null,
-    is_check boolean default false,
-    created_at datetime not null,
-    constraint `sd_fk_us` foreign key(sender) references users(id),
-    constraint `rcv_fk_us` foreign key(receiver) references users(id)
+CREATE TABLE notification
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    sender        BIGINT                NULL,
+    receiver      BIGINT                NULL,
+    title         VARCHAR(255)          NULL,
+    content       VARCHAR(255)          NULL,
+    is_check      BIT(1)                NOT NULL,
+    document_slug BIGINT                NULL,
+    created_at    datetime              NULL,
+    CONSTRAINT pk_notification PRIMARY KEY (id)
 );
+
+ALTER TABLE notification
+    ADD CONSTRAINT FK_NOTIFICATION_ON_DOCUMENT_SLUG FOREIGN KEY (document_slug) REFERENCES document (id);
+
+ALTER TABLE notification
+    ADD CONSTRAINT FK_NOTIFICATION_ON_RECEIVER FOREIGN KEY (receiver) REFERENCES users (id);
+
+ALTER TABLE notification
+    ADD CONSTRAINT FK_NOTIFICATION_ON_SENDER FOREIGN KEY (sender) REFERENCES users (id);
 
 create table banner(
 	id int not null auto_increment primary key,
@@ -264,6 +291,24 @@ create table comment(
       constraint `cmt_fk_dcm` foreign key(document_id) references document(id)
 );
 
+CREATE TABLE sub_comment
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    content       VARCHAR(255)          NULL,
+    created_date  datetime              NULL,
+    user_upload   VARCHAR(255)          NULL,
+    comment_id_id BIGINT                NULL,
+    CONSTRAINT pk_sub_comment PRIMARY KEY (id)
+);
+
+ALTER TABLE sub_comment
+    ADD CONSTRAINT FK_SUB_COMMENT_ON_COMMENTID FOREIGN KEY (comment_id_id) REFERENCES comment (id);
+
+create table setting(
+	id int not null auto_increment primary key,
+	name varchar(50) not null,
+    value varchar(50) not null
+);
 
 -- Performance
 -- create index idx_slug on document (slug);

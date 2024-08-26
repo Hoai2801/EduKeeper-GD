@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 
 import SubjectItems from "../components/SubjectItems";
 import toast from "react-hot-toast";
 import "./Department.css";
-import {jwtDecode} from "jwt-decode";
+import {JWTContext} from "../App";
 
 const Subject = () => {
     const [subject, setSubject] = useState(null);
@@ -14,7 +14,8 @@ const Subject = () => {
     const [isShowSpecializes, setIsShowSpecialized] = useState(false);
     const [listSpeciaziles, setListSpeciaziles] = useState([]);
 
-    const [jwt, setJwt] = useState(null);
+    const context = useContext(JWTContext);
+    const jwt = context?.token;
     const handleToggleDetails = (id) => {
         setActiveSpecializedtId((prevId) => (prevId === id ? null : id));
     };
@@ -30,93 +31,83 @@ const Subject = () => {
             toast.error("Bạn đang để trống danh sách chuyên ngành !");
         } else {
             try {
-                fetch('http://localhost:8080/api/v1/subjects', {
-                    method: 'POST',
+                fetch("http://localhost:8080/api/v1/subjects", {
+                    method: "POST",
                     // credentials: 'include',
                     // Authorization: 'Bearer ' + jwt,
                     headers: {
-                        'Content-Type': 'application/json',
-                        'authorization': 'Bearer ' + jwt
+                        "Content-Type": "application/json",
+                        authorization: "Bearer " + jwt,
                     },
                     body: JSON.stringify({
                         name: subject,
-                        specializedIds: listSpeciaziles.map(specialized => specialized.id)
+                        specializedIds: listSpeciaziles.map(
+                            (specialized) => specialized.id
+                        ),
                     }),
-                }).then((res) => res.text())
-                    .then((data) => {
-                        console.log(data)
-                        if (data === "Subject created successfully") {
-                            toast.success(
-                                "Thêm môn học thành công"
-                            );
-                        } else {
-                            toast.error(
-                                "Lỗi hệ thống!, vui là thực hiện lại!"
-                            );
-                        }
-                    }).catch(e => {
-                    toast.error(e);
                 })
+                    .then((res) => {
+                        if (res.status === 200) {
+                            return res.text().then((data) => {
+                                toast.success("Thêm môn học thành công");
+                                setIsShowPostSpecialized(false)
+                            });
+                        } else
+                            toast.error("Lỗi hệ thống!, vui là thực hiện lại!");
+                    })
+                    .catch((e) => {
+                        toast.error(e);
+                    });
             } catch (error) {
                 toast.error(error);
-
             }
-            ;
-            const handleConfirm = () => {
-                toast.custom((t) => (
-                    <div
-                        className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5">
-                        <div className="flex-1 w-0 p-4">
-                            <div className="flex items-start">
-                                <div className="ml-3 flex-1">
-                                    <p className="text-sm font-medium text-gray-900">
-                                        Tạo môn học mới
-                                    </p>
-                                    <p className="mt-1 text-sm text-gray-500">
-                                        Bạn có chắc muốn tạo mới môn học này không
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex border-l border-gray-300">
-                            <button
-                                onClick={async () => {
-                                    toast.remove(t.id);
-                                    // await createSubject();
-                                }}
-                                className="w-full border border-transparent rounded-none rounded-r-lg p-2 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            >
-                                Đồng ý
-                            </button>
-                        </div>
-                        <div className="flex border-l border-gray-300">
-                            <button
-                                onClick={() => toast.remove(t.id)}
-                                className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            >
-                                Hủy
-                            </button>
-                        </div>
-                    </div>
-                ));
-            };
-
-            handleConfirm();
-
-            setSpecialized("");
+            // const handleConfirm = () => {
+            //     toast.custom((t) => (
+            //         <div
+            //             className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5">
+            //             <div className="flex-1 w-0 p-4">
+            //                 <div className="flex items-start">
+            //                     <div className="ml-3 flex-1">
+            //                         <p className="text-sm font-medium text-gray-900">
+            //                             Tạo môn học mới
+            //                         </p>
+            //                         <p className="mt-1 text-sm text-gray-500">
+            //                             Bạn có chắc muốn tạo mới môn học này không
+            //                         </p>
+            //                     </div>
+            //                 </div>
+            //             </div>
+            //             <div className="flex border-l border-gray-300">
+            //                 <button
+            //                     onClick={async () => {
+            //                         toast.remove(t.id);
+            //                         // await createSubject();
+            //                     }}
+            //                     className="w-full border border-transparent rounded-none rounded-r-lg p-2 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            //                 >
+            //                     Đồng ý
+            //                 </button>
+            //             </div>
+            //             <div className="flex border-l border-gray-300">
+            //                 <button
+            //                     onClick={() => toast.remove(t.id)}
+            //                     className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            //                 >
+            //                     Hủy
+            //                 </button>
+            //             </div>
+            //         </div>
+            //     ));
+            // };
+            // setSpecialized("");
+            fetchSpecialized()
         }
     };
 
     const handleAddSpecialized = (spe) => {
         const isCheck = listSpeciaziles.find((item) => item.id === spe.id)
             ? true
-            : false;
-        // the "All subject" option is selected
-        if (spe.id === 40) {
-            setListSpeciaziles(specialized.map((item) => {
-                return { id: item.id, name: item.specializedName };
-            }));
-        }
+            : false || listSpeciaziles.find((item) => item.id === 40);
         if (isCheck) {
             toast.error("Chuyên ngành này đã được thêm vào danh sách trên.");
         } else {
@@ -127,7 +118,7 @@ const Subject = () => {
 
     const handleRemoveSpecialized = async (spe) => {
         const specializedId = spe.id;
-        const listIds = listSpeciaziles.filter((item) => item.id != specializedId);
+        const listIds = listSpeciaziles.filter((item) => item.id !== specializedId);
         setListSpeciaziles(listIds);
     };
 
@@ -137,7 +128,7 @@ const Subject = () => {
         setSubject("");
     };
 
-    useEffect(() => {
+    const fetchSpecialized = () => {
         fetch("http://localhost:8080/api/v1/specializes")
             .then((res) => res.json())
             .then((data) => {
@@ -148,41 +139,64 @@ const Subject = () => {
                 };
                 setSelectSpecializes(objectFake);
             });
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            setJwt(token);
-        }
-    }, [listSpeciaziles]);
+    };
+
+    useEffect(() => {
+        fetchSpecialized();
+    }, []);
 
     return (
         <div>
-            <div className="flex justify-end">
-                <button
-                    onClick={() => handleClickCreateSpecialized()}
-                    className="px-4 py-2 rounded-lg border-solid	bg-blue-500 text-white text-sm font-medium"
-                    type="submit"
-                >
-                    <span>Thêm môn học</span>
-                </button>
+            <div className="flex xl:flex-row md:flex-row flex-col justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold mt-5">Danh sách khoa</h1>
+                    <div>
+                        <p className={`text-red-500`}>Lưu ý: </p>
+                        <p>- Các môn học thuộc ngành là các môn học chuyên ngành</p>
+                        <p>
+                            - Các môn học mà ngành nào cũng có như Triết học, tư tưởng... sẽ
+                            thuộc Tất cả
+                        </p>
+                    </div>
+                </div>
+                <div className="flex justify-end">
+                    <button
+                        onClick={() => handleClickCreateSpecialized()}
+                        className="xl:p-6 md:p-6 max-w-fit p-4  rounded-lg bg-blue-500 text-white mt-5 font-semibold hover:shadow-lg h-fit"
+                        type="submit"
+                    >
+                        <span>Thêm môn học</span>
+                    </button>
+                </div>
             </div>
 
             {specialized &&
                 specialized.map((spe) => (
                     <div key={spe.id}>
-                        <div className="flex justify-between w-full border shadow-lg rounded-xl border-black p-4 mt-5">
-                            <h1 className="text-2xl">{spe.specializedName}</h1>
+                        <div
+                            className="flex justify-between items-center w-full border shadow-lg rounded-xl border-black p-4 mt-5">
+                            <h1 className="xl:text-2xl md:text-xl sm:text-xl text-xl xl:w-[50%] md:w-1/2 sm:w-1/2 w-2/5">
+                                {spe.specializedName}
+                            </h1>
+                            <p>
+                                {spe.locked ? (
+                                    <span className={`text-red-600`}>Đã khóa</span>
+                                ) : (
+                                    "Hoạt động"
+                                )}
+                            </p>
                             <div className=" flex items-end">
-                                <a
+                                <button
                                     onClick={() => handleToggleDetails(spe.id)}
                                     class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
                                 >
                                     Chi tiết
-                                </a>
+                                </button>
                             </div>
                         </div>
                         {activeSpecializedId && (
                             <SubjectItems
-                                isActive={activeSpecializedId == spe.id}
+                                isActive={activeSpecializedId === spe.id}
                                 dep={spe}
                             />
                         )}
@@ -218,31 +232,30 @@ const Subject = () => {
                                     <div>
                                         <label
                                             htmlFor="specialized"
-                                            className="block mb-2 text-sm font-semibold text-gray-900"
+                                            className="block mb-2 text-sm font-semibold text-gray-900 mt-5"
                                         >
                                             Thuộc ngành
                                         </label>
                                         <div className="max-h-40 overflow-auto">
                                             {isShowSpecializes &&
                                                 listSpeciaziles.map((spe, index) => {
-                                                    console.log(spe);
                                                     return (
-                                                        <li className={`flex flex-row justify-between ${spe.id === 40 ? "hidden" : ""}`}>
-                                                            <a className="text-gray-500 font-medium">
+                                                        <li className={`flex flex-row justify-between`}>
+                                                            <p className="text-gray-500 font-medium">
                                                                 {index + 1}
                                                                 {". "}{" "}
-                                                                <a className="" key={index}>
+                                                                <p className="" key={index}>
                                                                     {spe.name}
-                                                                </a>
-                                                            </a>
-                                                            <a
+                                                                </p>
+                                                            </p>
+                                                            <button
                                                                 onClick={() => {
                                                                     handleRemoveSpecialized(spe);
                                                                 }}
                                                                 className="text-blue-500 font-medium hover:cursor-pointer hover:underline"
                                                             >
                                                                 Xóa
-                                                            </a>
+                                                            </button>
                                                         </li>
                                                     );
                                                 })}

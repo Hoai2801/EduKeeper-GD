@@ -39,12 +39,12 @@ public class UserController {
     
     @PutMapping("/block/{staffCode}")
     public ResponseEntity<String> blockUser(@PathVariable("staffCode") String staffCode) {
-        return ResponseEntity.ok(userService.blockUser(staffCode));
+        return userService.blockUser(staffCode);
     }
     
     @PutMapping("/unblock/{staffCode}")
     public ResponseEntity<String> unblockUser(@PathVariable("staffCode") String staffCode) {
-        return ResponseEntity.ok(userService.unblockUser(staffCode));
+        return userService.unblockUser(staffCode);
     }
     
     @GetMapping("/is-blocked/{staffCode}")
@@ -93,5 +93,12 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+    
+    @PutMapping("/reset-password/{staffCode}")
+    public ResponseEntity<?> resetPassword(
+            @PathVariable("staffCode") String staffCode
+    ) {
+        return userService.resetPassword(staffCode);
     }
 }

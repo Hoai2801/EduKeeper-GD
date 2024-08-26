@@ -5,14 +5,15 @@ import com.GDU.backend.dtos.requests.RecommendationRequestDTO;
 import com.GDU.backend.dtos.requests.UploadRequestDTO;
 import com.GDU.backend.dtos.responses.*;
 import com.GDU.backend.models.Document;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface DocumentService {
-    String uploadDocument(UploadRequestDTO uploadRequestDto) throws IOException;
+    ResponseEntity<String> uploadDocument(UploadRequestDTO uploadRequestDto) throws IOException;
 
-    String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO);
+    String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) throws IOException;
 
     DocumentResponseDTO getDocumentBySlug(String slug);
 
@@ -37,7 +38,7 @@ public interface DocumentService {
     int getTotalDownloadsByAuthor(Long authorId);
 
     int getDocumentsCountByAuthor(String authorId);
-    
+
     int countDocumentsToday();
 
     int countPublishedDocuments();
@@ -54,20 +55,18 @@ public interface DocumentService {
 
     List<Monthly> countDocumentsMonthly(int year);
 
-
     List<TypeRes> countDocumentsByType(int year);
 
-    List<DocumentResponseDTO> getTop3Documents();
+    List<DocumentResponseDTO> getTop10Documents();
 
     List<DocumentResponseDTO> getPaginationDocs(int page);
 
     Document getDocumentById(Long documentId);
 
-    List<Document> findDocumentsWithMostDownloads(int limit);
-
+    List<Document> getTop10DocumentsWithMostDownloadsByDepartment(int departmentId);
 
     List<DocumentResponseDTO> getDeletedDocument();
-    
+
     boolean deleteDocumentById(Long id);
 
     String recoveryDocument(List<Long> ids) throws IOException;

@@ -21,4 +21,4 @@ spring:
         expiration: 15768000000 # 6 months
     mailing:
       frontend:
-        activation-url: http://localhost:3000/account/activate
+        activation-url: http:/103.241.43.206/account/activate

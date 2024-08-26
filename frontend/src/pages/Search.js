@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react'
-import {useParams, useSearchParams} from 'react-router-dom'
+import {useSearchParams} from 'react-router-dom'
 import DocumentCard from '../components/DocumentCard'
 
 const Search = ({jwt}) => {
     const url = window.location.href;
-    const [searchParams, setSearchParams] = useSearchParams();
+    const searchParams = useSearchParams();
 
     // lasted, most download or most views
     const order = searchParams.get('order');
@@ -16,7 +16,7 @@ const Search = ({jwt}) => {
 
     const [documents, setDocument] = useState([])
 
-    const search = localStorage.getItem('search') || '';
+    const [search] = localStorage.getItem('search') || '';
 
     useEffect(() => {
         const dataSearch = {
@@ -30,7 +30,6 @@ const Search = ({jwt}) => {
         };
 
         const api = "http://localhost:8080/api/v1/documents/filter"
-        console.log(dataSearch)
         fetch(api, {
             method: 'POST',
             headers: {
@@ -38,17 +37,23 @@ const Search = ({jwt}) => {
             },
             body: JSON.stringify(dataSearch),
         })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data)
-                if (data) {
-                    setDocument(data)
-                    setTimeout(() => {
-                        localStorage.removeItem('search')
-                    }, 3000)
+            .then((res) => {
+                if (!res.ok) {
+                    setDocument([])
                 }
-            });
-    }, [url, order, slugSpecialized, slugSubject, publishYear, category])
+                return res.json()
+                    .then((data) => {
+                        if (data) {
+                            console.log(data)
+                            setDocument(data)
+                            setTimeout(() => {
+                                localStorage.removeItem('search')
+                            }, 3000)
+                        }
+                    });
+            })
+
+    }, [url, order, slugSpecialized, slugSubject, publishYear, category, search, slugDepartment])
 
     const [limit, setLimit] = useState(20)
 
@@ -59,9 +64,7 @@ const Search = ({jwt}) => {
                 {documents && documents.map((item, index) => {
                         if (index < limit) {
                             return (
-                                <div className={`${jwt ? '' : 'hidden'}`}>
-                                    <DocumentCard key={index} document={item}/>
-                                </div>
+                                <DocumentCard key={index} document={item}/>
                             )
                         }
                     }

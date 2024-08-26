@@ -10,9 +10,11 @@ import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +28,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
-    // private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final SpecializedRepository specializedRepository;
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public void changePassword(User user, String newPassword) {
-        // user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 
@@ -131,14 +133,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public String blockUser(String staffCode) {
+    public ResponseEntity<String> blockUser(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
             user.setAccountLocked(true);
             userRepository.save(user);
-            return "Đã khoá người dùng!";
+            return ResponseEntity.ok("Đã khoá người dùng!");
         }
-        return "Lỗi hệ thống, hiện tại không thể thực hiện thao tác!";
+        return ResponseEntity.badRequest().body("Lỗi hệ thống, hiện tại không thể thực hiện thao tác này");
     }
 
     @Override
@@ -151,14 +153,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public String unblockUser(String staffCode) {
+    public ResponseEntity<String> unblockUser(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
             user.setAccountLocked(false);
             userRepository.save(user);
-            return "Đã mở khoá người dùng!";
+            return ResponseEntity.ok("Đã mở khoá người dùng!");
         }
-        return "Lỗi hệ thống, hiện tại không thể thực hiện thao tác!";
+        return ResponseEntity.badRequest().body("Lỗi hệ thống, hiện tại không thể thực hiện thao tác không");
+    }
+
+    @Override
+    public ResponseEntity<?> resetPassword(String staffCode) {
+        User user = getUserByStaffCode(staffCode);
+        if (user != null) {
+            String newPassword = "GDU13456";
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return ResponseEntity.ok(newPassword);
+        }
+        return null;
     }
 
     @Override
@@ -200,8 +214,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setSpecialized(specialized);
         }
         var role = roleRepository.findByName(userDetailDTO.getRole()).orElseThrow(
-                () -> new UsernameNotFoundException("Role not found")
-        );
+                () -> new UsernameNotFoundException("Role not found"));
         user.setRoles(role);
         user.setUsername(userDetailDTO.getUsername());
         user.setKlass(userDetailDTO.getKlass());

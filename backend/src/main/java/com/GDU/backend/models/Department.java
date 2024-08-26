@@ -25,4 +25,7 @@ public class Department {
 
     @Column(name = "department_slug", nullable = false, length = 100)
     private String departmentSlug;
+    
+    @Column(name = "is_locked")
+    private boolean isLocked;
 }

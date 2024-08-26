@@ -24,4 +24,13 @@ public class Download {
     @ManyToOne
     @JoinColumn(name = "document_id", nullable = false)
     private Document document;
+
+    @Override
+    public String toString() {
+        return "Download{" +
+                "id=" + id +
+                ", user=" + (user != null ? user.getId() : null) +
+                ", document=" + (document != null ? document.getId() : null) +
+                '}';
+    }
 }

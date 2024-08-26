@@ -2,7 +2,6 @@ package com.GDU.backend.services;
 
 import com.GDU.backend.dtos.requests.FavoriteDTO;
 import com.GDU.backend.dtos.responses.DocumentResponseDTO;
-import com.GDU.backend.models.Favorite;
 
 import java.util.List;
 

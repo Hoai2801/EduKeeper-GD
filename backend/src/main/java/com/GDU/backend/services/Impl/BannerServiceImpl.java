@@ -5,6 +5,7 @@ import com.GDU.backend.models.Banner;
 import com.GDU.backend.repositories.BannerRepository;
 import com.GDU.backend.services.BannerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,7 @@ public class BannerServiceImpl implements BannerService {
     private final BannerRepository bannerRepository;
     
     @Override
-    public String createBanner(BannerDTO banner) {
+    public ResponseEntity<String> createBanner(BannerDTO banner) {
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + banner.getBanner().getOriginalFilename();
         File destFile = new File("src/main/resources/static/banner/" + fileName);
@@ -33,6 +34,7 @@ public class BannerServiceImpl implements BannerService {
             Files.copy(banner.getBanner().getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             e.printStackTrace();
+            return ResponseEntity.badRequest().body("Tạo banner thất bại");
         }
         Banner newBanner = Banner.builder()
                 .image(fileName)
@@ -40,7 +42,7 @@ public class BannerServiceImpl implements BannerService {
                 .enable(banner.isEnable())
                 .build();
         bannerRepository.save(newBanner);
-        return "success";
+        return ResponseEntity.ok("Tạo banner mới thành công!");
     }
 
     @Override
@@ -54,55 +56,38 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
-    public String activeBanner(Long id) {
+    public ResponseEntity<String> activeBanner(Long id) {
         Banner existBanner = bannerRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Banner not found"));
+                () -> new RuntimeException("Banner not found")
+        );
         existBanner.setEnable(!existBanner.isEnable());
         bannerRepository.save(existBanner);
-        return "Cập nhật banner thành công";
+        return ResponseEntity.ok("Cập nhật banner thành công");
     }
 
     @Override
-    public String deleteBanner(Long id) {
+    public ResponseEntity<String> deleteBanner(Long id) {
         Banner existBanner = bannerRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Banner not found"));
         File oldFile = new File("src/main/resources/static/banner/" + existBanner.getImage());
         if (oldFile.exists()) {
             System.out.println("Delete file: " + oldFile.getName());
-            oldFile.delete();
+            boolean result = oldFile.delete();
+            if (!result) {
+                return ResponseEntity.badRequest().body("Xóa banner thất bại");
+            }
         }
         bannerRepository.delete(existBanner);
-        return "success";
+        return ResponseEntity.ok("Xóa banner thành công");
     }
 
     @Override
-    public String updateBanner(Long id, BannerDTO bannerDTO) {
+    public ResponseEntity<String> updateBanner(Long id, BannerDTO bannerDTO) {
         Banner existBanner = bannerRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Banner not found"));
-        if (bannerDTO.getBanner() != null) {
-            // generate file name and path
-            String fileName = System.currentTimeMillis() + "_" + bannerDTO.getBanner().getOriginalFilename();
-            File destFile = new File("src/main/resources/static/banner/" + fileName);
-            
-            // save file
-            try {
-                Path uploadDir = Paths.get("src/main/resources/static/banner/");
-                Files.createDirectories(uploadDir);
-                Files.copy(bannerDTO.getBanner().getInputStream(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            // delete old file
-            
-            File oldFile = new File("src/main/resources/static/banner/" + existBanner.getImage());
-            if (oldFile.exists()) {
-                oldFile.delete();
-            }
-            existBanner.setImage(fileName);
-        }
         existBanner.setUrl(bannerDTO.getUrl());
         existBanner.setEnable(bannerDTO.isEnable());
         bannerRepository.save(existBanner);
-        return "success";
+        return ResponseEntity.ok("Cập nhật banner thành công");
     }
 }

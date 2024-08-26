@@ -57,7 +57,19 @@ public class EmailService {
         context.setVariables(properties);
         helper.setFrom("dreamhoaihack@gmail.com");
         helper.setTo(to);
-        helper.setSubject(emailTemplateName.name());
+        switch (emailTemplateName.name()) {
+            case "ACTIVATION":
+                helper.setSubject("Thông báo xác nhận email tạo tài khoản");
+                break;
+            case "FORGOT_PASSWORD":
+                helper.setSubject("Thông báo đặt lại mật khẩu tài khoản");
+                break;
+            case "CHANGE_PASSWORD":
+                helper.setSubject("Thông báo thay đổi mật khẩu tài khoản");
+                break;
+            default:
+                helper.setSubject(emailTemplateName.name());
+        }
 
         String template = templateEngine.process(templateName, context);
         helper.setText(template, true);

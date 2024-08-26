@@ -1,18 +1,19 @@
 package com.GDU.backend.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.GDU.backend.exceptions.ResourceNotFoundException;
+import com.GDU.backend.repositories.DocumentRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/test")
+@RequiredArgsConstructor
 public class TestController {
+    private final DocumentRepository documentRepository;
     
-    @GetMapping
-    public String test(HttpServletRequest request) {
-        System.out.println(request.getHeader("Authorization"));
-        System.out.println(request);
-        return "test";
+    @GetMapping("/document")
+    public ResponseEntity<?> testDocument() {
+        return ResponseEntity.ok(documentRepository.findAll());
     }
 }

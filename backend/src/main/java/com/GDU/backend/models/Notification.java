@@ -33,6 +33,10 @@ public class Notification {
     
     private boolean is_check;
     
+    @ManyToOne
+    @JoinColumn(name = "document_slug")
+    private Document document;
+    
     @Column(name = "created_at")
     private LocalDateTime created_at;
 }

@@ -34,4 +34,7 @@ public class Specialized {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
     
+    @Column(name = "is_locked")
+    private boolean isLocked;
+    
 }

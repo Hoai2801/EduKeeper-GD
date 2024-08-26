@@ -1,5 +1,6 @@
 package com.GDU.backend.dtos.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +39,9 @@ public class RegisterRequest {
     private String specialized;
     
     private String classroom;
+
+    @JsonProperty("isAdminCreate")
+    private boolean isAdminCreate;
 
     @NotEmpty
     @NotBlank

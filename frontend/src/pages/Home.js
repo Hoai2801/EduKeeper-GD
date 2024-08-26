@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import Post from '../components/DocumentCard'
 import {Link} from 'react-router-dom'
-import {jwtDecode} from "jwt-decode";
+import Banner from "../components/Banner";
+import {JWTContext} from "../App";
 
 const Home = () => {
 
@@ -11,20 +12,8 @@ const Home = () => {
 
     const [lastedDocuments, setLastedDocuments] = useState([])
 
-    const [staffCode, setStaffCode] = useState(null)
-
-    const [banner, setBanner] = useState([])
-
-    const [indexBanner, setIndexBanner] = useState(0)
-
-
-    const handleNextBanner = () => {
-        if (indexBanner < banner?.length - 1) {
-            setIndexBanner(indexBanner + 1)
-        } else {
-            setIndexBanner(0)
-        }
-    }
+    const context = useContext(JWTContext);
+    const staffCode = context?.jwtDecoded?.staff_code;
 
     useEffect(() => {
         fetch('http://localhost:8080/api/v1/view-history/top-documents/9', {
@@ -33,80 +22,72 @@ const Home = () => {
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-        }).then(res => res?.json()).then(data => {
-            setMostViewed(data)
-        })
+        }).then(res => {
+            if (res?.status === 200) {
+                return res.json().then(data => {
+                    setMostViewed(data);
+                });
+            } else {
+                throw new Error(`Unexpected status code: ${res.status}`);
+            }
+        }).catch(err => {
+            console.error('Failed to fetch most viewed documents:', err);
+        });
+
         fetch('http://localhost:8080/api/v1/documents/most-downloaded?limit=9', {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-        }).then(res => res?.json()).then(data => setMostDownloaded(data))
+        }).then(res => {
+            if (res?.status === 200) {
+                return res.json().then(data => {
+                    setMostDownloaded(data);
+                });
+            } else {
+                throw new Error(`Unexpected status code: ${res.status}`);
+            }
+        }).catch(err => {
+            console.error('Failed to fetch most downloaded documents:', err);
+        });
+
         fetch('http://localhost:8080/api/v1/documents/latest?limit=9', {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 'Access-Control-Allow-Origin': '*',
             },
-        }).then(res => res?.json()).then(data => {
-            setLastedDocuments(data)
-        })
-        fetch('http://localhost:8080/api/v1/banners', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            },
-        })
-            .then(res => res?.json())
-            .then(data => {
-                setBanner(data)
-            })
-    }, [])
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            handleNextBanner();
-        }, 5000);
-
-        // Cleanup the timeout on component unmount
-        return () => clearTimeout(timeout);
-    }, [indexBanner, banner]);
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token !== "undefined" && token !== null) {
-            const jwt = jwtDecode(token);
-            setStaffCode(jwt?.staff_code);
-        }
+        }).then(res => {
+            if (res?.status === 200) {
+                return res.json().then(data => {
+                    setLastedDocuments(data);
+                });
+            } else {
+                throw new Error(`Unexpected status code: ${res.status}`);
+            }
+        }).catch(err => {
+            console.error('Failed to fetch latest documents:', err);
+        });
     }, []);
+
 
     return (
         <div>
-            <div className={`w-full h-fit md:h-[600px] ${banner?.length === 0 ? "hidden" : "block"} relative`}>
-                {banner?.map((banner, index) => {
-                    console.log(banner.url);
-                    return (
-                    <a href={banner?.url?.includes('http') || banner?.url?.includes('https') ? banner?.url : banner.url !== null ? `https://${banner?.url}` : ''}>
-                        <img src={`http://localhost:8080/api/v1/images/banner/${banner.image}`} alt=""
-                             className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 md:rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
-                        />
-                    </a>
-                )})}
-                    <div className={`w-full flex justify-center ${banner?.length === 0 || banner?.length === 1 ? "hidden" : "block"} flex gap-2 absolute bottom-5 right-0`}>
-                        {banner?.map((banner, index) => (
-                            <button onClick={() => setIndexBanner(index)} className={`${index === indexBanner ? "bg-gray-700" : "bg-gray-400"} w-3 h-3 rounded-full mt-5`}></button>
-                        ))}
-                    </div>
+            <div className={`w-full h-fit relative`}>
+                <Banner/>
             </div>
             <div
-                className='bg-white rounded-lg lg:w-[1200px] w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 p-2'>
-                <h2 className='font-bold text-[28px] mb-5'>Tài liệu mới</h2>
+                className='bg-white rounded-lg max-w-[1200px] p-2 w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 gap-10 pb-10'>
+                <h2 className='font-bold text-[28px] mb-5 pl-5'>Tài liệu mới</h2>
                 <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
                     {lastedDocuments && lastedDocuments?.map((item, index) => (
                         <div
-                            className={`${item.scope === "private" || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
+                            className={`${
+                                ((item.scope === "private" && staffCode !== item.user_upload.staffCode) || (item.scope === "student-only" && !staffCode) || item.status !== "published")
+                                    ? "hidden"
+                                    : "block"
+                            }`}>
                             <Post key={index} document={item}/>
                         </div>
                     ))}

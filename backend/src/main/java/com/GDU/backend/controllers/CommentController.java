@@ -17,11 +17,19 @@ public class CommentController {
             @RequestBody CommentDTO commentDTO,
             @PathVariable Long documentId
     ) {
-        return ResponseEntity.ok(commentService.insertComment(commentDTO, documentId));
+        return commentService.insertComment(commentDTO, documentId);
     }
     
     @GetMapping("/{documentId}")
     public ResponseEntity<?> getComments(@PathVariable Long documentId) {
         return ResponseEntity.ok(commentService.getComments(documentId));
+    }
+    
+    @PostMapping("/reply/{commentId}")
+    public ResponseEntity<String> insertReply(
+            @RequestBody CommentDTO commentDTO,
+            @PathVariable Long commentId
+    ) {
+        return commentService.insertReply(commentDTO, commentId);
     }
 }

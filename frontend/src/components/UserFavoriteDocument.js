@@ -23,6 +23,7 @@ const UserFavoriteDocument = ({isTrueLegit, jwt}) => {
     return (
         <div>
             <h2 className={`text-3xl font-semibold mb-5`}>Danh sách tài liệu ưu thích</h2>
+            {documentList?.length === 0 && <p className={`text-xl font-semibold mb-5 text-gray-500`}>Không có tài liệu nào được thích</p>}
             <div className={`flex flex-wrap gap-5`}>
                 {documentList?.map((item, index) => (
                     <DocumentCard key={index} document={item}/>
