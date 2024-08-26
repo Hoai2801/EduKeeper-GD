@@ -65,7 +65,7 @@ const Login = () => {
                     <form className="space-y-5" onSubmit={handleSubmit}>
                         <div>
                             <label htmlFor="staffCode" className="block text-sm font-medium text-gray-700">
-                                Mã giáo viên
+                                Mã sinh viên/giáo viên
                             </label>
                             <div className="mt-1">
                                 <input
