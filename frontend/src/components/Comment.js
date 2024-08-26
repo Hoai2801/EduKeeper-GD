@@ -2,7 +2,7 @@ import React, {useContext, useState} from 'react';
 import {JWTContext} from "../App";
 import toast from "react-hot-toast";
 
-const Comment = ({comment, fetchComment, countReply}) => {
+const Comment = ({comment, fetchComment}) => {
     const [showSetting, setShowSetting] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
 
@@ -12,6 +12,18 @@ const Comment = ({comment, fetchComment, countReply}) => {
 
     const context = useContext(JWTContext);
     const staffCode = context?.jwtDecoded?.staff_code;
+
+    function countComments(commentList) {
+        if (commentList === undefined) return 0;
+        let count = 0;
+        commentList.forEach(comment => {
+            count++; // count the current comment
+            if (comment.replies && comment.replies.length > 0) {
+                count += countComments(comment.replies); // count the nested replies
+            }
+        });
+        return count;
+    }
 
     const createReply = () => {
         if (content === '' || !staffCode) {
@@ -25,7 +37,6 @@ const Comment = ({comment, fetchComment, countReply}) => {
         }
 
         if (context?.token) {
-            console.log(data)
             fetch('http://localhost:8080/api/v1/comments/reply/' + comment?.id, {
                 method: 'POST',
                 headers: {
@@ -72,10 +83,10 @@ const Comment = ({comment, fetchComment, countReply}) => {
                      className={`${showSetting ? "absolute" : "hidden"} ${staffCode === comment?.user?.staffCode ? "block" : "hidden"} right-0 z-10 w-36 bg-white rounded-2 border-black divide-y divide-gray-100 shadow`}>
                     <ul className="py-1 text-sm text-gray-700 dark:text-gray-200"
                         aria-labelledby="dropdownMenuIconHorizontalButton">
-                        <li>
-                            <a href="#"
-                               className="block py-2 px-4 text-red-400">Xóa</a>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <a href="#"*/}
+                        {/*       className="block py-2 px-4 text-red-400">Xóa</a>*/}
+                        {/*</li>*/}
                         {/*<li>*/}
                         {/*    <a href="#"*/}
                         {/*       className="block py-2 px-4 hover:bg-gray-100 text-gray-500">Report</a>*/}
@@ -109,14 +120,14 @@ const Comment = ({comment, fetchComment, countReply}) => {
                 </button>
             </div>
             <div>
-                <button className={`text-blue-600 hover:cursor-pointer text-lg font-semibold mt-2 ml-4 ${showReply ? "hidden" : "block"} ${countReply(comment?.replies) < 3 ? "hidden" : ""}`} onClick={() => setShowReply(!showReply)}>Hiện {countReply(comment?.replies)} phản hồi</button>
+                <button className={`text-blue-600 hover:cursor-pointer text-lg font-semibold mt-2 ml-4 ${showReply ? "hidden" : "block"} ${countComments(comment?.replies) < 3 ? "hidden" : ""}`} onClick={() => setShowReply(!showReply)}>Hiện {countComments(comment?.replies)} phản hồi</button>
             </div>
-            <div className={`${showReply || countReply(comment?.replies) < 3 ? "block" : "hidden"} w-[800px] text-justify`}>
+            <div className={`${showReply || countComments(comment?.replies) < 3 ? "block" : "hidden"} w-[800px] text-justify`}>
                 {
                     comment?.replies?.map((reply, index) => {
                         return (
                             <div className={`flex border-l-2 border-gray-300 pl-2 w-full`}>
-                                <Comment isReply={true} key={index} comment={reply} fetchComment={fetchComment} countReply={countReply}/>
+                                <Comment isReply={true} key={index} comment={reply} fetchComment={fetchComment} countComments={countComments}/>
                             </div>
                         )
                     })

@@ -229,7 +229,7 @@ public class DocumentServiceImpl implements DocumentService {
                     slide.draw(graphics);
                     String imgFileName = fileName + "_slide_" + System.currentTimeMillis() + ".png";
                     ImageIO.write(img, "png", new File("src/main/resources/static/images/" + imgFileName));
-                    htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName).append("' style='width:100%; height:auto;'><br>");
+                    htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName).append("' style='width:100%; height:auto;' loading='lazy'/><br>");
                 }
                 htmlContent.append("</body></html>");
                 try (FileWriter htmlFile = new FileWriter("src/main/resources/static/convert/" + fileName + ".html")) {
@@ -252,7 +252,7 @@ public class DocumentServiceImpl implements DocumentService {
     private static void injectFontStyle(String htmlFilePath) {
         try {
             // Load the HTML content
-            String htmlContent = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(htmlFilePath)), StandardCharsets.UTF_8);
+            String htmlContent = Files.readString(Paths.get(htmlFilePath));
 
             // Inject CSS style for Times New Roman font
             String style = "<meta charset=\"UTF-8\">";
@@ -261,7 +261,7 @@ public class DocumentServiceImpl implements DocumentService {
             htmlContent = htmlContent.replace("</head>", style + "</head>");
 
             // Write the modified HTML content back to the file
-            java.nio.file.Files.write(java.nio.file.Paths.get(htmlFilePath), htmlContent.getBytes(StandardCharsets.UTF_8));
+            java.nio.file.Files.writeString(java.nio.file.Paths.get(htmlFilePath), htmlContent);
 
             System.out.println("Font style injected successfully!");
 
