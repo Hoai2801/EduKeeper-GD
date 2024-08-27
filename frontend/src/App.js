@@ -25,16 +25,10 @@ import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import Subject from "./pages/Subject";
 import Setting from "./pages/Setting";
-<<<<<<< HEAD
 import NotFound404 from "./pages/404";
 import NoticeWarning from "./pages/Notify";
 import Maintenance from "./pages/Maintenance";
 export const JWTContext = createContext(null);
-=======
-import Backup from "./pages/Backup";
-
-export const JWTContext = createContext(null)
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
 
 function App() {
   window.scrollTo(0, 0);

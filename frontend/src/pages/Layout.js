@@ -1,24 +1,24 @@
-import React, {useEffect} from 'react'
-import {Outlet, useLocation} from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
+import React, { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const Layout = () => {
-    const { pathname } = useLocation();
+  const { pathname } = useLocation();
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   return (
-    <div className='bg-slate-200'>
-        <Navbar />
-        <div className=' flex justify-center min-h-[100vh] mb-5'>
-          <Outlet />
-        </div>
-        <Footer />
+    <div className="bg-white">
+      <Navbar />
+      <div className=" min-h-[100vh]">
+        <Outlet />
+      </div>
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

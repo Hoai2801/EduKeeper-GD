@@ -84,21 +84,20 @@ public class DocumentServiceImpl implements DocumentService {
         System.out.println(thumbnail);
         String downloadFileName = null;
         // file download
-        if (!Objects.equals(uploadRequestDTO.getDocument().getOriginalFilename(), uploadRequestDTO.getDocumentDownload().getOriginalFilename()) && !Objects.equals(uploadRequestDTO.getDocument().getContentType(), uploadRequestDTO.getDocumentDownload().getContentType())) {
+        if (!Objects.equals(uploadRequestDTO.getDocument().getOriginalFilename(),
+                uploadRequestDTO.getDocumentDownload().getOriginalFilename())
+                && !Objects.equals(uploadRequestDTO.getDocument().getContentType(),
+                        uploadRequestDTO.getDocumentDownload().getContentType())) {
             // save file
             downloadFileName = System.currentTimeMillis() + "_"
                     + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
             File downloadFile = new File(UPLOAD_DIR + downloadFileName);
             MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
             Files.createDirectories(uploadDir);
-<<<<<<< HEAD
             Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
-=======
-            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } else {
             downloadFileName = fileName;
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
         }
 
         Document newDocument = Document.builder()
@@ -108,12 +107,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .path(fileName)
                 .documentType(uploadRequestDTO.getDocument().getContentType())
-<<<<<<< HEAD
-                .documentDownload(uploadRequestDTO.getDocumentDownload() != null ? downloadFileName : null)
-                .status("draft")
-=======
                 .documentDownload(downloadFileName)
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
                 .scope(uploadRequestDTO.getScope())
                 .downloadFileType(uploadRequestDTO.getDocumentDownload().getContentType())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
@@ -207,42 +201,11 @@ public class DocumentServiceImpl implements DocumentService {
             return fileName;
         } catch (IOException e) {
             log.error("Error generating thumbnail: {}", e.getMessage());
-            throw e;  // Rethrow the exception to handle it in the calling method
+            throw e; // Rethrow the exception to handle it in the calling method
         }
     }
 
     @Override
-<<<<<<< HEAD
-    public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) {
-        try {
-
-            Document existDocument = documentRepository.findById(id).orElse(null);
-            if (existDocument == null) {
-                return "Document not existing";
-            }
-
-            User userUpload = userService.getUserByStaffCode(uploadRequestDTO.getUserUpload());
-            if (userUpload == null) {
-                return "User not existing";
-            }
-            existDocument.setUserUpload(userUpload);
-
-            Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
-            existDocument.setCategory(category);
-            existDocument.setAuthor(uploadRequestDTO.getAuthor());
-            existDocument.setDescription(uploadRequestDTO.getDescription());
-            existDocument.setScope(uploadRequestDTO.getScope());
-            existDocument.setTitle(uploadRequestDTO.getTitle());
-            existDocument.setSlug(createSlug(uploadRequestDTO.getTitle()));
-            existDocument.setStatus("draft");
-            documentRepository.save(existDocument);
-            System.out.println("Yeah");
-            return "Update document successfully";
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
-=======
     public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) throws IOException {
         Document existDocument = documentRepository.findById(id).orElse(null);
         if (existDocument == null) {
@@ -260,11 +223,13 @@ public class DocumentServiceImpl implements DocumentService {
                 }
             }
             Path uploadDir = Paths.get(UPLOAD_DIR);
-            String downloadFileName = System.currentTimeMillis() + "_" + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
+            String downloadFileName = System.currentTimeMillis() + "_"
+                    + uploadRequestDTO.getDocumentDownload().getOriginalFilename();
             File downloadFile = new File(UPLOAD_DIR + downloadFileName);
             MultipartFile downloadFileMultipart = uploadRequestDTO.getDocumentDownload();
             Files.createDirectories(uploadDir);
-            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(downloadFileMultipart.getInputStream(), downloadFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
 
             existDocument.setDocumentDownload(downloadFileName);
             existDocument.setDownloadFileType(uploadRequestDTO.getDocumentDownload().getContentType());
@@ -289,7 +254,6 @@ public class DocumentServiceImpl implements DocumentService {
         });
         documentRepository.save(existDocument);
         return "Update document successfully";
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
     }
 
     @Override

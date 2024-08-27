@@ -33,11 +33,6 @@ public class Document {
 
     @Column(name = "download_file_type", nullable = false, length = 30)
     private String downloadFileType;
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
     @Column(nullable = false)
     private Long documentSize;
 
@@ -107,10 +102,10 @@ public class Document {
         return downloads != null ? downloads.size() : 0;
     }
 
-<<<<<<< HEAD
     public int getFavoritesCount() {
         return favorites != null ? favorites.size() : 0;
-=======
+    }
+
     @Override
     public String toString() {
         return "Document{" +
@@ -136,6 +131,5 @@ public class Document {
                 ", subject=" + (subject != null ? subject.getId() : null) +
                 ", specialized=" + (specialized != null ? specialized.getId() : null) +
                 '}';
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
     }
 }
