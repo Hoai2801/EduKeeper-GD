@@ -2,7 +2,7 @@ import React, {useContext, useState} from 'react';
 import {JWTContext} from "../App";
 import toast from "react-hot-toast";
 
-const Comment = ({comment, fetchComment, countReply}) => {
+const Comment = ({comment, fetchComment}) => {
     const [showSetting, setShowSetting] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
 
@@ -12,6 +12,18 @@ const Comment = ({comment, fetchComment, countReply}) => {
 
     const context = useContext(JWTContext);
     const staffCode = context?.jwtDecoded?.staff_code;
+
+    function countComments(commentList) {
+        if (commentList === undefined) return 0;
+        let count = 0;
+        commentList.forEach(comment => {
+            count++; // count the current comment
+            if (comment.replies && comment.replies.length > 0) {
+                count += countComments(comment.replies); // count the nested replies
+            }
+        });
+        return count;
+    }
 
     const createReply = () => {
         if (content === '' || !staffCode) {
@@ -25,7 +37,6 @@ const Comment = ({comment, fetchComment, countReply}) => {
         }
 
         if (context?.token) {
-            console.log(data)
             fetch('http://localhost:8080/api/v1/comments/reply/' + comment?.id, {
                 method: 'POST',
                 headers: {
@@ -41,7 +52,6 @@ const Comment = ({comment, fetchComment, countReply}) => {
                         fetchComment()
                     }
                 })
-
         }
     }
 
@@ -60,7 +70,7 @@ const Comment = ({comment, fetchComment, countReply}) => {
                     </p>
                 </div>
                 <button onClick={() => setShowSetting(!showSetting)}
-                        className="absolute right-0 inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50"
+                        className={`absolute right-0 inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 ${staffCode === comment?.user?.staffCode ? "block" : "hidden"}`}
                         type="button">
                     <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                          fill="currentColor" viewBox="0 0 16 3">
@@ -70,17 +80,17 @@ const Comment = ({comment, fetchComment, countReply}) => {
                     <span className="sr-only">Comment settings</span>
                 </button>
                 <div onMouseLeave={() => setShowSetting(false)}
-                     className={`${showSetting ? "absolute" : "hidden"} right-0 z-10 w-36 bg-white rounded-2 border-black divide-y divide-gray-100 shadow`}>
+                     className={`${showSetting ? "absolute" : "hidden"} ${staffCode === comment?.user?.staffCode ? "block" : "hidden"} right-0 z-10 w-36 bg-white rounded-2 border-black divide-y divide-gray-100 shadow`}>
                     <ul className="py-1 text-sm text-gray-700 dark:text-gray-200"
                         aria-labelledby="dropdownMenuIconHorizontalButton">
-                        <li>
-                            <a href="#"
-                               className="block py-2 px-4 text-red-400">Remove</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               className="block py-2 px-4 hover:bg-gray-100 text-gray-500">Report</a>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <a href="#"*/}
+                        {/*       className="block py-2 px-4 text-red-400">Xóa</a>*/}
+                        {/*</li>*/}
+                        {/*<li>*/}
+                        {/*    <a href="#"*/}
+                        {/*       className="block py-2 px-4 hover:bg-gray-100 text-gray-500">Report</a>*/}
+                        {/*</li>*/}
                     </ul>
                 </div>
             </footer>
@@ -95,11 +105,11 @@ const Comment = ({comment, fetchComment, countReply}) => {
                               stroke-width="2"
                               d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
                     </svg>
-                    Phân hồi
+                    Phản hồi
                 </button>
             </div>
             <div
-                className={`mt-4 p-4 text-end border border-gray-300 rounded-lg ml-4 ${showReplyInput ? "block" : "hidden"}`}>
+                className={`mt-4 p-4 text-end border border-gray-300 rounded-lg lg:w-[400px] w-[80vw] ml-4 ${showReplyInput ? "block" : "hidden"}`}>
                 <textarea type="text" className={`w-full p-2 border border-gray-300 rounded-lg`}
                           placeholder={`Nhập phản hồi`}
                           onChange={(e) => setContent(e.target.value)}
@@ -110,14 +120,14 @@ const Comment = ({comment, fetchComment, countReply}) => {
                 </button>
             </div>
             <div>
-                <button className={`text-blue-600 hover:cursor-pointer text-lg font-semibold mt-2 ml-4 ${showReply ? "hidden" : "block"} ${countReply(comment?.replies) < 3 ? "hidden" : ""}`} onClick={() => setShowReply(!showReply)}>Hiện {countReply(comment?.replies)} phản hồi</button>
+                <button className={`text-blue-600 hover:cursor-pointer text-lg font-semibold mt-2 ml-4 ${showReply ? "hidden" : "block"} ${countComments(comment?.replies) < 3 ? "hidden" : ""}`} onClick={() => setShowReply(!showReply)}>Hiện {countComments(comment?.replies)} phản hồi</button>
             </div>
-            <div className={`${showReply || countReply(comment?.replies) < 3 ? "block" : "hidden"} w-[800px] text-justify`}>
+            <div className={`${showReply || countComments(comment?.replies) < 3 ? "block" : "hidden"} w-[800px] text-justify`}>
                 {
                     comment?.replies?.map((reply, index) => {
                         return (
                             <div className={`flex border-l-2 border-gray-300 pl-2 w-full`}>
-                                <Comment isReply={true} key={index} comment={reply} fetchComment={fetchComment} countReply={countReply}/>
+                                <Comment isReply={true} key={index} comment={reply} fetchComment={fetchComment} countComments={countComments}/>
                             </div>
                         )
                     })

@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import backup from "../assets/data-backup-128.png";
+import backupIcon from "../assets/data-backup-128.png";
 
 const SideBarAdmin = () => {
   const [documentsDraft, setDocumentsDraft] = useState([]);
@@ -44,11 +44,11 @@ const SideBarAdmin = () => {
     <div className="">
       <aside className="bg-gradient-to-br from-gray-800 to-gray-900 -translate-x-80 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 overflow-auto">
         <div className="relative border-b border-white/20">
-          <a className="flex items-center gap-4 py-6 px-8" href="#">
-            <h6 className="block antialiased tracking-normal font-sans text-3xl font-semibold leading-relaxed text-white">
+          <Link to="/">
+            <h6 className="block text-center antialiased tracking-normal font-sans text-3xl font-semibold leading-relaxed text-white">
               EduKeeper
             </h6>
-          </a>
+          </Link>
           <button
             className="middle none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-8 max-w-[32px] h-8 max-h-[32px] rounded-lg text-xs text-white hover:bg-white/10 active:bg-white/30 absolute right-0 top-0 grid rounded-br-none rounded-tl-none xl:hidden md:hidden"
             type="button"
@@ -250,6 +250,24 @@ const SideBarAdmin = () => {
 
                 <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
                   Banner
+                </p>
+              </NavLink>
+              <NavLink
+                className={({ isActive, isPending }) =>
+                  isPending
+                    ? "pending"
+                    : isActive
+                    ? "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85] w-full flex items-center gap-4 px-4 capitalize"
+                    : "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-white hover:bg-white/10 active:bg-white/30 w-full flex items-center gap-4 px-4 capitalize"
+                }
+                to="backup"
+              >
+                <div className="w-5 h-5">
+                  <img src={backupIcon} alt="" className="" />
+                </div>
+
+                <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                  Sao lưu dữ liệu
                 </p>
               </NavLink>
             </li>
@@ -565,6 +583,36 @@ const SideBarAdmin = () => {
 
                   <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
                     Banner
+                  </p>
+                </NavLink>
+              </li>
+              <li onClick={handleClickMenu}>
+                <NavLink
+                  className={({ isActive, isPending }) =>
+                    isPending
+                      ? "pending"
+                      : isActive
+                      ? "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/40 active:opacity-[0.85] w-full flex items-center gap-4 px-4 capitalize"
+                      : "middle none font-sans font-bold center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-slate-600 hover:bg-white/10 active:bg-white/30 w-full flex items-center gap-4 px-4 capitalize"
+                  }
+                  to="backup"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 384 512"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    className="w-5 h-5 text-inherit"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0L384 128z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+
+                  <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+                    Sao lưu dữ liệu!
                   </p>
                 </NavLink>
               </li>

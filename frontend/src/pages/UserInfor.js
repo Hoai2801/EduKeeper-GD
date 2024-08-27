@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {jwtDecode} from "jwt-decode";
-import {useLocation, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {JWTContext} from "../App";
 
 const UserInfor = () => {
@@ -13,7 +13,6 @@ const UserInfor = () => {
     // user info
     const [name, setName] = useState(null);
     const [email, setEmail] = useState(null);
-    const [phone, setPhone] = useState(null);
     const [birth, setBirth] = useState(null);
     const [staffCode, setStaffCode] = useState(null);
     const [klass, setKlass] = useState(null);
@@ -26,15 +25,6 @@ const UserInfor = () => {
     const staffCodeParam = location.valueOf("staff_code").staff_code;
 
     const userJWT = useContext(JWTContext);
-    console.log(staffCodeParam)
-
-    if (userJWT?.jwtDecoded) {
-        if (staffCodeParam !== userJWT?.jwtDecoded?.staff_code) {
-            window.location.href = `/`;
-        }
-    } else {
-        window.location.href = `/`;
-    }
 
     useEffect(() => {
         fetch("http://localhost:8080/api/v1/departments")
@@ -66,14 +56,6 @@ const UserInfor = () => {
                     setSelectedSpecialized(data?.specialized?.id)
                     setUser(data)
                 });
-
-            if (jwt) {
-                if (location.valueOf("staff_code").staff_code !== jwt?.staff_code) {
-                    window.location.href = `/`;
-                }
-            } else {
-                window.location.href = `/`;
-            }
 
             fetch("http://localhost:8080/api/v1/specializes/department/" + jwt?.staff_code)
                 .then((res) => res.json())
@@ -114,6 +96,7 @@ const UserInfor = () => {
                 "username": name,
                 "email": email,
                 "birthDay": birth,
+                "role": jwt?.role,
                 "klass": klass,
                 "department": selectedDepartment.id,
                 "specialized": selectedSpecialized
@@ -126,9 +109,18 @@ const UserInfor = () => {
             });
     }
 
+    if (userJWT?.jwtDecoded !== null) {
+        if (staffCodeParam !== userJWT?.jwtDecoded?.staff_code) {
+            window.location.href = `/`;
+        }
+    } else {
+        window.location.href = `/`;
+    }
+
     return (
         <div>
-            <h2 className='text-3xl font-semibold text-center'>Thông tin tài khoản</h2>
+            <h3 className={`bg-red-300 p-3 rounded-lg text-center`}>Vui lòng chắc chắn thông tin khai báo là đúng để việc cộng điểm rèn luyện không xảy ra sai xót!</h3>
+            <h2 className='text-3xl font-semibold text-center mt-2'>Thông tin tài khoản</h2>
             <div>
                 <div className='md:grid md:grid-cols-2 flex flex-col justify-center gap-5 w-[85%] md:w-fit mx-auto mt-2'>
                     <div className='my-3 flex flex-col gap-2'>

@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react'
-import {useParams, useSearchParams} from 'react-router-dom'
+import {useSearchParams} from 'react-router-dom'
 import DocumentCard from '../components/DocumentCard'
 
 const Search = ({jwt}) => {
     const url = window.location.href;
-    const [searchParams, setSearchParams] = useSearchParams();
+    const searchParams = useSearchParams();
 
     // lasted, most download or most views
     const order = searchParams.get('order');
@@ -16,7 +16,7 @@ const Search = ({jwt}) => {
 
     const [documents, setDocument] = useState([])
 
-    const search = localStorage.getItem('search') || '';
+    const [search] = localStorage.getItem('search') || '';
 
     useEffect(() => {
         const dataSearch = {
@@ -53,7 +53,7 @@ const Search = ({jwt}) => {
                     });
             })
 
-    }, [url, order, slugSpecialized, slugSubject, publishYear, category])
+    }, [url, order, slugSpecialized, slugSubject, publishYear, category, search, slugDepartment])
 
     const [limit, setLimit] = useState(20)
 

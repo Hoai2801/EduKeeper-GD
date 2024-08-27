@@ -33,14 +33,17 @@ const Admin = () => {
     return (
         <div className={`min - h - screen bg-gray-100`}>
             <div className={`absolute top-0 left-0 z-50 h-screen w-screen bg-gray-400 flex justify-center items-center ${auth ? "hidden" : "block"}`}>
-                <div className={`flex flex-col items-center`}>
+                <form onSubmit={(e) => {
+                    e.preventDefault()
+                    handleAuth()
+                }} className={`flex flex-col items-center`}>
                     <label className={`text-white text-2xl font-bold mb-5`}>Nhập mã đăng nhập</label>
                     <input type="text" className={`w-80 h-10 p-2 rounded-lg`} value={input}
                            onChange={(e) => setInput(e.target.value)}/>
                     <button className={`w-80 h-10 p-2 bg-blue-500 text-white rounded-lg mt-5`}
                             onClick={() => handleAuth()}>Xác nhận
                     </button>
-                </div>
+                </form>
             </div>
             <div className={`${auth ? "" : "hidden"} bg-gray-100 min-h-screen`}>
                 <SideBarAdmin/>

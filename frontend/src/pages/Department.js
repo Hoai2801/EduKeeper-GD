@@ -1,6 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import removeIcon from "../assets/logo192.png";
-import editIcon from "../assets/edit-246.png";
 import DepartmentItems from "../components/DepartmentItems";
 import toast from "react-hot-toast";
 import "./Department.css";
@@ -196,19 +194,19 @@ const Department = () => {
                 )}
               </p>
               <div className=" flex xl:flex-row md:flex-row sm:flex-row flex-col xl:items-end">
-                <a
+                <button
                   onClick={() => handleClickAddSpecialized(dep)}
                   class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
                 >
                   Thêm ngành mới
-                </a>
-                <a
+                </button>
+                <button
                   onClick={() => handleToggleDetails(dep.id)}
                   class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
                 >
                   Chi tiết
-                </a>
-                <a
+                </button>
+                <button
                   onClick={() => {
                     setSelectDepartment(dep);
                     setIsEditDepartment(true);
@@ -216,12 +214,12 @@ const Department = () => {
                   class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline  ms-3 hover:cursor-pointer"
                 >
                   Sửa
-                </a>
+                </button>
               </div>
             </div>
             {activeDocumentId && (
               <DepartmentItems
-                isActive={activeDocumentId == dep.id}
+                isActive={activeDocumentId === dep.id}
                 id={activeDocumentId}
                 fetchDepartment={fetchDepartment}
               />

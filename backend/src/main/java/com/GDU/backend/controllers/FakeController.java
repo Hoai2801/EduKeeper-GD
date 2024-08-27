@@ -36,6 +36,12 @@ public class FakeController {
         }
         return "faking";
     }
+    
+    @GetMapping("/mail")
+    public String fakeMail() throws IOException {
+        createFakeDocument();
+        return "faking";
+    }
 
     private void createFakeDocument() throws IOException {
         Faker faker = new Faker();

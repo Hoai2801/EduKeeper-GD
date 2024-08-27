@@ -5,20 +5,9 @@ import {JWTContext} from "../App";
 
 const SubjectItems = ({isActive, dep}) => {
     const [items, setItems] = useState([]);
-    const [specialized, setSpecialized] = useState([]);
-    const [specializedId, setSpecializedId] = useState([]);
 
     const context = useContext(JWTContext);
     const userJWT = context?.token;
-
-    const [isEdit, setIsEdit] = useState(false);
-    const [itemEdit, setItemEdit] = useState(null);
-    const [subjectName, setSubjectName] = useState(null);
-    const hanldeClickEdit = (subject) => {
-        setIsEdit(true);
-        setItemEdit(subject);
-        setSubjectName(subject?.subjectName);
-    };
 
     const fetchData = () => {
         fetch(`http://localhost:8080/api/v1/subjects/specialized/${dep?.id}`)
@@ -33,13 +22,13 @@ const SubjectItems = ({isActive, dep}) => {
         fetchData();
     }, [dep?.id]);
 
-    useEffect(() => {
-        fetch(`http://localhost:8080/api/v1/specializes`)
-            .then((res) => res.json())
-            .then((data) => {
-                setSpecialized(data);
-            });
-    }, []);
+    // useEffect(() => {
+    //     fetch(`http://localhost:8080/api/v1/specializes`)
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             setSpecialized(data);
+    //         });
+    // }, []);
 
     function removeSubjectWithId(id) {
         if (window.confirm("Bạn có xác nhận xóa môn học này không?")) {
@@ -51,10 +40,10 @@ const SubjectItems = ({isActive, dep}) => {
             })
                 .then((res) => {
                     if (res.status === 200) {
-                        toast.success("Xóa môn học này thanh cong");
+                        toast.success("Xóa môn học này thành công");
                         fetchData();
                     } else {
-                        toast.error("Xóa môn học này that bai");
+                        toast.error("Xóa môn học này thất bại");
                     }
                 })
         }

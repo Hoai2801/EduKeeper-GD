@@ -159,6 +159,7 @@ export default function Document(params) {
       fetch("http://localhost:8080/api/v1/documents/public")
         .then((res) => res.json())
         .then((data) => {
+          console.log(data);
           setPublicDocumentList(data);
           setDocs(data.slice(0, 10));
         });

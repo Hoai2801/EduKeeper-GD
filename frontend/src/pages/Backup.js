@@ -9,7 +9,8 @@ const Backup = () => {
 
     const context = useContext(JWTContext);
     const jwt = context?.token;
-    const user = context?.jwtDecoded;
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const fetchBackup = () => {
         fetch('http://localhost:8080/api/v1/backups/list-backups')
@@ -104,6 +105,7 @@ const Backup = () => {
 
 
     const restoreBackup = (name) => {
+        setIsLoading(true);
         if (name.endsWith('.sql')) {
             fetch('http://localhost:8080/api/v1/backups/restore-database/' + name, {
                 method: 'POST',
@@ -138,6 +140,7 @@ const Backup = () => {
                     }
                 })
         }
+        setIsLoading(false);
     }
     return (
         <div>
@@ -161,7 +164,7 @@ const Backup = () => {
                             <button onClick={() => restoreBackup(item)}>
                                 Khôi phục
                             </button>
-                            <button onClick={() => downloadBackup(item)}>
+                            <button onClick={() => downloadBackup(item)} disabled={isLoading}>
                                 Tải
                             </button>
                         </div>

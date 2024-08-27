@@ -6,7 +6,6 @@ import { useHandleDetailDocs } from "../components/HandleEvent";
 export default function DeletedDocument(params) {
     const [documents, setDocuments] = useState([]);
     const [activePage, setActivePage] = useState(1);
-    const [isCheck, setIsCheck] = useState(true);
     const navigate = useNavigate();
     const handleDetailDocs = useHandleDetailDocs();
     const goBack = () => {
@@ -111,7 +110,6 @@ export default function DeletedDocument(params) {
         fetch(`http://localhost:8080/api/v1/documents/deleted`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setDocuments(data);
             });
     }, []);
@@ -249,7 +247,7 @@ export default function DeletedDocument(params) {
                                         <a
                                             href=""
                                             className={` flex  items-center ${
-                                                activePage == 3 ? "active-check" : ""
+                                                activePage === 3 ? "active-check" : ""
                                             } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}
                                         >
                                             3

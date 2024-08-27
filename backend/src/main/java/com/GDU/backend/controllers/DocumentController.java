@@ -31,10 +31,23 @@ public class DocumentController {
     public ResponseEntity<Resource> getFileBySlug(@PathVariable("slug") String slug) {
         try {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
-            File file = new File(UPLOAD_DIR + document.getPath());
+            File file = new File(UPLOAD_DIR + document.getFile());
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(document.getDocument_type()))
                     .body(new FileSystemResource(file));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    
+    @GetMapping("/{slug}/html")
+    public ResponseEntity<Resource> getHtmlFileBySlug(@PathVariable("slug") String slug) {
+        try {
+            DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
+            String path = "src/main/resources/static/convert/" + document.getFile() + ".html";
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("text/html"))
+                    .body(new FileSystemResource(path));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -46,7 +59,7 @@ public class DocumentController {
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
             // null because the raw file is pdf
             if (document.getFile_download() == null) {
-                File file = new File(UPLOAD_DIR + document.getPath());
+                File file = new File(UPLOAD_DIR + document.getFile());
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(document.getDocument_type()))
                         .body(new FileSystemResource(file));

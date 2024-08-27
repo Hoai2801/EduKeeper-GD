@@ -2,10 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import DragDropFile from "../components/DragDropFile";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { Document, Page } from "react-pdf";
+import { Document, Page, pdfjs } from "react-pdf";
 import { useLocation, useParams } from "react-router-dom";
 import { JWTContext } from "../App";
 import toast from "react-hot-toast";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
 
 export const Upload = () => {
   const location = useLocation();
@@ -13,214 +15,233 @@ export const Upload = () => {
 
   const path = useParams();
 
-  // edit file
-  const [documentEdit, setDocumentEdit] = useState(null);
-
-  // file upload
-  const [selectedFile, setFile] = useState(null);
-
-  const [haveDownloadFile, setHaveDownloadFile] = useState(false);
-  const [downloadFile, setDownloadFile] = useState(null);
-
-  const [departments, setDepartments] = useState([]);
-  const [listCategory, setListCategory] = useState([]);
-  const [category, setCategory] = useState(1);
-  const [description, setDescription] = useState(null);
-  const [scopeList, setScopeList] = useState([
-    {
-      scope: "public",
-      name: "Công khai",
-    },
-    {
-      scope: "private",
-      name: "Riêng tư",
-    },
-    {
-      scope: "student-only",
-      name: "Nội bộ sinh viên",
-    },
-  ]);
-  const [scope, setScope] = useState(null);
-  const [specialized, setSpecialized] = useState(null);
-  const [subject, setSubject] = useState(null);
-  const [title, setTitle] = useState(null);
-
-  const [selectedDepartment, setSelectedDepartment] = useState(null);
-  const [listSpecialized, setListSpecialized] = useState([]);
-  const [listSubject, setListSubject] = useState(null);
-  const [author, setAuthor] = useState(null);
-
   const context = useContext(JWTContext);
   const jwt = context?.token;
   const user = context?.jwtDecoded;
+
+  const [listDepartment, setListDepartment] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [listSpecialized, setListSpecialized] = useState([]);
+  const [listCategory, setListCategory] = useState([]);
+  const [listSubject, setListSubject] = useState([]);
+
+  const [documentEditId, setDocumentEditId] = useState(-1);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [uploadData, setUploadData] = useState({
+    title: "",
+    description: "",
+    specialized: "",
+    subject: "",
+    category: "",
+    scope: "",
+    userUpload: user?.staff_code || "",
+    author: "",
+    document: null,
+    documentDownload: null,
+  });
+
+  // Handler for input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUploadData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  // // true if user want to have a download file different the file which is uploaded
+  // const [haveDownloadFile, setHaveDownloadFile] = useState(false);
+
+  const [scopeList] = useState([
+    {
+      scope: "public",
+      name: "Công khai",
+    },
+    {
+      scope: "private",
+      name: "Riêng tư",
+    },
+    {
+      scope: "student-only",
+      name: "Nội bộ sinh viên",
+    },
+  ]);
+
+  const handleListSpecialized = (departmentId) => {
+    fetch("http://localhost:8080/api/v1/specializes/department/" + departmentId)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .then((data) => {
+        setListSpecialized(data);
+      })
+      .catch((error) => console.error(error));
+  };
 
   useEffect(() => {
     if (path && path.slug) {
       fetch("http://localhost:8080/api/v1/documents/" + path.slug)
         .then((response) => response.json())
         .then((data) => {
-          setDocumentEdit(data);
+          setDocumentEditId(data.id);
+          uploadData.title = data.title;
+          uploadData.description = data.description;
+          uploadData.specialized = data.specialized.id;
+          uploadData.subject = data.subject.id;
+          uploadData.category = data.category.id;
+          uploadData.scope = data.scope;
+          uploadData.userUpload = data.userUpload;
+          uploadData.author = data.author;
+
+          // if (data.path !== data.file_download) {
+          //     setHaveDownloadFile(true);
+          //     fetch('http://localhost:8080/api/v1/documents/' + data.slug + "/download")
+          //         .then(response => response.blob())
+          //         .then(blob => {
+          //             const file = new File([blob], data.file_download, {type: blob.type});
+          //             setUploadData(prevState => ({
+          //                 ...prevState,
+          //                 documentDownload: file
+          //             }));
+          //         })
+          //         .catch(error => {
+          //             console.error('Download error:', error);
+          //         });
+          // }
+          fetch("http://localhost:8080/api/v1/documents/" + data.slug + "/file")
+            .then((response) => response.blob())
+            .then((blob) => {
+              const file = new File([blob], data.path, { type: blob.type });
+              setUploadData((prevState) => ({
+                ...prevState,
+                document: file,
+              }));
+              // if (!haveDownloadFile) {
+              //     setUploadData(prevState => ({
+              //         ...prevState,
+              //         documentDownload: file
+              //     }));
+              // }
+            })
+            .catch((error) => {
+              console.error("Download error:", error);
+            });
+
+          setSelectedDepartment(data.department.id);
+          handleListSpecialized(data.department.id);
         })
-        .catch((error) => console.error(error));
+        .catch((error) => {
+          console.error("Fetch error:", error);
+        });
     }
-  }, [path]);
+  }, [path, uploadData]);
 
   useEffect(() => {
-    if (specialized) {
+    if (uploadData.specialized) {
       fetch(
-        "http://localhost:8080/api/v1/subjects/specialized/" + specialized?.id
+        "http://localhost:8080/api/v1/subjects/specialized/" +
+          uploadData.specialized
       )
         .then((response) => response.json())
         .then((data) => {
           setListSubject(data);
         })
         .catch((error) => console.error(error));
+    } else {
+      setListSubject([]);
     }
-  }, [specialized]);
+  }, [uploadData.specialized]);
 
   const handleFiles = (updatedFile) => {
-    setFile(updatedFile[0]);
+    setUploadData((prevState) => ({
+      ...prevState,
+      document: updatedFile[0],
+    }));
   };
 
-  const handleFileDownload = (updatedFile) => {
-    setDownloadFile(updatedFile[0]);
+  const resetUploadFiles = () => {
+    setUploadData((prevState) => ({
+      ...prevState,
+      document: null,
+    }));
   };
 
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/departments")
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          throw new Error(`Unexpected status code: ${response.status}`);
+        }
+      })
       .then((data) => {
-        setDepartments(data);
+        setListDepartment(data);
       })
       .catch((error) => console.error(error));
 
     fetch("http://localhost:8080/api/v1/categories")
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          throw new Error(`Unexpected status code: ${response.status}`);
+        }
+      })
       .then((data) => {
         setListCategory(data);
       })
       .catch((error) => console.error(error));
   }, []);
 
-  useEffect(() => {
-    if (path && path.slug) {
-      fetch("http://localhost:8080/api/v1/documents/" + path.slug)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          setTitle(data.title);
-          setDescription(data.description);
-          setAuthor(data.author);
-          setScope(data.scope);
-          setSpecialized(data.specialized);
-          setSelectedDepartment(data.specialized.department);
-          setCategory(data.category.id);
-          setSubject(data.subject?.id);
-          setDocumentEdit(data);
-        })
-        .catch((error) => console.error(error));
-      const fetchFile = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:8080/api/v1/documents/${path.slug}/file`,
-            {
-              method: "GET",
-            }
-          );
-
-          // Check if the response is OK
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-
-          const data = await response?.blob();
-          setFile(data);
-        } catch (error) {
-          console.error("Error fetching file:", error);
-        }
-      };
-
-      fetchFile();
-    }
-  }, [path]);
-
-  useEffect(() => {
-    if (selectedDepartment) {
-      fetch(
-        "http://localhost:8080/api/v1/specializes/department/" +
-          selectedDepartment?.id
-      )
-        .then((data) => data.json())
-        .then((data) => {
-          if (data.length > 0) {
-            setListSpecialized(data);
-          }
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [selectedDepartment]);
-
-  useEffect(() => {
-    if (specialized) {
-      fetch(
-        "http://localhost:8080/api/v1/subjects/specialized/" + specialized?.id
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          setListSubject(data);
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [specialized]);
-
   const createDocument = (event) => {
     event.preventDefault();
 
-    // check data
-    if (selectedFile === null) {
-      alert("Vui lòng chọn tài liệu");
+    // Check data
+    if (!uploadData.document) {
+      toast.error("Vui lòng chọn tài liệu");
       return;
     }
-    if (title === null || title === "") {
-      alert("Vui lòng nhập tiêu đề");
+    if (!uploadData.title) {
+      toast.error("Vui lòng nhập tiêu đề");
       return;
     }
-    if (category === null || category === "") {
-      alert("Vui lòng chọn thể loại");
+    if (!uploadData.category || uploadData.category === -1) {
+      toast.error("Vui lòng chọn thể loại");
       return;
     }
-    if (selectedDepartment === null || selectedDepartment === "") {
-      alert("Vui lòng chọn đơn vị");
+    if (!uploadData.specialized || uploadData.specialized === -1) {
+      toast.error("Vui lòng chọn chuyên ngành");
       return;
     }
-    if (specialized === null || specialized === "") {
-      alert("Vui lòng chọn chuyên ngành");
+    if (!uploadData.author) {
+      toast.error("Vui lòng nhập tên tác giả");
       return;
     }
-    if (author === null || author === "") {
-      alert("Vui lòng nhập tên tác giả");
-      return;
-    }
-    if (scope === null || scope === "") {
-      alert("Vui lòng chọn quyền riêng tư");
+    if (!uploadData.scope || uploadData.scope === -1) {
+      toast.error("Vui lòng chọn quyền riêng tư");
       return;
     }
 
     const formData = new FormData();
-    console.log(user);
-    formData.append("document", selectedFile);
-    formData.append("title", title);
-    formData.append("department", selectedDepartment.id);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("subject", subject || -1);
-    formData.append("specialized", specialized?.id);
+    formData.append("document", uploadData.document);
+    formData.append("title", uploadData.title);
+    formData.append("specialized", uploadData.specialized);
+    formData.append("category", uploadData.category);
+    formData.append("description", uploadData.description);
+    formData.append("subject", uploadData.subject);
     formData.append("userUpload", user?.staff_code);
-    formData.append("scope", scope || "public");
-    formData.append("author", author);
-    formData.append("documentDownload", downloadFile);
-    console.log(formData);
+    formData.append("scope", uploadData.scope);
+    formData.append("author", uploadData.author);
+    // formData.append('documentDownload', haveDownloadFile ? uploadData.documentDownload : uploadData.document);
 
+    setIsLoading(true);
     fetch("http://localhost:8080/api/v1/documents/upload", {
       method: "POST",
       body: formData,
@@ -229,40 +250,46 @@ export const Upload = () => {
       },
     })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
-          toast.success("Tài liệu đã được tải lên");
-          setFile(null);
-          setCategory("");
-          setSelectedDepartment("");
-          setDescription("");
-          setSpecialized(null);
-          setListSpecialized(null);
-          setSubject("");
-          setTitle("");
-          setScope(null);
-          setAuthor("");
+          resetDocument();
+          toast.success("Tài liệu đã được tải lên");
         } else {
           response.text().then((data) => toast.error(data));
         }
       })
       .catch((error) => console.error(error));
+    setIsLoading(false);
+  };
+
+  const resetDocument = () => {
+    setSelectedDepartment(-1);
+    // setHaveDownloadFile(false)
+    uploadData.document = null;
+    uploadData.title = "";
+    uploadData.specialized = -1;
+    uploadData.category = -1;
+    uploadData.description = "";
+    uploadData.subject = -1;
+    uploadData.scope = -1;
+    uploadData.author = "";
+    uploadData.documentDownload = null;
   };
 
   const updateDocument = (event) => {
     event.preventDefault();
     const formData = new FormData();
-    formData.append("document", selectedFile);
-    formData.append("title", title);
-    formData.append("department", selectedDepartment.id);
-    formData.append("category", category);
-    formData.append("description", description);
-    formData.append("subject", subject || 1);
-    formData.append("userUpload", jwt.staff_code);
-    formData.append("scope", scope);
-    formData.append("author", author);
-    console.log(documentEdit);
-    fetch(`http://localhost:8080/api/v1/documents/${documentEdit.id}`, {
+    formData.append("document", uploadData.document);
+    formData.append("title", uploadData.title);
+    formData.append("specialized", uploadData.specialized);
+    formData.append("category", uploadData.category);
+    formData.append("description", uploadData.description);
+    formData.append("subject", uploadData.subject);
+    formData.append("userUpload", user?.staff_code);
+    formData.append("scope", uploadData.scope);
+    formData.append("author", uploadData.author);
+    formData.append("documentDownload", uploadData.documentDownload);
+
+    fetch("http://localhost:8080/api/v1/documents/" + documentEditId, {
       method: "PUT",
       body: formData,
       headers: {
@@ -271,27 +298,46 @@ export const Upload = () => {
     })
       .then((response) => {
         if (response.status === 200) {
-          alert("Cập nhật tài liệu thành công");
-        } else {
-          response.text().then((text) => {
-            console.error(`Error: ${response.status} - ${text}`);
-          });
+          toast.success("Cập nhật tài liệu thành công");
         }
       })
       .catch((error) => console.error(error));
   };
 
-  // check is true author or not
-  // if (jwt && documentEdit) {
-  //     if (jwt?.staff_code !== documentEdit?.user_upload?.staffCode) {
-  //         window.location.href = "/";
-  //     }
-  // }
-
   return (
     <div className={`w-full p-2`}>
+      <div
+        className={`${
+          isLoading ? "" : "hidden"
+        } top-0 left-0 w-full h-[100vh] fixed bg-gray-500/50 z-50 flex justify-center items-center`}
+      >
+        <div
+          role="status"
+          className={`z-50 flex flex-col justify-center items-center`}
+        >
+          <svg
+            aria-hidden="true"
+            className="inline w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+            viewBox="0 0 100 101"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+              fill="currentColor"
+            />
+            <path
+              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+              fill="currentFill"
+            />
+          </svg>
+          <h3 className={`text-xl font-bold text-white mt-5`}>
+            Đang đăng tài liệu, quá trình này có thể diễn ra trong vài phút!
+          </h3>
+        </div>
+      </div>
       <h2
-        className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 ${
+        className={`text-3xl font-bold mb-5 mt-10 pl-10 lg:pl-0 text-center ${
           isEditPage ? "block" : "hidden"
         }`}
       >
@@ -304,85 +350,42 @@ export const Upload = () => {
         <p className={`text-lg`}>
           Tài liệu <span className="text-red-500">*</span>
         </p>
-        <p className={`text-red-500 mb-2`}>Lưu ý chỉ hỗ trợ file PDF</p>
-        <div className={`${selectedFile ? "hidden" : "block"}`}>
+        <p className={`text-red-500 mb-2`}>
+          Lưu ý chỉ hỗ trợ file PDF, Doc, Docx, PPT và PPTX
+        </p>
+        <div className={`${uploadData.document ? "hidden" : "block"}`}>
           <DragDropFile
             handleFiles={handleFiles}
-            fileSupport={`application/pdf`}
+            fileSupport={`application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/pdf, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/msword`}
           />
         </div>
       </div>
-      <div className={`flex justify-center p-2`}>
-        {selectedFile && (
+      <div
+        className={`flex justify-center p-2 ${isEditPage ? "hidden" : "block"}`}
+      >
+        {uploadData?.document && (
           <div className="bg-white p-5 rounded-2xl flex gap-3 max-w-md mt-2">
-            <Document file={selectedFile} type={selectedFile.type}>
-              <div className="max-h-[50px] overflow-hidden">
-                <Page pageNumber={1} width={40} height={50} />
-              </div>
-            </Document>
+            {uploadData?.document.type === "application/pdf" ? (
+              <Document
+                file={uploadData.document}
+                type={uploadData.document.type}
+              >
+                <div className="max-h-[50px] overflow-hidden">
+                  <Page pageNumber={1} width={40} height={50} />
+                </div>
+              </Document>
+            ) : (
+              ""
+            )}
             <div className={`max-w-md overflow-hidden flex flex-col gap-2`}>
-              <p className="w-full">{selectedFile?.name}</p>
-              <p>{(selectedFile?.size / (1024 * 1024)).toFixed(1)} MB</p>
+              <p className="w-full">{uploadData?.document.name}</p>
+              <p>{(uploadData?.document.size / (1024 * 1024)).toFixed(1)} MB</p>
             </div>
-            <button onClick={() => setFile(null)} className="text-red-500">
+            <button onClick={() => resetUploadFiles()} className="text-red-500">
               Xóa
             </button>
           </div>
         )}
-      </div>
-      <div
-        className={`${
-          haveDownloadFile ? "bg-white rounded-2xl mt-2" : ""
-        } flex flex-col items-center max-w-[450px] mx-auto`}
-      >
-        {/*toggle*/}
-        <label className="inline-flex items-center cursor-pointer my-3 p-2">
-          <input
-            type="checkbox"
-            value=""
-            className="sr-only peer"
-            checked={haveDownloadFile}
-            onChange={(e) => {
-              setHaveDownloadFile(e.target.checked);
-              setDownloadFile(null);
-            }}
-          />
-          <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-          <p className="ml-3 w-[70%] text-gray-900 font-semibold">
-            Tôi muốn file người dùng tải về là file khác (word, powerpoint,
-            excel...)
-          </p>
-        </label>
-        <div className={`p-10 max-w-[450px]`}>
-          {haveDownloadFile && !downloadFile && (
-            <div className={`${isEditPage ? "hidden" : "block"} max-w-[450px]`}>
-              <DragDropFile
-                handleFiles={handleFileDownload}
-                fileSupport={`any`}
-              />
-            </div>
-          )}
-          {downloadFile && haveDownloadFile && (
-            <div
-              className={`${
-                isEditPage ? "hidden" : "block"
-              } max-w-[450px] overflow-hidden p-2 flex justify-between gap-5 rounded-2xl border border-gray-300`}
-            >
-              <p className={`text-gray-700 font-semibold`}>
-                Tải lên thành công{" "}
-                <span className={`text-gray-900 font-semibold`}>
-                  {downloadFile.name}
-                </span>
-              </p>
-              <button
-                className={`text-white bg-red-400 px-2 py-1 rounded-lg mt-2`}
-                onClick={() => setDownloadFile(null)}
-              >
-                Xóa
-              </button>
-            </div>
-          )}
-        </div>
       </div>
       <div className="max-w-md mx-auto p-8 bg-white rounded-md shadow-md mt-5">
         <h2 className="text-2xl font-semibold mb-6">Thông tin tài liệu</h2>
@@ -397,12 +400,12 @@ export const Upload = () => {
             <input
               type="text"
               id="name"
-              name="name"
+              name="title"
               placeholder="Báo cáo môn học ..."
               required
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-              onChange={(event) => setTitle(event.target.value)}
-              value={title}
+              onChange={handleChange}
+              value={uploadData.title}
             />
           </div>
 
@@ -417,21 +420,23 @@ export const Upload = () => {
               id="department"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
               onChange={(event) => {
-                const selectedDepartment = JSON.parse(event.target.value);
-                console.log(selectedDepartment);
-                setSelectedDepartment(selectedDepartment);
-                setListSpecialized(selectedDepartment.specializeds);
+                setSelectedDepartment(event.target.value);
+                handleListSpecialized(event.target.value);
               }}
-              value={JSON.stringify(selectedDepartment)}
+              value={selectedDepartment}
             >
-              <option className={`${isEditPage ? "hidden" : "block"}`}>
+              <option
+                value={-1}
+                className={`${isEditPage ? "hidden" : "block"}`}
+              >
                 Chọn khoa
               </option>
-              {departments &&
-                departments.map((dep) => {
+              {listDepartment &&
+                listDepartment?.map((dep) => {
                   return (
                     <option
-                      value={JSON.stringify(dep)}
+                      value={dep.id}
+                      selected={dep.id === selectedDepartment}
                       className={`${dep.locked ? "hidden" : "block"}`}
                       key={dep.id}
                     >
@@ -449,17 +454,19 @@ export const Upload = () => {
               Ngành <span className={`text-red-500`}>*</span>
             </label>
             <select
-              id="department"
+              id="specialized"
+              name="specialized"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              onChange={(e) => setSpecialized(JSON.parse(e.target.value))}
-              value={JSON.stringify(specialized)}
+              onChange={handleChange}
+              value={uploadData.specialized}
             >
-              <option>Chọn ngành</option>
+              <option value={-1}>Chọn ngành</option>
               {listSpecialized &&
                 listSpecialized?.map((specialized) => {
                   return (
                     <option
-                      value={JSON.stringify(specialized)}
+                      value={specialized.id}
+                      selected={specialized.id === uploadData.specialized}
                       className={`${specialized.locked ? "hidden" : "block"}`}
                       key={specialized.id}
                     >
@@ -477,15 +484,23 @@ export const Upload = () => {
               Thể loại <span className={`text-red-500`}>*</span>
             </label>
             <select
-              id="department"
+              id="category"
+              name="category"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              onChange={(e) => setCategory(e.target.value)}
-              value={category}
+              onChange={handleChange}
+              value={uploadData.category}
             >
-              <option value={null}>Chọn thể loại</option>
+              <option value={-1}>Chọn thể loại</option>
               {Array.isArray(listCategory) &&
                 listCategory.map((category) => (
-                  <option value={category.id} key={category.id}>
+                  <option
+                    value={category.id}
+                    key={category.id}
+                    selected={
+                      category.id === uploadData.category ||
+                      category.id === uploadData.category
+                    }
+                  >
                     {category.categoryName}
                   </option>
                 ))}
@@ -493,20 +508,25 @@ export const Upload = () => {
           </div>
           <div className="max-w-sm mx-auto mb-3">
             <label
-              htmlFor="department"
+              htmlFor="subject"
               className="block mb-2 text-sm font-semibold text-gray-900"
             >
-              Môn
+              Môn <span className={`text-red-500`}>*</span>
             </label>
             <select
-              id="department"
+              id="subject"
+              name="subject"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              onChange={(e) => setSubject(e.target.value)}
+              onChange={handleChange}
             >
               <option value={null}>Chọn môn</option>
-              {Array.isArray(listSubject) &&
+              {listSubject &&
                 listSubject.map((subject) => (
-                  <option value={subject.id} key={subject.id}>
+                  <option
+                    selected={subject.id === uploadData.subject}
+                    value={subject.id}
+                    key={subject.id}
+                  >
                     {subject.subjectName}
                   </option>
                 ))}
@@ -514,20 +534,25 @@ export const Upload = () => {
           </div>
           <div className="max-w-sm mx-auto mb-3">
             <label
-              htmlFor="department"
+              htmlFor="scope"
               className="block mb-2 text-sm font-semibold text-gray-900"
             >
               Quyền riêng tư <span className={`text-red-500`}>*</span>
             </label>
             <select
-              id="department"
+              id="scope"
+              name="scope"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-              onChange={(e) => setScope(e.target.value)}
-              value={scope}
+              onChange={handleChange}
+              value={uploadData.scope}
             >
-              <option value={""}>Chọn quyền riêng tư</option>
+              <option value={-1}>Chọn quyền riêng tư</option>
               {scopeList.map((scope, index) => (
-                <option value={scope.scope} key={index}>
+                <option
+                  selected={scope.scope === uploadData.scope}
+                  key={index}
+                  value={scope.scope}
+                >
                   {scope.name}
                 </option>
               ))}
@@ -566,11 +591,11 @@ export const Upload = () => {
             <input
               type="text"
               id="teacher"
-              name="teacher"
+              name="author"
               placeholder=""
               required
-              onChange={(e) => setAuthor(e.target.value)}
-              value={author}
+              onChange={handleChange}
+              value={uploadData.author}
               className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -583,9 +608,10 @@ export const Upload = () => {
             </label>
             <CKEditor
               editor={ClassicEditor}
-              data={description}
+              data={uploadData.description}
               onChange={(event, editor) => {
-                setDescription(editor.getData());
+                const data = editor.getData();
+                setUploadData({ ...uploadData, description: data });
               }}
             />
           </div>

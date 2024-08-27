@@ -33,30 +33,6 @@ public class NotificationServiceImpl implements NotificationService {
         User user = userService.getUserByStaffCode(staffCode);
         List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
         // return list of notification
-<<<<<<< HEAD
-
-        // return notificationList.stream().map(
-        // notification -> NotificationDTO.builder()
-        // .sender(notification.getSender().getStaffCode())
-        // .receiver(notification.getReceiver().getStaffCode())
-        // .title(notification.getTitle())
-        // .content(notification.getContent())
-        // .is_check(notification.is_check())
-        // .created_at(notification.getCreated_at())
-        // .build())
-        // .toList().reversed();
-        return notificationList.stream()
-                .map(notification -> NotificationDTO.builder()
-                        .sender(notification.getSender().getStaffCode())
-                        .receiver(notification.getReceiver().getStaffCode())
-                        .title(notification.getTitle())
-                        .content(notification.getContent())
-                        .is_check(notification.is_check())
-                        .created_at(notification.getCreated_at())
-                        .build())
-                .sorted(Comparator.comparing(NotificationDTO::getCreated_at).reversed())
-                .collect(Collectors.toList());
-=======
         return notificationList.stream().map(
                         notification -> NotificationDTO.builder()
                                 .sender(notification.getSender().getStaffCode())
@@ -68,7 +44,6 @@ public class NotificationServiceImpl implements NotificationService {
                                 .created_at(notification.getCreated_at())
                                 .build())
                 .toList().reversed();
->>>>>>> 857f3cd23cccdad73188e82016ffec4026385302
     }
 
     public void send(NotificationDTO message) {
