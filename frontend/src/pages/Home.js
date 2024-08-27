@@ -1,132 +1,126 @@
-import React, {useContext, useEffect, useState} from 'react'
-import Post from '../components/DocumentCard'
-import {Link} from 'react-router-dom'
+import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Banner from "../components/Banner";
-import {JWTContext} from "../App";
-
+import { JWTContext } from "../App";
+import ListDocuments from "../components/homepages/ListDocuments";
 const Home = () => {
+  const [mostViewed, setMostViewed] = useState([]);
 
-    const [mostViewed, setMostViewed] = useState([])
+  const [mostDownloaded, setMostDownloaded] = useState([]);
 
-    const [mostDownloaded, setMostDownloaded] = useState([])
+  const [lastedDocuments, setLastedDocuments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-    const [lastedDocuments, setLastedDocuments] = useState([])
+  const context = useContext(JWTContext);
+  const staffCode = context?.jwtDecoded?.staff_code;
+  console.log(staffCode);
 
-    const context = useContext(JWTContext);
-    const staffCode = context?.jwtDecoded?.staff_code;
+  useEffect(() => {
+    setIsLoading(true);
 
-    useEffect(() => {
-        fetch('http://localhost:8080/api/v1/view-history/top-documents/9', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            },
-        }).then(res => {
-            if (res?.status === 200) {
-                return res.json().then(data => {
-                    setMostViewed(data);
-                });
-            } else {
-                throw new Error(`Unexpected status code: ${res.status}`);
-            }
-        }).catch(err => {
-            console.error('Failed to fetch most viewed documents:', err);
-        });
-
-        fetch('http://localhost:8080/api/v1/documents/most-downloaded?limit=9', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            },
-        }).then(res => {
-            if (res?.status === 200) {
-                return res.json().then(data => {
-                    setMostDownloaded(data);
-                });
-            } else {
-                throw new Error(`Unexpected status code: ${res.status}`);
-            }
-        }).catch(err => {
-            console.error('Failed to fetch most downloaded documents:', err);
-        });
-
-        fetch('http://localhost:8080/api/v1/documents/latest?limit=9', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                'Access-Control-Allow-Origin': '*',
-            },
-        }).then(res => {
-            if (res?.status === 200) {
-                return res.json().then(data => {
-                    setLastedDocuments(data);
-                });
-            } else {
-                throw new Error(`Unexpected status code: ${res.status}`);
-            }
-        }).catch(err => {
-            console.error('Failed to fetch latest documents:', err);
-        });
-    }, []);
-
-
-    return (
-        <div>
-            <div className={`w-full h-fit relative`}>
-                <Banner/>
-            </div>
-            <div
-                className='bg-white rounded-lg max-w-[1200px] p-2 w-full h-fit shadow-2xl pt-5 mt-10 flex flex-col md:p-10 gap-10 pb-10'>
-                <h2 className='font-bold text-[28px] mb-5 pl-5'>Tài liệu mới</h2>
-                <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
-                    {lastedDocuments && lastedDocuments?.map((item, index) => (
-                        <div
-                            className={`${
-                                ((item.scope === "private" && staffCode !== item.user_upload.staffCode) || (item.scope === "student-only" && !staffCode) || item.status !== "published")
-                                    ? "hidden"
-                                    : "block"
-                            }`}>
-                            <Post key={index} document={item}/>
-                        </div>
-                    ))}
-                </div>
-                {/* button "see more" */}
-                <div className='flex justify-center mt-5'>
-                    <Link to={`/search?order=lastest&searchTerm=`}
-                          className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
-                </div>
-                <h2 className='font-bold text-[28px] mb-5'>Tải nhiều nhất tháng này</h2>
-                <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
-                    {mostDownloaded?.map((item, index) => (
-                        <div
-                            className={`${item.scope === "private" || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
-                            <Post key={index} document={item}/>
-                        </div>
-                    ))}
-                </div>
-                <div className='flex justify-center mt-5'>
-                    <Link to={`/search?order=mostDownloaded&searchTerm=`}
-                          className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
-                </div>
-                <h2 className='font-bold text-[28px]'>Xem nhiều nhất tháng này</h2>
-                <div className='lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-center'>
-                    {mostViewed?.map((item, index) => (
-                        <div
-                            className={`${item.scope === "private" || item.status !== "published" ? "hidden" : item.scope === "student-only" && !staffCode ? "hidden" : "block"}`}>
-                            <Post key={index} document={item}/>
-                        </div>
-                    ))}
-                </div>
-                <div className='flex justify-center mt-5'>
-                    <Link to={`/search?order=mostViewed&searchTerm=`}
-                          className='text-white bg-blue-500 hover:bg-blue-300 rounded-md p-4'>Xem thêm</Link>
-                </div>
-            </div>
-
-        </div>
+    const fetchMostViewed = fetch(
+      "http://localhost:8080/api/v1/view-history/top-documents/9",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     )
-}
+      .then((res) => res?.json())
+      .then((data) => setMostViewed(data));
 
-export default Home
+    const fetchMostDownloaded = fetch(
+      "http://localhost:8080/api/v1/documents/most-downloaded?limit=9",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
+      .then((res) => res?.json())
+      .then((data) => setMostDownloaded(data));
+
+    const fetchLastedDocuments = fetch(
+      "http://localhost:8080/api/v1/documents/latest?limit=9",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
+      .then((res) => res?.json())
+      .then((data) => setLastedDocuments(data));
+    Promise.all([fetchMostViewed, fetchMostDownloaded, fetchLastedDocuments])
+      .then(() => setIsLoading(false)) // Stop loading after all requests are done
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setIsLoading(false); // Stop loading even if there’s an error
+      });
+  }, []);
+
+  return (
+    <div className="w-screen h-full">
+      {isLoading ? (
+        <div>Loading ...</div>
+      ) : (
+        <div>
+          <div className={`w-full h-fit relative`}>
+            <Banner />
+          </div>
+          <div className=" rounded-xl p-2 w-full  pt-5 mt-10 flex flex-col md:p-10 gap-10 pb-10">
+            <h2 className="font-bold text-[28px] pl-5">Tài liệu mới</h2>
+            {lastedDocuments && (
+              <ListDocuments
+                listDocuments={lastedDocuments}
+                maximumElements={12}
+                staffCode={staffCode}
+              />
+            )}
+            <div id="mostDownLoaded">
+              <h2 className="font-bold text-[28px] mb-5">
+                Tải nhiều nhất tháng này
+              </h2>
+              {mostDownloaded && (
+                <ListDocuments
+                  listDocuments={mostDownloaded}
+                  maximumElements={12}
+                  staffCode={staffCode}
+                />
+              )}
+            </div>
+            <div id="mostViewed">
+              <h2 className="font-bold text-[28px] mb-5">
+                Xem nhiều nhất tháng này
+              </h2>
+              <div className="lg:ml-5 flex gap-5 overflow-auto flex-wrap justify-start">
+                {mostViewed && (
+                  <ListDocuments
+                    listDocuments={mostViewed}
+                    maximumElements={12}
+                    staffCode={staffCode}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end mt-5">
+              <Link
+                to={`/search?order=mostViewed&searchTerm=`}
+                className="text-blue-500 underline underline-offset-2 hover:cursor-pointer hover:opacity-70  p-4"
+              >
+                Xem thêm
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Home;

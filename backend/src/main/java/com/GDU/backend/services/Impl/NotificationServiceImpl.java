@@ -23,50 +23,51 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
-    private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
-    private final NotificationRepository notificationRepository;
-    private final UserService userService;
-    private final DocumentRepository documentRepository;
+        private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
+        private final NotificationRepository notificationRepository;
+        private final UserService userService;
+        private final DocumentRepository documentRepository;
 
-    @Override
-    public List<NotificationDTO> getAllNotificationOfUser(String staffCode) {
-        User user = userService.getUserByStaffCode(staffCode);
-        List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
-        // return list of notification
-        return notificationList.stream().map(
-                        notification -> NotificationDTO.builder()
-                                .sender(notification.getSender().getStaffCode())
-                                .receiver(notification.getReceiver().getStaffCode())
-                                .title(notification.getTitle())
-                                .content(notification.getContent())
-                                .document(notification.getDocument().getSlug())
-                                .is_check(notification.is_check())
-                                .created_at(notification.getCreated_at())
-                                .build())
-                .toList().reversed();
-    }
+        @Override
+        public List<NotificationDTO> getAllNotificationOfUser(String staffCode) {
+                User user = userService.getUserByStaffCode(staffCode);
+                List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
+                // return list of notification
+                return notificationList.stream().map(
+                                notification -> NotificationDTO.builder()
+                                                .sender(notification.getSender().getStaffCode())
+                                                .receiver(notification.getReceiver().getStaffCode())
+                                                .title(notification.getTitle())
+                                                .content(notification.getContent())
+                                                .document(notification.getDocument().getSlug())
+                                                .is_check(notification.is_check())
+                                                .created_at(notification.getCreated_at())
+                                                .build())
+                                .toList().reversed();
+        }
 
-    public void send(NotificationDTO message) {
-        User sender = userService.getUserByStaffCode(message.getSender());
-        User receiver = userService.getUserByStaffCode(message.getReceiver());
-        Document document = documentRepository.findBySlug(message.getDocument()).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-        Notification notification = Notification.builder()
-                .sender(sender)
-                .receiver(receiver)
-                .title(message.getTitle())
-                .document(document)
-                .content(message.getContent())
-                .created_at(LocalDateTime.now())
-                .build();
-        log.info("Sending message: {}", notification);
-        notificationRepository.save(notification);
-    }
+        public void send(NotificationDTO message) {
+                User sender = userService.getUserByStaffCode(message.getSender());
+                User receiver = userService.getUserByStaffCode(message.getReceiver());
+                Document document = documentRepository.findBySlug(message.getDocument())
+                                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+                Notification notification = Notification.builder()
+                                .sender(sender)
+                                .receiver(receiver)
+                                .title(message.getTitle())
+                                .document(document)
+                                .content(message.getContent())
+                                .created_at(LocalDateTime.now())
+                                .build();
+                log.info("Sending message: {}", notification);
+                notificationRepository.save(notification);
+        }
 
-    @Override
-    public void makeCheckedAllNotificationOfUser(String staffCode) {
-        User user = userService.getUserByStaffCode(staffCode);
-        List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
-        notificationList.forEach(notification -> notification.set_check(true));
-        notificationRepository.saveAll(notificationList);
-    }
+        @Override
+        public void makeCheckedAllNotificationOfUser(String staffCode) {
+                User user = userService.getUserByStaffCode(staffCode);
+                List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
+                notificationList.forEach(notification -> notification.set_check(true));
+                notificationRepository.saveAll(notificationList);
+        }
 }

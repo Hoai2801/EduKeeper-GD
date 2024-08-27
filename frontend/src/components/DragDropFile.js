@@ -33,10 +33,14 @@ const DragDropFile = ({ handleFiles, fileSupport }) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       console.log(e.target.files[0].type);
-      if (e.target.files[0].type === fileSupport
-          || fileSupport.includes(e.target.files[0].type)
-          // use for the download document can be support any type but not image
-          || (fileSupport === "any" && e.target.files[0].type !== "image/png" && e.target.files[0].type !== "image/jpeg" && e.target.files[0].type !== "image/jpg")
+      if (
+        e.target.files[0].type === fileSupport ||
+        fileSupport.includes(e.target.files[0].type) ||
+        // use for the download document can be support any type but not image
+        (fileSupport === "any" &&
+          e.target.files[0].type !== "image/png" &&
+          e.target.files[0].type !== "image/jpeg" &&
+          e.target.files[0].type !== "image/jpg")
       ) {
         if (e.target.files[0].size < 52428800) {
           handleFiles(e.target.files);

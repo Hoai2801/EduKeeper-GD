@@ -30,7 +30,7 @@ import NoticeWarning from "./pages/Notify";
 import Maintenance from "./pages/Maintenance";
 import Backup from "./pages/Backup";
 
-export const JWTContext = createContext(null)
+export const JWTContext = createContext(null);
 
 function App() {
   window.scrollTo(0, 0);
@@ -112,7 +112,7 @@ function App() {
           <Route path="subject" element={<Subject />} />
           <Route path="banner" element={<BannerManager />} />
           <Route path="deleted" element={<DeletedDocument />} />
-          <Route path="backup" element={<Backup/>} />
+          <Route path="backup" element={<Backup />} />
           <Route path="setting" element={<Setting />} />
         </Route>
         <Route element={<NoticeWarning />}>

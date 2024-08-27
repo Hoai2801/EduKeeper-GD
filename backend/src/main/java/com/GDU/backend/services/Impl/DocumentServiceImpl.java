@@ -160,7 +160,7 @@ public class DocumentServiceImpl implements DocumentService {
                     PDFRenderer pdfRenderer = new PDFRenderer(document);
                     StringBuilder htmlContent = new StringBuilder();
                     htmlContent.append("<html><body>");
-    
+
                     for (int page = 0; page < document.getNumberOfPages(); page++) {
                         BufferedImage bim = pdfRenderer.renderImageWithDPI(page, 100); // Higher DPI for better quality
                         // set size of image
@@ -168,13 +168,15 @@ public class DocumentServiceImpl implements DocumentService {
                         String imagePath = outputDirPathOfImage + slideName;
                         ImageIO.write(bim, "png", new File(imagePath));
                         System.out.println("PDF page " + (page + 1) + " converted to image successfully!");
-                        htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(slideName).append("' style=\"width: 100%; max-width: 100%;\" loading=\"lazy\" /><br/>");
+                        htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(slideName)
+                                .append("' style=\"width: 100%; max-width: 100%;\" loading=\"lazy\" /><br/>");
                     }
 
                     htmlContent.append("</body></html>");
 
                     // Save the HTML content to a file
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputDirPathOfHtml + fileName + ".html"))) {
+                    try (BufferedWriter writer = new BufferedWriter(
+                            new FileWriter(outputDirPathOfHtml + fileName + ".html"))) {
                         writer.write(htmlContent.toString());
                     }
 
@@ -189,7 +191,8 @@ public class DocumentServiceImpl implements DocumentService {
                 XWPFWordExtractor extractor = new XWPFWordExtractor(document);
                 totalPages = extractor.getExtendedProperties().getUnderlyingProperties().getPages();
                 XHTMLOptions options = XHTMLOptions.create().setImageManager(new Base64EmbedImgManager());
-                try (FileOutputStream out = new FileOutputStream("src/main/resources/static/convert/" + fileName + ".html")) {
+                try (FileOutputStream out = new FileOutputStream(
+                        "src/main/resources/static/convert/" + fileName + ".html")) {
                     XHTMLConverter.getInstance().convert(document, out, options);
                 }
                 document.close();
@@ -207,9 +210,11 @@ public class DocumentServiceImpl implements DocumentService {
                 serializer.setOutputProperty(OutputKeys.METHOD, "html");
                 serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
                 serializer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "-//W3C//DTD XHTML 1.0 Transitional//EN");
-                serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+                serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,
+                        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
                 serializer.transform(new DOMSource(wordToHtmlConverter.getDocument()),
-                        new StreamResult(new FileOutputStream("src/main/resources/static/convert/" + fileName + ".html")));
+                        new StreamResult(
+                                new FileOutputStream("src/main/resources/static/convert/" + fileName + ".html")));
                 System.out.println("Converted DOC to HTML");
             } else if (originalFilename.endsWith(".pptx") || originalFilename.endsWith(".ppt")) {
                 XMLSlideShow ppt = new XMLSlideShow(new FileInputStream(destFile));
@@ -229,7 +234,8 @@ public class DocumentServiceImpl implements DocumentService {
                     slide.draw(graphics);
                     String imgFileName = fileName + "_slide_" + System.currentTimeMillis() + ".png";
                     ImageIO.write(img, "png", new File("src/main/resources/static/images/" + imgFileName));
-                    htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName).append("' style='width:100%; height:auto;' loading='lazy'/><br>");
+                    htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName)
+                            .append("' style='width:100%; height:auto;' loading='lazy'/><br>");
                 }
                 htmlContent.append("</body></html>");
                 try (FileWriter htmlFile = new FileWriter("src/main/resources/static/convert/" + fileName + ".html")) {
@@ -244,7 +250,8 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         // Update the Document's totalPages and save to the database
-        Document document = documentRepository.findById(documentId).orElseThrow(() -> new RuntimeException("Document not found"));
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Document not found"));
         document.setPages(totalPages);
         documentRepository.save(document);
     }
@@ -297,7 +304,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (userUpload == null) {
             return "User not existing";
         }
-        
+
         existDocument.setUserUpload(userUpload);
 
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory()).orElse(null);
@@ -346,10 +353,10 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO) {
         return documentRepository.getDocumentsSuggested(
-                        recommendationRequestDTO.getSpecialized(),
-                        recommendationRequestDTO.getCategory(),
-                        recommendationRequestDTO.getTitle(),
-                        recommendationRequestDTO.getAuthor())
+                recommendationRequestDTO.getSpecialized(),
+                recommendationRequestDTO.getCategory(),
+                recommendationRequestDTO.getTitle(),
+                recommendationRequestDTO.getAuthor())
                 .stream().map(this::convertToDocumentResponse).toList();
     }
 

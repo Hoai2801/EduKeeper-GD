@@ -30,7 +30,9 @@ public class Document {
 
     @Column(nullable = false, length = 30)
     private String documentType;
-    
+
+    @Column(name = "download_file_type", nullable = false, length = 30)
+    private String downloadFileType;
     @Column(nullable = false)
     private Long documentSize;
 
@@ -97,7 +99,7 @@ public class Document {
     public int getFavoritesCount() {
         return favorites != null ? favorites.size() : 0;
     }
-        
+
     @Override
     public String toString() {
         return "Document{" +
