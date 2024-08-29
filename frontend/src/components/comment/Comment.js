@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {JWTContext} from "../App";
+import {JWTContext} from "../../App";
 import toast from "react-hot-toast";
 
 const Comment = ({comment, fetchComment}) => {
@@ -55,6 +55,8 @@ const Comment = ({comment, fetchComment}) => {
         }
     }
 
+    console.log(comment?.user?.avatar)
+
     return (
         <article className="p-6 text-base rounded-lg w-full bg-white">
             <footer className="flex justify-between items-center mb-2 relative w-full">
@@ -62,7 +64,7 @@ const Comment = ({comment, fetchComment}) => {
                     <p className="inline-flex items-center mr-3 text-sm text-gray-900 font-semibold">
                         <img
                             className="mr-2 w-6 h-6 rounded-full"
-                            src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
+                            src={'http://localhost:8080/api/v1/images/avatar/' + comment?.user?.avatar}
                             alt="Michael Gough"/>{comment?.user.name}</p>
                     <p className="text-sm text-gray-600 min-w-[500px]">
                         <time>{comment?.createdAt}

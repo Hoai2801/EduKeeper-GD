@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.hpsf.SummaryInformation;
+import org.apache.poi.hpsf.Thumbnail;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.converter.WordToHtmlConverter;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
@@ -147,6 +148,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     public void processDocumentConversion(File destFile, String fileName, Long documentId) throws IOException {
         int totalPages = 0;
+        String thumbnail = "";
         String dir = "src/main/resources/static/convert/";
         if (!Files.exists(Paths.get(dir))) {
             Files.createDirectories(Paths.get(dir));
@@ -167,7 +169,9 @@ public class DocumentServiceImpl implements DocumentService {
                         String slideName = fileName + "_page_" + (page + 1) + ".png";
                         String imagePath = outputDirPathOfImage + slideName;
                         ImageIO.write(bim, "png", new File(imagePath));
-                        System.out.println("PDF page " + (page + 1) + " converted to image successfully!");
+                        if (page == 0) {
+                            thumbnail = slideName;
+                        }
                         htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(slideName)
                                 .append("' style=\"width: 100%; max-width: 100%;\" loading=\"lazy\" /><br/>");
                     }
@@ -233,6 +237,7 @@ public class DocumentServiceImpl implements DocumentService {
                     graphics.fill(new Rectangle2D.Float(0, 0, pgsize.width, pgsize.height));
                     slide.draw(graphics);
                     String imgFileName = fileName + "_slide_" + System.currentTimeMillis() + ".png";
+                    thumbnail = imgFileName;
                     ImageIO.write(img, "png", new File("src/main/resources/static/images/" + imgFileName));
                     htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName)
                             .append("' style='width:100%; height:auto;' loading='lazy'/><br>");
@@ -253,6 +258,7 @@ public class DocumentServiceImpl implements DocumentService {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new RuntimeException("Document not found"));
         document.setPages(totalPages);
+        document.setThumbnail(thumbnail);
         documentRepository.save(document);
     }
 
@@ -520,6 +526,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .user_upload(userUpload)
                 .author(document.getAuthor())
                 .status(document.getStatus())
+                .thumbnail(document.getThumbnail())
                 .scope(document.getScope())
                 .specialized(document.getSpecialized())
                 .department(document.getSpecialized().getDepartment())

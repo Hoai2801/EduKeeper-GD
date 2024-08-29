@@ -68,7 +68,7 @@ const LoveButton = ({staffCode, documentId}) => {
 
     return (
         <div>
-            <button className={`w-full hover:shadow-lg rounded-md bg-white p-4 mt-5`}
+            <button className={`w-full hover:shadow-lg rounded-md bg-white p-4 mt-5 border border-black`}
                     onClick={() => favorite()}>
                 <div className={`w-full min-w-[220px] flex items-center gap-2 h-10 justify-center`}>
                     <p className="font-bold text-lg">{isFavorite ? "Đã lưu" : "Lưu vào yêu thích"}</p>

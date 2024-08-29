@@ -31,8 +31,6 @@ public class Document {
     @Column(nullable = false, length = 30)
     private String documentType;
 
-    @Column(name = "download_file_type", nullable = false, length = 30)
-    private String downloadFileType;
     @Column(nullable = false)
     private Long documentSize;
 
@@ -60,6 +58,8 @@ public class Document {
     private User userUpload;
 
     private String author;
+    
+    private String thumbnail;
 
     @OneToMany(mappedBy = "document")
     private List<Download> downloads;

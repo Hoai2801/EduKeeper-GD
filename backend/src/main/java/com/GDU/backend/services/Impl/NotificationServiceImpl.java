@@ -39,7 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
                                                 .receiver(notification.getReceiver().getStaffCode())
                                                 .title(notification.getTitle())
                                                 .content(notification.getContent())
-                                                .document(notification.getDocument().getSlug())
+                                                .document(notification.getDocument() != null ? notification.getDocument().getSlug() : null)
                                                 .is_check(notification.is_check())
                                                 .created_at(notification.getCreated_at())
                                                 .build())
