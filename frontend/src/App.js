@@ -29,6 +29,7 @@ import NotFound404 from "./pages/404";
 import NoticeWarning from "./pages/Notify";
 import Maintenance from "./pages/Maintenance";
 import Backup from "./pages/Backup";
+import ForgotPassword from "./pages/ForgotPassword";
 
 export const JWTContext = createContext(null);
 
@@ -99,6 +100,7 @@ function App() {
           <Route path="/document/:slug" element={<Detail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/account/:action/:token" element={<AccountAction />} />
           <Route element={<SideBar />}>
             <Route path="/search" element={<Search />} />

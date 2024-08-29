@@ -11,7 +11,7 @@ const Layout = () => {
   }, [pathname]);
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#F4F3F2]">
       <Navbar />
       <div className=" min-h-[100vh]">
         <Outlet />

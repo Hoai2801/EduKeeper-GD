@@ -189,16 +189,16 @@ public class AuthenticationService {
         return "activated";
     }
 
-    public ResponseEntity<String> forgotPassword(String staffCode) {
+    public ResponseEntity<String> forgotPassword(String mail) {
         try {
-            var user = userRepository.findByStaffCode(staffCode).orElseThrow(
+            var user = userRepository.findByEmail(mail).orElseThrow(
                     () -> new UserNotFoundException("User not found")
             );
             String newToken = generateToken(user);
             // send email
             String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" + newToken;
             emailService.sendEmail(user.getEmail(),
-                    user.getName(), 
+                    user.getName(),
                     EmailTemplateName.FORGOT_PASSWORD,
                     forgotPasswordUrl);
             return ResponseEntity.ok("success");

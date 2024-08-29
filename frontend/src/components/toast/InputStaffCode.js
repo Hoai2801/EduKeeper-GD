@@ -9,16 +9,7 @@ const InputStaffCode = ({setIsInputStaffCodeOpen}) => {
             toast.error("Vui lòng nhập mã giáo viên/sinh viên")
             return;
         }
-        fetch('http://localhost:8080/api/v1/auth/forgot-password/' + staffCode, {
-            method: 'POST',
-        })
-            .then((data) => {
-                if (data.status === 200) {
-                    toast.success("Email xác nhận đã được gửi đến email của bạn")
-                    setIsInputStaffCodeOpen(false)
-                    setStaffCode('')
-                }
-            })
+
     }
     return (
         <div className={`w-full h-full z-50 absolute top-0 left-0 bg-gray-500/50 flex justify-center items-center`}>

@@ -60,11 +60,11 @@ public class AuthController {
         return ResponseEntity.ok().body(authenticationService.activate(token));
     }
 
-    @PostMapping("/forgot-password/{staffCode}")
+    @PostMapping("/forgot-password/{mail}")
     public ResponseEntity<?> forgotPassword(
-            @PathVariable("staffCode") String staffCode
+            @PathVariable("mail") String mail
     ) {
-        return authenticationService.forgotPassword(staffCode);
+        return authenticationService.forgotPassword(mail);
     }
 
     @PostMapping("/reset-password/{token}")

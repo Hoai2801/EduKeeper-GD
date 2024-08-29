@@ -55,8 +55,6 @@ const Comment = ({comment, fetchComment}) => {
         }
     }
 
-    console.log(comment?.user?.avatar)
-
     return (
         <article className="p-6 text-base rounded-lg w-full bg-white">
             <footer className="flex justify-between items-center mb-2 relative w-full">
