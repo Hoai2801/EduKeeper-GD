@@ -13,6 +13,7 @@ import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.SpecializedService;
 import jakarta.persistence.NonUniqueResultException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,7 @@ public class SpecializedServiceImpl implements SpecializedService {
     }
 
     @Override
+    @Cacheable("specializeds")
     public List<SpecializesWithCount> getSpecializedWithCount() {
         try {
             List<SpecializesWithCount> result = new ArrayList<>();

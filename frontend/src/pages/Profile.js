@@ -9,7 +9,6 @@ const Profile = () => {
 
     const location = useParams();
 
-
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token !== "undefined" && token !== null) {

@@ -1,14 +1,18 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.SubjectDTO;
+import com.GDU.backend.models.Document;
 import com.GDU.backend.models.Specialized;
 import com.GDU.backend.models.Subject;
 import com.GDU.backend.models.SubjectSpecialized;
+import com.GDU.backend.repositories.DocumentRepository;
 import com.GDU.backend.repositories.SubjectRepository;
 import com.GDU.backend.repositories.SubjectSpecializedRepository;
 import com.GDU.backend.services.SpecializedService;
 import com.GDU.backend.services.SubjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +20,6 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +27,7 @@ public class SubjectServiceImpl implements SubjectService {
     private final SpecializedService specializedService;
     private final SubjectRepository subjectRepository;
     private final SubjectSpecializedRepository subjectSpecializedRepository;
+    private final DocumentRepository documentRepository;
     
     @Override
     public List<Subject> getAllSubjects() {
@@ -53,7 +57,11 @@ public class SubjectServiceImpl implements SubjectService {
                     .subject(savedSubject)
                     .specialized(specialized)
                     .build();
-            SubjectSpecialized exists = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(subjectSpecialized.getSubject().getId(), subjectSpecialized.getSpecialized().getId());
+            SubjectSpecialized exists = 
+                    subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(
+                                                subjectSpecialized.getSubject().getId(), 
+                                                subjectSpecialized.getSpecialized().getId()
+                    );
             // have a same subject in database
             if (exists != null) {
                 continue;
@@ -81,10 +89,19 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public ResponseEntity<String> deleteSubject(Long id_specialized, Long id_subject) {
-        SubjectSpecialized subjectSpecialized = subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(id_specialized, id_subject);
+        SubjectSpecialized subjectSpecialized = 
+                subjectSpecializedRepository.getSubjectSpecializedBySpecializedAndSubject(id_specialized, id_subject);
         if (subjectSpecialized == null) {
             return ResponseEntity.badRequest().body("Môn học không tìm thấy");
         }
+        // check if subject is used in subject_specialized
+        if (subjectSpecializedRepository.getSubjectSpecializedBySubjectId(id_subject) == null) {
+            List<Document> documents = documentRepository.getDocumentsBySubjectId(id_subject);
+            // if subject of specialized is deleted, 
+            // so we don't need the document of this subject anymore
+            documentRepository.deleteAll(documents);
+        }
+        subjectRepository.deleteById(id_subject);
         subjectSpecializedRepository.delete(subjectSpecialized);
         return ResponseEntity.ok("Xóa môn học thành công");
     }

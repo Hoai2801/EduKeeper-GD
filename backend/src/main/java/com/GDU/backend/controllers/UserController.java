@@ -6,6 +6,8 @@ import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,7 @@ public class UserController {
     }
 
     @GetMapping("/{staffCode}")
+    @Cacheable(value = "getUserDetail", key = "#staffCode")
     public ResponseEntity<UserDetailResponse> getUserResponseById(@PathVariable("staffCode") String staffCode) {
         return ResponseEntity.ok(
                 userService.getUserResponseByStaffCode(staffCode)
@@ -33,21 +36,25 @@ public class UserController {
     }
     
     @PutMapping
+    @CacheEvict(value = "getUserDetail", key = "#userDetailDTO.staffCode" ,allEntries = true)
     public ResponseEntity<String> updateUser(@RequestBody UserDetailDTO userDetailDTO) {
         return ResponseEntity.ok(userService.updateUser(userDetailDTO));
     }
     
     @PutMapping("/block/{staffCode}")
+    @CacheEvict(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<String> blockUser(@PathVariable("staffCode") String staffCode) {
         return userService.blockUser(staffCode);
     }
     
     @PutMapping("/unblock/{staffCode}")
+    @CacheEvict(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<String> unblockUser(@PathVariable("staffCode") String staffCode) {
         return userService.unblockUser(staffCode);
     }
     
     @GetMapping("/is-blocked/{staffCode}")
+    @Cacheable(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<Boolean> isUserBlocked(@PathVariable("staffCode") String staffCode) {
         return ResponseEntity.ok(userService.isUserBlocked(staffCode));
     }
@@ -59,6 +66,7 @@ public class UserController {
     }
     
     @PostMapping("/avatar/{staffCode}")
+    @CacheEvict(value = "getUserDetail", key = "#staffCode")
     public ResponseEntity<String> changeAvatar(
             @PathVariable("staffCode") String staffCode,
             @RequestBody MultipartFile avatar
@@ -78,7 +86,6 @@ public class UserController {
     @GetMapping("/monthly/{year}")
     public ResponseEntity<?> countUsersMonthly(@PathVariable("year") int year) {
         try {
-
             return ResponseEntity.ok(userService.countUsersMonthly(year));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -88,7 +95,6 @@ public class UserController {
     @GetMapping("/type/{year}")
     public ResponseEntity<?> countUsersByRoles(@PathVariable("year") int year) {
         try {
-
             return ResponseEntity.ok(userService.countUsersByRoles(year));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -96,6 +102,7 @@ public class UserController {
     }
     
     @PutMapping("/reset-password/{staffCode}")
+    @CacheEvict(value = "getUserDetail", key = "#staffCode")
     public ResponseEntity<?> resetPassword(
             @PathVariable("staffCode") String staffCode
     ) {

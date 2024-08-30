@@ -5,9 +5,10 @@ import com.GDU.backend.models.Banner;
 import com.GDU.backend.repositories.BannerRepository;
 import com.GDU.backend.services.BannerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ public class BannerServiceImpl implements BannerService {
     private final BannerRepository bannerRepository;
     
     @Override
+    @CacheEvict(value = "banners", allEntries = true)
     public ResponseEntity<String> createBanner(BannerDTO banner) {
         // generate file name and path
         String fileName = System.currentTimeMillis() + "_" + banner.getBanner().getOriginalFilename();
@@ -46,6 +48,7 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
+    @Cacheable("banners")
     public List<Banner> getBanners() {
         return bannerRepository.getBanners();
     }
@@ -56,6 +59,7 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
+    @CacheEvict(value = "banners", allEntries = true)
     public ResponseEntity<String> activeBanner(Long id) {
         Banner existBanner = bannerRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Banner not found")
@@ -66,6 +70,7 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
+    @CacheEvict(value = "banners", allEntries = true)
     public ResponseEntity<String> deleteBanner(Long id) {
         Banner existBanner = bannerRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Banner not found"));
@@ -82,6 +87,7 @@ public class BannerServiceImpl implements BannerService {
     }
 
     @Override
+    @CacheEvict(value = "banners", allEntries = true)
     public ResponseEntity<String> updateBanner(Long id, BannerDTO bannerDTO) {
         Banner existBanner = bannerRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Banner not found"));

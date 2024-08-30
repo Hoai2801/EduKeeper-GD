@@ -30,47 +30,34 @@ const Detail = () => {
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/documents/" + slug)
         .then((res) => res.json())
-        .then((data) => {
-          setData(data)
-        });
+        .then((data) => setData(data));
 
     fetch("http://localhost:8080/api/v1/documents/" + slug + "/html")
         .then((res) => {
           if (res.status === 200) {
-            res.text().then(r => {
-              setHtmlContent(r)
-            })
+            res.text().then(r => setHtmlContent(r));
           } else {
-            setHtmlContent("Đang tải tài liệu")
+            setHtmlContent("Đang tải tài liệu");
           }
-        })
+        });
 
     fetch("http://localhost:8080/api/v1/documents/" + slug + "/download")
-        .then((res) => {
-          res.blob().then(r => {
-            setFileDownload(r)
-          })
-        })
+        .then((res) => res.blob().then(r => setFileDownload(r)));
+  }, [slug]); // This effect depends only on slug
 
-    // make view history
-    const increaseView = setTimeout(() => {
-      if (staffCode) {
+  useEffect(() => {
+    if (staffCode && data?.id) {
+      const increaseView = setTimeout(() => {
         fetch("http://localhost:8080/api/v1/view-history", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            documentId: data?.id,
-            staffCode: staffCode
-          }),
-        })
-      }
-    }, 30000);
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ documentId: data.id, staffCode: staffCode }),
+        });
+      }, 30000);
 
-    return () => clearTimeout(increaseView);
-
-  }, [slug, data?.id, staffCode])
+      return () => clearTimeout(increaseView);
+    }
+  }, [data?.id, staffCode]);
 
   return (
       <div className={`w-full`}>

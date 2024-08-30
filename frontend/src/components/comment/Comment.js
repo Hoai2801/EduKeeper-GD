@@ -45,13 +45,13 @@ const Comment = ({comment, fetchComment}) => {
                 },
                 body: JSON.stringify(data),
             })
-                .then((res) => {
-                    if (res.status === 200) {
-                        setContent('')
-                        setShowReplyInput(false)
-                        fetchComment()
-                    }
-                })
+            .then((res) => {
+                if (res.status === 200) {
+                    setContent('')
+                    setShowReplyInput(false)
+                    fetchComment()
+                }
+            })
         }
     }
 

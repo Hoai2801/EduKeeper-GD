@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.hpsf.SummaryInformation;
-import org.apache.poi.hpsf.Thumbnail;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.converter.WordToHtmlConverter;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
@@ -32,6 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +49,6 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,8 +76,26 @@ public class DocumentServiceImpl implements DocumentService {
     private EntityManager entityManager;
     @Value("${admin-staff-code}")
     private String adminStaffCode;
+    @Autowired
+    private CacheManager cacheManager;
 
+    private static final Logger logger = LoggerFactory.getLogger(DocumentService.class);
+    
     @Override
+    @CacheEvict(value = {
+            "documentBySlug", 
+            "mostDownloadedDocuments", 
+            "latestDocuments", 
+            "totalDocuments", 
+            "totalDocumentsThisMonth",
+            "totalDocumentsThisYear",
+            "documentsBySpecialized",
+            "documentsByAuthor",
+            "totalDownloadsByAuthor",
+            "documentToday",
+            "publicDocument",
+            "draftDocument"
+    }, allEntries = true)
     public ResponseEntity<String> uploadDocument(UploadRequestDTO uploadRequestDTO) throws IOException {
         Category category = categoryRepository.findById(uploadRequestDTO.getCategory())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
@@ -300,6 +320,20 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @CacheEvict(value = {
+            "documentBySlug",
+            "mostDownloadedDocuments",
+            "latestDocuments",
+            "totalDocuments",
+            "totalDocumentsThisMonth",
+            "totalDocumentsThisYear",
+            "documentsBySpecialized",
+            "documentsByAuthor",
+            "totalDownloadsByAuthor",
+            "documentToday",
+            "publicDocument",
+            "draftDocument"
+    }, allEntries = true)
     public String updateDocumentById(Long id, UploadRequestDTO uploadRequestDTO) throws IOException {
         Document existDocument = documentRepository.findById(id).orElse(null);
         if (existDocument == null) {
@@ -333,6 +367,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable(value = "documentBySlug", key = "#slug", condition = "#slug != null")
     public DocumentResponseDTO getDocumentBySlug(String slug) {
         Document document = documentRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
@@ -340,7 +375,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable(value = "mostDownloadedDocuments", key = "#limit")
     public List<DocumentResponseDTO> getMostDownloadedDocuments(int limit) {
+        
         // only get document has download more than 0
         return documentRepository.getMostDownloadedDocuments(limit).stream()
                 .filter(document -> !document.getDownloads().isEmpty())
@@ -349,6 +386,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable(value = "latestDocuments", key = "#limit")
     public List<DocumentResponseDTO> getLatestDocuments(int limit) {
         List<Document> documents = documentRepository.getLastedDocuments(limit);
         return documents.stream()
@@ -359,11 +397,11 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentResponseDTO> getRecommendedDocuments(RecommendationRequestDTO recommendationRequestDTO) {
         return documentRepository.getDocumentsSuggested(
-                recommendationRequestDTO.getSpecialized(),
-                recommendationRequestDTO.getCategory(),
-                recommendationRequestDTO.getTitle(),
-                recommendationRequestDTO.getAuthor())
-                .stream().map(this::convertToDocumentResponse).toList();
+                    recommendationRequestDTO.getSpecialized(),
+                    recommendationRequestDTO.getCategory(),
+                    recommendationRequestDTO.getTitle(),
+                    recommendationRequestDTO.getAuthor()
+                ).stream().map(this::convertToDocumentResponse).toList();
     }
 
     @Override
@@ -439,6 +477,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("totalDocumentsThisYear")
     public TotalResponse getDocumentsThisYear() {
         try {
             Integer numberOfDocsThisYear = documentRepository.getNumberOfDocumentsThisYear();
@@ -458,6 +497,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("totalDocumentsThisMonth")
     public TotalResponse getDocumentsThisMonth() {
         try {
             Integer numberOfDocsThisMonth = documentRepository.getNumberOfDocumentsThisMonth();
@@ -476,11 +516,13 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("totalDocuments")
     public int countAllDocuments() {
         return documentRepository.countAllDocuments();
     }
 
     @Override
+    @Cacheable("documentsByAuthor")
     public List<DocumentResponseDTO> getDocumentsByAuthor(Long id) {
         User existingUser = userService.getUserByStaffCode(id.toString());
         List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
@@ -488,11 +530,13 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("documentsBySpecialized")
     public int getDocumentsCountBySpecialized(Long id) {
         return documentRepository.findAllBySpecializedId(id);
     }
 
     @Override
+    @Cacheable("totalDownloadsByAuthor")
     public int getTotalDownloadsByAuthor(Long authorId) {
         User existingUser = userService.getUserByStaffCode(authorId.toString());
         List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
@@ -503,6 +547,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("documentsByAuthor")
     public int getDocumentsCountByAuthor(String staffCode) {
         User existingUser = userService.getUserByStaffCode(staffCode);
         List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
@@ -561,6 +606,20 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @CacheEvict(value = {
+            "documentBySlug",
+            "mostDownloadedDocuments",
+            "latestDocuments",
+            "totalDocuments",
+            "totalDocumentsThisMonth",
+            "totalDocumentsThisYear",
+            "documentsBySpecialized",
+            "documentsByAuthor",
+            "totalDownloadsByAuthor",
+            "documentToday",
+            "publicDocument",
+            "draftDocument"
+    }, allEntries = true)
     public String AcceptDocument(Long id) throws IOException {
         try {
             Document document = documentRepository.findById(id)
@@ -577,6 +636,20 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @CacheEvict(value = {
+            "documentBySlug",
+            "mostDownloadedDocuments",
+            "latestDocuments",
+            "totalDocuments",
+            "totalDocumentsThisMonth",
+            "totalDocumentsThisYear",
+            "documentsBySpecialized",
+            "documentsByAuthor",
+            "totalDownloadsByAuthor",
+            "documentToday",
+            "publicDocument",
+            "draftDocument"
+    }, allEntries = true)
     public String AcceptListDocument(List<Long> ids) throws IOException {
         try {
             for (Long id : ids) {
@@ -614,6 +687,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("documentToday")
     public int countDocumentsToday() {
         try {
             return documentRepository.countDocumentsToday();
@@ -623,6 +697,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("publicDocument")
     public int countPublishedDocuments() {
         try {
             return documentRepository.countPublishedDocuments();
@@ -632,6 +707,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Cacheable("draftDocument")
     public int countDraftDocuments() {
         try {
             return documentRepository.countDraftDocuments();

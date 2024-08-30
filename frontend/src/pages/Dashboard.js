@@ -78,8 +78,6 @@ const Dashboard = () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         setTop10Docs(data);
       });
   }, [selectDepartment]);

@@ -29,6 +29,8 @@ const Banner = () => {
         return () => clearTimeout(timeout);
     }, [indexBanner]);
 
+    console.log(banner)
+
     return (
         <div>
             <div className={`${banner?.length > 0 ? "block" : "hidden"}`}>
@@ -40,7 +42,7 @@ const Banner = () => {
                         : ''}
                        className={`relative`}
                     >
-                        <img src={`http://localhost:8080/api/v1/images/banner/${banner?.image}`} alt=""
+                        <img src={`${banner?.image ?? 'http://localhost:8080/api/v1/images/banner/' + banner?.image}`} alt=""
                              className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 md:rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
                         />
                     </a>

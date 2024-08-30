@@ -4,15 +4,14 @@ const Footer = () => {
   return (
     <footer className="bg-white w-screen">
       <hr className="my-1 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-1" />
-
       <div className="w-full p-8 md:py-8 text-[#174D89]">
-        <div className="sm:flex sm:items-start sm:justify-between">
+        <div className="sm:flex-row sm:items-start sm:justify-between gap-5 flex flex-col">
           <div className="w-60">
             <Link
               href="/"
               className="flex items-center sm:mb-0 space-x-3 rtl:space-x-reverse"
             >
-              <span className="self-center text-2xl font-extrabold whitespace-nowrap ">
+              <span className="self-center md:text-2xl text-lg font-extrabold whitespace-nowrap ">
                 TRƯỜNG ĐẠI HỌC GIA ĐỊNH
               </span>
             </Link>
@@ -44,7 +43,7 @@ const Footer = () => {
             <div class="w-full">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.9300823358094!2d106.67287377301786!3d10.816662654363435!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752918602fcba5%3A0x2599dd3bc2b48244!2zR0RVIC0gVFLGr-G7nE5HIMSQ4bqgSSBI4buMQyBHSUEgxJDhu4pOSCBUUEhDTQ!5e0!3m2!1svi!2s!4v1724732113187!5m2!1svi!2s"
-                width="460"
+                width="360"
                 height="320"
                 allowFullscreen=""
                 loading="lazy"
