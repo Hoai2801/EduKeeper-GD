@@ -119,9 +119,9 @@ const BannerManager = ({ jwt }) => {
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
                       <img
-                        src={`${item.image ?? 'http://localhost:8080/api/v1/images/banner/' + item.image}`}
+                        src={`${item?.image ? 'http://localhost:8080/api/v1/images/banner/' + item.image : ''}`}
                         alt=""
-                        className={`w-32 h-32`}
+                        className={`w-52 h-32 object-cover`}
                       />
                     </th>
                     <td className="px-6 py-4">

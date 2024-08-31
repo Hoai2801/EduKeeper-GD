@@ -29,6 +29,4 @@ public class UploadRequestDTO {
     private String author;
     
     private MultipartFile document;
-    
-    private MultipartFile documentDownload;
 }

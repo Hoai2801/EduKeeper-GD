@@ -17,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-//    private final SubCommentRepository subCommentRepository;
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;

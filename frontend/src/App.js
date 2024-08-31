@@ -36,25 +36,25 @@ export const JWTContext = createContext(null);
 function App() {
   window.scrollTo(0, 0);
 
-  const [jwtDecoded, setJwtDecoded] = useState(null);
+  const [user, setUser] = useState(null);
 
-  const [token, setToken] = useState(null);
+  const [jwt, setJWT] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token !== "undefined" && token !== null) {
-      setToken(token);
+      setJWT(token);
       const decodedJwt = jwtDecode(token);
-      setJwtDecoded(decodedJwt);
+      setUser(decodedJwt);
     }
   }, []);
 
   useEffect(() => {
-    if (jwtDecoded) {
+    if (user) {
       const checkIfBlocked = () => {
         fetch(
           "http://localhost:8080/api/v1/users/is-blocked/" +
-            jwtDecoded?.staff_code
+            user?.staff_code
         )
           .then((res) => {
             if (res.status === 200) {
@@ -80,9 +80,9 @@ function App() {
       // Cleanup interval on component unmount
       return () => clearInterval(intervalId);
     }
-  }, [jwtDecoded]);
+  }, [user]);
   return (
-    <JWTContext.Provider value={{ jwtDecoded, token }}>
+    <JWTContext.Provider value={{ user, jwt }}>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

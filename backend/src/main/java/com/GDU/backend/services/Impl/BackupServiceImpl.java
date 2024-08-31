@@ -27,7 +27,7 @@ public class BackupServiceImpl {
             // Export database
             String dbName = dbUrl.substring(dbUrl.lastIndexOf("/") + 1);
             DatabaseUtils.exportDatabase(dbName, dbUser, dbPassword, "backup-" + System.currentTimeMillis() + ".sql");
-            String[] directories = {"avatar", "banner", "thumbnail", "uploads"};
+            String[] directories = {"avatar", "banner", "thumbnail", "uploads", "convert", "backup"};
             String outputZipFile = "backup-" + System.currentTimeMillis() + ".zip";
             ZipUtils.zipDirectories(directories, outputZipFile);
             System.out.println("Backup created successfully: " + outputZipFile);
@@ -53,7 +53,7 @@ public class BackupServiceImpl {
     public boolean restoreBackup(String fileName) {
         try {
             // Clean up old directories
-            String[] directories = {"avatar", "banner", "thumbnail", "uploads"};
+            String[] directories = {"avatar", "banner", "thumbnail", "uploads", "convert", "backup"};
             for (String dir : directories) {
                 File directory = new File(ZipUtils.getStaticPath() + dir);
                 if (directory.exists()) {

@@ -7,7 +7,7 @@ import Notification from "./Notification";
 import {JWTContext} from "../App";
 
 const Navbar = () => {
-    const jwtDecoded = useContext(JWTContext);
+    const context = useContext(JWTContext);
 
     const [isShowSpecialized, setIsShownSpecialized] = useState(false);
     const [isShowCategory, setIsShownCategory] = useState(false);
@@ -52,10 +52,10 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        if (jwtDecoded?.jwtDecoded) {
+        if (context?.user) {
             fetch(
                 "http://localhost:8080/api/v1/users/" +
-                jwtDecoded?.jwtDecoded?.staff_code
+                context?.user?.staff_code
             )
                 .then((res) => res.json())
                 .then((data) => {
@@ -63,13 +63,13 @@ const Navbar = () => {
                 });
         }
         if (
-            jwtDecoded?.jwtDecoded &&
-            jwtDecoded?.jwtDecoded.exp < Date.now() / 1000
+            context?.user &&
+            context?.user.exp < Date.now() / 1000
         ) {
             localStorage.removeItem("token");
             window.location.href = "/";
         }
-    }, [jwtDecoded?.jwtDecoded]);
+    }, [context?.user]);
 
     const out = () => {
         setIsShownSpecialized(false);
@@ -140,10 +140,10 @@ const Navbar = () => {
 
     const checkNotification = () => {
         setIsHasNotification(0);
-        if (jwtDecoded?.jwtDecoded) {
+        if (context?.user) {
             fetch(
                 "http://localhost:8080/api/v1/notifications/user/checked/" +
-                jwtDecoded?.jwtDecoded.staff_code
+                context?.user.staff_code
             );
             getNotification();
         }
@@ -243,9 +243,9 @@ const Navbar = () => {
                             </div>
                         </div>
                     </Link>
-                    {jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" ||
-                    jwtDecoded?.jwtDecoded?.role === "ROLE_TEACHER" ||
-                    jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN" ? (
+                    {context?.user?.role === "ROLE_ADMIN" ||
+                    context?.user?.role === "ROLE_TEACHER" ||
+                    context?.user?.role === "ROLE_SUB-ADMIN" ? (
                         <Link
                             to="/upload"
                             className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
@@ -353,7 +353,7 @@ const Navbar = () => {
                         </div>
 
                         <div className="">
-                            {jwtDecoded?.jwtDecoded ? (
+                            {context?.user ? (
                                 <div>
                                     <button
                                         onClick={() => {
@@ -379,18 +379,18 @@ const Navbar = () => {
                                         onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}
                                     >
                                         <Link
-                                            to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}`}
+                                            to={`/profile/${context?.user?.staff_code}`}
                                             className="px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full"
                                         >
                                             Trang cá nhân
                                         </Link>
-                                        {/*<Link to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}/setting`}*/}
+                                        {/*<Link to={`/profile/${context?.context?.staff_code}/setting`}*/}
                                         {/*      className="hover:bg-blue-300 w-full">Cài đặt</Link>*/}
                                         <Link
                                             to={`/dashboard/home`}
                                             className={`${
-                                                jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" ||
-                                                jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN"
+                                                context?.user?.role === "ROLE_ADMIN" ||
+                                                context?.user?.role === "ROLE_SUB-ADMIN"
                                                     ? "block"
                                                     : "hidden"
                                             } px-4  hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full
@@ -479,8 +479,8 @@ const Navbar = () => {
                                 <Link
                                     to={`/dashboard/home`}
                                     className={`${
-                                        jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" ||
-                                        jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN"
+                                        context?.user?.role === "ROLE_ADMIN" ||
+                                        context?.user?.role === "ROLE_SUB-ADMIN"
                                             ? "block"
                                             : "hidden"
                                     }`}
@@ -540,18 +540,18 @@ const Navbar = () => {
                                             ))}
                                     </div>
                                 </div>
-                                {jwtDecoded?.jwtDecoded?.role === "ADMIN" ? (
+                                {context?.user?.role === "ADMIN" ? (
                                     <Link to="/upload" onClick={() => setIsMobileMenuOpen(false)}>
                                         Upload tài liệu
                                     </Link>
                                 ) : (
                                     " "
                                 )}
-                                {jwtDecoded?.jwtDecoded ? (
+                                {context?.user ? (
                                     <>
                                         <div className="flex flex-col items-center w-full gap-3">
                                             <Link
-                                                to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}`}
+                                                to={`/profile/${context?.user?.staff_code}`}
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                             >
                                                 Trang cá nhân
@@ -569,7 +569,7 @@ const Navbar = () => {
                                     </>
                                 ) : (
                                     <Link
-                                        to={"/login"}
+                                        to="/login"
                                         className="bg-blue-600 px-5 py-3 mt-5 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >

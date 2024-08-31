@@ -28,7 +28,6 @@ public class UserController {
     }
 
     @GetMapping("/{staffCode}")
-    @Cacheable(value = "getUserDetail", key = "#staffCode")
     public ResponseEntity<UserDetailResponse> getUserResponseById(@PathVariable("staffCode") String staffCode) {
         return ResponseEntity.ok(
                 userService.getUserResponseByStaffCode(staffCode)
@@ -36,25 +35,21 @@ public class UserController {
     }
     
     @PutMapping
-    @CacheEvict(value = "getUserDetail", key = "#userDetailDTO.staffCode" ,allEntries = true)
     public ResponseEntity<String> updateUser(@RequestBody UserDetailDTO userDetailDTO) {
         return ResponseEntity.ok(userService.updateUser(userDetailDTO));
     }
     
     @PutMapping("/block/{staffCode}")
-    @CacheEvict(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<String> blockUser(@PathVariable("staffCode") String staffCode) {
         return userService.blockUser(staffCode);
     }
     
     @PutMapping("/unblock/{staffCode}")
-    @CacheEvict(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<String> unblockUser(@PathVariable("staffCode") String staffCode) {
         return userService.unblockUser(staffCode);
     }
     
     @GetMapping("/is-blocked/{staffCode}")
-    @Cacheable(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<Boolean> isUserBlocked(@PathVariable("staffCode") String staffCode) {
         return ResponseEntity.ok(userService.isUserBlocked(staffCode));
     }
@@ -66,7 +61,6 @@ public class UserController {
     }
     
     @PostMapping("/avatar/{staffCode}")
-    @CacheEvict(value = "getUserDetail", key = "#staffCode")
     public ResponseEntity<String> changeAvatar(
             @PathVariable("staffCode") String staffCode,
             @RequestBody MultipartFile avatar
@@ -102,7 +96,6 @@ public class UserController {
     }
     
     @PutMapping("/reset-password/{staffCode}")
-    @CacheEvict(value = "getUserDetail", key = "#staffCode")
     public ResponseEntity<?> resetPassword(
             @PathVariable("staffCode") String staffCode
     ) {

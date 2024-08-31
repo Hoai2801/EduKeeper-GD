@@ -74,4 +74,12 @@ public class AuthController {
     ) {
         return authenticationService.resetPassword(token, changePasswordRequest);
     }
+    
+    @PutMapping("/change-password/{staffCode}")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordRequest changePasswordRequest,
+            @PathVariable("staffCode") String staffCode
+    ) {
+        return authenticationService.changePassword(changePasswordRequest, staffCode);
+    }
 }

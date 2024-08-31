@@ -10,6 +10,8 @@ import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -109,6 +111,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @CacheEvict(value = "getUserDetail", key = "#staffCode")
     public String changeAvatar(String staffCode, MultipartFile avatar) {
         User user = userRepository.findByStaffCode(staffCode).orElse(null);
         if (user != null) {
@@ -133,6 +136,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @CacheEvict(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<String> blockUser(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -144,6 +148,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @Cacheable(value = "isUserBlocked", key = "#staffCode")
     public Boolean isUserBlocked(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -153,6 +158,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @CacheEvict(value = "isUserBlocked", key = "#staffCode")
     public ResponseEntity<String> unblockUser(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -164,6 +170,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @CacheEvict(value = "getUserDetail", key = "#staffCode")
     public ResponseEntity<?> resetPassword(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -176,6 +183,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @Cacheable(value = "getUserDetail", key = "#staffCode")
     public UserDetailResponse getUserResponseByStaffCode(String staffCode) {
         User user = getUserByStaffCode(staffCode);
         if (user != null) {
@@ -196,6 +204,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @CacheEvict(value = "getUserDetail", key = "#userDetailDTO.staffCode" ,allEntries = true)
     public String updateUser(UserDetailDTO userDetailDTO) {
         User user = getUserByStaffCode(userDetailDTO.getStaffCode());
         if (user == null) {

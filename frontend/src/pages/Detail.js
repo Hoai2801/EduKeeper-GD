@@ -19,7 +19,7 @@ const Detail = () => {
   }
 
   const context = useContext(JWTContext);
-  const staffCode = context?.jwtDecoded?.staff_code;
+  const staffCode = context?.user?.staff_code;
 
   const url = window.location.href;
   const slug = extractSlugFromURL(url);
