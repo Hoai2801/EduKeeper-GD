@@ -15,7 +15,7 @@ export default function ListDocuments({
   return (
     <div>
       {listDocuments.length > 0 ? (
-        <div className="lg:ml-5 flex gap-y-4 gap-x-8 overflow-auto flex-wrap justify-start">
+        <div className="lg:ml-5 flex gap-y-4 gap-x-8 flex-wrap justify-start">
           {listDocuments.map((item, index) => (
             <div
               key={index}

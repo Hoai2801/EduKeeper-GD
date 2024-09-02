@@ -101,6 +101,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .userUpload(userUpload)
                 .slug(createSlug(uploadRequestDTO.getTitle()))
                 .file(fileName)
+                .status("draft")
                 .documentType(uploadRequestDTO.getDocument().getContentType())
                 .scope(uploadRequestDTO.getScope())
                 .documentSize(uploadRequestDTO.getDocument().getSize() / 1_000_000)
@@ -112,7 +113,7 @@ public class DocumentServiceImpl implements DocumentService {
                 .subject(subject)
                 .uploadDate(LocalDate.now())
                 .build();
-
+        System.out.println(uploadRequestDTO.getDocument().getContentType());
         // get auto accept document setting
         settingRepository.findById(1L).ifPresent(setting -> {
             if (setting.getValue().equals("true")) {

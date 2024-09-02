@@ -14,7 +14,6 @@ export default function Document(params) {
   const [isPostDocs, setIsPostDocs] = useState(false);
   const [isShowEditDocs, setIsShowEditDocs] = useState(false);
   const [documentEdit, setDocumentEdit] = useState(null);
-  const [documents, setDocuments] = useState([]);
   // Variable docs use render
   const [docs, setDocs] = useState([]);
   const [activeButton, setActiveButton] = useState(0);
@@ -27,6 +26,8 @@ export default function Document(params) {
   const [documentLength, setDocumentLength] = useState(
     publicDocumentList?.length
   );
+
+  console.log(documentLength);
 
   const [totalPage, setTotalPage] = useState(0);
   useEffect(() => {
@@ -141,7 +142,6 @@ export default function Document(params) {
     fetch("http://localhost:8080/api/v1/documents/count-draft")
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setDraftCount(data);
       });
   }, []);
@@ -153,7 +153,6 @@ export default function Document(params) {
         .then((data) => {
           setDraftDocumentList(data);
           setDocs(data.slice(0, 10));
-          setDocumentLength(data.length);
         });
     } else {
       fetch("http://localhost:8080/api/v1/documents/public")
@@ -162,6 +161,7 @@ export default function Document(params) {
           console.log(data);
           setPublicDocumentList(data);
           setDocs(data.slice(0, 10));
+          setDocumentLength(data.length);
         });
     }
   }, [activeButton]);
@@ -286,7 +286,7 @@ export default function Document(params) {
         </div>
         <div className="mt-4  ">
           <div class="relative overflow-x-auto border rounded-xl shadow-md sm:rounded-lg">
-            {documents && (
+            {docs && (
               <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -435,40 +435,39 @@ export default function Document(params) {
                       </svg>{" "}
                     </div>
                   </li>
-                  {totalPage > 0 ? (
-                    pagination?.map((el, index) => {
-                      return (
-                        <li>
-                          <div
-                            onClick={() => {
-                              if (el === "...") {
-                                toast.error("error");
-                              } else {
-                                setActivePage(el);
-                              }
-                              SetDocumentsToRender();
-                            }}
-                            className={` flex  items-center cursor-pointer ${
-                              activePage == el ? "active-check" : ""
-                            } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}
-                          >
-                            {el}
-                          </div>
-                        </li>
-                      );
-                    })
-                  ) : (
-                    <li>
-                      <div
-                        href="http://localhost:3000/dashboard/document/1"
-                        className={` flex  items-center ${
-                          activePage == 1 ? "active-check" : ""
-                        } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}
-                      >
-                        1
-                      </div>
-                    </li>
-                  )}
+                  {totalPage > 0
+                    ? pagination?.map((el, index) => {
+                        return (
+                          <li>
+                            <div
+                              onClick={() => {
+                                if (el === "...") {
+                                  toast.error("error");
+                                } else {
+                                  setActivePage(el);
+                                }
+                                SetDocumentsToRender();
+                              }}
+                              className={` flex  items-center cursor-pointer ${
+                                activePage == el ? "active-check" : ""
+                              } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}
+                            >
+                              {el}
+                            </div>
+                          </li>
+                        );
+                      })
+                    : // <li>
+                      //   <div
+                      //     href="http://localhost:3000/dashboard/document/1"
+                      //     className={` flex  items-center ${
+                      //       activePage == 1 ? "active-check" : ""
+                      //     } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}
+                      //   >
+                      //     1
+                      //   </div>
+                      // </li>
+                      ""}
                   {/* <li>
                   <div
                     href="http://localhost:3000/dashboard/document/1"

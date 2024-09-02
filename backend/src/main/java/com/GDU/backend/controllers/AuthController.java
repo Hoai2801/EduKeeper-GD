@@ -24,8 +24,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(
-            @Valid @RequestBody RegisterRequest registerRequest
-    ) {
+            @Valid @RequestBody RegisterRequest registerRequest) {
         try {
             return authenticationService.register(registerRequest);
         } catch (Exception e) {
@@ -35,12 +34,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @Valid @RequestBody AuthenticationRequest loginRequest
-    ) {
+            @Valid @RequestBody AuthenticationRequest loginRequest) {
         try {
             System.out.println("Login");
             return authenticationService.login(loginRequest);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -55,23 +54,20 @@ public class AuthController {
 
     @PostMapping("/activate/{token}")
     public ResponseEntity<String> activate(
-            @PathVariable("token") String token
-    ) {
+            @PathVariable("token") String token) {
         return ResponseEntity.ok().body(authenticationService.activate(token));
     }
 
     @PostMapping("/forgot-password/{staffCode}")
     public ResponseEntity<?> forgotPassword(
-            @PathVariable("staffCode") String staffCode
-    ) {
+            @PathVariable("staffCode") String staffCode) {
         return authenticationService.forgotPassword(staffCode);
     }
 
     @PostMapping("/reset-password/{token}")
     public ResponseEntity<?> resetPassword(
             @PathVariable("token") String token,
-            @RequestBody ChangePasswordRequest changePasswordRequest
-    ) {
+            @RequestBody ChangePasswordRequest changePasswordRequest) {
         return authenticationService.resetPassword(token, changePasswordRequest);
     }
 }

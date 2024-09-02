@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import Loading from "../components/loading/Loading";
 import { Link } from "react-router-dom";
 import Banner from "../components/Banner";
 import { JWTContext } from "../App";
@@ -67,14 +68,14 @@ const Home = () => {
   return (
     <div className="w-screen h-full">
       {isLoading ? (
-        <div>Loading ...</div>
+        <Loading />
       ) : (
         <div>
           <div className={`w-full h-fit relative`}>
             <Banner />
           </div>
           <div className=" rounded-xl p-2 w-full  pt-5 mt-10 flex flex-col md:p-10 gap-10 pb-10">
-            <h2 className="font-bold text-[28px] pl-5">Tài liệu mới</h2>
+            <h2 className="font-bold text-[28px]">Tài liệu mới</h2>
             {lastedDocuments && (
               <ListDocuments
                 listDocuments={lastedDocuments}

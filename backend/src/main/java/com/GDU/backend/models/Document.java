@@ -28,11 +28,9 @@ public class Document {
     @Column(nullable = false, length = 300)
     private String slug;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50)
     private String documentType;
 
-    @Column(name = "download_file_type", nullable = false, length = 30)
-    private String downloadFileType;
     @Column(nullable = false)
     private Long documentSize;
 

@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 public class ImageController {
 
     @GetMapping("/{imageName}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String imageName) throws IOException {
+    public ResponseEntity<byte[]> getImage(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "images", imageName);
 
         // Read the image file into a byte array
@@ -31,7 +31,7 @@ public class ImageController {
     }
 
     @GetMapping("/avatar/{imageName}")
-    public ResponseEntity<byte[]> getAvatar(@PathVariable String imageName) throws IOException {
+    public ResponseEntity<byte[]> getAvatar(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "avatar", imageName);
 
         // Read the image file into a byte array
@@ -45,7 +45,7 @@ public class ImageController {
     }
 
     @GetMapping("/banner/{imageName}")
-    public ResponseEntity<byte[]> getBanner(@PathVariable String imageName) throws IOException {
+    public ResponseEntity<byte[]> getBanner(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "banner", imageName);
 
         // Read the image file into a byte array

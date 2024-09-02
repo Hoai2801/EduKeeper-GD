@@ -8,7 +8,7 @@ import { JWTContext } from "../App";
 import LoveButton from "../components/LoveButton";
 import DownloadButton from "../components/DownloadButton";
 import CommentComponent from "../components/comment/CommentComponent";
-
+import AvatarTeacher from "../assets/avatar-teacher.png";
 const Detail = () => {
   function extractSlugFromURL(url) {
     // Split the URL by '/'

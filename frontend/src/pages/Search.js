@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import DocumentCard from "../components/DocumentCard";
+// import DocumentCard from "../components/DocumentCard";
+import DocumentCardRow from "../components/DocsCardRow";
 
 const Search = ({ jwt }) => {
   const url = window.location.href;
@@ -13,8 +14,9 @@ const Search = ({ jwt }) => {
   const slugSubject = searchParams.get("subject");
   const publishYear = searchParams.get("publishYear");
   const category = searchParams.get("category");
-
+  const sort = searchParams.get("sort");
   const [documents, setDocument] = useState([]);
+  const [documentsShow, setDocumentShow] = useState([]);
 
   const search = localStorage.getItem("search") || "";
 
@@ -42,8 +44,8 @@ const Search = ({ jwt }) => {
       }
       return res.json().then((data) => {
         if (data) {
-          console.log(data);
           setDocument(data);
+          setDocumentShow(data);
           setTimeout(() => {
             localStorage.removeItem("search");
           }, 3000);
@@ -52,18 +54,23 @@ const Search = ({ jwt }) => {
     });
   }, [url, order, slugSpecialized, slugSubject, publishYear, category]);
 
-    }, [url, order, slugSpecialized, slugSubject, publishYear, category, search, slugDepartment])
+  useEffect(() => {
+    if (sort) {
+      const sortedDocuments = [...documents].sort((a, b) => {
+        return b[sort] - a[sort];
+      });
+      setDocumentShow(sortedDocuments);
+    }
+  }, [sort, documents]);
 
+  const [limit, setLimit] = useState(10);
   return (
     <div className="w-full">
-      <h2 className="text-[28px] font-bold text-center mt- mb-5">
-        Tài liệu ({documents && documents.length})
-      </h2>
-      <div className="my-5 flex gap-5 h-fit flex-wrap justify-start">
-        {documents &&
-          documents.map((item, index) => {
+      <div className="my-5 xl:ml-4 flex justify-start gap-y-5 gap-x-4 h-fit flex-wrap  items-center">
+        {documentsShow &&
+          documentsShow.map((item, index) => {
             if (index < limit) {
-              return <DocumentCard key={index} document={item} />;
+              return <DocumentCardRow key={index} document={item} />;
             }
           })}
       </div>

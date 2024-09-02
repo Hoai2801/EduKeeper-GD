@@ -251,7 +251,7 @@ export const Upload = () => {
     })
       .then((response) => {
         if (response.status === 200) {
-          resetDocument();
+          // resetDocument();
           toast.success("Tài liệu đã được tải lên");
         } else {
           response.text().then((data) => toast.error(data));
