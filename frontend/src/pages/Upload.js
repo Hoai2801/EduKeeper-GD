@@ -15,9 +15,8 @@ export const Upload = () => {
 
   const path = useParams();
 
-  const context = useContext(JWTContext);
-  const jwt = context?.token;
-  const user = context?.jwtDecoded;
+  const jwt = useContext(JWTContext)?.jwt;
+  const user = useContext(JWTContext)?.user;
 
   const [listDepartment, setListDepartment] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
@@ -99,21 +98,6 @@ export const Upload = () => {
           uploadData.userUpload = data.userUpload;
           uploadData.author = data.author;
 
-          // if (data.path !== data.file_download) {
-          //     setHaveDownloadFile(true);
-          //     fetch('http://localhost:8080/api/v1/documents/' + data.slug + "/download")
-          //         .then(response => response.blob())
-          //         .then(blob => {
-          //             const file = new File([blob], data.file_download, {type: blob.type});
-          //             setUploadData(prevState => ({
-          //                 ...prevState,
-          //                 documentDownload: file
-          //             }));
-          //         })
-          //         .catch(error => {
-          //             console.error('Download error:', error);
-          //         });
-          // }
           fetch("http://localhost:8080/api/v1/documents/" + data.slug + "/file")
             .then((response) => response.blob())
             .then((blob) => {
@@ -122,12 +106,6 @@ export const Upload = () => {
                 ...prevState,
                 document: file,
               }));
-              // if (!haveDownloadFile) {
-              //     setUploadData(prevState => ({
-              //         ...prevState,
-              //         documentDownload: file
-              //     }));
-              // }
             })
             .catch((error) => {
               console.error("Download error:", error);
@@ -140,7 +118,7 @@ export const Upload = () => {
           console.error("Fetch error:", error);
         });
     }
-  }, [path, uploadData]);
+  }, [path]);
 
   useEffect(() => {
     if (uploadData.specialized) {

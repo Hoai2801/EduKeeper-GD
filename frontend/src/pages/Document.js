@@ -27,8 +27,6 @@ export default function Document(params) {
     publicDocumentList?.length
   );
 
-  console.log(documentLength);
-
   const [totalPage, setTotalPage] = useState(0);
   useEffect(() => {
     setTotalPage(Math.ceil(documentLength / 10));
@@ -158,7 +156,6 @@ export default function Document(params) {
       fetch("http://localhost:8080/api/v1/documents/public")
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setPublicDocumentList(data);
           setDocs(data.slice(0, 10));
           setDocumentLength(data.length);

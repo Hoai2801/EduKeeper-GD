@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +48,11 @@ public class ImageController {
     @GetMapping("/banner/{imageName}")
     public ResponseEntity<byte[]> getBanner(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "banner", imageName);
-
+        
+        if (imageName.equals("undefined")) {
+            return ResponseEntity.notFound().build();
+        }
+        
         // Read the image file into a byte array
         byte[] imageBytes = Files.readAllBytes(imagePath);
 

@@ -6,6 +6,7 @@ import com.GDU.backend.repositories.CategoryRepository;
 import com.GDU.backend.services.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -60,6 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Cacheable("categories")
     public List<Category> findAll() {
         return categoryRepository.findAll();
     }

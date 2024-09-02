@@ -1,6 +1,7 @@
 package com.GDU.backend.services.Impl;
 
 import com.GDU.backend.dtos.requests.CommentDTO;
+import com.GDU.backend.dtos.responses.CommentResponse;
 import com.GDU.backend.exceptions.ResourceNotFoundException;
 import com.GDU.backend.models.*;
 import com.GDU.backend.repositories.*;
@@ -16,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-//    private final SubCommentRepository subCommentRepository;
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
@@ -51,13 +51,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getComments(Long documentId) {
+    public List<CommentResponse> getComments(Long documentId) {
         List<Comment> parentComments = commentRepository.findByDocumentId(documentId);
         for (Comment parentComment : parentComments) {
             List<Comment> subComments = commentRepository.findByParentCommentId(parentComment.getId());
             parentComment.setReplies(subComments);
         }
-        return parentComments;
+        return parentComments.stream().map(CommentResponse::convertToResponse).toList();
     }
 
     @Override

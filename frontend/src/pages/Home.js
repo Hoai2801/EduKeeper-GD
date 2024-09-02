@@ -20,7 +20,7 @@ const Home = () => {
     setIsLoading(true);
 
     const fetchMostViewed = fetch(
-      "http://localhost:8080/api/v1/view-history/top-documents/9",
+      "http://localhost:8080/api/v1/view-history/top-documents/12",
       {
         method: "GET",
         headers: {
@@ -33,7 +33,7 @@ const Home = () => {
       .then((data) => setMostViewed(data));
 
     const fetchMostDownloaded = fetch(
-      "http://localhost:8080/api/v1/documents/most-downloaded?limit=9",
+      "http://localhost:8080/api/v1/documents/most-downloaded?limit=12",
       {
         method: "GET",
         headers: {
@@ -46,7 +46,7 @@ const Home = () => {
       .then((data) => setMostDownloaded(data));
 
     const fetchLastedDocuments = fetch(
-      "http://localhost:8080/api/v1/documents/latest?limit=9",
+      "http://localhost:8080/api/v1/documents/latest?limit=12",
       {
         method: "GET",
         headers: {

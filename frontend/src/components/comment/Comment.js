@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {JWTContext} from "../App";
+import {JWTContext} from "../../App";
 import toast from "react-hot-toast";
 
 const Comment = ({comment, fetchComment}) => {
@@ -11,7 +11,7 @@ const Comment = ({comment, fetchComment}) => {
     const [content, setContent] = useState('');
 
     const context = useContext(JWTContext);
-    const staffCode = context?.jwtDecoded?.staff_code;
+    const staffCode = useContext(JWTContext)?.user?.staff_code;
 
     function countComments(commentList) {
         if (commentList === undefined) return 0;
@@ -36,24 +36,26 @@ const Comment = ({comment, fetchComment}) => {
             "staffCode": staffCode
         }
 
-        if (context?.token) {
+        if (context?.jwt) {
             fetch('http://localhost:8080/api/v1/comments/reply/' + comment?.id, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + context?.token
+                    'Authorization': 'Bearer ' + context?.jwt
                 },
                 body: JSON.stringify(data),
             })
-                .then((res) => {
-                    if (res.status === 200) {
-                        setContent('')
-                        setShowReplyInput(false)
-                        fetchComment()
-                    }
-                })
+            .then((res) => {
+                if (res.status === 200) {
+                    setContent('')
+                    setShowReplyInput(false)
+                    fetchComment()
+                }
+            })
         }
     }
+
+    console.log(comment)
 
     return (
         <article className="p-6 text-base rounded-lg w-full bg-white">
@@ -62,37 +64,37 @@ const Comment = ({comment, fetchComment}) => {
                     <p className="inline-flex items-center mr-3 text-sm text-gray-900 font-semibold">
                         <img
                             className="mr-2 w-6 h-6 rounded-full"
-                            src="https://flowbite.com/docs/images/people/profile-picture-2.jpg"
-                            alt="Michael Gough"/>{comment?.user.name}</p>
-                    <p className="text-sm text-gray-600 min-w-[500px]">
-                        <time>{comment?.createdAt}
+                            src={'http://localhost:8080/api/v1/images/avatar/' + comment?.user?.avatar}
+                            alt="Michael Gough"/>{comment?.user?.username}</p>
+                    <p className="text-sm text-gray-600 min-w-[500px] leading-10">
+                        <time>{new Date(comment?.createdAt).toLocaleDateString()}
                         </time>
                     </p>
                 </div>
-                <button onClick={() => setShowSetting(!showSetting)}
-                        className={`absolute right-0 inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 ${staffCode === comment?.user?.staffCode ? "block" : "hidden"}`}
-                        type="button">
-                    <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                         fill="currentColor" viewBox="0 0 16 3">
-                        <path
-                            d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
-                    </svg>
-                    <span className="sr-only">Comment settings</span>
-                </button>
-                <div onMouseLeave={() => setShowSetting(false)}
-                     className={`${showSetting ? "absolute" : "hidden"} ${staffCode === comment?.user?.staffCode ? "block" : "hidden"} right-0 z-10 w-36 bg-white rounded-2 border-black divide-y divide-gray-100 shadow`}>
-                    <ul className="py-1 text-sm text-gray-700 dark:text-gray-200"
-                        aria-labelledby="dropdownMenuIconHorizontalButton">
-                        {/*<li>*/}
-                        {/*    <a href="#"*/}
-                        {/*       className="block py-2 px-4 text-red-400">Xóa</a>*/}
-                        {/*</li>*/}
-                        {/*<li>*/}
-                        {/*    <a href="#"*/}
-                        {/*       className="block py-2 px-4 hover:bg-gray-100 text-gray-500">Report</a>*/}
-                        {/*</li>*/}
-                    </ul>
-                </div>
+                {/*<button onClick={() => setShowSetting(!showSetting)}*/}
+                {/*        className={`absolute right-0 inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50 ${staffCode === comment?.user?.staffCode ? "block" : "hidden"}`}*/}
+                {/*        type="button">*/}
+                {/*    <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"*/}
+                {/*         fill="currentColor" viewBox="0 0 16 3">*/}
+                {/*        <path*/}
+                {/*            d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>*/}
+                {/*    </svg>*/}
+                {/*    <span className="sr-only">Comment settings</span>*/}
+                {/*</button>*/}
+                {/*<div onMouseLeave={() => setShowSetting(false)}*/}
+                {/*     className={`${showSetting ? "absolute" : "hidden"} ${staffCode === comment?.user?.staffCode ? "block" : "hidden"} right-0 z-10 w-36 bg-white rounded-2 border-black divide-y divide-gray-100 shadow`}>*/}
+                {/*    <ul className="py-1 text-sm text-gray-700 dark:text-gray-200"*/}
+                {/*        aria-labelledby="dropdownMenuIconHorizontalButton">*/}
+                {/*        /!*<li>*!/*/}
+                {/*        /!*    <a href="#"*!/*/}
+                {/*        /!*       className="block py-2 px-4 text-red-400">Xóa</a>*!/*/}
+                {/*        /!*</li>*!/*/}
+                {/*        /!*<li>*!/*/}
+                {/*        /!*    <a href="#"*!/*/}
+                {/*        /!*       className="block py-2 px-4 hover:bg-gray-100 text-gray-500">Report</a>*!/*/}
+                {/*        /!*</li>*!/*/}
+                {/*    </ul>*/}
+                {/*</div>*/}
             </footer>
             <p className="text-gray-600 text-lg leading-relaxed font-medium">{comment?.content}</p>
             <div className="flex items-center mt-4 space-x-4">

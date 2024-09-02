@@ -7,8 +7,7 @@ import zip from '../assets/zip.png';
 const Backup = () => {
     const [listBackup, setListBackup] = useState([]);
 
-    const context = useContext(JWTContext);
-    const jwt = context?.token;
+    const jwt = useContext(JWTContext)?.jwt
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -25,6 +24,7 @@ const Backup = () => {
     }, []);
 
     const createBackup = () => {
+        setIsLoading(true);
         fetch('http://localhost:8080/api/v1/backups', {
             method: 'POST',
             headers: {
@@ -36,8 +36,10 @@ const Backup = () => {
                 if (res.ok) {
                     toast.success("Tạo bản backup thành công")
                     fetchBackup();
+                    setIsLoading(false);
                 } else {
                     toast.error("Tạo bản backup thất bại")
+                    setIsLoading(false);
                 }
             })
     };
@@ -145,7 +147,8 @@ const Backup = () => {
     return (
         <div>
             <div className={`p-5 w-full flex justify-center gap-10`}>
-                <button className={`bg-blue-600 text-white p-5 rounded-lg`} onClick={createBackup}>
+                <button className={`bg-blue-600 text-white p-5 rounded-lg ${isLoading && 'cursor-not-allowed'}`} onClick={createBackup}
+                        disabled={isLoading}>
                     Tạo backup
                 </button>
             </div>

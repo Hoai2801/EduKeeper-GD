@@ -246,7 +246,7 @@ const SearchSideBar = () => {
         </div>
         <div className="flex flex-row justify-between xl:px-4 xl:mr-5 md:mr-11 gap-2 max-w-full mr-11">
           {/* Sort result */}
-          <div className="xl:max-w-1/4 xl:min-w-1/4">
+          <div className="xl:max-w-1/4 xl:min-w-1/4 bg-white">
             <div className="relative inline-block  w-fit min-w-32 ">
               <button
                 onClick={() => {
@@ -358,7 +358,7 @@ const SearchSideBar = () => {
           </div>
           {/* Filters */}
 
-          <div className="xl:max-w-1/4 xl:min-w-1/4">
+          <div className="bg-white xl:max-w-1/4 xl:min-w-1/4">
             <div className="relative inline-block  xl:w-32 md:w-32 w-28 ">
               <button
                 onClick={() => {

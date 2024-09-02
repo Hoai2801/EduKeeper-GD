@@ -6,13 +6,11 @@ import {
   DoughnutUserChart,
 } from "../components/Chart";
 import { useHandleDetailDocs } from "../components/HandleEvent";
-import AvatarBoy from "../assets/avatar-boy.webp";
 import DevBoy from "../assets/dev-boy.webp";
 import DefaultDocs from "../assets/docs.jpg";
 import Top3User from "../components/rankingUser/Top3User";
 import Top2User from "../components/rankingUser/Top2User";
 import Top1User from "../components/rankingUser/Top1User";
-import { toast } from "react-hot-toast";
 import TableTopUser from "../components/rankingUser/TableTopUser";
 const Dashboard = () => {
   const currentYear = new Date().getFullYear();
@@ -78,8 +76,6 @@ const Dashboard = () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-
         setTop10Docs(data);
       });
   }, [selectDepartment]);

@@ -1,11 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import docIcon from "../assets/docs.jpg";
 
 const DocumentCardRow = ({ document }) => {
   return (
     <div
-      className={` shadow-md border text-gray-500 xl:min-w-fit md:min-w-fit max-w-full  max-h-36 xl:max-h-fit ${
+      className={`bg-white shadow-md border text-gray-500 xl:min-w-fit md:min-w-fit max-w-full  max-h-36 xl:max-h-fit ${
         document?._delete ? "hidden" : ""
       } `}
     >

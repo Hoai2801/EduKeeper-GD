@@ -5,6 +5,10 @@ import toast from "react-hot-toast";
 import ToastConfirm from "../components/toast/ToastConfirm";
 
 const User = () => {
+  const context = useContext(JWTContext);
+
+  const [jwt] = useState(context?.jwt);
+  const [user] = useState(context?.user);
   // list of users
   const [users, setUsers] = useState([]);
 
@@ -90,9 +94,6 @@ const User = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  const context = useContext(JWTContext);
-  const jwt = context.token;
 
   function saveEditUser() {
     fetch(`http://localhost:8080/api/v1/users`, {
@@ -322,7 +323,7 @@ const User = () => {
                 <option value="ROLE_TEACHER">Giáo viên</option>
                 <option
                   className={`${
-                    context.jwtDecoded.role === "ROLE_SUB-ADMIN" ? "hidden" : ""
+                    context?.jwtDecoded?.role === "ROLE_SUB-ADMIN" ? "hidden" : ""
                   }`}
                   value="ROLE_SUB-ADMIN"
                 >
@@ -411,7 +412,12 @@ const User = () => {
                   ? "Khóa người dùng"
                   : "Mở khóa người dùng"}
               </button>
-              {context.jwtDecoded.role === "ROLE_SUB-ADMIN" && (
+              <button
+                className={`bg-gray-400 text-white rounded-lg w-fit p-2`}
+              >
+                Reset mật khẩu
+              </button>
+              {user?.role === "ROLE_SUB-ADMIN" || user?.role === "ROLE_ADMIN" && (
                 <button
                   onClick={() => showToast(editUser.staffCode)}
                   className="bg-red-400 text-white rounded-lg w-fit p-2"

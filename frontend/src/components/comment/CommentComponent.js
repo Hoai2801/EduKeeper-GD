@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import toast from "react-hot-toast";
-import Comment from "../Comment";
+import Comment from "./Comment";
 
 const CommentComponent = ({data, staffCode}) => {
 

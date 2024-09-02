@@ -156,4 +156,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
         @Query(value = "SELECT count(vh) FROM Document d left join ViewHistory vh on d.id = vh.document.id WHERE d.isDelete = false AND d.userUpload.staffCode = :staffCode")
         int getTotalViewsByAuthor(@Param("staffCode") String staffCode);
+
+        @Query(value = "SELECT d FROM Document d left join Subject s on d.subject.id = s.id")
+        List<Document> getDocumentsBySubjectId(Long idSubject);
 }

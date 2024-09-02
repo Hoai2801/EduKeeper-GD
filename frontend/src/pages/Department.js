@@ -38,7 +38,7 @@ const Department = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          authorization: "Bearer " + userJWT?.token,
+          authorization: "Bearer " + userJWT?.jwt,
         },
         body: JSON.stringify(specializedDTO),
       }).then((res) => {
@@ -78,7 +78,7 @@ const Department = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          authorization: "Bearer " + userJWT?.token,
+          authorization: "Bearer " + userJWT?.jwt,
         },
         body: JSON.stringify(departmentDTO),
       }).then((res) => {
@@ -99,7 +99,7 @@ const Department = () => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        authorization: "Bearer " + userJWT?.token,
+        authorization: "Bearer " + userJWT?.jwt,
       },
       body: JSON.stringify({
         departmentName: selectDepartment.departmentName,
@@ -120,7 +120,7 @@ const Department = () => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        authorization: "Bearer " + userJWT?.token,
+        authorization: "Bearer " + userJWT?.jwt,
       },
     }).then((res) => {
       if (res.status === 200) {
@@ -138,7 +138,7 @@ const Department = () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        authorization: "Bearer " + userJWT?.token,
+        authorization: "Bearer " + userJWT?.jwt,
       },
     }).then((res) => {
       if (res.status === 200) {
@@ -382,7 +382,7 @@ const Department = () => {
                 </button>
                 <button
                   className={` mt-3 font-medium  text-white rounded-xl flex justify-center items-center h-10 min-w-max px-12 py-4 bg-red-500 ${
-                    userJWT.jwtDecoded.role === "ROLE_SUB-ADMIN" ? "hidden" : ""
+                    userJWT.user.role === "ROLE_SUB-ADMIN" ? "hidden" : ""
                   }`}
                   onClick={() => deleteDepartment(selectDepartment.id)}
                 >

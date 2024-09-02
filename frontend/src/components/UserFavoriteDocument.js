@@ -1,14 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {jwtDecode} from "jwt-decode";
 import DocumentCard from "./DocumentCard";
 import {useParams} from "react-router-dom";
 
 const UserFavoriteDocument = ({isTrueLegit, jwt}) => {
-    // const token = localStorage.getItem("token");
-    // let jwt = null;
-    // if (token !== "undefined" && token !== null) {
-    //     jwt = jwtDecode(token);
-    // }
     const location = useParams();
 
     const [documentList, setDocumentList] = useState([]);

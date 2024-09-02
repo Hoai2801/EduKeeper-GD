@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-// import DocumentCard from "../components/DocumentCard";
+import { useSearchParams } from "react-router-dom";
+import DocumentCard from "../components/DocumentCard";
 import DocumentCardRow from "../components/DocsCardRow";
-
 const Search = ({ jwt }) => {
   const url = window.location.href;
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   // lasted, most download or most views
   const order = searchParams.get("order");
@@ -18,7 +17,7 @@ const Search = ({ jwt }) => {
   const [documents, setDocument] = useState([]);
   const [documentsShow, setDocumentShow] = useState([]);
 
-  const search = localStorage.getItem("search") || "";
+  const [search] = localStorage.getItem("search") || "";
 
   useEffect(() => {
     const dataSearch = {
@@ -65,9 +64,12 @@ const Search = ({ jwt }) => {
 
   const [limit, setLimit] = useState(10);
   return (
-    <div className="w-full">
-      <div className="my-5 xl:ml-4 flex justify-start gap-y-5 gap-x-4 h-fit flex-wrap  items-center">
-        {documentsShow &&
+    <div className="w-full pr-10">
+      {/* <h2 className="text-[28px] font-bold text-center mt- mb-5">
+        Tài liệu ({documents && documents.length})
+      </h2> */}
+      <div className="my-5 flex gap-5 h-fit flex-wrap justify-start">
+        {documents &&
           documentsShow.map((item, index) => {
             if (index < limit) {
               return <DocumentCardRow key={index} document={item} />;

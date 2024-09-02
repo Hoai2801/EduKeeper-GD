@@ -12,6 +12,8 @@ import com.GDU.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
         private final DocumentRepository documentRepository;
 
         @Override
+        @Cacheable("notifications")
         public List<NotificationDTO> getAllNotificationOfUser(String staffCode) {
                 User user = userService.getUserByStaffCode(staffCode);
                 List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());
@@ -39,7 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
                                                 .receiver(notification.getReceiver().getStaffCode())
                                                 .title(notification.getTitle())
                                                 .content(notification.getContent())
-                                                .document(notification.getDocument().getSlug())
+                                                .document(notification.getDocument() != null ? notification.getDocument().getSlug() : null)
                                                 .is_check(notification.is_check())
                                                 .created_at(notification.getCreated_at())
                                                 .build())
@@ -47,6 +50,7 @@ public class NotificationServiceImpl implements NotificationService {
                 // .reversed();
         }
 
+        @CacheEvict(value = "notifications", allEntries = true)
         public void send(NotificationDTO message) {
                 User sender = userService.getUserByStaffCode(message.getSender());
                 User receiver = userService.getUserByStaffCode(message.getReceiver());
@@ -65,6 +69,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         @Override
+        @CacheEvict(value = "notifications", allEntries = true)
         public void makeCheckedAllNotificationOfUser(String staffCode) {
                 User user = userService.getUserByStaffCode(staffCode);
                 List<Notification> notificationList = notificationRepository.findByReceiverUser(user.getId());

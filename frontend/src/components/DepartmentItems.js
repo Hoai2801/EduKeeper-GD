@@ -16,8 +16,8 @@ const DepartmentItems = ({ isActive, id}) => {
         setItemEdit(specialized);
     };
 
-    const jwt = useContext(JWTContext)?.token;
-    const userJWT = useContext(JWTContext).jwtDecoded;
+    const jwt = useContext(JWTContext)?.jwt
+    const userJWT = useContext(JWTContext).user;
 
     const handleEditSpecialized = () => {
         console.log(selectedDepartment.id, newName, itemEdit.id)

@@ -219,7 +219,7 @@ const DoughnutUserChart = ({ year }) => {
       });
   }, [year]);
   const data = {
-    labels: ["Admin", "Sinh viên", "Giáo Viên", "Người dùng "],
+    labels: ["Admin", "Sinh viên", "Giáo Viên"],
     datasets: [
       {
         label: "Tổng",
@@ -227,16 +227,14 @@ const DoughnutUserChart = ({ year }) => {
           ? [
               totalUserByType[0]?.total,
               totalUserByType[1]?.total,
-              totalUserByType[2]?.total,
-              totalUserByType[3]?.total,
+              totalUserByType[2]?.total
             ]
-          : [1, 1, 1, 1],
-        backgroundColor: ["#facc15", "#3b82f6", "#22c55e", "#ef4444"],
+          : [1, 1, 1],
+        backgroundColor: ["#facc15", "#3b82f6", "#22c55e"],
         borderColor: [
           "rgba(255, 99, 132, 1)",
           "rgba(115, 127, 217, 0.8)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(255, 99, 71, 0.8)",
+          "rgba(75, 192, 192, 1)"
         ],
         borderWidth: 1,
       },

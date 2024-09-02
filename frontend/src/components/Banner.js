@@ -8,6 +8,7 @@ const Banner = () => {
         fetch('http://localhost:8080/api/v1/banners')
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
                 setBanner(data)
             })
     }, [])
@@ -29,9 +30,11 @@ const Banner = () => {
         return () => clearTimeout(timeout);
     }, [indexBanner]);
 
+    console.log(banner)
+
     return (
-        <div>
-            <div className={`${banner?.length > 0 ? "block" : "hidden"}`}>
+        <div className={`w-full flex justify-center`}>
+            <div className={`${banner?.length > 0 ? "relative" : "hidden"}`}>
                 {banner?.map((banner, index) => (
                     <a href={banner?.url?.trim()?.length > 0
                         ? banner?.url?.includes('http') || banner?.url?.includes('https')
@@ -40,7 +43,7 @@ const Banner = () => {
                         : ''}
                        className={`relative`}
                     >
-                        <img src={`http://localhost:8080/api/v1/images/banner/${banner?.image}`} alt=""
+                        <img src={`${banner?.image ? 'http://localhost:8080/api/v1/images/banner/' + banner.image : ''}`} alt={banner.image}
                              className={`w-full object-cover max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 md:rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
                         />
                     </a>

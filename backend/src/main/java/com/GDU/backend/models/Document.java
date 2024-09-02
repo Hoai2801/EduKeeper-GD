@@ -58,6 +58,8 @@ public class Document {
     private User userUpload;
 
     private String author;
+    
+    private String thumbnail;
 
     @OneToMany(mappedBy = "document")
     private List<Download> downloads;

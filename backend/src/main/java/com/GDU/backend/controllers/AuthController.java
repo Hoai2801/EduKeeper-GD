@@ -58,10 +58,11 @@ public class AuthController {
         return ResponseEntity.ok().body(authenticationService.activate(token));
     }
 
-    @PostMapping("/forgot-password/{staffCode}")
+    @PostMapping("/forgot-password/{mail}")
     public ResponseEntity<?> forgotPassword(
-            @PathVariable("staffCode") String staffCode) {
-        return authenticationService.forgotPassword(staffCode);
+            @PathVariable("mail") String mail
+    ) {
+        return authenticationService.forgotPassword(mail);
     }
 
     @PostMapping("/reset-password/{token}")
@@ -69,5 +70,13 @@ public class AuthController {
             @PathVariable("token") String token,
             @RequestBody ChangePasswordRequest changePasswordRequest) {
         return authenticationService.resetPassword(token, changePasswordRequest);
+    }
+    
+    @PutMapping("/change-password/{staffCode}")
+    public ResponseEntity<String> changePassword(
+            @Valid @RequestBody ChangePasswordRequest changePasswordRequest,
+            @PathVariable("staffCode") String staffCode
+    ) {
+        return authenticationService.changePassword(changePasswordRequest, staffCode);
     }
 }

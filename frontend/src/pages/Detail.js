@@ -3,12 +3,10 @@ import "./Detail.css";
 import { Link } from "react-router-dom";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import Comment from "../components/Comment";
 import { JWTContext } from "../App";
 import LoveButton from "../components/LoveButton";
 import DownloadButton from "../components/DownloadButton";
 import CommentComponent from "../components/comment/CommentComponent";
-import AvatarTeacher from "../assets/avatar-teacher.png";
 const Detail = () => {
   function extractSlugFromURL(url) {
     // Split the URL by '/'
@@ -20,60 +18,47 @@ const Detail = () => {
   }
 
   const context = useContext(JWTContext);
-  const staffCode = context?.jwtDecoded?.staff_code;
+  const staffCode = context?.user?.staff_code;
 
   const url = window.location.href;
   const slug = extractSlugFromURL(url);
   const [fileDownload, setFileDownload] = useState(null);
   const [data, setData] = useState(null);
   const [htmlContent, setHtmlContent] = useState("Đang tải tài liệu");
-  const [isContentLoading, setIsContentLoading] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:8080/api/v1/documents/" + slug)
       .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-      });
+      .then((data) => setData(data));
 
-    fetch("http://localhost:8080/api/v1/documents/" + slug + "/html")
-      .then((res) => {
+    fetch("http://localhost:8080/api/v1/documents/" + slug + "/html").then(
+      (res) => {
         if (res.status === 200) {
-          res.text().then((r) => {
-            setHtmlContent(r);
-          });
+          res.text().then((r) => setHtmlContent(r));
         } else {
           setHtmlContent("Đang tải tài liệu");
         }
-      })
-      .then(() => setIsContentLoading(true));
-
-    fetch("http://localhost:8080/api/v1/documents/" + slug + "/download").then(
-      (res) => {
-        res.blob().then((r) => {
-          setFileDownload(r);
-        });
       }
     );
 
-    // make view history
-    const increaseView = setTimeout(() => {
-      if (staffCode) {
+    fetch("http://localhost:8080/api/v1/documents/" + slug + "/download").then(
+      (res) => res.blob().then((r) => setFileDownload(r))
+    );
+  }, [slug]); // This effect depends only on slug
+
+  useEffect(() => {
+    if (staffCode && data?.id) {
+      const increaseView = setTimeout(() => {
         fetch("http://localhost:8080/api/v1/view-history", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            documentId: data?.id,
-            staffCode: staffCode,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ documentId: data.id, staffCode: staffCode }),
         });
-      }
-    }, 30000);
+      }, 30000);
 
-    return () => clearTimeout(increaseView);
-  }, [slug, data?.id, staffCode]);
+      return () => clearTimeout(increaseView);
+    }
+  }, [data?.id, staffCode]);
 
   return (
     <div className={`w-full`}>

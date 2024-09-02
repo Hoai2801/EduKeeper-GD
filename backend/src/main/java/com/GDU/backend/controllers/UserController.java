@@ -6,6 +6,8 @@ import com.GDU.backend.dtos.responses.UserResponse;
 import com.GDU.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,7 +80,6 @@ public class UserController {
     @GetMapping("/monthly/{year}")
     public ResponseEntity<?> countUsersMonthly(@PathVariable("year") int year) {
         try {
-
             return ResponseEntity.ok(userService.countUsersMonthly(year));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -88,7 +89,6 @@ public class UserController {
     @GetMapping("/type/{year}")
     public ResponseEntity<?> countUsersByRoles(@PathVariable("year") int year) {
         try {
-
             return ResponseEntity.ok(userService.countUsersByRoles(year));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

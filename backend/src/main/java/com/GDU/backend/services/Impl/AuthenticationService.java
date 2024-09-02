@@ -13,6 +13,7 @@ import com.GDU.backend.models.User;
 import com.GDU.backend.repositories.*;
 import com.GDU.backend.services.Impl.enums.EmailTemplateName;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -187,9 +188,9 @@ public class AuthenticationService {
         return "activated";
     }
 
-    public ResponseEntity<String> forgotPassword(String staffCode) {
+    public ResponseEntity<String> forgotPassword(String mail) {
         try {
-            var user = userRepository.findByStaffCode(staffCode).orElseThrow(
+            var user = userRepository.findByEmail(mail).orElseThrow(
                     () -> new UserNotFoundException("User not found"));
             String newToken = generateToken(user);
             // send email
@@ -219,6 +220,27 @@ public class AuthenticationService {
         User user = dbToken.getUser();
         userService.changePassword(user, changePasswordRequest.getPassword());
         tokenRepository.delete(dbToken);
+        return ResponseEntity.ok("success");
+    }
+
+    public ResponseEntity<String> changePassword(@Valid ChangePasswordRequest changePasswordRequest, String staffCode) {
+        if (changePasswordRequest.getPassword().equals(changePasswordRequest.getConfirmPassword())) {
+            throw new PasswordsDoNotMatchException("2 passwords must be different");
+        }
+        if (changePasswordRequest.getConfirmPassword().length() < 8) {
+            throw new PasswordsDoNotMatchException("Password must be at least 8 characters long");
+        }
+        var auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        staffCode,
+                        changePasswordRequest.getPassword()));
+
+        if (auth == null) {
+            return ResponseEntity.badRequest().body("Sai mật khẩu");
+        }
+
+        var user = (User) auth.getPrincipal();
+        userService.changePassword(user, changePasswordRequest.getConfirmPassword());
         return ResponseEntity.ok("success");
     }
 }
