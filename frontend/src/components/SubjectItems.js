@@ -13,7 +13,6 @@ const SubjectItems = ({isActive, dep}) => {
         fetch(`http://localhost:8080/api/v1/subjects/specialized/${dep?.id}`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data)
                 setItems(data);
             });
     };
@@ -21,14 +20,6 @@ const SubjectItems = ({isActive, dep}) => {
     useEffect(() => {
         fetchData();
     }, [dep?.id]);
-
-    // useEffect(() => {
-    //     fetch(`http://localhost:8080/api/v1/specializes`)
-    //         .then((res) => res.json())
-    //         .then((data) => {
-    //             setSpecialized(data);
-    //         });
-    // }, []);
 
     function removeSubjectWithId(id) {
         if (window.confirm("Bạn có xác nhận xóa môn học này không?")) {

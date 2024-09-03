@@ -73,10 +73,10 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public List<Subject> getSubjectsBySpecializedId(String specializedId) {
-        List<SubjectSpecialized> subjectSpecializeds = subjectSpecializedRepository.getSubjectsBySpecializedId(Long.parseLong(specializedId));
+        List<SubjectSpecialized> subjectSpecializes = subjectSpecializedRepository.getSubjectsBySpecializedId(Long.parseLong(specializedId));
         List<SubjectSpecialized> subjectsOfAllSpecialized = subjectSpecializedRepository.getSubjectsBySpecializedId(40L);
         List<Subject> subjects = new ArrayList<>();
-        for (SubjectSpecialized subjectSpecialized : subjectSpecializeds) {
+        for (SubjectSpecialized subjectSpecialized : subjectSpecializes) {
             subjects.add(subjectSpecialized.getSubject());
         }
         for (SubjectSpecialized subjectSpecialized : subjectsOfAllSpecialized) {
@@ -94,15 +94,16 @@ public class SubjectServiceImpl implements SubjectService {
         if (subjectSpecialized == null) {
             return ResponseEntity.badRequest().body("Môn học không tìm thấy");
         }
+
+        subjectSpecializedRepository.delete(subjectSpecialized);
         // check if subject is used in subject_specialized
-        if (subjectSpecializedRepository.getSubjectSpecializedBySubjectId(id_subject) == null) {
+        if ((long) subjectSpecializedRepository.getSubjectSpecializedBySubjectId(id_subject).size() == 0) {
             List<Document> documents = documentRepository.getDocumentsBySubjectId(id_subject);
             // if subject of specialized is deleted, 
             // so we don't need the document of this subject anymore
             documentRepository.deleteAll(documents);
+            subjectRepository.deleteById(id_subject);
         }
-        subjectRepository.deleteById(id_subject);
-        subjectSpecializedRepository.delete(subjectSpecialized);
         return ResponseEntity.ok("Xóa môn học thành công");
     }
 

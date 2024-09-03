@@ -412,15 +412,10 @@ const User = () => {
                   ? "Khóa người dùng"
                   : "Mở khóa người dùng"}
               </button>
-              <button
-                className={`bg-gray-400 text-white rounded-lg w-fit p-2`}
-              >
-                Reset mật khẩu
-              </button>
               {user?.role === "ROLE_SUB-ADMIN" || user?.role === "ROLE_ADMIN" && (
                 <button
                   onClick={() => showToast(editUser.staffCode)}
-                  className="bg-red-400 text-white rounded-lg w-fit p-2"
+                  className="bg-gray-400 text-white rounded-lg w-fit p-2"
                 >
                   Reset mật khẩu
                 </button>

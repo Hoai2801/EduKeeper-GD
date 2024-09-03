@@ -14,8 +14,8 @@ const Subject = () => {
     const [isShowSpecializes, setIsShowSpecialized] = useState(false);
     const [listSpeciaziles, setListSpeciaziles] = useState([]);
 
-    const context = useContext(JWTContext);
-    const jwt = context?.token;
+    // const context = ;
+    const jwt = useContext(JWTContext)?.jwt;
     const handleToggleDetails = (id) => {
         setActiveSpecializedtId((prevId) => (prevId === id ? null : id));
     };
@@ -33,8 +33,6 @@ const Subject = () => {
             try {
                 fetch("http://localhost:8080/api/v1/subjects", {
                     method: "POST",
-                    // credentials: 'include',
-                    // Authorization: 'Bearer ' + jwt,
                     headers: {
                         "Content-Type": "application/json",
                         authorization: "Bearer " + jwt,
@@ -45,15 +43,15 @@ const Subject = () => {
                             (specialized) => specialized.id
                         ),
                     }),
-                })
-                    .then((res) => {
+                }).then((res) => {
                         if (res.status === 200) {
                             return res.text().then((data) => {
                                 toast.success("Thêm môn học thành công");
                                 setIsShowPostSpecialized(false)
                             });
-                        } else
+                        } else {
                             toast.error("Lỗi hệ thống!, vui là thực hiện lại!");
+                        }
                     })
                     .catch((e) => {
                         toast.error(e);
