@@ -51,13 +51,13 @@ public class AuthenticationService {
         // if user is student, we need to check the information
         if (role.getName().equals("ROLE_USER")) {
             if (!registerRequest.isAdminCreate()) {
-                var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment())).orElseThrow(
-                        () -> new RuntimeException("Department not found")
-                );
-    
-                var specialized = specializedRepository.findById(Long.parseLong(registerRequest.getSpecialized())).orElseThrow(
-                        () -> new RuntimeException("Specialized not found")
-                );
+                var department = departmentRepository.findById(Long.parseLong(registerRequest.getDepartment()))
+                        .orElseThrow(
+                                () -> new RuntimeException("Department not found"));
+
+                var specialized = specializedRepository.findById(Long.parseLong(registerRequest.getSpecialized()))
+                        .orElseThrow(
+                                () -> new RuntimeException("Specialized not found"));
                 user.setDepartment(department);
                 user.setSpecialized(specialized);
                 user.setKlass(registerRequest.getClassroom());
@@ -68,9 +68,9 @@ public class AuthenticationService {
                 user.setKlass(null);
                 user.setEnable(true);
             }
-        // if user is teacher, we don't need to check the information
-        // because the information is not required
-        // teacher do not belong to any department
+            // if user is teacher, we don't need to check the information
+            // because the information is not required
+            // teacher do not belong to any department
         } else {
             user.setDepartment(null);
             user.setSpecialized(null);
@@ -147,8 +147,7 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         // use staff code to log in
                         loginRequest.getStaffCode(),
-                        loginRequest.getPassword())
-        );
+                        loginRequest.getPassword()));
 
         if (auth == null) {
             return ResponseEntity.badRequest().body("Sai mật khẩu");
@@ -168,9 +167,8 @@ public class AuthenticationService {
         var jwt = jwtService.generateToken(claims, user);
         return ResponseEntity.ok(
                 AuthenticationResponse.builder()
-                    .token(jwt)
-                    .build()
-        );
+                        .token(jwt)
+                        .build());
     }
 
     public String activate(String token) {
@@ -193,8 +191,7 @@ public class AuthenticationService {
     public ResponseEntity<String> forgotPassword(String mail) {
         try {
             var user = userRepository.findByEmail(mail).orElseThrow(
-                    () -> new UserNotFoundException("User not found")
-            );
+                    () -> new UserNotFoundException("User not found"));
             String newToken = generateToken(user);
             // send email
             String forgotPasswordUrl = "http://localhost:3000/account/forgot-password/" + newToken;
@@ -236,13 +233,12 @@ public class AuthenticationService {
         var auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         staffCode,
-                        changePasswordRequest.getPassword())
-        );
+                        changePasswordRequest.getPassword()));
 
         if (auth == null) {
             return ResponseEntity.badRequest().body("Sai mật khẩu");
         }
-        
+
         var user = (User) auth.getPrincipal();
         userService.changePassword(user, changePasswordRequest.getConfirmPassword());
         return ResponseEntity.ok("success");

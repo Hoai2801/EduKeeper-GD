@@ -46,7 +46,8 @@ public class NotificationServiceImpl implements NotificationService {
                                                 .is_check(notification.is_check())
                                                 .created_at(notification.getCreated_at())
                                                 .build())
-                                .toList().reversed();
+                                .toList();
+                // .reversed();
         }
 
         @CacheEvict(value = "notifications", allEntries = true)

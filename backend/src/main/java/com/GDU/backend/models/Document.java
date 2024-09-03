@@ -28,7 +28,7 @@ public class Document {
     @Column(nullable = false, length = 300)
     private String slug;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50)
     private String documentType;
 
     @Column(nullable = false)
