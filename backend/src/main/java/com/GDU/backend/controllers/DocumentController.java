@@ -137,12 +137,9 @@ public class DocumentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDocumentById(
-
             @PathVariable("id") Long id,
             @ModelAttribute UploadRequestDTO uploadRequestDTO) {
         try {
-            System.out.println(uploadRequestDTO);
-            System.out.println(id);
             return ResponseEntity.ok(documentService.updateDocumentById(id, uploadRequestDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);

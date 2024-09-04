@@ -27,7 +27,7 @@ const UserInfor = () => {
 
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/v1/departments")
+        fetch("http://103.241.43.206:8080/api/v1/departments")
             .then((res) => res.json())
             .then((data) => {
                 setDepartmentList(data)
@@ -37,7 +37,7 @@ const UserInfor = () => {
 
     useEffect(() => {
         if (jwt) {
-            fetch("http://localhost:8080/api/v1/users/" + context?.user?.staff_code)
+            fetch("http://103.241.43.206:8080/api/v1/users/" + context?.user?.staff_code)
                 .then((res) => res.json())
                 .then((data) => {
                     setBirth(data?.birthDay)
@@ -50,7 +50,7 @@ const UserInfor = () => {
                     setUser(data)
                 });
 
-            fetch("http://localhost:8080/api/v1/specializes/department/" + context?.user?.staff_code)
+            fetch("http://103.241.43.206:8080/api/v1/specializes/department/" + context?.user?.staff_code)
                 .then((res) => res.json())
                 .then((data) => {
                     setSpecializedList(data)
@@ -62,7 +62,7 @@ const UserInfor = () => {
     useEffect(() => {
         if (selectedDepartment) {
             console.log(selectedDepartment)
-            fetch("http://localhost:8080/api/v1/specializes/department/" + selectedDepartment?.id)
+            fetch("http://103.241.43.206:8080/api/v1/specializes/department/" + selectedDepartment?.id)
                 .then((res) => res.json())
                 .then((data) => {
                     setSpecializedList(data)
@@ -71,7 +71,7 @@ const UserInfor = () => {
     }, [selectedDepartment])
 
     const updateUser = () => {
-        fetch("http://localhost:8080/api/v1/users", {
+        fetch("http://103.241.43.206:8080/api/v1/users", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

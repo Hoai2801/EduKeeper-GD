@@ -12,7 +12,7 @@ const UserUploadDocument = () => {
     // if user login, check if user is the same
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
+        fetch("http://103.241.43.206:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
             .then((res) => res.json())
             .then((data) => {
                 setDocumentList(data);
@@ -40,23 +40,25 @@ const UserUploadDocument = () => {
                             </div>
                             <DocumentCard key={index} document={item}/>
                             <div
-                                className={`absolute bottom-[20%] right-0 rounded-lg p-2 m-4 text-white w-10 h-10 overflow-hidden cursor-pointer
+                                className={`absolute bottom-[10%] right-0 px-5 py-2 rounded-3xl m-4 w-fit bg-gray-500 text-white h-10 overflow-hidden cursor-pointer
                                 ${context?.user?.staff_code === item.user_upload.staffCode ? "block" : "hidden"}
                             `}>
-                                <Link to={`/edit/${item.slug}`}>
-                                    <img src={edit} alt="" className={`w-full h-full`}/>
+                                <Link to={`/edit/${item.slug}`}
+                                >
+                                    {/*<img src={edit} alt="" className={`w-full h-full`}/>*/}
+                                    Sửa
                                 </Link>
                             </div>
-                            <div
-                                className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white 
-                            ${item.user_upload.staffCode !== context?.user?.staff_code ? "hidden" : ""}
-                            ${item.scope !== "public" ?
-                                    item.scope === "private" ? "bg-gray-500" :
-                                        // only for student
-                                        "bg-amber-200"
-                                    : "bg-green-500"}`}>
-                                {item.scope}
-                            </div>
+                            {/*<div*/}
+                            {/*    className={`absolute bottom-0 right-0 rounded-lg p-2 m-4 text-white */}
+                            {/*${item.user_upload.staffCode !== context?.user?.staff_code ? "hidden" : ""}*/}
+                            {/*${item.scope !== "public" ?*/}
+                            {/*        item.scope === "private" ? "bg-gray-500" :*/}
+                            {/*            // only for student*/}
+                            {/*            "bg-amber-200"*/}
+                            {/*        : "bg-green-500"}`}>*/}
+                            {/*    {item.scope}*/}
+                            {/*</div>*/}
                         </div>
                     )
                 })}

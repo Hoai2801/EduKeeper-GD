@@ -76,11 +76,7 @@ public class DocumentServiceImpl implements DocumentService {
     private EntityManager entityManager;
     @Value("${admin-staff-code}")
     private String adminStaffCode;
-    @Autowired
-    private CacheManager cacheManager;
 
-    private static final Logger logger = LoggerFactory.getLogger(DocumentService.class);
-    
     @Override
     @CacheEvict(value = {
             "documentBySlug", 
@@ -170,14 +166,16 @@ public class DocumentServiceImpl implements DocumentService {
     public void processDocumentConversion(File destFile, String fileName, Long documentId) throws IOException {
         int totalPages = 0;
         String thumbnail = "";
-        String dir = "src/main/resources/static/convert/";
-        if (!Files.exists(Paths.get(dir))) {
-            Files.createDirectories(Paths.get(dir));
+        String outputDirPathOfHtml = "src/main/resources/static/convert/";
+        String outputDirPathOfImage = "src/main/resources/static/images/";
+        if (!Files.exists(Paths.get(outputDirPathOfHtml))) {
+            Files.createDirectories(Paths.get(outputDirPathOfHtml));
+        }
+        if (!Files.exists(Paths.get(outputDirPathOfImage))) {
+            Files.createDirectories(Paths.get(outputDirPathOfImage));
         }
         try {
             String originalFilename = destFile.getName();
-            String outputDirPathOfHtml = "src/main/resources/static/convert/";
-            String outputDirPathOfImage = "src/main/resources/static/images/";
             if (originalFilename.endsWith(".pdf")) {
                 try (PDDocument document = PDDocument.load(destFile)) {
                     PDFRenderer pdfRenderer = new PDFRenderer(document);
@@ -193,7 +191,7 @@ public class DocumentServiceImpl implements DocumentService {
                         if (page == 0) {
                             thumbnail = slideName;
                         }
-                        htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(slideName)
+                        htmlContent.append("<img src='http://103.241.43.206:8080/api/v1/images/").append(slideName)
                                 .append("' style=\"width: 100%; max-width: 100%;\" loading=\"lazy\" /><br/>");
                     }
 
@@ -260,7 +258,7 @@ public class DocumentServiceImpl implements DocumentService {
                     String imgFileName = fileName + "_slide_" + System.currentTimeMillis() + ".png";
                     thumbnail = imgFileName;
                     ImageIO.write(img, "png", new File("src/main/resources/static/images/" + imgFileName));
-                    htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName)
+                    htmlContent.append("<img src='http://103.241.43.206:8080/api/v1/images/").append(imgFileName)
                             .append("' style='width:100%; height:auto;' loading='lazy'/><br>");
                 }
                 htmlContent.append("</body></html>");
@@ -372,7 +370,7 @@ public class DocumentServiceImpl implements DocumentService {
     public DocumentResponseDTO getDocumentBySlug(String slug) {
         Document document = documentRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-        return convertToDocumentResponse(document);
+        return DocumentResponseDTO.from(document);
     }
 
     @Override
@@ -382,7 +380,7 @@ public class DocumentServiceImpl implements DocumentService {
         // only get document has download more than 0
         return documentRepository.getMostDownloadedDocuments(limit).stream()
                 .filter(document -> !document.getDownloads().isEmpty())
-                .map(this::convertToDocumentResponse)
+                .map(DocumentResponseDTO::from)
                 .toList();
     }
 
@@ -391,7 +389,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<DocumentResponseDTO> getLatestDocuments(int limit) {
         List<Document> documents = documentRepository.getLastedDocuments(limit);
         return documents.stream()
-                .map(this::convertToDocumentResponse)
+                .map(DocumentResponseDTO::from)
                 .toList();
     }
 
@@ -402,7 +400,7 @@ public class DocumentServiceImpl implements DocumentService {
                     recommendationRequestDTO.getCategory(),
                     recommendationRequestDTO.getTitle(),
                     recommendationRequestDTO.getAuthor()
-                ).stream().map(this::convertToDocumentResponse).toList();
+                ).stream().map(DocumentResponseDTO::from).toList();
     }
 
     @Override
@@ -474,7 +472,7 @@ public class DocumentServiceImpl implements DocumentService {
                     .sorted(Comparator.comparing(Document::getId).reversed())
                     .collect(Collectors.toList());
         }
-        return documents.stream().map(this::convertToDocumentResponse).toList();
+        return documents.stream().map(DocumentResponseDTO::from).toList();
     }
 
     @Override
@@ -527,7 +525,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<DocumentResponseDTO> getDocumentsByAuthor(Long id) {
         User existingUser = userService.getUserByStaffCode(id.toString());
         List<Document> documents = documentRepository.findAllByAuthorId(existingUser.getId());
-        return documents.stream().map(this::convertToDocumentResponse).toList();
+        return documents.stream().map(DocumentResponseDTO::from).toList();
     }
 
     @Override
@@ -555,45 +553,47 @@ public class DocumentServiceImpl implements DocumentService {
         return documents.size();
     }
 
-    public DocumentResponseDTO convertToDocumentResponse(Document document) {
-        // only need show name of user
-        UserResponse userUpload = UserResponse.builder()
-                .id(document.getUserUpload().getId())
-                .username(document.getUserUpload().getName())
-                .staffCode(document.getUserUpload().getStaffCode())
-                .avatar(document.getUserUpload().getAvatar())
-                .build();
-        return DocumentResponseDTO.builder()
-                .id(document.getId())
-                .title(document.getTitle())
-                .slug(document.getSlug())
-                .download(document.getDownloadsCount())
-                .views(document.getViewsCount())
-                .user_upload(userUpload)
-                .author(document.getAuthor())
-                .status(document.getStatus())
-                .thumbnail(document.getThumbnail())
-                .scope(document.getScope())
-                .specialized(document.getSpecialized())
-                .department(document.getSpecialized().getDepartment())
-                .category(document.getCategory())
-                .upload_date(document.getUploadDate())
-                .is_delete(document.isDelete())
-                .deleted_at(document.getDeleteDate())
-                .subject(document.getSubject())
-                .file(document.getFile())
-                .pages(document.getPages())
-                .description(document.getDescription())
-                .document_type(document.getDocumentType())
-                .document_size(document.getDocumentSize())
-                .build();
-    }
+//    public DocumentResponseDTO convertToDocumentResponse(Document document) {
+//        // only need show name of user
+//        UserResponse userUpload = UserResponse.builder()
+//                .id(document.getUserUpload().getId())
+//                .username(document.getUserUpload().getName())
+//                .staffCode(document.getUserUpload().getStaffCode())
+//                .avatar(document.getUserUpload().getAvatar())
+//                .build();
+//        return DocumentResponseDTO.builder()
+//                .id(document.getId())
+//                .title(document.getTitle())
+//                .slug(document.getSlug())
+//                .download(document.getDownloadsCount())
+//                .views(document.getViewsCount())
+//                .user_upload(userUpload)
+//                .author(document.getAuthor())
+//                .status(document.getStatus())
+//                .favorites(document.getFavorites())
+//                .download(document.getDownloadsCount())
+//                .thumbnail(document.getThumbnail())
+//                .scope(document.getScope())
+//                .specialized(document.getSpecialized())
+//                .department(document.getSpecialized().getDepartment())
+//                .category(document.getCategory())
+//                .upload_date(document.getUploadDate())
+//                .is_delete(document.isDelete())
+//                .deleted_at(document.getDeleteDate())
+//                .subject(document.getSubject())
+//                .file(document.getFile())
+//                .pages(document.getPages())
+//                .description(document.getDescription())
+//                .document_type(document.getDocumentType())
+//                .document_size(document.getDocumentSize())
+//                .build();
+//    }
 
     @Override
     public List<DocumentResponseDTO> getDraftDocument() {
         return documentRepository.findDraftDocuments()
                 .stream()
-                .map(this::convertToDocumentResponse)
+                .map(DocumentResponseDTO::from)
                 .toList();
     }
 
@@ -602,7 +602,7 @@ public class DocumentServiceImpl implements DocumentService {
         // filter the document is not deleted
         return documentRepository.findPublishedDocuments()
                 .stream()
-                .map(this::convertToDocumentResponse)
+                .map(DocumentResponseDTO::from)
                 .toList();
     }
 
@@ -619,7 +619,8 @@ public class DocumentServiceImpl implements DocumentService {
             "totalDownloadsByAuthor",
             "documentToday",
             "publicDocument",
-            "draftDocument"
+            "draftDocument",
+            "topDocuments"
     }, allEntries = true)
     public String AcceptDocument(Long id) throws IOException {
         try {
@@ -649,7 +650,8 @@ public class DocumentServiceImpl implements DocumentService {
             "totalDownloadsByAuthor",
             "documentToday",
             "publicDocument",
-            "draftDocument"
+            "draftDocument", 
+            "topDocuments"
     }, allEntries = true)
     public String AcceptListDocument(List<Long> ids) throws IOException {
         try {
@@ -731,7 +733,7 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             return documentRepository.getTop10Docs()
                     .stream()
-                    .map(this::convertToDocumentResponse)
+                    .map(DocumentResponseDTO::from)
                     .toList();
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method count Docs: " + e.getMessage());
@@ -745,7 +747,7 @@ public class DocumentServiceImpl implements DocumentService {
             int offset = (page - 1) * pageSize;
             return documentRepository.getPaginationDocuments(offset)
                     .stream()
-                    .map(this::convertToDocumentResponse)
+                    .map(DocumentResponseDTO::from)
                     .toList();
 
         } catch (Exception e) {
@@ -765,16 +767,30 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @CacheEvict(value = {
+            "documentBySlug",
+            "mostDownloadedDocuments",
+            "latestDocuments",
+            "totalDocuments",
+            "totalDocumentsThisMonth",
+            "totalDocumentsThisYear",
+            "documentsBySpecialized",
+            "documentsByAuthor",
+            "totalDownloadsByAuthor",
+            "documentToday",
+            "publicDocument",
+            "draftDocument",
+            "topDocuments"
+    }, allEntries = true)
     public boolean deleteDocumentById(Long id) {
         try {
             Document document = documentRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-
             document.setDeleteDate(LocalDateTime.now());
             document.setDelete(true);
             NotificationDTO notification = NotificationDTO.builder()
                     .receiver(document.getUserUpload().getStaffCode())
-                    .sender("22140044")
+                    .sender(adminStaffCode)
                     .created_at(LocalDateTime.now())
                     .document(document.getSlug())
                     .title("Tài liệu của bạn đã bị gỡ bởi hệ thống")
@@ -805,7 +821,7 @@ public class DocumentServiceImpl implements DocumentService {
 
             return list
                     .stream()
-                    .map(this::convertToDocumentResponse)
+                    .map(DocumentResponseDTO::from)
                     .toList();
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method pagination Docs: " + e.getMessage());

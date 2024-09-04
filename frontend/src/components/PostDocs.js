@@ -26,7 +26,7 @@ export default function EditDocs({ onClose }) {
   useEffect(() => {
     console.log(selectedDepartment);
     fetch(
-        "http://localhost:8080/api/v1/specializes/department/" +
+        "http://103.241.43.206:8080/api/v1/specializes/department/" +
         selectedDepartment?.id
     )
         .then((response) => response.json())
@@ -37,7 +37,7 @@ export default function EditDocs({ onClose }) {
         .catch((error) => console.error(error));
   }, [selectedDepartment]);
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/departments")
+    fetch("http://103.241.43.206:8080/api/v1/departments")
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
@@ -45,7 +45,7 @@ export default function EditDocs({ onClose }) {
         })
         .catch((error) => console.error(error));
 
-    fetch("http://localhost:8080/api/v1/categories")
+    fetch("http://103.241.43.206:8080/api/v1/categories")
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
@@ -64,7 +64,7 @@ export default function EditDocs({ onClose }) {
     formData.append("subject", 1);
     formData.append("userUpload", "admin");
     formData.append("author", author);
-    fetch("http://localhost:8080/api/v1/documents/upload", {
+    fetch("http://103.241.43.206:8080/api/v1/documents/upload", {
       method: "POST",
       body: formData,
     })

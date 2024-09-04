@@ -82,6 +82,7 @@ public class DocumentResponseDTO {
                 .views(document.getViewsCount())
                 .download(document.getDownloadsCount())
                 .favorites(document.getFavoritesCount())
+                .thumbnail(document.getThumbnail())
                 .user_upload(userUpload)
                 .author(document.getAuthor())
                 .category(document.getCategory())

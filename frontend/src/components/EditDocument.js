@@ -31,7 +31,7 @@ const EditDocument = ({ isShowEdit, setIsShowEdit, documentEdit }) => {
     formData.append("category", selectCategory.id);
     formData.append("subject", 1);
     formData.append("description", description);
-    fetch(`http://localhost:8080/api/v1/documents/${documentEdit.id}`, {
+    fetch(`http://103.241.43.206:8080/api/v1/documents/${documentEdit.id}`, {
       method: "PUT",
       body: formData,
     })
@@ -57,19 +57,19 @@ const EditDocument = ({ isShowEdit, setIsShowEdit, documentEdit }) => {
     setSubject(documentEdit.subject);
     setDescription(documentEdit.description);
     setSpecializeds(documentEdit.specializeds);
-    fetch("http://localhost:8080/api/v1/specializes")
+    fetch("http://103.241.43.206:8080/api/v1/specializes")
         .then((res) => res.json())
         .then((data) => {
           setSpecialized(data);
         });
 
-    fetch("http://localhost:8080/api/v1/users")
+    fetch("http://103.241.43.206:8080/api/v1/users")
         .then((res) => res.json())
         .then((data) => {
           setUsers(data);
         });
 
-    fetch("http://localhost:8080/api/v1/categories")
+    fetch("http://103.241.43.206:8080/api/v1/categories")
         .then((res) => res.json())
         .then((data) => {
           setCategory(data);

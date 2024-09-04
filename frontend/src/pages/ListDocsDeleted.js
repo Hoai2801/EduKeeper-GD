@@ -36,7 +36,7 @@ export default function DeletedDocument(params) {
             const res = async () => {
                 try {
                     const response = await fetch(
-                        "http://localhost:8080/api/v1/documents/recovery",
+                        "http://103.241.43.206:8080/api/v1/documents/recovery",
                         {
                             method: "PUT",
                             headers: { "Content-Type": "application/json" },
@@ -107,7 +107,7 @@ export default function DeletedDocument(params) {
     };
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/v1/documents/deleted`)
+        fetch(`http://103.241.43.206:8080/api/v1/documents/deleted`)
             .then((res) => res.json())
             .then((data) => {
                 setDocuments(data);
@@ -225,7 +225,7 @@ export default function DeletedDocument(params) {
                                     </li>
                                     <li>
                                         <div
-                                            href="http://localhost:3000/dashboard/document/1"
+                                            href="http://103.241.43.206:3000/dashboard/document/1"
                                             className={` flex  items-center ${
                                                 activePage == 1 ? "active-check" : ""
                                             } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}
@@ -235,7 +235,7 @@ export default function DeletedDocument(params) {
                                     </li>
                                     <li>
                                         <div
-                                            href="http://localhost:3000/dashboard/document/2"
+                                            href="http://103.241.43.206:3000/dashboard/document/2"
                                             className={` flex  items-center ${
                                                 activePage == 2 ? "active-check" : ""
                                             } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}

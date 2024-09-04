@@ -22,7 +22,7 @@ const AccountAction = () => {
 
     useEffect(() => {
         if (action === "activate") {
-            axios.post("http://localhost:8080/api/v1/auth/" + action + "/" + token)
+            axios.post("http://103.241.43.206:8080/api/v1/auth/" + action + "/" + token)
                 .then((data) => {
                     window.location.href = "/";
                 })
@@ -44,7 +44,7 @@ const AccountAction = () => {
             setError('Mật khẩu phải lớn hơn 8 kí tự');
             return;
         }
-        fetch('http://localhost:8080/api/v1/auth/reset-password/' + token, {
+        fetch('http://103.241.43.206:8080/api/v1/auth/reset-password/' + token, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

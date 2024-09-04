@@ -27,11 +27,14 @@ const Detail = () => {
   const [htmlContent, setHtmlContent] = useState("Đang tải tài liệu");
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/documents/" + slug)
+    fetch("http://103.241.43.206:8080/api/v1/documents/" + slug)
       .then((res) => res.json())
-      .then((data) => setData(data));
+      .then((data) => {
+        console.log(data);
+        setData(data)
+      });
 
-    fetch("http://localhost:8080/api/v1/documents/" + slug + "/html").then(
+    fetch("http://103.241.43.206:8080/api/v1/documents/" + slug + "/html").then(
       (res) => {
         if (res.status === 200) {
           res.text().then((r) => setHtmlContent(r));
@@ -41,7 +44,7 @@ const Detail = () => {
       }
     );
 
-    fetch("http://localhost:8080/api/v1/documents/" + slug + "/download").then(
+    fetch("http://103.241.43.206:8080/api/v1/documents/" + slug + "/download").then(
       (res) => res.blob().then((r) => setFileDownload(r))
     );
   }, [slug]); // This effect depends only on slug
@@ -49,7 +52,7 @@ const Detail = () => {
   useEffect(() => {
     if (staffCode && data?.id) {
       const increaseView = setTimeout(() => {
-        fetch("http://localhost:8080/api/v1/view-history", {
+        fetch("http://103.241.43.206:8080/api/v1/view-history", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ documentId: data.id, staffCode: staffCode }),

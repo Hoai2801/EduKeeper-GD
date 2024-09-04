@@ -31,7 +31,7 @@ const Subject = () => {
             toast.error("Bạn đang để trống danh sách chuyên ngành !");
         } else {
             try {
-                fetch("http://localhost:8080/api/v1/subjects", {
+                fetch("http://103.241.43.206:8080/api/v1/subjects", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -127,7 +127,7 @@ const Subject = () => {
     };
 
     const fetchSpecialized = () => {
-        fetch("http://localhost:8080/api/v1/specializes")
+        fetch("http://103.241.43.206:8080/api/v1/specializes")
             .then((res) => res.json())
             .then((data) => {
                 setSpecialized(data);

@@ -19,7 +19,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
         Document getDocumentBySlug(@Param("slug") String slug);
 
         @Query("SELECT d FROM Document d WHERE MONTH(d.uploadDate) = MONTH(CURRENT_DATE())\n" +
-                        "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) ORDER BY size(d.downloads) DESC LIMIT :limit")
+                        "AND YEAR(d.uploadDate) = YEAR(CURRENT_DATE()) AND d.isDelete = false ORDER BY size(d.downloads) DESC LIMIT :limit")
         List<Document> getMostDownloadedDocuments(@Param("limit") int limit);
 
         @Query(value = "SELECT * FROM document d WHERE d.is_Delete = 0 and d.status = 'published' and (d.scope = 'student-only' or d.scope = 'public') ORDER BY d.id DESC LIMIT :limit", nativeQuery = true)

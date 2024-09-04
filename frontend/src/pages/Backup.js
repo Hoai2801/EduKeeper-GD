@@ -12,7 +12,7 @@ const Backup = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const fetchBackup = () => {
-        fetch('http://localhost:8080/api/v1/backups/list-backups')
+        fetch('http://103.241.43.206:8080/api/v1/backups/list-backups')
             .then((res) => res.json())
             .then((data) => {
                 setListBackup(data);
@@ -25,7 +25,7 @@ const Backup = () => {
 
     const createBackup = () => {
         setIsLoading(true);
-        fetch('http://localhost:8080/api/v1/backups', {
+        fetch('http://103.241.43.206:8080/api/v1/backups', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ const Backup = () => {
     }
 
     const deleteBackup = (name) => {
-        fetch('http://localhost:8080/api/v1/backups/' + name, {
+        fetch('http://103.241.43.206:8080/api/v1/backups/' + name, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const Backup = () => {
 
     const downloadBackup = (name) => {
         console.log(name);
-        fetch('http://localhost:8080/api/v1/backups/download-backup/' + name, {
+        fetch('http://103.241.43.206:8080/api/v1/backups/download-backup/' + name, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const Backup = () => {
     const restoreBackup = (name) => {
         setIsLoading(true);
         if (name.endsWith('.sql')) {
-            fetch('http://localhost:8080/api/v1/backups/restore-database/' + name, {
+            fetch('http://103.241.43.206:8080/api/v1/backups/restore-database/' + name, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const Backup = () => {
                 })
         } else {
 
-            fetch('http://localhost:8080/api/v1/backups/restore-backup/' + name, {
+            fetch('http://103.241.43.206:8080/api/v1/backups/restore-backup/' + name, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

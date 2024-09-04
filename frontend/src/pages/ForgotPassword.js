@@ -31,7 +31,7 @@ const ForgotPassword = () => {
         }
 
         // send mail
-        fetch('http://localhost:8080/api/v1/auth/forgot-password/' + mail, {
+        fetch('http://103.241.43.206:8080/api/v1/auth/forgot-password/' + mail, {
             method: 'POST',
         })
         .then((data) => {

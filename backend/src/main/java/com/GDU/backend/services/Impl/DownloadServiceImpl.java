@@ -10,6 +10,7 @@ import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.DownloadService;
 import com.GDU.backend.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class DownloadServiceImpl implements DownloadService {
     private final DownloadRepository downloadRepository;
 
     @Override
+    @CacheEvict(value = {"latestDocuments", "mostDownloadedDocuments", "topDocuments"}, allEntries = true)
     public String createDownload(DownloadDTO downloadDTO) {
         User user = userService.getUserByStaffCode(downloadDTO.getStaffCode());
         Document document = documentService.getDocumentById(downloadDTO.getDocumentId());

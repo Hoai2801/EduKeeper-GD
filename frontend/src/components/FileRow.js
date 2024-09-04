@@ -6,7 +6,7 @@ const FileRow = ({ limit, title, editDocument, change, setChange }) => {
     const [document, setDocument] = useState([]);
 
     useEffect(() => {
-        fetch(`http://localhost:8080/api/v1/documents/latest?limit=${limit}`)
+        fetch(`http://103.241.43.206:8080/api/v1/documents/latest?limit=${limit}`)
             .then((res) => res.json())
             .then((data) => {
                 setDocument(data)
@@ -15,7 +15,7 @@ const FileRow = ({ limit, title, editDocument, change, setChange }) => {
 
 
     const handleDelete = (id) => {
-        fetch(`http://localhost:8080/api/v1/documents/${id}`, {
+        fetch(`http://103.241.43.206:8080/api/v1/documents/${id}`, {
             method: 'DELETE',
         }).then(() => {
             console.log("Deleted")

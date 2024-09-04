@@ -10,6 +10,8 @@ import com.GDU.backend.services.DocumentService;
 import com.GDU.backend.services.UserService;
 import com.GDU.backend.services.ViewHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -60,6 +62,7 @@ public class ViewHistoryServiceImpl implements ViewHistoryService {
     }
 
     @Override
+    @Cacheable("topDocuments")
     public List<DocumentResponseDTO> getTopDocuments(Integer limit) {
         List<Document> viewHistories = viewHistoryRepository.findTopDocuments(limit);
         if (!viewHistories.isEmpty()) {

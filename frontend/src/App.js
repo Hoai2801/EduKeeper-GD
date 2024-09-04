@@ -53,7 +53,7 @@ function App() {
     if (user) {
       const checkIfBlocked = () => {
         fetch(
-          "http://localhost:8080/api/v1/users/is-blocked/" +
+          "http://103.241.43.206:8080/api/v1/users/is-blocked/" +
             user?.staff_code
         )
           .then((res) => {

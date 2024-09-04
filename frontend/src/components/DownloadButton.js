@@ -10,7 +10,7 @@ const DownloadButton = ({documentId, fileName, fileDownload, type, staffCode}) =
         }));
 
         // increase download value of document
-        fetch("http://localhost:8080/api/v1/downloads", {
+        fetch("http://103.241.43.206:8080/api/v1/downloads", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

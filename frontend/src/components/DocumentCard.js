@@ -5,7 +5,7 @@ import docIcon from "../assets/docs.jpg";
 const DocumentCard = ({ document }) => {
   return (
     <div
-      className={`flex justify-center shadow-md border items-center text-gray-500 overflow-hidden  relative ${
+      className={`flex justify-center shadow-md border items-center text-gray-500 overflow-hidden relative ${
         document?._delete ? "hidden" : ""
       } `}
     >
@@ -13,15 +13,15 @@ const DocumentCard = ({ document }) => {
         <span>{document.scope}</span>
       </div>
       <Link to={`/document/${document?.slug}`}>
-        <div className="w-72 h-64  flex justify-center items-center">
-          <div className="h-[220px] overflow-hidden w-[220px]  relative group">
+        <div className="w-72 h-64 flex justify-center items-center">
+          <div className="h-[220px] flex justify-center items-center overflow-hidden w-[220px] relative group">
             {document?.thumbnail ? (
               <img
                 src={
-                  "http://localhost:8080/api/v1/images/" + document?.thumbnail
+                  "http://103.241.43.206:8080/api/v1/images/" + document?.thumbnail
                 }
                 alt=""
-                className="w-full h-full object-cover"
+                className="h-full object-cover"
               />
             ) : (
               <img
@@ -41,9 +41,9 @@ const DocumentCard = ({ document }) => {
 
         <div className="w-full max-w-72 h-fit p-4 flex flex-col  text-gray-500 ">
           <div className="flex flex-row justify-between items-center">
-            <div className="px-8 py-1 w-fit max-w-56 max-h-24 bg-lime-100 flex justify-center items-center">
-              <h3 className="font-medium font-serif text-sm text-ellipsis overflow-hidden line-clamp-2">
-                {document.category.categoryName}
+            <div className="px-8 py-1 w-fit max-w-56 max-h-24 bg-lime-500 flex justify-center items-center rounded-3xl">
+              <h3 className="font-medium font-mono text-gray-700 text-sm text-ellipsis overflow-hidden line-clamp-2">
+                {document.category.categoryName !== "Nghiên cứu khoa học" ? document.category.categoryName : "NCKH"}
               </h3>
             </div>
             <div className="flex flex-row gap-x-2 justify-center items-center ">
@@ -67,13 +67,12 @@ const DocumentCard = ({ document }) => {
             </div>{" "}
           </div>
           <div className="flex flex-col gap-1 mt-2">
-            <div className="max-h-[48px] max-w-full ">
+            <div className="h-[48px] max-w-full ">
               <h3 className="font-bold uppercase  text-[16px] text-ellipsis overflow-hidden line-clamp-2">
-                {document?.title} ksafksa kfkals fkasn fnaksn fkans kfkasnknk
-                msafma,
+                {document?.title}
               </h3>
             </div>
-            <div className="  text-[14px] font-semibold hover:underline">
+            <div className="  text-[14px] text-purple-500 font-semibold hover:underline">
               {document?.subject ? (
                 <Link
                   to={`/search?subject=${document?.subject?.subjectSlug}`}

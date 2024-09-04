@@ -175,21 +175,22 @@ CREATE TABLE document
     id             BIGINT AUTO_INCREMENT NOT NULL,
     title          VARCHAR(200)          NOT NULL,
     slug           VARCHAR(300)          NOT NULL,
-    document_type	  VARCHAR(30)           NOT NULL,
+    document_type  VARCHAR(30)        NOT NULL,
     document_size  BIGINT                NOT NULL,
     pages          INT                   NOT NULL,
     `description`  VARCHAR(255)          NULL,
+    thumbnail      varchar(250)          NULL,
     upload_date    date                  NOT NULL,
-    file           VARCHAR(500)          NOT NULL,
-    is_delete      boolean                NOT NULL,
-    category_id    TINYINT               NULL,
+    `file`           VARCHAR(500)        NOT NULL,
+    is_delete      boolean               NOT NULL,
+    category_id    int               	 NULL,
     user_upload    BIGINT                NOT NULL,
     author         VARCHAR(255)          NULL,
     deleted_at     datetime              NULL,
     scope          VARCHAR(255)          NULL,
     status         VARCHAR(255)          NULL,
-    subject_id     BIGINT                NULL,
-    specialized_id BIGINT                NULL,
+    subject_id     int                NULL,
+    specialized_id int                NULL,
     CONSTRAINT pk_document PRIMARY KEY (id)
 );
 
@@ -223,7 +224,7 @@ CREATE TABLE `favorite` (
 CREATE TABLE token (
                        id int AUTO_INCREMENT PRIMARY KEY,
                        token VARCHAR(255) UNIQUE NOT NULL,
-                       user_id int,
+                       user_id bigint,
                        created_date datetime not null,
                        expires_date datetime not null,
                        validated_at datetime,
@@ -281,34 +282,29 @@ create table banner(
     is_enable boolean default true
 );
 
-create table comment(
-	id int not null auto_increment primary key,
-    document_id int not null,
-    user_id int not null,
-    content varchar(1000) not null,
-    created_at datetime not null,
-     constraint `cmt_fk_user` foreign key(user_id) references users(id),
-      constraint `cmt_fk_dcm` foreign key(document_id) references document(id)
-);
-
-CREATE TABLE sub_comment
+create table comment
 (
-    id            BIGINT AUTO_INCREMENT NOT NULL,
-    content       VARCHAR(255)          NULL,
-    created_date  datetime              NULL,
-    user_upload   VARCHAR(255)          NULL,
-    comment_id_id BIGINT                NULL,
-    CONSTRAINT pk_sub_comment PRIMARY KEY (id)
+    id          bigint auto_increment
+        primary key,
+    document_id bigint        null,
+    user_id     bigint        null,
+    content     varchar(5000) not null,
+    parent_id   bigint        null,
+    created_at  datetime      null,
+    constraint cmt_fk_dcm
+        foreign key (document_id) references document (id),
+    constraint cmt_fk_user
+        foreign key (user_id) references users (id)
 );
-
-ALTER TABLE sub_comment
-    ADD CONSTRAINT FK_SUB_COMMENT_ON_COMMENTID FOREIGN KEY (comment_id_id) REFERENCES comment (id);
 
 create table setting(
 	id int not null auto_increment primary key,
 	name varchar(50) not null,
     value varchar(50) not null
 );
+INSERT INTO documentDB.setting (id, name, value) VALUES (1, 'Tự động duyệt tài liệu mới', 'true');
+INSERT INTO documentDB.setting (id, name, value) VALUES (2, 'Tự động duyệt tài liệu sửa đổi', 'true');
+
 
 -- Performance
 -- create index idx_slug on document (slug);

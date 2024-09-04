@@ -27,7 +27,7 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/specializes/count", {
+    fetch("http://103.241.43.206:8080/api/v1/specializes/count", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const Navbar = () => {
         );
       });
 
-    fetch("http://localhost:8080/api/v1/categories")
+    fetch("http://103.241.43.206:8080/api/v1/categories")
       .then((res) => res.json())
       .then((data) => {
         setCategory(data);
@@ -53,10 +53,10 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    if (jwtDecoded?.jwtDecoded) {
+    if (jwtDecoded?.user) {
       fetch(
-        "http://localhost:8080/api/v1/users/" +
-          jwtDecoded?.jwtDecoded?.staff_code
+        "http://103.241.43.206:8080/api/v1/users/" +
+          jwtDecoded?.user?.staff_code
       )
         .then((res) => res.json())
         .then((data) => {
@@ -64,13 +64,13 @@ const Navbar = () => {
         });
     }
     if (
-      jwtDecoded?.jwtDecoded &&
-      jwtDecoded?.jwtDecoded.exp < Date.now() / 1000
+      jwtDecoded?.user &&
+      jwtDecoded?.user.exp < Date.now() / 1000
     ) {
       localStorage.removeItem("token");
       window.location.href = "/";
     }
-  }, [jwtDecoded?.jwtDecoded]);
+  }, [jwtDecoded?.user]);
 
   const out = () => {
     setIsShownSpecialized(false);
@@ -79,7 +79,7 @@ const Navbar = () => {
   };
 
   const logout = () => {
-    fetch("http://localhost:8080/api/v1/auth/logout", {
+    fetch("http://103.241.43.206:8080/api/v1/auth/logout", {
       method: "POST",
     }).then((data) => {
       if (data.status === 200) {
@@ -92,7 +92,7 @@ const Navbar = () => {
   const search = () => {
     localStorage.setItem("search", searchTerm);
     if (localStorage.getItem("search") !== null) {
-      window.location.href = `http://localhost/search?filter=&order=lasted`;
+      window.location.href = `http://103.241.43.206/search?filter=&order=lasted`;
     }
   };
 
@@ -100,12 +100,11 @@ const Navbar = () => {
 
   const getNotification = () => {
     fetch(
-      "http://localhost:8080/api/v1/notifications/user/" + user.staffCode
+      "http://103.241.43.206:8080/api/v1/notifications/user/" + user.staffCode
     ).then((res) => {
       if (res.status === 200) {
         return res.json().then((data) => {
           setNotification(data);
-          setNotification([]);
           let uncheckedCount = 0;
 
           for (let i = 0; i < data.length; i++) {
@@ -142,10 +141,10 @@ const Navbar = () => {
 
   const checkNotification = () => {
     setIsHasNotification(0);
-    if (jwtDecoded?.jwtDecoded) {
+    if (jwtDecoded?.user) {
       fetch(
-        "http://localhost:8080/api/v1/notifications/user/checked/" +
-          jwtDecoded?.jwtDecoded.staff_code
+        "http://103.241.43.206:8080/api/v1/notifications/user/checked/" +
+          jwtDecoded?.user.staff_code
       );
       getNotification();
     }
@@ -245,9 +244,9 @@ const Navbar = () => {
               </div>
             </div>
           </Link>
-          {jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" ||
-          jwtDecoded?.jwtDecoded?.role === "ROLE_TEACHER" ||
-          jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN" ? (
+          {jwtDecoded?.user?.role === "ROLE_ADMIN" ||
+          jwtDecoded?.user?.role === "ROLE_TEACHER" ||
+          jwtDecoded?.user?.role === "ROLE_SUB-ADMIN" ? (
             <Link
               to="/upload"
               className="hover:rounded-3xl hover:text-blue-700 hover:bg-[#C5D6F8] py-3 px-5"
@@ -355,7 +354,7 @@ const Navbar = () => {
             </div>
 
             <div className="">
-              {jwtDecoded?.jwtDecoded ? (
+              {jwtDecoded?.user ? (
                 <div>
                   <button
                     onClick={() => {
@@ -366,7 +365,7 @@ const Navbar = () => {
                     <img
                       src={
                         user && user?.avatar
-                          ? "http://localhost:8080/api/v1/images/avatar/" +
+                          ? "http://103.241.43.206:8080/api/v1/images/avatar/" +
                             user?.avatar
                           : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
                       }
@@ -381,18 +380,18 @@ const Navbar = () => {
                     onMouseLeave={() => setIsSubMenuShown(!isSubMenuShow)}
                   >
                     <Link
-                      to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}`}
+                      to={`/profile/${jwtDecoded?.user?.staff_code}`}
                       className="px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full"
                     >
                       Trang cá nhân
                     </Link>
-                    {/*<Link to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}/setting`}*/}
+                    {/*<Link to={`/profile/${jwtDecoded?.user?.staff_code}/setting`}*/}
                     {/*      className="hover:bg-blue-300 w-full">Cài đặt</Link>*/}
                     <Link
                       to={`/dashboard/home`}
                       className={`${
-                        jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" ||
-                        jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN"
+                        jwtDecoded?.user?.role === "ROLE_ADMIN" ||
+                        jwtDecoded?.user?.role === "ROLE_SUB-ADMIN"
                           ? "block"
                           : "hidden"
                       } px-4  hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-full
@@ -480,8 +479,8 @@ const Navbar = () => {
                 <Link
                   to={`/dashboard/home`}
                   className={`${
-                    jwtDecoded?.jwtDecoded?.role === "ROLE_ADMIN" ||
-                    jwtDecoded?.jwtDecoded?.role === "ROLE_SUB-ADMIN"
+                    jwtDecoded?.user?.role === "ROLE_ADMIN" ||
+                    jwtDecoded?.user?.role === "ROLE_SUB-ADMIN"
                       ? "block"
                       : "hidden"
                   }`}
@@ -541,18 +540,18 @@ const Navbar = () => {
                       ))}
                   </div>
                 </div>
-                {jwtDecoded?.jwtDecoded?.role === "ADMIN" ? (
+                {jwtDecoded?.user?.role !== "USER" ? (
                   <Link to="/upload" onClick={() => setIsMobileMenuOpen(false)}>
                     Upload tài liệu
                   </Link>
                 ) : (
                   " "
                 )}
-                {jwtDecoded?.jwtDecoded ? (
+                {jwtDecoded?.user ? (
                   <>
                     <div className="flex flex-col items-center w-full gap-3">
                       <Link
-                        to={`/profile/${jwtDecoded?.jwtDecoded?.staff_code}`}
+                        to={`/profile/${jwtDecoded?.user?.staff_code}`}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         Trang cá nhân
@@ -570,7 +569,7 @@ const Navbar = () => {
                   </>
                 ) : (
                   <Link
-                    to={"/login"}
+                    to="/login"
                     className="bg-blue-600 px-5 py-3 mt-5 rounded-3xl h-[45px] w-[150px] hover:bg-blue-300 text-white text-center pt-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >

@@ -18,7 +18,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
             formData.append('avatar', avatar);
             let isTrue = window.confirm("Bạn có muốn thay đổi ảnh đại diện?");
             if (isTrue) {
-                fetch("http://localhost:8080/api/v1/users/avatar/" + user.staffCode, {
+                fetch("http://103.241.43.206:8080/api/v1/users/avatar/" + user.staffCode, {
                     method: "POST",
                     body: formData
                 })
@@ -32,7 +32,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
     }, [avatar]);
 
     const out = () => {
-        fetch('http://localhost:8080/api/v1/auth/logout', {
+        fetch('http://103.241.43.206:8080/api/v1/auth/logout', {
             method: 'POST',
             credentials: 'include',
         }).then((data) => {
@@ -49,7 +49,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
     useEffect(() => {
         console.log(jwt)
         if (location.staff_code !== jwt?.staff_code) {
-            fetch('http://localhost:8080/api/v1/users/' + location.staff_code)
+            fetch('http://103.241.43.206:8080/api/v1/users/' + location.staff_code)
                 .then(res => res.json())
                 .then(data => {
                     setUser(data)
@@ -114,7 +114,7 @@ const ProfileSideBar = ({isTrueLegit, jwt}) => {
                 <div className='flex flex-col items-center justify-center relative w-[160px] mx-auto'>
                     <div className='lg:w-[150px] lg:h-[150px] w-[150px] h-[150px] rounded-full overflow-hidden'>
                         <img
-                            src={user && user?.avatar ? "http://localhost:8080/api/v1/images/avatar/" + user?.avatar : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
+                            src={user && user?.avatar ? "http://103.241.43.206:8080/api/v1/images/avatar/" + user?.avatar : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHfd3PPulVSp4ZbuBFNkePoUR_fLJQe474Ag&s"}
                             alt="" className='w-full h-full object-cover'/>
                         <div className={`${!isTrueLegit && 'hidden'} z-50`}>
                             <label htmlFor="avatar"

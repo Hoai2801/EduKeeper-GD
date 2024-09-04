@@ -22,7 +22,7 @@ const ChangePassword = ({setIsChangePassword, staffCode}) => {
             toast.error("Mật không mới phải khác mật khẩu cũ");
             return;
         }
-        fetch("http://localhost:8080/api/v1/auth/change-password/" + staffCode, {
+        fetch("http://103.241.43.206:8080/api/v1/auth/change-password/" + staffCode, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json',

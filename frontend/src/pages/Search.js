@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import DocumentCard from "../components/DocumentCard";
 import DocumentCardRow from "../components/DocsCardRow";
 const Search = ({ jwt }) => {
   const url = window.location.href;
@@ -30,7 +29,7 @@ const Search = ({ jwt }) => {
       order: order,
     };
 
-    const api = "http://localhost:8080/api/v1/documents/filter";
+    const api = "http://103.241.43.206:8080/api/v1/documents/filter";
     fetch(api, {
       method: "POST",
       headers: {
@@ -68,7 +67,7 @@ const Search = ({ jwt }) => {
       {/* <h2 className="text-[28px] font-bold text-center mt- mb-5">
         Tài liệu ({documents && documents.length})
       </h2> */}
-      <div className="my-5 flex gap-5 h-fit flex-wrap justify-start">
+      <div className="my-5 flex gap-5 h-fit flex-wrap justify-center">
         {documents &&
           documentsShow.map((item, index) => {
             if (index < limit) {

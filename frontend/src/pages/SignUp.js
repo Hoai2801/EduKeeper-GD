@@ -18,7 +18,7 @@ const SignUp = () => {
     const [selectedspecialized, setSelectedSpecialized] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/v1/departments')
+        fetch('http://103.241.43.206:8080/api/v1/departments')
             .then(response => response.json())
             .then(data => {
                 setListDepartment(data)
@@ -28,7 +28,7 @@ const SignUp = () => {
 
     useEffect(() => {
         if (selectedDepartment) {
-            fetch(`http://localhost:8080/api/v1/specializes/department/${selectedDepartment.id}`)
+            fetch(`http://103.241.43.206:8080/api/v1/specializes/department/${selectedDepartment.id}`)
                 .then(response => response.json())
                 .then(data => {
                     setListSpecialized(data)
@@ -83,7 +83,7 @@ const SignUp = () => {
             toast.error("Vui lòng nhập mật khẩu tối thiểu 8 ký tự");
             return;
         }
-        fetch('http://localhost:8080/api/v1/auth/register', {
+        fetch('http://103.241.43.206:8080/api/v1/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

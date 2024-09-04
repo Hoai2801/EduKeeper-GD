@@ -64,12 +64,10 @@ public class Document {
     @OneToMany(mappedBy = "document")
     private List<Download> downloads;
 
-    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "document")
     private List<ViewHistory> views;
 
-    @OneToMany(mappedBy = "documentID", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "documentID")
     private List<Favorite> favorites;
 
     @Column(name = "deleted_at")
@@ -97,6 +95,10 @@ public class Document {
     }
 
     public int getFavoritesCount() {
+        return favorites != null ? favorites.size() : 0;
+    }
+    
+    public int getFavorites() {
         return favorites != null ? favorites.size() : 0;
     }
 

@@ -72,7 +72,7 @@ const SearchSideBar = () => {
   const [year, setYear] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/departments")
+    fetch("http://103.241.43.206:8080/api/v1/departments")
       .then((res) => res.json())
       .then((data) => {
         setDepartmentList(data.filter((item) => item.locked === false));
@@ -82,7 +82,7 @@ const SearchSideBar = () => {
   useEffect(() => {
     if (department) {
       fetch(
-        `http://localhost:8080/api/v1/specializes/department/${department.id}`
+        `http://103.241.43.206:8080/api/v1/specializes/department/${department.id}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -95,7 +95,7 @@ const SearchSideBar = () => {
     if (specialized) {
       console.log(specialized.id);
       fetch(
-        "http://localhost:8080/api/v1/subjects/specialized/" + specialized.id
+        "http://103.241.43.206:8080/api/v1/subjects/specialized/" + specialized.id
       )
         .then((response) => response.json())
         .then((data) => {
@@ -106,7 +106,7 @@ const SearchSideBar = () => {
 
   const filter = () => {
     const redirect =
-      `http://localhost:3000/search?filter&order=${sort.value}` +
+      `http://103.241.43.206/search?filter&order=${sort.value}` +
       (department ? `&department=${department.departmentSlug}` : "") +
       (specialized ? `&specialized=${specialized.specializedSlug}` : "") +
       (subject
@@ -130,7 +130,7 @@ const SearchSideBar = () => {
   }, [sort, department, specialized]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/subjects/specialized/40")
+    fetch("http://103.241.43.206:8080/api/v1/subjects/specialized/40")
       .then((res) => res.json())
       .then((data) => {
         setSubjectList(data);
@@ -181,7 +181,7 @@ const SearchSideBar = () => {
               </div>
             </form>
             <div className="w-0.5 h-8 bg-gray-300"></div>
-            <div className="relative inline-block  md:w-32 xl:w-32 w-28 ">
+            <div className="relative inline-block z-50 md:w-32 xl:w-32 w-28 ">
               <button
                 onClick={() => {
                   setIsDropSort(!isDropSort);
