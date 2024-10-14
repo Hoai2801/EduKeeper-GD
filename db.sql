@@ -220,6 +220,11 @@ CREATE TABLE `favorite` (
                             CONSTRAINT `access_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
 );
 
+ALTER TABLE favorite
+ADD CONSTRAINT access_ibfk_2
+FOREIGN KEY (document_id) REFERENCES document(id)
+ON DELETE CASCADE;
+
 
 CREATE TABLE token (
                        id int AUTO_INCREMENT PRIMARY KEY,
@@ -240,6 +245,16 @@ create table view_history (
 	constraint `vh_fk_u` FOREIGN key (`user_id`) REFERENCES `users` (`id`),
 	CONSTRAINT `vh_fk_do` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
 );
+ALTER TABLE view_history
+DROP FOREIGN KEY vh_fk_do;
+
+ALTER TABLE view_history
+ADD CONSTRAINT vh_fk_do
+FOREIGN KEY (document_id) 
+REFERENCES document(id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
 
 CREATE TABLE `downloads` (
                             `id` int NOT NULL AUTO_INCREMENT,
@@ -251,6 +266,11 @@ CREATE TABLE `downloads` (
                             CONSTRAINT `dl_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
                             CONSTRAINT `dl_ibfk_2` FOREIGN KEY (`document_id`) REFERENCES `document` (`id`)
 );
+
+ALTER TABLE downloads
+ADD CONSTRAINT dl_ibfk_2
+FOREIGN KEY (document_id) REFERENCES document(id)
+ON DELETE SET NULL;
 
 CREATE TABLE notification
 (
@@ -266,7 +286,9 @@ CREATE TABLE notification
 );
 
 ALTER TABLE notification
-    ADD CONSTRAINT FK_NOTIFICATION_ON_DOCUMENT_SLUG FOREIGN KEY (document_slug) REFERENCES document (id);
+ADD CONSTRAINT FK_NOTIFICATION_ON_DOCUMENT_SLUG
+FOREIGN KEY (document_slug) REFERENCES document(id)
+ON DELETE CASCADE;
 
 ALTER TABLE notification
     ADD CONSTRAINT FK_NOTIFICATION_ON_RECEIVER FOREIGN KEY (receiver) REFERENCES users (id);
@@ -296,6 +318,15 @@ create table comment
     constraint cmt_fk_user
         foreign key (user_id) references users (id)
 );
+
+ALTER TABLE comment
+DROP FOREIGN KEY cmt_fk_dcm;
+
+ALTER TABLE comment
+ADD CONSTRAINT cmt_fk_dcm
+FOREIGN KEY (document_id) 
+REFERENCES document(id)
+ON DELETE CASCADE;
 
 create table setting(
 	id int not null auto_increment primary key,
