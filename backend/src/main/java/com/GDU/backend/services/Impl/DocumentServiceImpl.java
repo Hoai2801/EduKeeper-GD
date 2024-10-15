@@ -143,15 +143,6 @@ public class DocumentServiceImpl implements DocumentService {
 
         documentRepository.save(newDocument);
 
-        // use thread to convert document to html, because it takes time
-//        new Thread(() -> {
-//            try {
-//                processDocumentConversion(destFile, fileName, newDocument.getId());
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }).start();
-
         processDocumentConversion(destFile, fileName, newDocument.getId());
 
         // create notification to admin

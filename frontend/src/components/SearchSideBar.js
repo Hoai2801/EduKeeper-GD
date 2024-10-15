@@ -93,7 +93,6 @@ const SearchSideBar = () => {
 
   useEffect(() => {
     if (specialized) {
-      console.log(specialized.id);
       fetch(
         "http://localhost:8080/api/v1/subjects/specialized/" + specialized.id
       )
@@ -106,7 +105,7 @@ const SearchSideBar = () => {
 
   const filter = () => {
     const redirect =
-      `http://localhost/search?filter&order=${sort.value}` +
+      `http://localhost:3000/search?filter&order=${sort.value}` +
       (department ? `&department=${department.departmentSlug}` : "") +
       (specialized ? `&specialized=${specialized.specializedSlug}` : "") +
       (subject
@@ -176,6 +175,12 @@ const SearchSideBar = () => {
                   className="block w-full p-2 xl:p-4 md:p-4 xl:ps-10 md:ps-10 ps-10 text-sm text-gray-900  focus:ring-blue-500 focus:border-blue-500 focus:outline-none focus:ring-0"
                   placeholder="Từ khóa"
                   required
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      filter();
+                      e.preventDefault();
+                    }
+                  }}
                   onChange={handleSearch}
                 />
               </div>

@@ -62,7 +62,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         ).hasRole("ADMIN")
 
                         // Role-specific GET requests
-                        .requestMatchers(GET, "/api/v1/role/**", "/api/v1/departments/**", "/api/v1/subjects/**")
+                        .requestMatchers(GET, "/api/v1/role/**")
                         .hasAnyAuthority("ROLE_ADMIN", "ROLE_SUB-ADMIN", "ROLE_TEACHER")
 
                         // Role-specific POST requests
@@ -92,7 +92,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 "/api/v1/users/**", "/api/v1/specializes/**",
                                 "/api/v1/role/**", "/api/v1/categories/**",
                                 "/api/v1/images/**", "/api/v1/notifications/**",
-                                "/api/v1/view-history/**"
+                                "/api/v1/view-history/**", "/api/v1/departments/**", 
+                                "/api/v1/subjects/**"
                         ).permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(

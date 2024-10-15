@@ -118,7 +118,7 @@ export const Upload = () => {
             console.error("Fetch error:", error);
           });
     }
-  }, [path]);
+  }, [path, jwt]);
 
   useEffect(() => {
     if (uploadData.specialized) {
@@ -137,7 +137,7 @@ export const Upload = () => {
     } else {
       setListSubject([]);
     }
-  }, [uploadData.specialized]);
+  }, [uploadData.specialized, jwt]);
 
   const handleFiles = (updatedFile) => {
     setUploadData((prevState) => ({
@@ -185,7 +185,7 @@ export const Upload = () => {
           setListCategory(data);
         })
         .catch((error) => console.error(error));
-  }, []);
+  }, [jwt]);
 
   const createDocument = (event) => {
     event.preventDefault();

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import DocumentCardRow from "../components/DocsCardRow";
-const Search = ({ jwt }) => {
+const Search = () => {
   const url = window.location.href;
   const [searchParams] = useSearchParams();
 
@@ -16,11 +16,9 @@ const Search = ({ jwt }) => {
   const [documents, setDocument] = useState([]);
   const [documentsShow, setDocumentShow] = useState([]);
 
-  const [search] = localStorage.getItem("search") || "";
-
   useEffect(() => {
     const dataSearch = {
-      searchTerm: search || "",
+      searchTerm: localStorage.getItem("search") || "",
       subjectName: slugSubject || "",
       categoryName: category || "",
       departmentSlug: slugDepartment || "",
@@ -30,6 +28,7 @@ const Search = ({ jwt }) => {
     };
 
     const api = "http://localhost:8080/api/v1/documents/filter";
+    console.log(dataSearch)
     fetch(api, {
       method: "POST",
       headers: {
