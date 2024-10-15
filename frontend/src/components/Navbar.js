@@ -328,7 +328,7 @@ const Navbar = () => {
               <div
                 className={`${
                   isNotificationOpen ? "block" : "hidden"
-                } z-50 flex flex-col px-4 gap-2 absolute -left-8 transform -translate-x-1/2 top-[calc(100%+10px)] text-sm bg-white rounded-lg shadow-lg md:w-[320px] max-h-[240px] overflow-y-auto`}
+                } z-50 flex flex-col px-4 gap-2 min-w-[250px] absolute -left-8 transform -translate-x-1/2 top-[calc(100%+10px)] text-sm bg-white rounded-lg shadow-lg md:w-[320px] max-h-[240px] overflow-y-auto`}
                 onMouseLeave={() => {
                   setIsNotificationOpen(!isNotificationOpen);
                   checkNotification();

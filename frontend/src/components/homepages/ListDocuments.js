@@ -14,7 +14,7 @@ export default function ListDocuments({
 
     return (
         <div>
-            <div className={`lg:ml-5 flex gap-y-4 gap-x-8 flex-wrap justify-start`}>
+            <div className={`lg:ml-5 flex gap-y-4 gap-x-8 flex-wrap lg:justify-start justify-center`}>
                 {listDocuments.length ?
                     listDocuments.map((item, index) => (
                         <div
