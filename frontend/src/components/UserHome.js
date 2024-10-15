@@ -17,7 +17,7 @@ const UserHome = () => {
 
     useEffect(() => {
         const limit = 10;
-        fetch('http://103.241.43.206:8080/api/v1/view-history/' + staffCode + '/' + limit)
+        fetch('http://localhost:8080/api/v1/view-history/' + staffCode + '/' + limit)
             .then((res) => res.json())
             .then((data) => {
                 if (data?.length > 0) {
@@ -30,7 +30,7 @@ const UserHome = () => {
         const fetchData = async () => {
             try {
                 // Fetch total favorites
-                let response = await fetch(`http://103.241.43.206:8080/api/v1/favorites/author/${staffCode}`);
+                let response = await fetch(`http://localhost:8080/api/v1/favorites/author/${staffCode}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -38,18 +38,18 @@ const UserHome = () => {
                 setTotalFavorites(data);
 
                 // Fetch total views
-                await fetch(`http://103.241.43.206:8080/api/v1/documents/total-views/${staffCode}`)
+                await fetch(`http://localhost:8080/api/v1/documents/total-views/${staffCode}`)
                     .then(res => res.json())
                     .then(data => setTotalViews(data));
 
 
                 // Fetch total downloads
-                response = await fetch(`http://103.241.43.206:8080/api/v1/documents/total-downloads/${staffCode}`);
+                response = await fetch(`http://localhost:8080/api/v1/documents/total-downloads/${staffCode}`);
                 data = await response.json();
                 setTotalDownloads(data);
 
                 // Fetch total documents
-                await fetch(`http://103.241.43.206:8080/api/v1/documents/total-documents/${staffCode}`)
+                await fetch(`http://localhost:8080/api/v1/documents/total-documents/${staffCode}`)
                     .then(res => res.text())
                     .then(data => setTotalDocuments(data));
             } catch (error) {

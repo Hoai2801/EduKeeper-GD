@@ -12,7 +12,7 @@ const BannerManager = ({ jwt }) => {
   const [bannerEdit, setBannerEdit] = useState(null);
 
   const fetchBanner = () => {
-    fetch("http://103.241.43.206:8080/api/v1/banners/all")
+    fetch("http://localhost:8080/api/v1/banners/all")
       .then((res) => res.json())
       .then((data) => {
         setBannerList(data);
@@ -24,7 +24,7 @@ const BannerManager = ({ jwt }) => {
   }, []);
 
   const handleDelete = (id) => {
-    fetch("http://103.241.43.206:8080/api/v1/banners/" + id, {
+    fetch("http://localhost:8080/api/v1/banners/" + id, {
       method: "DELETE",
     }).then((res) => {
       if (res.status === 200) {
@@ -41,7 +41,7 @@ const BannerManager = ({ jwt }) => {
     formData.append("enable", activeBanner);
     console.log(formData);
 
-    fetch("http://103.241.43.206:8080/api/v1/banners/" + bannerEdit?.id, {
+    fetch("http://localhost:8080/api/v1/banners/" + bannerEdit?.id, {
       method: "PUT",
       body: formData,
     }).then((res) => {
@@ -61,7 +61,7 @@ const BannerManager = ({ jwt }) => {
     formData.append("enable", activeBanner);
     console.log(formData);
 
-    fetch("http://103.241.43.206:8080/api/v1/banners", {
+    fetch("http://localhost:8080/api/v1/banners", {
       method: "POST",
       body: formData,
     }).then((res) => {
@@ -119,7 +119,7 @@ const BannerManager = ({ jwt }) => {
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
                       <img
-                        src={`${item?.image ? 'http://103.241.43.206:8080/api/v1/images/banner/' + item.image : ''}`}
+                        src={`${item?.image ? 'http://localhost:8080/api/v1/images/banner/' + item.image : ''}`}
                         alt=""
                         className={`w-52 h-32 object-cover`}
                       />
@@ -130,7 +130,7 @@ const BannerManager = ({ jwt }) => {
                         checked={item.enable}
                         onClick={() => {
                           fetch(
-                            `http://103.241.43.206:8080/api/v1/banners/active/${item.id}`,
+                            `http://localhost:8080/api/v1/banners/active/${item.id}`,
                             {
                               method: "PUT",
                               headers: {
@@ -224,7 +224,7 @@ const BannerManager = ({ jwt }) => {
                     src={
                       file
                         ? URL.createObjectURL(file[0])
-                        : !bannerEdit ? '' : `http://103.241.43.206:8080/api/v1/images/banner/${bannerEdit?.image}`
+                        : !bannerEdit ? '' : `http://localhost:8080/api/v1/images/banner/${bannerEdit?.image}`
                     }
                     alt=""
                     className={`w-full`}

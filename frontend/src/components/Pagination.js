@@ -67,7 +67,7 @@ export default function Pagination({ totalPage }) {
             ) : (
               <li>
                 <div
-                  href="http://103.241.43.206:3000/dashboard/document/1"
+                  href="http://localhost:3000/dashboard/document/1"
                   className={` flex  items-center ${
                     activePage == 1 ? "active-check" : ""
                   } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}

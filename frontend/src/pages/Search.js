@@ -29,7 +29,7 @@ const Search = ({ jwt }) => {
       order: order,
     };
 
-    const api = "http://103.241.43.206:8080/api/v1/documents/filter";
+    const api = "http://localhost:8080/api/v1/documents/filter";
     fetch(api, {
       method: "POST",
       headers: {

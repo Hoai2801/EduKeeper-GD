@@ -8,7 +8,7 @@ const UserFavoriteDocument = ({isTrueLegit, jwt}) => {
     const [documentList, setDocumentList] = useState([]);
 
     useEffect(() => {
-            fetch("http://103.241.43.206:8080/api/v1/favorites/" + location.valueOf("staff_code").staff_code)
+            fetch("http://localhost:8080/api/v1/favorites/" + location.valueOf("staff_code").staff_code)
                 .then((res) => res.json())
                 .then((data) => {
                     setDocumentList(data)

@@ -28,7 +28,7 @@ const ColumnChart = ({ year }) => {
   const [countDocsMonthly, setCountDocsMonthly] = useState([]);
 
   useEffect(() => {
-    fetch(`http://103.241.43.206:8080/api/v1/documents/monthly/${year}`)
+    fetch(`http://localhost:8080/api/v1/documents/monthly/${year}`)
       .then((res) => res.json())
       .then((data) => {
         setCountDocsMonthly(data);
@@ -71,12 +71,12 @@ const LineChart = ({ year }) => {
   const [countDocsMonthly, setCountDocsMonthly] = useState([]);
   const [countUsersMonthly, setCountUsersMonthly] = useState([]);
   useEffect(() => {
-    fetch(`http://103.241.43.206:8080/api/v1/documents/monthly/${year}`)
+    fetch(`http://localhost:8080/api/v1/documents/monthly/${year}`)
       .then((res) => res.json())
       .then((data) => {
         setCountDocsMonthly(data);
       });
-    fetch(`http://103.241.43.206:8080/api/v1/users/monthly/${year}`)
+    fetch(`http://localhost:8080/api/v1/users/monthly/${year}`)
       .then((res) => res.json())
       .then((data) => {
         setCountUsersMonthly(data);
@@ -158,7 +158,7 @@ const DoughnutDocsChart = ({ year }) => {
   const [totalDocsByType, setTotalDocsByType] = useState([]);
 
   useEffect(() => {
-    fetch(`http://103.241.43.206:8080/api/v1/documents/type/${year}`)
+    fetch(`http://localhost:8080/api/v1/documents/type/${year}`)
       .then((res) => res.json())
       .then((data) => {
         setTotalDocsByType(data);
@@ -212,7 +212,7 @@ const DoughnutUserChart = ({ year }) => {
   const [totalUserByType, setTotalUserByType] = useState([]);
 
   useEffect(() => {
-    fetch(`http://103.241.43.206:8080/api/v1/users/type/${year}`)
+    fetch(`http://localhost:8080/api/v1/users/type/${year}`)
       .then((res) => res.json())
       .then((data) => {
         setTotalUserByType(data);

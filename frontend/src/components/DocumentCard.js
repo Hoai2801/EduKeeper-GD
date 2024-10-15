@@ -18,7 +18,7 @@ const DocumentCard = ({ document }) => {
             {document?.thumbnail ? (
               <img
                 src={
-                  "http://103.241.43.206:8080/api/v1/images/" + document?.thumbnail
+                  "http://localhost:8080/api/v1/images/" + document?.thumbnail
                 }
                 alt=""
                 className="h-full object-cover"

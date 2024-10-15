@@ -8,7 +8,7 @@ const SideBarAdmin = () => {
   const POLLING_INTERVAL = 30000; // 30 seconds
   useEffect(() => {
     const intervalId = setInterval(() => {
-      fetch("http://103.241.43.206:8080/api/v1/documents/count-draft")
+      fetch("http://localhost:8080/api/v1/documents/count-draft")
         .then((res) => res.text())
         .then((data) => {
           setDocumentsDraft(data);
@@ -18,7 +18,7 @@ const SideBarAdmin = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://103.241.43.206:8080/api/v1/documents/count-draft")
+    fetch("http://localhost:8080/api/v1/documents/count-draft")
       .then((res) => res.text())
       .then((data) => {
         setDocumentsDraft(data);

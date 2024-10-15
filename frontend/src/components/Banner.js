@@ -5,7 +5,7 @@ const Banner = () => {
     const [banner, setBanner] = useState([])
     const [indexBanner, setIndexBanner] = useState(0)
     useEffect(() => {
-        fetch('http://103.241.43.206:8080/api/v1/banners')
+        fetch('http://localhost:8080/api/v1/banners')
             .then((res) => res.json())
             .then((data) => {
                 setBanner(data)
@@ -36,11 +36,11 @@ const Banner = () => {
                     <a href={banner?.url?.trim()?.length > 0
                         ? banner?.url?.includes('http') || banner?.url?.includes('https')
                             ? banner?.url
-                            : banner?.url === "null" ? "103.241.43.206:3000" : `https://${banner?.url.trim()}`
+                            : banner?.url === "null" ? "localhost:3000" : `https://${banner?.url.trim()}`
                         : ''}
                        className={`relative`}
                     >
-                        <img src={`${banner?.image ? 'http://103.241.43.206:8080/api/v1/images/banner/' + banner.image : ''}`} alt={banner.image}
+                        <img src={`${banner?.image ? 'http://localhost:8080/api/v1/images/banner/' + banner.image : ''}`} alt={banner.image}
                              className={`w-full object-fill max-h-[300px] md:max-h-[600px] md:w-[1200px] mt-5 md:rounded-lg ${index === indexBanner ? "block" : "hidden"}`}
                         />
                     </a>

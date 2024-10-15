@@ -10,7 +10,7 @@ const SubjectItems = ({isActive, dep}) => {
     const userJWT = context?.token;
 
     const fetchData = () => {
-        fetch(`http://103.241.43.206:8080/api/v1/subjects/specialized/${dep?.id}`)
+        fetch(`http://localhost:8080/api/v1/subjects/specialized/${dep?.id}`)
             .then((res) => res.json())
             .then((data) => {
                 setItems(data);
@@ -23,7 +23,7 @@ const SubjectItems = ({isActive, dep}) => {
 
     function removeSubjectWithId(id) {
         if (window.confirm("Bạn có xác nhận xóa môn học này không?")) {
-            fetch(`http://103.241.43.206:8080/api/v1/subjects/specialized/${dep?.id}/${id}`, {
+            fetch(`http://localhost:8080/api/v1/subjects/specialized/${dep?.id}/${id}`, {
                 method: "DELETE",
                 headers: {
                     'Authorization': 'Bearer ' + userJWT

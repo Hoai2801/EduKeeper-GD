@@ -13,7 +13,7 @@ const Recommend = ({ search, category, specialized, author }) => {
     console.log(recommendDto)
 
     useEffect(() => {
-        fetch(`http://103.241.43.206:8080/api/v1/documents/recommend`, {
+        fetch(`http://localhost:8080/api/v1/documents/recommend`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -27,7 +27,7 @@ const Navbar = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://103.241.43.206:8080/api/v1/specializes/count", {
+    fetch("http://localhost:8080/api/v1/specializes/count", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +45,7 @@ const Navbar = () => {
         );
       });
 
-    fetch("http://103.241.43.206:8080/api/v1/categories")
+    fetch("http://localhost:8080/api/v1/categories")
       .then((res) => res.json())
       .then((data) => {
         setCategory(data);
@@ -55,7 +55,7 @@ const Navbar = () => {
   useEffect(() => {
     if (jwtDecoded?.user) {
       fetch(
-        "http://103.241.43.206:8080/api/v1/users/" +
+        "http://localhost:8080/api/v1/users/" +
           jwtDecoded?.user?.staff_code
       )
         .then((res) => res.json())
@@ -79,7 +79,7 @@ const Navbar = () => {
   };
 
   const logout = () => {
-    fetch("http://103.241.43.206:8080/api/v1/auth/logout", {
+    fetch("http://localhost:8080/api/v1/auth/logout", {
       method: "POST",
     }).then((data) => {
       if (data.status === 200) {
@@ -92,7 +92,7 @@ const Navbar = () => {
   const search = () => {
     localStorage.setItem("search", searchTerm);
     if (localStorage.getItem("search") !== null) {
-      window.location.href = `http://103.241.43.206/search?filter=&order=lasted`;
+      window.location.href = `http://localhost/search?filter=&order=lasted`;
     }
   };
 
@@ -100,7 +100,7 @@ const Navbar = () => {
 
   const getNotification = () => {
     fetch(
-      "http://103.241.43.206:8080/api/v1/notifications/user/" + user.staffCode
+      "http://localhost:8080/api/v1/notifications/user/" + user.staffCode
     ).then((res) => {
       if (res.status === 200) {
         return res.json().then((data) => {
@@ -143,7 +143,7 @@ const Navbar = () => {
     setIsHasNotification(0);
     if (jwtDecoded?.user) {
       fetch(
-        "http://103.241.43.206:8080/api/v1/notifications/user/checked/" +
+        "http://localhost:8080/api/v1/notifications/user/checked/" +
           jwtDecoded?.user.staff_code
       );
       getNotification();
@@ -365,7 +365,7 @@ const Navbar = () => {
                     <img
                       src={
                         user && user?.avatar
-                          ? "http://103.241.43.206:8080/api/v1/images/avatar/" +
+                          ? "http://localhost:8080/api/v1/images/avatar/" +
                             user?.avatar
                           : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
                       }

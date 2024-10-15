@@ -10,7 +10,7 @@ const Login = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        fetch('http://103.241.43.206:8080/api/v1/auth/login', {
+        fetch('http://localhost:8080/api/v1/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

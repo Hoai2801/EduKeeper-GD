@@ -8,7 +8,7 @@ const LoveButton = ({staffCode, documentId}) => {
     function favorite() {
         if (staffCode) {
             if (isFavorite) {
-                fetch("http://103.241.43.206:8080/api/v1/favorites", {
+                fetch("http://localhost:8080/api/v1/favorites", {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
@@ -25,7 +25,7 @@ const LoveButton = ({staffCode, documentId}) => {
                         }
                     })
             } else {
-                fetch("http://103.241.43.206:8080/api/v1/favorites", {
+                fetch("http://localhost:8080/api/v1/favorites", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const LoveButton = ({staffCode, documentId}) => {
 
     useEffect(() => {
         if (staffCode && documentId) {
-            fetch("http://103.241.43.206:8080/api/v1/favorites/is-favorite", {
+            fetch("http://localhost:8080/api/v1/favorites/is-favorite", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -22,7 +22,7 @@ const DepartmentItems = ({ isActive, id}) => {
     const handleEditSpecialized = () => {
         console.log(selectedDepartment.id, newName, itemEdit.id)
         fetch(
-            "http://103.241.43.206:8080/api/v1/specializes/" + itemEdit.id,
+            "http://localhost:8080/api/v1/specializes/" + itemEdit.id,
             {
                 method: "PUT",
                 headers: {"Content-Type": "application/json",
@@ -47,7 +47,7 @@ const DepartmentItems = ({ isActive, id}) => {
     }
 
     const handleDeleteSpecialized = (id) => {
-        fetch("http://103.241.43.206:8080/api/v1/specializes/" + id, {
+        fetch("http://localhost:8080/api/v1/specializes/" + id, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -65,7 +65,7 @@ const DepartmentItems = ({ isActive, id}) => {
     };
 
     const fetchDepartment = () => {
-        fetch("http://103.241.43.206:8080/api/v1/departments")
+        fetch("http://localhost:8080/api/v1/departments")
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
@@ -74,7 +74,7 @@ const DepartmentItems = ({ isActive, id}) => {
     };
 
     const fetchSpecialized = () => {
-        fetch("http://103.241.43.206:8080/api/v1/specializes/department/" + id)
+        fetch("http://localhost:8080/api/v1/specializes/department/" + id)
             .then((res) => res.json())
             .then((data) => {
                 setItems(data);
@@ -87,7 +87,7 @@ const DepartmentItems = ({ isActive, id}) => {
     }, [id]);
 
     function handleLockSpecialized(id) {
-        fetch("http://103.241.43.206:8080/api/v1/specializes/lock/" + id, {
+        fetch("http://localhost:8080/api/v1/specializes/lock/" + id, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",

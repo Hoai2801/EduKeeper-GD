@@ -36,6 +36,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -143,13 +144,15 @@ public class DocumentServiceImpl implements DocumentService {
         documentRepository.save(newDocument);
 
         // use thread to convert document to html, because it takes time
-        new Thread(() -> {
-            try {
-                processDocumentConversion(destFile, fileName, newDocument.getId());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).start();
+//        new Thread(() -> {
+//            try {
+//                processDocumentConversion(destFile, fileName, newDocument.getId());
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }).start();
+
+        processDocumentConversion(destFile, fileName, newDocument.getId());
 
         // create notification to admin
         NotificationDTO notificationDTO = NotificationDTO.builder()
@@ -163,6 +166,7 @@ public class DocumentServiceImpl implements DocumentService {
         return ResponseEntity.ok("Đăng tài liệu thành công");
     }
 
+    @Async
     public void processDocumentConversion(File destFile, String fileName, Long documentId) throws IOException {
         int totalPages = 0;
         String thumbnail = "";
@@ -191,7 +195,7 @@ public class DocumentServiceImpl implements DocumentService {
                         if (page == 0) {
                             thumbnail = slideName;
                         }
-                        htmlContent.append("<img src='http://103.241.43.206:8080/api/v1/images/").append(slideName)
+                        htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(slideName)
                                 .append("' style=\"width: 100%; max-width: 100%;\" loading=\"lazy\" /><br/>");
                     }
 
@@ -258,7 +262,7 @@ public class DocumentServiceImpl implements DocumentService {
                     String imgFileName = fileName + "_slide_" + System.currentTimeMillis() + ".png";
                     thumbnail = imgFileName;
                     ImageIO.write(img, "png", new File("src/main/resources/static/images/" + imgFileName));
-                    htmlContent.append("<img src='http://103.241.43.206:8080/api/v1/images/").append(imgFileName)
+                    htmlContent.append("<img src='http://localhost:8080/api/v1/images/").append(imgFileName)
                             .append("' style='width:100%; height:auto;' loading='lazy'/><br>");
                 }
                 htmlContent.append("</body></html>");
@@ -801,7 +805,6 @@ public class DocumentServiceImpl implements DocumentService {
             return true;
         } catch (Exception e) {
             throw new UnsupportedOperationException("Unimplemented method delete document " + e.getMessage());
-
         }
     }
 

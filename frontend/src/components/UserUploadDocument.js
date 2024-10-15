@@ -12,7 +12,7 @@ const UserUploadDocument = () => {
     // if user login, check if user is the same
 
     useEffect(() => {
-        fetch("http://103.241.43.206:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
+        fetch("http://localhost:8080/api/v1/documents/author/" + location.valueOf("staff_code").staff_code)
             .then((res) => res.json())
             .then((data) => {
                 setDocumentList(data);

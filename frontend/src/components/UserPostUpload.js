@@ -12,7 +12,7 @@ const UserPostUpload = () => {
     const [document, setDocument] = useState([]);
 
     useEffect(() => {
-        fetch('http://103.241.43.206:8080' +
+        fetch('http://localhost:8080' +
             '/api/v1/documents/author/' + jwt?.staffCode)
             .then((res) => res.json())
             .then((data) => {

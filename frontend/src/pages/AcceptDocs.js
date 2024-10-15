@@ -33,7 +33,7 @@ export default function AcceptDocs(params) {
     if (checkedDocuments.length === 0) {
       toast.error("Bạn phải chọn tài liệu để cập nhật");
     } else {
-      fetch("http://103.241.43.206:8080/api/v1/documents/accept", {
+      fetch("http://localhost:8080/api/v1/documents/accept", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export default function AcceptDocs(params) {
   };
 
   useEffect(() => {
-    fetch(`http://103.241.43.206:8080/api/v1/documents/draft`)
+    fetch(`http://localhost:8080/api/v1/documents/draft`)
         .then((res) => res.json())
         .then((data) => {
           setDocuments(data);
@@ -188,7 +188,7 @@ export default function AcceptDocs(params) {
                       </li>
                       <li>
                         <div
-                            href="http://103.241.43.206:3000/dashboard/document/1"
+                            href="http://localhost:3000/dashboard/document/1"
                             className={` flex  items-center ${
                                 activePage == 1 ? "active-check" : ""
                             } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}
@@ -198,7 +198,7 @@ export default function AcceptDocs(params) {
                       </li>
                       <li>
                         <div
-                            href="http://103.241.43.206:3000/dashboard/document/2"
+                            href="http://localhost:3000/dashboard/document/2"
                             className={` flex  items-center ${
                                 activePage == 2 ? "active-check" : ""
                             } justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border  hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white `}

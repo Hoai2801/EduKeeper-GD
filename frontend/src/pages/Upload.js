@@ -69,7 +69,7 @@ export const Upload = () => {
   ]);
 
   const handleListSpecialized = (departmentId) => {
-    fetch("http://103.241.43.206:8080/api/v1/specializes/department/" + departmentId)
+    fetch("http://localhost:8080/api/v1/specializes/department/" + departmentId)
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -85,7 +85,7 @@ export const Upload = () => {
 
   useEffect(() => {
     if (path && path.slug) {
-      fetch("http://103.241.43.206:8080/api/v1/documents/" + path.slug)
+      fetch("http://localhost:8080/api/v1/documents/" + path.slug)
           .then((response) => response.json())
           .then((data) => {
             setDocumentEditId(data.id);
@@ -98,7 +98,7 @@ export const Upload = () => {
             uploadData.userUpload = data.userUpload;
             uploadData.author = data.author;
 
-            fetch("http://103.241.43.206:8080/api/v1/documents/" + data.slug + "/file")
+            fetch("http://localhost:8080/api/v1/documents/" + data.slug + "/file")
                 .then((response) => response.blob())
                 .then((blob) => {
                   const file = new File([blob], data.path, { type: blob.type });
@@ -122,10 +122,13 @@ export const Upload = () => {
 
   useEffect(() => {
     if (uploadData.specialized) {
-      fetch(
-          "http://103.241.43.206:8080/api/v1/subjects/specialized/" +
-          uploadData.specialized
-      )
+      fetch("http://localhost:8080/api/v1/subjects/specialized/" + uploadData.specialized, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + jwt,
+        },
+      })
           .then((response) => response.json())
           .then((data) => {
             setListSubject(data);
@@ -151,7 +154,13 @@ export const Upload = () => {
   };
 
   useEffect(() => {
-    fetch("http://103.241.43.206:8080/api/v1/departments")
+    fetch("http://localhost:8080/api/v1/departments", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + jwt,
+      },
+    })
         .then((response) => {
           if (response.status === 200) {
             return response.json();
@@ -164,7 +173,7 @@ export const Upload = () => {
         })
         .catch((error) => console.error(error));
 
-    fetch("http://103.241.43.206:8080/api/v1/categories")
+    fetch("http://localhost:8080/api/v1/categories")
         .then((response) => {
           if (response.status === 200) {
             return response.json();
@@ -220,7 +229,7 @@ export const Upload = () => {
     // formData.append('documentDownload', haveDownloadFile ? uploadData.documentDownload : uploadData.document);
 
     setIsLoading(true);
-    fetch("http://103.241.43.206:8080/api/v1/documents/upload", {
+    fetch("http://localhost:8080/api/v1/documents/upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -231,12 +240,12 @@ export const Upload = () => {
           if (response.status === 200) {
             resetDocument();
             toast.success("Tài liệu đã được tải lên");
+            setIsLoading(false);
           } else {
             response.text().then((data) => toast.error(data));
           }
         })
         .catch((error) => console.error(error));
-    setIsLoading(false);
   };
 
   const resetDocument = () => {
@@ -267,7 +276,7 @@ export const Upload = () => {
     formData.append("author", uploadData.author);
     formData.append("documentDownload", uploadData.documentDownload);
 
-    fetch("http://103.241.43.206:8080/api/v1/documents/" + documentEditId, {
+    fetch("http://localhost:8080/api/v1/documents/" + documentEditId, {
       method: "PUT",
       body: formData,
       headers: {

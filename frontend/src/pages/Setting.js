@@ -5,7 +5,7 @@ const Setting = () => {
     const [setting, setSetting] = useState([]);
 
     const fetchSetting = () => {
-        fetch('http://103.241.43.206:8080/api/v1/settings')
+        fetch('http://localhost:8080/api/v1/settings')
             .then((res) => {
                 if (res.ok) {
                     res.json()
@@ -24,7 +24,7 @@ const Setting = () => {
 
     const handleUpdate = (value, id) => {
         console.log(value)
-        fetch('http://103.241.43.206:8080/api/v1/settings/' + id, {
+        fetch('http://localhost:8080/api/v1/settings/' + id, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

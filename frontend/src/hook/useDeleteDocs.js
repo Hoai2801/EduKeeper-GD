@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 const DocumentDeleter = ({ id, setDocs, docs}) => {
     const deleteDocument = async () => {
         try {
-            const response = await fetch(`http://103.241.43.206:8080/api/v1/documents/${id}`, {
+            const response = await fetch(`http://localhost:8080/api/v1/documents/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

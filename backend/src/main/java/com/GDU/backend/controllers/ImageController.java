@@ -21,6 +21,10 @@ public class ImageController {
     public ResponseEntity<byte[]> getImage(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "images", imageName);
 
+//        if (imagePath.equals("null")) {
+//            return ResponseEntity.notFound().build();
+//        }
+
         // Read the image file into a byte array
         byte[] imageBytes = Files.readAllBytes(imagePath);
 
@@ -34,7 +38,9 @@ public class ImageController {
     @GetMapping("/avatar/{imageName}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "avatar", imageName);
-
+//        if (!Files.exists(imagePath)) {
+//            return ResponseEntity.notFound().build();
+//        }
         // Read the image file into a byte array
         byte[] imageBytes = Files.readAllBytes(imagePath);
 
@@ -48,10 +54,9 @@ public class ImageController {
     @GetMapping("/banner/{imageName}")
     public ResponseEntity<byte[]> getBanner(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "banner", imageName);
-        
-        if (imageName.equals("undefined")) {
-            return ResponseEntity.notFound().build();
-        }
+//        if (!Files.exists(imagePath)) {
+//            return ResponseEntity.notFound().build();
+//        }
         
         // Read the image file into a byte array
         byte[] imageBytes = Files.readAllBytes(imagePath);

@@ -72,7 +72,7 @@ const SearchSideBar = () => {
   const [year, setYear] = useState(null);
 
   useEffect(() => {
-    fetch("http://103.241.43.206:8080/api/v1/departments")
+    fetch("http://localhost:8080/api/v1/departments")
       .then((res) => res.json())
       .then((data) => {
         setDepartmentList(data.filter((item) => item.locked === false));
@@ -82,7 +82,7 @@ const SearchSideBar = () => {
   useEffect(() => {
     if (department) {
       fetch(
-        `http://103.241.43.206:8080/api/v1/specializes/department/${department.id}`
+        `http://localhost:8080/api/v1/specializes/department/${department.id}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -95,7 +95,7 @@ const SearchSideBar = () => {
     if (specialized) {
       console.log(specialized.id);
       fetch(
-        "http://103.241.43.206:8080/api/v1/subjects/specialized/" + specialized.id
+        "http://localhost:8080/api/v1/subjects/specialized/" + specialized.id
       )
         .then((response) => response.json())
         .then((data) => {
@@ -106,7 +106,7 @@ const SearchSideBar = () => {
 
   const filter = () => {
     const redirect =
-      `http://103.241.43.206/search?filter&order=${sort.value}` +
+      `http://localhost/search?filter&order=${sort.value}` +
       (department ? `&department=${department.departmentSlug}` : "") +
       (specialized ? `&specialized=${specialized.specializedSlug}` : "") +
       (subject
@@ -130,7 +130,7 @@ const SearchSideBar = () => {
   }, [sort, department, specialized]);
 
   useEffect(() => {
-    fetch("http://103.241.43.206:8080/api/v1/subjects/specialized/40")
+    fetch("http://localhost:8080/api/v1/subjects/specialized/40")
       .then((res) => res.json())
       .then((data) => {
         setSubjectList(data);

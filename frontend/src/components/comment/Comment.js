@@ -37,7 +37,7 @@ const Comment = ({comment, fetchComment}) => {
         }
 
         if (context?.jwt) {
-            fetch('http://103.241.43.206:8080/api/v1/comments/reply/' + comment?.id, {
+            fetch('http://localhost:8080/api/v1/comments/reply/' + comment?.id, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ const Comment = ({comment, fetchComment}) => {
                     <p className="inline-flex items-center mr-3 text-sm text-gray-900 font-semibold">
                         <img
                             className="mr-2 w-6 h-6 rounded-full"
-                            src={comment?.user?.avatar? 'http://103.241.43.206:8080/api/v1/images/avatar/' + comment?.user?.avatar : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
+                            src={comment?.user?.avatar? 'http://localhost:8080/api/v1/images/avatar/' + comment?.user?.avatar : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
                             alt="avatar"/>{comment?.user?.username}</p>
                     <p className="text-sm text-gray-600 min-w-[500px] leading-10">
                         <time>{new Date(comment?.createdAt).toLocaleDateString()}

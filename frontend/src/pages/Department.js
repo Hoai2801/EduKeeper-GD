@@ -34,7 +34,7 @@ const Department = () => {
         departmentId: selectDepartment.id,
         specializedName: specialized,
       };
-      fetch("http://103.241.43.206:8080/api/v1/specializes", {
+      fetch("http://localhost:8080/api/v1/specializes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +56,7 @@ const Department = () => {
   };
 
   const fetchDepartment = () => {
-    fetch("http://103.241.43.206:8080/api/v1/departments")
+    fetch("http://localhost:8080/api/v1/departments")
       .then((res) => res.json())
       .then((data) => {
         setDepartment(data);
@@ -74,7 +74,7 @@ const Department = () => {
       const departmentDTO = {
         departmentName: departmentName,
       };
-      fetch("http://103.241.43.206:8080/api/v1/departments", {
+      fetch("http://localhost:8080/api/v1/departments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +95,7 @@ const Department = () => {
   }
 
   function updateSpecialized() {
-    fetch("http://103.241.43.206:8080/api/v1/departments/" + selectDepartment.id, {
+    fetch("http://localhost:8080/api/v1/departments/" + selectDepartment.id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -116,7 +116,7 @@ const Department = () => {
   }
 
   function lockDepartment(id) {
-    fetch("http://103.241.43.206:8080/api/v1/departments/lock/" + id, {
+    fetch("http://localhost:8080/api/v1/departments/lock/" + id, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -134,7 +134,7 @@ const Department = () => {
   }
 
   function deleteDepartment(id) {
-    fetch("http://103.241.43.206:8080/api/v1/departments/" + id, {
+    fetch("http://localhost:8080/api/v1/departments/" + id, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

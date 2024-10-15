@@ -65,7 +65,7 @@ const User = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-    fetch("http://103.241.43.206:8080/api/v1/auth/register", {
+    fetch("http://localhost:8080/api/v1/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -83,7 +83,7 @@ const User = () => {
   };
 
   const fetchUsers = () => {
-    fetch("http://103.241.43.206:8080/api/v1/users", {})
+    fetch("http://localhost:8080/api/v1/users", {})
       .then((res) => res.json())
       .then((data) => {
         setCopyOfFullUsers(data);
@@ -96,7 +96,7 @@ const User = () => {
   }, []);
 
   function saveEditUser() {
-    fetch(`http://103.241.43.206:8080/api/v1/users`, {
+    fetch(`http://localhost:8080/api/v1/users`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +115,7 @@ const User = () => {
   }
 
   function blockUser(staffCode) {
-    fetch(`http://103.241.43.206:8080/api/v1/users/block/${staffCode}`, {
+    fetch(`http://localhost:8080/api/v1/users/block/${staffCode}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +133,7 @@ const User = () => {
   }
 
   function unblockUser(staffCode) {
-    fetch(`http://103.241.43.206:8080/api/v1/users/unblock/${staffCode}`, {
+    fetch(`http://localhost:8080/api/v1/users/unblock/${staffCode}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -154,7 +154,7 @@ const User = () => {
 
   const handleConfirm = (confirmed, staffCode) => {
     if (confirmed) {
-      fetch(`http://103.241.43.206:8080/api/v1/users/reset-password/${staffCode}`, {
+      fetch(`http://localhost:8080/api/v1/users/reset-password/${staffCode}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

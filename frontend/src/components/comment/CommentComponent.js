@@ -16,7 +16,7 @@ const CommentComponent = ({data, staffCode}) => {
 
     const fetchComment = () => {
         if (data) {
-            fetch('http://103.241.43.206:8080/api/v1/comments/' + data?.id)
+            fetch('http://localhost:8080/api/v1/comments/' + data?.id)
                 .then(res => {
                     if (res.status === 200) {
                         return res.json().then(data => {
@@ -38,7 +38,7 @@ const CommentComponent = ({data, staffCode}) => {
             toast.error("Bạn chưa nhập nội dung");
             return;
         }
-        fetch("http://103.241.43.206:8080/api/v1/comments/" + data?.id, {
+        fetch("http://localhost:8080/api/v1/comments/" + data?.id, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

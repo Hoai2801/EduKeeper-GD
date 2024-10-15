@@ -32,37 +32,37 @@ const Dashboard = () => {
     useState(currentYear);
   const handleDetailDocs = useHandleDetailDocs();
   useEffect(() => {
-    fetch("http://103.241.43.206:8080/api/v1/users/top-downloads")
+    fetch("http://localhost:8080/api/v1/users/top-downloads")
       .then((res) => res.json())
       .then((data) => {
         setTop10User(data);
       });
 
-    fetch("http://103.241.43.206:8080/api/v1/documents/count")
+    fetch("http://localhost:8080/api/v1/documents/count")
       .then((res) => res.json())
       .then((data) => {
         setTotalDocuments(data);
       });
 
-    fetch("http://103.241.43.206:8080/api/v1/documents/count-draft")
+    fetch("http://localhost:8080/api/v1/documents/count-draft")
       .then((res) => res.json())
       .then((data) => {
         setTotalDraftDocuments(data);
       });
 
-    fetch("http://103.241.43.206:8080/api/v1/documents/count-published")
+    fetch("http://localhost:8080/api/v1/documents/count-published")
       .then((res) => res.json())
       .then((data) => {
         setTotalPublishedDocuments(data);
       });
 
-    fetch("http://103.241.43.206:8080/api/v1/documents/today")
+    fetch("http://localhost:8080/api/v1/documents/today")
       .then((res) => res.json())
       .then((data) => {
         setTotalTodayDocuments(data);
       });
 
-    fetch("http://103.241.43.206:8080/api/v1/departments")
+    fetch("http://localhost:8080/api/v1/departments")
       .then((res) => res.json())
       .then((data) => {
         setDepartments(data);
@@ -72,7 +72,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetch(
-      `http://103.241.43.206:8080/api/v1/downloads/top-documents/${selectDepartment}`
+      `http://localhost:8080/api/v1/downloads/top-documents/${selectDepartment}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -234,7 +234,7 @@ const Dashboard = () => {
                         <img
                           src={
                             docs.thumbnail
-                              ? `http://103.241.43.206:8080/api/v1/images/${docs.thumbnail}`
+                              ? `http://localhost:8080/api/v1/images/${docs.thumbnail}`
                               : DefaultDocs
                           }
                           alt="Thumbnail docs"

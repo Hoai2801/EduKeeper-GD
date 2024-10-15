@@ -33,7 +33,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://103.241.43.206:3000", "http://103.241.43.206", "http://localhost:3000")
+                .allowedOrigins("http://localhost:3000", "http://localhost", "http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true);
@@ -43,7 +43,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowedOrigins(List.of("http://103.241.43.206:3000", "http://103.241.43.206", "http://localhost:3000"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost", "http://localhost:3000"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         corsConfiguration.setAllowCredentials(true);
 
@@ -54,55 +54,46 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 .cors(cors -> cors.configurationSource(source))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
+                        // Admin-only endpoints
                         .requestMatchers(
-                                "/swagger-ui.html",
-                                "/v3/api-docs",
-                                "/configuration/ui",
-                                "/swagger-resources/**",
-                                "/configuration/security",
-                                "/swagger-ui/**",
-                                "/api/v1/admin/**",
-                                "/webjars/**"
+                                "/swagger-ui.html", "/v3/api-docs", "/configuration/ui",
+                                "/swagger-resources/**", "/configuration/security",
+                                "/swagger-ui/**", "/api/v1/admin/**", "/webjars/**"
                         ).hasRole("ADMIN")
-                        .requestMatchers(GET,
-                                "/api/v1/role/**"
-                        ).hasAnyRole("ADMIN", "SUB-ADMIN", "TEACHER", "USER")
+
+                        // Role-specific GET requests
+                        .requestMatchers(GET, "/api/v1/role/**", "/api/v1/departments/**", "/api/v1/subjects/**")
+                        .hasAnyAuthority("ROLE_ADMIN", "ROLE_SUB-ADMIN", "ROLE_TEACHER")
+
+                        // Role-specific POST requests
                         .requestMatchers(POST,
-                                "/api/v1/specializes",
-                                "/api/v1/departments/**",
-                                "/api/v1/subjects",
-                                "/api/v1/backups/**"
-                        )
-                        .hasAnyRole("ADMIN", "SUB-ADMIN")
+                                "/api/v1/specializes", "/api/v1/departments/**",
+                                "/api/v1/subjects", "/api/v1/backups/**"
+                        ).hasAnyRole("ADMIN", "SUB-ADMIN")
+
+                        // Role-specific PUT requests
                         .requestMatchers(PUT,
-                                "/api/v1/departments/**",
-                                "/api/v1/settings/**"
-                        )
-                        .hasAnyRole("ADMIN", "SUB-ADMIN")
+                                "/api/v1/departments/**", "/api/v1/settings/**"
+                        ).hasAnyRole("ADMIN", "SUB-ADMIN")
+
+                        // Role-specific DELETE requests
                         .requestMatchers(DELETE,
-                                "/api/v1/users/**",
-                                "/api/v1/subjects/**",
-                                "/api/v1/specializes/**",
-                                "/api/v1/departments/**",
+                                "/api/v1/users/**", "/api/v1/subjects/**",
+                                "/api/v1/specializes/**", "/api/v1/departments/**",
                                 "/api/v1/backups/**"
-                        )
-                        .hasAnyRole("ADMIN", "SUB-ADMIN")
-                        .requestMatchers(
-                                "/api/v1/documents/upload"
-                        ).hasAnyRole("TEACHER", "ADMIN", "SUB-ADMIN")
+                        ).hasAnyRole("ADMIN", "SUB-ADMIN")
+
+                        // Publicly accessible endpoints
                         .requestMatchers(
                                 "/api/v1/auth/**",
-                                "/api/v1/documents/filter",
-                                "/api/v1/favorites/**",
-                                "/api/v1/downloads/**",
-                                "/api/v1/documents/**",
-                                "/api/v1/view-history",
-                                "/api/v1/banners/**",
-                                "/api/v1/comments/**",
-                                "/api/v1/users/**",
-                                "/api/v1/specializes/**"
+                                "/api/v1/favorites/**", "/api/v1/downloads/**",
+                                "/api/v1/documents/**", "/api/v1/view-history",
+                                "/api/v1/banners/**", "/api/v1/comments/**",
+                                "/api/v1/users/**", "/api/v1/specializes/**",
+                                "/api/v1/role/**", "/api/v1/categories/**",
+                                "/api/v1/images/**", "/api/v1/notifications/**",
+                                "/api/v1/view-history/**"
                         ).permitAll()
-                        .requestMatchers(GET).permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS
