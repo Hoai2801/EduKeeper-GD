@@ -1,5 +1,6 @@
 package com.GDU.backend.controllers;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +21,22 @@ import java.util.zip.GZIPOutputStream;
 @RequestMapping("api/v1/images")
 public class ImageController {
 
+    @Cacheable(value = "images", key = "#imageName")
     @GetMapping("/{imageName}")
     public ResponseEntity<byte[]> getImage(@PathVariable("imageName") String imageName) throws IOException {
+        System.out.println("uncache");
         Path imagePath = Paths.get("src", "main", "resources", "static", "images", imageName);
         return getCompressedImageResponse(imagePath, MediaType.IMAGE_PNG);
     }
 
+    @Cacheable(value = "avatarImages", key = "#imageName")
     @GetMapping("/avatar/{imageName}")
     public ResponseEntity<byte[]> getAvatar(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "avatar", imageName);
         return getCompressedImageResponse(imagePath, MediaType.IMAGE_PNG);
     }
 
+    @Cacheable(value = "bannerImages", key = "#imageName")
     @GetMapping("/banner/{imageName}")
     public ResponseEntity<byte[]> getBanner(@PathVariable("imageName") String imageName) throws IOException {
         Path imagePath = Paths.get("src", "main", "resources", "static", "banner", imageName);

@@ -111,7 +111,7 @@ public class DocumentController {
 
     // get most downloaded in 30 days
     @GetMapping("/most-downloaded")
-    public ResponseEntity<?> getMostDownloadedDocuments(@RequestParam("limit") int limit) {
+    public ResponseEntity<?> getMostDownloadedDocuments(@RequestParam(defaultValue = "10", name = "limit") int limit) {
         try {
             return ResponseEntity.ok(documentService.getMostDownloadedDocuments(limit));
         } catch (Exception e) {
@@ -120,7 +120,7 @@ public class DocumentController {
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<?> getLatestDocuments(@RequestParam("limit") int limit) {
+    public ResponseEntity<?> getLatestDocuments(@RequestParam(defaultValue = "10", name = "limit") int limit) {
         try {
             return ResponseEntity.ok().body(documentService.getLatestDocuments(limit));
         } catch (Exception e) {
@@ -130,7 +130,8 @@ public class DocumentController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadDocument(
-            @ModelAttribute UploadRequestDTO uploadRequestDTO) {
+            @ModelAttribute UploadRequestDTO uploadRequestDTO
+    ) {
         try {
             return documentService.uploadDocument(uploadRequestDTO);
         } catch (Exception e) {
