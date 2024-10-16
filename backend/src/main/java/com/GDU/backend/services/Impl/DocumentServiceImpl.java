@@ -27,12 +27,8 @@ import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
@@ -131,7 +127,6 @@ public class DocumentServiceImpl implements DocumentService {
                 .subject(subject)
                 .uploadDate(LocalDate.now())
                 .build();
-        System.out.println(uploadRequestDTO.getDocument().getContentType());
         // get auto accept document setting
         settingRepository.findById(1L).ifPresent(setting -> {
             if (setting.getValue().equals("true")) {

@@ -7,16 +7,22 @@ import com.GDU.backend.dtos.responses.DocumentResponseDTO;
 import com.GDU.backend.services.DocumentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 @CrossOrigin
 @RestController
@@ -39,15 +45,36 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    
+
     @GetMapping("/{slug}/html")
     public ResponseEntity<Resource> getHtmlFileBySlug(@PathVariable("slug") String slug) {
         try {
+            // Fetch document details
             DocumentResponseDTO document = documentService.getDocumentBySlug(slug);
             String path = "src/main/resources/static/convert/" + document.getFile() + ".html";
+
+            // Read the file content
+            FileInputStream fis = new FileInputStream(path);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
+
+            // Copy the file content to the GZIP stream
+            StreamUtils.copy(fis, gzipOutputStream);
+            gzipOutputStream.close();
+
+            // Create a resource from the compressed content
+            ByteArrayResource resource = new ByteArrayResource(byteArrayOutputStream.toByteArray());
+
+            // Set the response headers for gzip
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_ENCODING, "gzip");
+            headers.add(HttpHeaders.CONTENT_TYPE, "text/html; charset=UTF-8");
+
+            // Return the response with the gzipped file content
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType("text/html"))
-                    .body(new FileSystemResource(path));
+                    .headers(headers)
+                    .body(resource);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

@@ -47,7 +47,7 @@ public class FavoriteServiceImpl implements FavoriteService {
             List<Favorite> favorites = favoriteRepository.findAllByUserID(existUser.getId());
 
             return favorites.stream().map(favorite -> {
-                Document document = documentRepository.findById(favorite.getDocumentID().getId()).get();
+                Document document = documentRepository.findById(favorite.getDocumentID().getId()).isPresent() ? documentRepository.findById(favorite.getDocumentID().getId()).get() : null;
                 return DocumentResponseDTO.from(document);
             }).collect(Collectors.toList());
         } catch (Exception e) {

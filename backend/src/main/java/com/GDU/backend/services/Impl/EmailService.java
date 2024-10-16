@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.springframework.mail.javamail.MimeMessageHelper.MULTIPART_MODE_MIXED;
 
@@ -58,7 +59,7 @@ public class EmailService {
         context.setVariables(properties);
         helper.setFrom("dreamhoaihack@gmail.com");
         helper.setTo(to);
-        switch (emailTemplateName.name()) {
+        switch (Objects.requireNonNull(emailTemplateName).name()) {
             case "ACTIVATION":
                 helper.setSubject("Thông báo xác nhận email tạo tài khoản");
                 break;
